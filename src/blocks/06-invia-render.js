@@ -33,6 +33,8 @@ const adapters = concept.vocale ? [] : [
 if (!concept.attempts) adapters.push(...delGenere.filter((a) => presenti.includes(a.name)));
 
 const durata = Math.min(360, Math.round(concept.durata_s * 1.2)); // 360 s: limite del motore
+// Il nostro score vale al primo tentativo; dopo un fallimento lo scrive il motore
+const nostro = Boolean(concept.abc) && !concept.attempts;
 const body = {
   style: concept.style,
   lyrics: concept.lyrics,
@@ -42,7 +44,7 @@ const body = {
   // cosi' il brano si chiude da solo e non si interrompe a meta'. Il controllo qualita' usa la durata di riferimento.
   duration: durata,
   semantic_sampling: { max_tokens: Math.min(9000, Math.round(durata * 25 * 1.2)) },
-  abc_sampling: { max_tokens: Math.max(512, Math.min(9000, Math.round(durata * 25 * 1.2))) },
+  ...(nostro ? { abc: concept.abc } : { abc_sampling: { max_tokens: Math.max(512, Math.min(9000, Math.round(durata * 25 * 1.2))) } }),
   output_format: 'mp3',
   seed,
 };
@@ -53,6 +55,6 @@ if (!r.ok) {
   return [{ json: { state } }];
 }
 const id = JSON.parse(r.buf.toString('utf8')).id;
-state.job = { id, seed, submittedAt: Date.now(), concept, adapters };
+state.job = { id, seed, submittedAt: Date.now(), concept, adapters, abcNostro: nostro };
 log(`job ${id} inviato per "${concept.titolo}" (${concept.durata_s}s)`);
 return [{ json: { state } }];

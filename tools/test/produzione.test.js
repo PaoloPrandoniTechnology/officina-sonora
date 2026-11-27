@@ -12,7 +12,7 @@ const L = new Function('require', LIB + '\nreturn { CFG, extractAbc, componiStil
 const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'];
 
 // Esegue il blocco 6 con un motore finto; ritorna il corpo inviato a /synth e lo stato
-async function invia(categoria, { props, vocale = false, attempts = 0 } = {}) {
+async function invia(categoria, { props, vocale = false, attempts = 0, abc } = {}) {
   const finta = `
     CFG.comandi = {}; log = () => {}; engineUp = async () => true;
     req = async (m, url, o) => {
@@ -20,7 +20,7 @@ async function invia(categoria, { props, vocale = false, attempts = 0 } = {}) {
       $env.corpo = o.body; return { ok: true, status: 200, buf: Buffer.from('{"id":"j1"}') };
     };`;
   const env = { props };
-  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts };
+  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts, abc };
   const input = { first: () => ({ json: { state: { job: null, queue: [concept] } } }) };
   const [r] = await new AF('require', '$input', '$env', LIB + finta + '\n' + leggi('src', 'blocks', '06-invia-render.js'))(require, input, env);
   return { corpo: env.corpo, job: r.json.state.job };
@@ -84,4 +84,44 @@ test('dopo un render fallito si riducono le LoRA, poi si torna alla configurazio
   const terzo = await invia('Score-cinematico', { props, attempts: 2 });
   assert.equal(terzo.corpo.cot, 'melody');
   assert.deepEqual(terzo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
+});
+
+// Esegue il blocco 5d cosi' come finisce nel workflow generato
+async function componiScore(concept) {
+  require('child_process').execFileSync('node', ['build-workflow.mjs'], { cwd: RADICE, stdio: 'ignore' });
+  const wf = JSON.parse(leggi('officina-sonora-workflow.json'));
+  const codice = wf.nodes.find((n) => n.name === '5d Componi score').parameters.jsCode
+    .replace('// BLOCCO 5d', 'CFG.comandi = {}; log = () => {};\n// BLOCCO 5d');
+  assert.ok(wf.connections['5c Componi concept'].main[0].some((l) => l.node === '5d Componi score'));
+  assert.ok(wf.connections['5d Componi score'].main[0].some((l) => l.node === '6 Invia render'));
+  const input = { first: () => ({ json: { state: { job: null, queue: [concept] } } }) };
+  const [r] = await new AF('require', '$input', '$env', codice)(require, input, {});
+  return r.json.state.queue[0];
+}
+const conceptSurf = () => ({ titolo: 't', categoria: 'Surf-rock-strumentale', bpm: 130, tonalita: 'Mi minore', durata_s: 200, sezioni: L.CFG.strutture.arco, lyrics: 'x', vocale: false, attempts: 0 });
+
+test('blocco 5d: scrive score, lyrics e durata del brano strumentale', async () => {
+  const c = await componiScore(conceptSurf());
+  assert.match(c.abc, /^X:1\n/);
+  assert.ok(c.score.punteggio > 60 && Math.abs(c.durata_s - 200) <= 16);
+  assert.equal(c.lyrics.split('\n\n').length, L.CFG.strutture.arco.length);
+});
+
+test('blocco 5d: voci e richieste non componibili restano al motore', async () => {
+  assert.equal((await componiScore({ ...conceptSurf(), vocale: true })).abc, undefined);
+  const rotto = await componiScore({ ...conceptSurf(), sezioni: ['[Main]'] });
+  assert.equal(rotto.abc, undefined);
+  assert.equal(rotto.lyrics, 'x');
+});
+
+test('blocco 6: al primo tentativo invia il nostro score, dopo un fallimento lo scrive il motore', async () => {
+  const props = elenco('yue2-instrumental');
+  const primo = await invia('Surf-rock-strumentale', { props, abc: 'X:1' });
+  assert.equal(primo.corpo.abc, 'X:1');
+  assert.equal(primo.corpo.cot, 'full');
+  assert.equal(primo.corpo.abc_sampling, undefined);
+  assert.equal(primo.job.abcNostro, true);
+  const secondo = await invia('Surf-rock-strumentale', { props, abc: 'X:1', attempts: 1 });
+  assert.equal(secondo.corpo.abc, undefined);
+  assert.ok(secondo.corpo.abc_sampling.max_tokens > 0);
 });

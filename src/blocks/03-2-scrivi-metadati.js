@@ -33,6 +33,8 @@ const meta = {
   sezioni: c.sezioni,
   lyrics: c.lyrics,
   lora: job.adapters || [],
+  score: job.abcNostro ? c.score : undefined, // assente = score scritto dal motore
+  abc: job.abcNostro ? c.abc : undefined,
   seed: job.seed,
   job_id: job.id,
   bytes_audio: inp.bytes,

@@ -56,7 +56,7 @@ Una volta avviato, il sistema lavora da solo: un'attività pianificata (`Officin
                          e scarica gemma dalla GPU durante i render
 
  n8n (ogni minuto)
-   1 Leggi stato ── render in corso? ──no──► 5a ricetta ► 5b titolo ► 5c stile ► 6 invio a YuE2
+   1 Leggi stato ── render in corso? ──no──► 5a ricetta ► 5b titolo ► 5c stile ► 5d score ► 6 invio a YuE2
                           │
                           sì
                           ▼
@@ -98,7 +98,8 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, 2-4 strumenti del genere, un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
 | **5b Titolo** | Chiede a gemma titolo, descrizione, bpm e durata, entro i limiti del genere. Se il modello non è caricato, riprova al giro successivo. |
 | **5c Componi concept** | Compone il testo di **stile** e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
-| **6 Invia render** | Sceglie le **LoRA** presenti sul motore e invia a YuE2 stile, lyrics, durata, seed e `cot: full` (score con melodia e accordi). |
+| **5d Componi score** | Per i brani strumentali scrive 30 score candidati, li fa valutare al **revisore** e allega il migliore, con lyrics e durata coerenti. Se non riesce, lo score lo scrive il motore. |
+| **6 Invia render** | Sceglie le **LoRA** presenti sul motore e invia a YuE2 stile, lyrics, score, durata, seed e `cot: full`. |
 
 ### Audio e pubblicazione
 
@@ -153,9 +154,17 @@ Anche nei brani strumentali il campo è sempre compilato, con i soli tag che la 
 | `loop` | intro, verse, chorus, verse, bridge, verse, chorus, chorus, outro |
 
 ### Score ABC
-Prima dell'audio, YuE2 scrive uno **score** in notazione ABC (melodia e accordi) e lo segue. Il sistema lo salva
-in un file `.abc` accanto al brano. Il modulo `src\compositore\abc.js` sa scrivere e validare score nel dialetto
-del motore: è la base del compositore proprio, **non ancora usato in produzione**.
+Per gli strumentali lo score (melodia e accordi) lo scrive il **compositore** del progetto
+(`src\compositore\`), e YuE2 lo segue:
+
+- un **tema** per sezione, sviluppato in frasi di quattro battute (domanda, risposta, ripresa, cadenza);
+- riprese trasformate (sequenza, inversione, ornamento, spostamento ritmico);
+- **armonie, scale e ritmi del genere**; bridge in 3/4 o 7/8 dove lo stile lo regge;
+- ritornello più alto, intro rarefatta, finale sulla tonica;
+- un **revisore** dà un punteggio a 30 candidati e tiene il migliore (scritto nel log e nella scheda).
+
+Per i generi vocali, e come ripiego, lo score lo scrive il motore. In entrambi i casi è salvato nel file `.abc`
+accanto al brano. Le regole di scrittura, con le fonti, sono in [`docs/score-abc.md`](docs/score-abc.md).
 
 ### LoRA
 Gli strumentali usano `yue2-instrumental` (pensata per lo score); se manca, `yue2-instrumental-kto`.
@@ -175,7 +184,7 @@ I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una prop
 | Score cinematico | epic trailer |
 
 Se un render fallisce (per esempio perché le LoRA sovrapposte producono uno score illeggibile), il secondo
-tentativo parte senza la LoRA di genere e il terzo con la configurazione più collaudata (`yue2-instrumental-kto`,
+tentativo parte senza la LoRA di genere e con lo score scritto dal motore, e il terzo con la configurazione più collaudata (`yue2-instrumental-kto`,
 score di sola melodia).
 
 Una LoRA assente dal motore viene saltata e annotata nel log. Le scale scelte sono un punto di partenza,
@@ -388,7 +397,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 |---|---|
 | `src\blocks\` | i blocchi del workflow |
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
-| `src\compositore\` | score ABC: scrittura e validazione |
+| `src\compositore\` | compositore, revisore, scrittura e validazione dello score ABC |
 | `config\` | catalogo, linee guida e storico, parametri |
 | `gateway\` | servizio locale e dashboard |
 | `tools\` | manutenzione, prove sul motore (`prove\`), test (`test\`) |
@@ -433,12 +442,12 @@ In ordine di priorità. Il disegno completo è in
 
 | # | Miglioramento | Perché |
 |---|---|---|
-| 1 | **Brani troppo corti**: capire perché il motore chiude prima (durata dello score, token, LoRA) e correggerlo | circa un brano su tre è stato scartato finora, soprattutto per la durata |
-| 2 | **Compositore proprio**: genera molti score per brano (forma, accordi, temi, variazioni, soli, cambi di metro), un revisore li valuta e sceglie il migliore | gli score scritti dal motore possono essere ripetitivi |
-| 3 | **Schede artistiche per i 39 generi**: forme, progressioni, ritmi, chicche, prompt in inglese, durata 3-6 minuti | generi più distinti; oggi lo stile mescola italiano e inglese |
-| 4 | **Calibrazione delle LoRA** con ascolto e voti, e forme delle lyrics (anche con tempi) | le scale attuali non sono ancora validate a orecchio |
-| 5 | **Dashboard**: mostrare score, sezioni e LoRA di ogni brano; imparare dai voti anche su forme e LoRA | rendere visibile cosa funziona |
-| 6 | **Agente di ricerca locale** (DuckDuckGo e fonti di teoria, gemma): propone nuove idee compositive, da approvare in dashboard | miglioramento artistico continuo |
-| 7 | Eseguire la revisione delle linee guida quando gemma è caricato | oggi spesso fallisce durante i render |
-| 8 | Registrare in dashboard il motivo dei render falliti e le LoRA che li causano | tarare le scale con dati veri |
-| 9 | Validazione più severa dello score (blocchi, ordine delle voci, nomi delle sezioni) | serve quando il compositore andrà in produzione |
+| 1 | **Giudicare a orecchio gli score del compositore** e correggere forme, ritmi e armonie in base ai voti | la qualità musicale non è verificabile dai test |
+| 2 | **Brani troppo corti**: controllare se con lo score nostro il problema sparisce, altrimenti agire su token e LoRA | circa un brano su tre è stato scartato finora |
+| 3 | **Compositore più ricco**: contrappunto, soli, fill, cambi di tonalità, finali, novità rispetto agli score precedenti | più varietà e dettagli |
+| 4 | **Schede artistiche per i 39 generi**: forme, progressioni, ritmi, chicche, prompt in inglese, durata 3-6 minuti | generi più distinti; oggi lo stile mescola italiano e inglese |
+| 5 | **Calibrazione delle LoRA** e forme delle lyrics (anche con tempi) | le scale attuali non sono validate a orecchio |
+| 6 | **Dashboard**: score, sezioni, punteggio del revisore e motivo dei render falliti; imparare dai voti anche su questi | rendere visibile cosa funziona |
+| 7 | **Agente di ricerca locale** (DuckDuckGo e fonti di teoria, gemma), con approvazione in dashboard | miglioramento artistico continuo |
+| 8 | Eseguire la revisione delle linee guida quando gemma è caricato | oggi spesso fallisce durante i render |
+| 9 | Validazione più severa dello score (blocchi, ordine delle voci, nomi delle sezioni) | allinearla al validatore ufficiale |

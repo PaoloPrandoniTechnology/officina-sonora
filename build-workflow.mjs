@@ -20,6 +20,9 @@ const code = (prefix) => lib + '\n' + blockFile(prefix);
 const coverJs = readFileSync(join(here, 'src', 'cover.js'), 'utf8');
 const codeIb = (prefix) => lib + '\n' + libIb + '\n' + coverJs + '\n' + blockFile(prefix);
 
+// moduli CommonJS di src/compositore, ciascuno chiuso in una funzione
+const modulo = (nome, file) => `const ${nome} = (() => { const module = { exports: {} };\n${readFileSync(join(here, 'src', 'compositore', file), 'utf8')}\nreturn module.exports; })();`;
+const compositoreJs = modulo('ScoreAbc', 'abc.js') + '\n' + modulo('Compositore', 'compositore.js');
 const ifString = (left, right) => ({
   conditions: {
     options: { caseSensitive: true, leftValue: '', typeValidation: 'strict', version: 1 },
@@ -56,6 +59,7 @@ const nodes = {
   scegli: { name: '5a Scegli ricetta', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('05a-') }, position: pos(750, 450) },
   titolo: { name: '5b Titolo (modello)', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('05b-') }, position: pos(750, 600) },
   componi: { name: '5c Componi concept', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('05c-') }, position: pos(750, 750) },
+  score: { name: '5d Componi score', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: lib + '\n' + compositoreJs + '\n' + blockFile('05d-') }, position: pos(750, 900) },
   invia: { name: '6 Invia render', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('06-') }, position: pos(1000, 450) },
   scrivi: { name: '7 Scrivi stato', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('07-') }, position: pos(1750, 300) },
   riflessione: { name: '9 Riflessione giornaliera', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('09-') }, position: pos(250, -200) },
@@ -91,7 +95,8 @@ const links = [
   ['feedback', 0, 'scrivi'],
   ['scegli', 0, 'titolo'],
   ['titolo', 0, 'componi'],
-  ['componi', 0, 'invia'],
+  ['componi', 0, 'score'],
+  ['score', 0, 'invia'],
   ['invia', 0, 'prep'], // anche senza salvataggio: carica il backlog e i brani in coda
 ];
 

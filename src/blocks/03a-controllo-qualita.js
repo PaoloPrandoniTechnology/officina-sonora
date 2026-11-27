@@ -118,7 +118,8 @@ if (esito.problemi.length) {
       energia: meta.energia, attivita: meta.attivita, struttura: meta.struttura, style: meta.style, avoid: meta.avoid,
       sezioni: meta.sezioni, lyrics: (meta.sezioni || []).join('\n\n'), categoria: meta.categoria, tipo: meta.tipo,
       genere: meta.genere, variante: meta.variante, strumenti: meta.strumenti, influenza: meta.influenza, tonalita: meta.tonalita, guida_versione: meta.guida_versione, ricetta: meta.ricetta, esperimento: meta.esperimento,
-      attempts: 0, tentativi_render: tentativi,
+      // primo ritento con lo stesso score, poi lo scrive il motore
+      abc: meta.abc, score: meta.score, attempts: tentativi - 1, tentativi_render: tentativi,
     });
     log(`qualita': "${meta.titolo}" troppo corto, rigenero (tentativo ${tentativi}): ${esito.problemi.join('; ')}`);
   } else {
