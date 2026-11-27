@@ -11,7 +11,10 @@ async function altroPiano(motivo) {
   const c = job.concept;
   if (job.pianoN < PIANI_MAX) {
     const seed = nuovoSeed();
-    const id = await inviaSynth(corpoPiano(c, seed));
+    // con "Instrumental" il modello a volte ripete un interlude senza fine: nel ritento scrive una canzone,
+    // la cui melodia cantata passa comunque agli strumenti. Lo stile del render non cambia.
+    const canzone = c.style.replace(/^Instrumental, /, '').replace(/, no vocals$/, '');
+    const id = await inviaSynth(corpoPiano({ ...c, style: canzone }, seed));
     if (!id) return 'waiting';
     state.job = { ...job, id, seed, pianoN: job.pianoN + 1, submittedAt: Date.now() };
     log(`score di "${c.titolo}" non usato (${motivo}): ne chiedo un altro`);

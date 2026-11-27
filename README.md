@@ -165,7 +165,8 @@ Per gli strumentali segue la procedura ufficiale di YuE, in due passi:
 3. il motore rende l'audio seguendo quello score, con le LoRA.
 
 Uno score illeggibile, troncato o di durata inadatta (meno del 75% di quella richiesta, meno di 2 minuti o più di
-5 minuti e mezzo) viene richiesto di nuovo. Dopo 3 tentativi si usa lo score del **compositore** del progetto
+5 minuti e mezzo) viene richiesto di nuovo. Nei ritenti lo score si chiede senza `Instrumental` e `no vocals` (con quelle parole il modello a volte
+ripete un interlude senza fine). Dopo 3 tentativi si usa lo score del **compositore** del progetto
 (ripiego), e dopo un render fallito quello che il motore scrive da sé. La scheda del brano dice chi l'ha scritto
 (`score_fonte`: `modello`, `compositore` o `motore`). Le regole di scrittura sono in [`docs/score-abc.md`](docs/score-abc.md).
 

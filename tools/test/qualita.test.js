@@ -105,7 +105,9 @@ test('score pronto: parte il render con lo score del modello e la durata che ne 
 
 test('score troppo corto: si chiede un altro score, al terzo si passa al ripiego', async () => {
   const corto = scoreMotore(40);
-  const primo = await controlla(piano(), corto);
+  const primo = await controlla(piano({ concept: { ...piano().concept, style: 'Instrumental, surf rock, 132 BPM, no vocals' } }), corto);
+  assert.equal(primo.corpo.style, 'surf rock, 132 BPM', 'nel ritento lo score si chiede come per una canzone');
+  assert.match(primo.state.job.concept.style, /^Instrumental/, 'il render resta strumentale');
   assert.equal(primo.state.job.pianoN, 2);
   assert.equal(primo.corpo.duration, 1);
   const ultimo = await controlla(piano({ pianoN: 3 }), corto);
