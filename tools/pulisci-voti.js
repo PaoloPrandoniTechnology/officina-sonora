@@ -5,8 +5,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const LIBRERIA = process.env.YMF_LIBRERIA || 'E:\\Musica di sottofondo';
-const COPIE = process.env.YMF_BACKUP || path.join(__dirname, '..', 'state', 'backup');
+const LIBRERIA = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
+const COPIE = process.env.OFS_BACKUP || path.join(__dirname, '..', 'state', 'backup');
 const DA_IBROADCAST = /^(valutazione iBroadcast$|tag|playlist|cestino)/;
 
 // Modifica meta; ritorna 'rimosso', 'ibroadcast' o null (niente da fare)

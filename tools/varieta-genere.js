@@ -1,7 +1,7 @@
 // Aggiunge a pickSlot un vincolo di varieta': la categoria dei due brani precedenti non torna subito,
 // a meno che non sia l'unica possibile. Cosi' il genere cambia di brano in brano.
 const fs = require('fs');
-const file = 'E:/n8n/yoga/src/lib-apprendimento.js';
+const file = 'E:/n8n/officina-sonora/src/lib-apprendimento.js';
 let s = fs.readFileSync(file, 'utf8');
 const ancora = "  // Prima le ricette affidabili con punteggio migliore; le non affidabili solo se c'e' posto negli esperimenti";
 if (!s.includes(ancora)) throw new Error('ancora non trovata');

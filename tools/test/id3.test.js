@@ -76,7 +76,7 @@ test('tag completi, album leggibile, copertina JPEG e audio intatto', async () =
   assert.equal(t.TRCK, '161');
   for (const k of ['TIT2', 'TPE1', 'TPE2', 'TCON', 'TIT1', 'TIT3', 'TBPM', 'TCOM', 'TPUB', 'TCOP', 'TENC', 'COMM', 'APIC']) assert.ok(k in t, k);
   assert.equal(t.TIT2, 'Resonanza & Pietra');
-  assert.equal(t.TCOP, '2026 Yoga Music Factory');
+  assert.equal(t.TCOP, '2026 Officina Sonora');
   assert.deepEqual(Object.keys(t.TXXX).sort(), ['ATTIVITA', 'ENERGIA', 'MOOD', 'SEED', 'STRUMENTI', 'STRUTTURA', 'VARIANTE']);
   assert.equal(t.TXXX.MOOD, 'Chill');
   assert.equal(t.TXXX.STRUMENTI, 'sub bass, drone scuro');

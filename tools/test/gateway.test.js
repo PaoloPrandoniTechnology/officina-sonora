@@ -8,7 +8,7 @@ const os = require('os');
 const path = require('path');
 
 const LIB = fs.mkdtempSync(path.join(os.tmpdir(), 'ymf-lib-'));
-process.env.YMF_LIBRERIA = LIB;
+process.env.OFS_LIBRERIA = LIB;
 const GATEWAY = path.join(__dirname, '..', '..', 'gateway');
 const { ammessa } = require(path.join(GATEWAY, 'protezione.js'));
 const voti = require(path.join(GATEWAY, 'voti.js'));

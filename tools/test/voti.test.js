@@ -307,7 +307,7 @@ test('pulizia: a vuoto non scrive; --applica copia, scrive e rinomina il CSV; se
   const file = [a, b, csv];
   const originali = file.map((f) => fs.readFileSync(f, 'utf8'));
   const invariati = () => assert.deepEqual(file.map((f) => fs.readFileSync(f, 'utf8')), originali);
-  const esegui = (backup, ...args) => spawnSync(process.execPath, [PULIZIA, ...args], { encoding: 'utf8', env: { ...process.env, YMF_LIBRERIA: lib, YMF_BACKUP: backup } });
+  const esegui = (backup, ...args) => spawnSync(process.execPath, [PULIZIA, ...args], { encoding: 'utf8', env: { ...process.env, OFS_LIBRERIA: lib, OFS_BACKUP: backup } });
 
   const prova = esegui(copie);
   assert.equal(prova.status, 0, prova.stderr);

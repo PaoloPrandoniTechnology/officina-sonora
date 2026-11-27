@@ -1,6 +1,6 @@
 // Aggiunge sei generi al catalogo: tre piu' ritmati e tre piu' suonati dal vivo.
 const fs = require('fs');
-const file = 'E:/n8n/yoga/config/catalogo.json';
+const file = 'E:/n8n/officina-sonora/config/catalogo.json';
 const cat = JSON.parse(fs.readFileSync(file, 'utf8'));
 const nomi = new Set(cat.categories.map((c) => c.name));
 

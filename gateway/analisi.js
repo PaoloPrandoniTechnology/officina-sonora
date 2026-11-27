@@ -4,8 +4,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = process.env.YMF_LIBRERIA || 'E:\\Musica di sottofondo';
-const STATE = 'E:\\n8n\\yoga\\state';
+const ROOT = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
+const STATE = 'E:\\n8n\\officina-sonora\\state';
 const CATALOGO = path.join(__dirname, '..', 'config', 'catalogo.json');
 const GUIDA = path.join(__dirname, '..', 'config', 'guidance.json');
 const TTL_MS = 30 * 1000;

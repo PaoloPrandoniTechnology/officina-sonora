@@ -12,7 +12,7 @@ const voti = require('./voti');
 const andamento = require('./andamento');
 const { ammessa } = require('./protezione');
 
-const PORT = process.env.YMF_PORTA || 5790;
+const PORT = process.env.OFS_PORTA || 5790;
 const TOKEN_FILE = path.join(__dirname, 'token.json');
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const IB_CLIENT = process.env.IBROADCAST_CLIENT_ID || '';
@@ -67,16 +67,16 @@ async function accessToken() {
 // Lettura della libreria (sola lettura): brani, playlist, tag e ascolti
 async function ibLibrary() {
   const access = await accessToken();
-  const body = Buffer.from(JSON.stringify({ client: 'yoga-music-factory', version: '1.0', device_name: 'yoga-music-factory', user_agent: 'yoga-music-factory', mode: 'library' }));
-  const r = await httpsReq('library.ibroadcast.com', '/library', { 'Content-Type': 'application/json', 'User-Agent': 'yoga-music-factory', Authorization: 'Bearer ' + access }, body);
+  const body = Buffer.from(JSON.stringify({ client: 'officina-sonora', version: '1.0', device_name: 'officina-sonora', user_agent: 'officina-sonora', mode: 'library' }));
+  const r = await httpsReq('library.ibroadcast.com', '/library', { 'Content-Type': 'application/json', 'User-Agent': 'officina-sonora', Authorization: 'Bearer ' + access }, body);
   return { status: r.status, json: r.json };
 }
 
 async function ibApi(mode, args) {
   if (!IB_MODI.has(mode)) throw new Error(`operazione non permessa: ${mode}`);
   const access = await accessToken();
-  const body = Buffer.from(JSON.stringify({ client: 'yoga-music-factory', version: '1.0', device_name: 'yoga-music-factory', user_agent: 'yoga-music-factory', mode, ...args }));
-  const r = await httpsReq('api.ibroadcast.com', `/${mode}`, { 'Content-Type': 'application/json', 'User-Agent': 'yoga-music-factory', Authorization: `Bearer ${access}` }, body);
+  const body = Buffer.from(JSON.stringify({ client: 'officina-sonora', version: '1.0', device_name: 'officina-sonora', user_agent: 'officina-sonora', mode, ...args }));
+  const r = await httpsReq('api.ibroadcast.com', `/${mode}`, { 'Content-Type': 'application/json', 'User-Agent': 'officina-sonora', Authorization: `Bearer ${access}` }, body);
   return { status: r.status, json: r.json };
 }
 
@@ -92,7 +92,7 @@ function multipart(fields, fileName, fileData) {
 
 async function upload(fileName, data) {
   const access = await accessToken();
-  const m = multipart({ client: 'yoga-music-factory', version: '1.0', file_path: fileName, method: 'yoga-music-factory' }, fileName, data);
+  const m = multipart({ client: 'officina-sonora', version: '1.0', file_path: fileName, method: 'officina-sonora' }, fileName, data);
   const r = await httpsReq('upload.ibroadcast.com', '/', { 'Content-Type': m.contentType, Authorization: `Bearer ${access}` }, m.body);
   return { status: r.status, json: r.json };
 }

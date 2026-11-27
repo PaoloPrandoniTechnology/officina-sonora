@@ -1,7 +1,7 @@
 // Aggiunge i generi proposti (strumentali e vocali senza parole) e alcuni piu' intensi.
 // I generi vocali hanno vocale_senza_parole: niente "senza voce" e niente LoRA strumentale.
 const fs = require('fs');
-const file = 'E:/n8n/yoga/config/catalogo.json';
+const file = 'E:/n8n/officina-sonora/config/catalogo.json';
 const cat = JSON.parse(fs.readFileSync(file, 'utf8'));
 const nomi = new Set(cat.categories.map((c) => c.name));
 

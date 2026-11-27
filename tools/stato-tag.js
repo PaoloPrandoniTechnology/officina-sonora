@@ -15,6 +15,6 @@ let tot = 0, ok = 0, pend = 0, esauriti = 0; const esempi = [];
       else { pend++; if (esempi.length < 3) esempi.push(m.titolo + ' tentativi=' + (m.ibroadcast.tag_tentativi || 0)); }
     }
   }
-})('E:/Yoga Music');
+})('E:/libreria-storica');
 console.log({ tot, organizzati: ok, in_attesa: pend, esauriti });
 console.log(esempi.join('\n'));

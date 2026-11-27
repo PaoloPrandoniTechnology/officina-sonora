@@ -1,9 +1,9 @@
 // Aggiorna il codice alla nuova struttura: radice della libreria, cartella per ambito e famiglia.
 const fs = require('fs');
-const base = 'E:/n8n/yoga/src/';
+const base = 'E:/n8n/officina-sonora/src/';
 
 let lib = fs.readFileSync(base + 'lib.js', 'utf8');
-const r1 = "  root: 'E:\\\\Yoga Music',";
+const r1 = "  root: 'E:\\\\libreria-storica',";
 if (!lib.includes(r1)) throw new Error('radice non trovata in lib.js');
 lib = lib.replace(r1, "  root: 'E:\\\\Musica di sottofondo',");
 // Funzione unica per la cartella di un brano: Ambito / Famiglia / Categoria / Tipo

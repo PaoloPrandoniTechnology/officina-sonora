@@ -22,7 +22,7 @@ async function say(text, buttons) {
 }
 
 const AIUTO = [
-  'Yoga Music Factory - comandi:',
+  'Officina Sonora - comandi:',
   '/stato - a che punto siamo (brani, coda, errori)',
   '/annulla - scarta le modifiche in attesa',
   '/aiuto - questo elenco',
@@ -50,7 +50,7 @@ function statoTesto() {
 
 // Interpreta il messaggio in un'azione strutturata; se non e' chiaro, restituisce una domanda.
 async function interpreta(testo, contesto) {
-  const sistema = 'Sei l\'assistente di configurazione di un generatore di musica per yoga. Rispondi solo con JSON valido.';
+  const sistema = 'Sei l\'assistente di configurazione di un generatore di musica di sottofondo. Rispondi solo con JSON valido.';
   const utente = `${contesto ? `Contesto: ${contesto}\n` : ''}Messaggio dell'utente: "${testo}"
 
 Categorie attuali: ${(CFG.categories || []).map((c) => `${c.name} (energia ${c.energia}, bpm ${c.bpm.join('-')}, strutture ${c.strutture.join('/')})`).join('; ')}
@@ -253,7 +253,7 @@ async function salvaVoto(dati) {
 
 async function gestisciTesto(msg) {
   const testo = (msg.text || '').trim();
-  if (/^\/(start|aiuto|menu)/.test(testo)) return menu('Benvenuto in Yoga Music Factory. Scegli una voce oppure scrivi direttamente la modifica.');
+  if (/^\/(start|aiuto|menu)/.test(testo)) return menu('Benvenuto in Officina Sonora. Scegli una voce oppure scrivi direttamente la modifica.');
   if (/^\/stato/.test(testo)) return say(statoTesto());
   if (/^\/annulla/.test(testo)) { tgs.pending = {}; tgs.flow = null; return say('Annullato.').then(() => menu()); }
   if (!testo) return;

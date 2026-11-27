@@ -5,9 +5,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const vecchiaRadice = 'E:/Yoga Music';
+const vecchiaRadice = 'E:/libreria-storica';
 const nuovaRadice = 'E:/Musica di sottofondo';
-const cat = JSON.parse(fs.readFileSync('E:/n8n/yoga/config/catalogo.json', 'utf8'));
+const cat = JSON.parse(fs.readFileSync('E:/n8n/officina-sonora/config/catalogo.json', 'utf8'));
 const infoCat = Object.fromEntries(cat.categories.map((c) => [c.name, c]));
 const etichetta = (ambito) => (ambito === 'yoga' ? 'Yoga' : 'Sottofondo');
 

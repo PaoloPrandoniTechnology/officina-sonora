@@ -1,11 +1,11 @@
-// Genera il diagramma del flusso di n8n dal file yoga-workflow.json (sempre allineato alla versione pubblicata).
+// Genera il diagramma del flusso di n8n dal file officina-sonora-workflow.json (sempre allineato alla versione pubblicata).
 // Uso: node tools/diagramma.mjs   -> docs/flusso-n8n.svg (poi la PNG si crea con tools/screenshot.ps1)
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const radice = join(dirname(fileURLToPath(import.meta.url)), '..');
-const wf = JSON.parse(readFileSync(join(radice, 'yoga-workflow.json'), 'utf8'));
+const wf = JSON.parse(readFileSync(join(radice, 'officina-sonora-workflow.json'), 'utf8'));
 
 const nomi = Object.fromEntries(wf.nodes.map((n) => [n.name, n]));
 const archi = []; // [da, uscita, a]
@@ -81,7 +81,7 @@ let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" vi
   <filter id="ombra" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.45"/></filter>
 </defs>
 <rect width="${W}" height="${H}" fill="url(#fondo)"/>
-<text x="${MX}" y="38" fill="#e6eaf2" font-size="22" font-weight="650">Yoga Music Factory · flusso del workflow n8n</text>
+<text x="${MX}" y="38" fill="#e6eaf2" font-size="22" font-weight="650">Officina Sonora · flusso del workflow n8n</text>
 <text x="${MX}" y="58" fill="#8a94a8" font-size="13">${wf.nodes.length} nodi, letti da sinistra a destra. Il ciclo di produzione parte dal nodo "1 Leggi stato".</text>
 `;
 

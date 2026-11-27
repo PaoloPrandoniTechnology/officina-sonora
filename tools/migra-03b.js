@@ -1,6 +1,6 @@
 // Migrazione one-off: il blocco 03b non tiene piu' i token e usa il gateway locale.
 const fs = require('fs');
-const file = 'E:/n8n/yoga/src/blocks/03b-pubblica-ibroadcast.js';
+const file = 'E:/n8n/officina-sonora/src/blocks/03b-pubblica-ibroadcast.js';
 let s = fs.readFileSync(file, 'utf8');
 
 function taglia(da, a, sostituto) {

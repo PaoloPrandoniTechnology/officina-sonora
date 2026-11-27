@@ -1,6 +1,6 @@
 // Aggiunge al blocco 03b la notifica Telegram per ogni brano caricato (inviata tramite il gateway).
 const fs = require('fs');
-const file = 'E:/n8n/yoga/src/blocks/03b-pubblica-ibroadcast.js';
+const file = 'E:/n8n/officina-sonora/src/blocks/03b-pubblica-ibroadcast.js';
 let s = fs.readFileSync(file, 'utf8');
 const ancora = "    log(`iBroadcast: caricato ${path.basename(file)} (id ${trackId})`);";
 if (!s.includes(ancora)) throw new Error('ancora non trovata');

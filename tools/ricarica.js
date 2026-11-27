@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-const lib = fs.readFileSync('E:/n8n/yoga/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/yoga/src/lib-apprendimento.js', 'utf8');
-const blocco = fs.readFileSync('E:/n8n/yoga/src/blocks/03b-pubblica-ibroadcast.js', 'utf8');
+const lib = fs.readFileSync('E:/n8n/officina-sonora/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/officina-sonora/src/lib-apprendimento.js', 'utf8');
+const blocco = fs.readFileSync('E:/n8n/officina-sonora/src/blocks/03b-pubblica-ibroadcast.js', 'utf8');
 const AF = Object.getPrototypeOf(async function () {}).constructor;
 
 const tutti = [];
@@ -19,9 +19,9 @@ const tutti = [];
       if (fs.existsSync(j)) tutti.push(f);
     }
   }
-})('E:/Yoga Music');
+})('E:/libreria-storica');
 
-const statoIniziale = JSON.parse(fs.readFileSync('E:/n8n/yoga/state/state.json', 'utf8'));
+const statoIniziale = JSON.parse(fs.readFileSync('E:/n8n/officina-sonora/state/state.json', 'utf8'));
 statoIniziale.uploadQueue = tutti.slice();
 statoIniziale.ibroadcastScanned = true;
 statoIniziale.retagScanned = true;
@@ -32,13 +32,13 @@ statoIniziale.organizeScanned = true;
   const r = await new AF('require', '$input', '$env', lib + '\n' + blocco)(require, $input, {});
   const nuovo = r[0].json.state;
   // Unione con lo stato reale: si riprendono solo tag, playlist e la coda vuota
-  const attuale = JSON.parse(fs.readFileSync('E:/n8n/yoga/state/state.json', 'utf8'));
+  const attuale = JSON.parse(fs.readFileSync('E:/n8n/officina-sonora/state/state.json', 'utf8'));
   attuale.tags = nuovo.tags;
   attuale.playlists = nuovo.playlists;
   attuale.uploadQueue = [];
   attuale.ibroadcastScanned = true;
   attuale.retagScanned = true;
   attuale.organizeScanned = true;
-  fs.writeFileSync('E:/n8n/yoga/state/state.json', JSON.stringify(attuale, null, 2));
+  fs.writeFileSync('E:/n8n/officina-sonora/state/state.json', JSON.stringify(attuale, null, 2));
   console.log('ricaricamento completato su', tutti.length, 'brani');
 })().catch((e) => console.error('ERR', e.message));

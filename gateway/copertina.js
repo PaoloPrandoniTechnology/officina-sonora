@@ -50,7 +50,7 @@ function svgCopertina({ titolo, stile, sfondo }) {
 <rect x="64" y="${y0 - corpo - 62}" width="72" height="7" fill="${colore}"/>
 <text x="64" y="${y0 - corpo - 12}" font-family="Bahnschrift" font-size="34" letter-spacing="7" fill="${colore}">${esc(stile.etichetta.toUpperCase())}</text>
 ${l.map((x, k) => `<text x="64" y="${y0 + k * corpo * 1.05}" font-family="${esc(stile.font)}" font-style="${stile.corsivo ? 'italic' : 'normal'}" font-size="${corpo}" fill="#fff">${esc(x)}</text>`).join('\n')}
-<text x="64" y="962" font-family="Bahnschrift" font-size="22" letter-spacing="4" fill="#fff" fill-opacity="0.7">YOGA MUSIC FACTORY</text></svg>`;
+<text x="64" y="962" font-family="Bahnschrift" font-size="22" letter-spacing="4" fill="#fff" fill-opacity="0.7">OFFICINA SONORA</text></svg>`;
 }
 
 let motore = null;

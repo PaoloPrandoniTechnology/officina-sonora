@@ -1,7 +1,7 @@
 // Correzione one-off: i tag dopo il caricamento vengono applicati dal recupero, dopo l'elaborazione di iBroadcast,
 // e i messaggi transitori non contengono piu' parole che fanno scattare gli avvisi di errore.
 const fs = require('fs');
-const file = 'E:/n8n/yoga/src/blocks/03b-pubblica-ibroadcast.js';
+const file = 'E:/n8n/officina-sonora/src/blocks/03b-pubblica-ibroadcast.js';
 let s = fs.readFileSync(file, 'utf8');
 function sost(da, a) {
   if (!s.includes(da)) throw new Error('non trovato: ' + da.slice(0, 60));

@@ -80,7 +80,7 @@ function tagFile(file, meta, cop = copertinaProvvisoria(meta)) {
   const cat = (CFG.categories || []).find((c) => c.name === meta.categoria) || {};
   const album = (cat.copertina && cat.copertina.etichetta) || String(meta.categoria || 'Raccolta').replace(/-/g, ' ');
   const durata = (meta.qualita && meta.qualita.durata_reale_s) || meta.durata_s;
-  const editore = 'Yoga Music Factory';
+  const editore = 'Officina Sonora';
   const comment = [meta.descrizione, meta.attivita && `Attività: ${meta.attivita}`, meta.style && `Stile: ${meta.style}`,
     meta.energia && `Energia: ${meta.energia}/5`, meta.struttura && `Struttura: ${meta.struttura}`, 'Strumentale, generato con YuE2']
     .filter(Boolean).join(' | ');

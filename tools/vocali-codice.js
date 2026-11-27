@@ -1,6 +1,6 @@
 // Generi vocali senza parole: stile senza "senza voce", flag nel concept, niente LoRA strumentale.
 const fs = require('fs');
-const base = 'E:/n8n/yoga/src/';
+const base = 'E:/n8n/officina-sonora/src/';
 function sost(file, da, a) {
   let s = fs.readFileSync(base + file, 'utf8');
   if (!s.includes(da)) throw new Error(file + ': non trovato: ' + da.slice(0, 60));

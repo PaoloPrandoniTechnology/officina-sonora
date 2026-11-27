@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const lib = fs.readFileSync('E:/n8n/yoga/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/yoga/src/lib-apprendimento.js', 'utf8');
-const libIb = fs.readFileSync('E:/n8n/yoga/src/lib-ibroadcast.js', 'utf8');
-const cover = fs.readFileSync('E:/n8n/yoga/src/cover.js', 'utf8');
+const lib = fs.readFileSync('E:/n8n/officina-sonora/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/officina-sonora/src/lib-apprendimento.js', 'utf8');
+const libIb = fs.readFileSync('E:/n8n/officina-sonora/src/lib-ibroadcast.js', 'utf8');
+const cover = fs.readFileSync('E:/n8n/officina-sonora/src/cover.js', 'utf8');
 const blocchi = [
   ['03d1-prepara-caricamento.js', true],
   ['03d2-carica-ibroadcast.js', false],
@@ -29,7 +29,7 @@ const brani = [];
       }
     }
   }
-})('E:/Yoga Music');
+})('E:/libreria-storica');
 brani.sort((a, b) => a.numero - b.numero);
 
 // Copie vecchie da cestinare: gli id attuali prima del ricaricamento
@@ -44,11 +44,11 @@ const vecchi = [];
       if (m.ibroadcast && m.ibroadcast.track_id) vecchi.push(String(m.ibroadcast.track_id));
     }
   }
-})('E:/Yoga Music');
-fs.writeFileSync('E:/n8n/yoga/tools/da-cestinare-copertine.json', JSON.stringify([...new Set(vecchi)]));
+})('E:/libreria-storica');
+fs.writeFileSync('E:/n8n/officina-sonora/tools/da-cestinare-copertine.json', JSON.stringify([...new Set(vecchi)]));
 console.log('brani da ricaricare:', brani.length, '| copie vecchie registrate:', new Set(vecchi).size);
 
-const statoFile = 'E:/n8n/yoga/state/state.json';
+const statoFile = 'E:/n8n/officina-sonora/state/state.json';
 const statoIniziale = JSON.parse(fs.readFileSync(statoFile, 'utf8'));
 statoIniziale.uploadQueue = brani.map((b) => b.mp3);
 statoIniziale.ibroadcastScanned = true;
@@ -59,7 +59,7 @@ statoIniziale.retagScanned = true;
   for (const [b, ib] of blocchi) {
     const $input = { first: () => ({ json: input }) };
     const extra = ib ? libIb + '\n' + cover : '';
-    const r = await new AF('require', '$input', '$env', lib + '\n' + extra + '\n' + fs.readFileSync('E:/n8n/yoga/src/blocks/' + b, 'utf8'))(require, $input, {});
+    const r = await new AF('require', '$input', '$env', lib + '\n' + extra + '\n' + fs.readFileSync('E:/n8n/officina-sonora/src/blocks/' + b, 'utf8'))(require, $input, {});
     input = r[0].json;
     console.log(b, 'ok');
   }

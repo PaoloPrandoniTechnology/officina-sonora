@@ -1,8 +1,8 @@
 // Applica la copertina ai brani gia' presenti sul PC (solo locale: iBroadcast non viene toccato).
 const fs = require('fs'), path = require('path');
-const lib = fs.readFileSync('E:/n8n/yoga/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/yoga/src/lib-apprendimento.js', 'utf8');
-const libIb = fs.readFileSync('E:/n8n/yoga/src/lib-ibroadcast.js', 'utf8');
-const cover = fs.readFileSync('E:/n8n/yoga/src/cover.js', 'utf8');
+const lib = fs.readFileSync('E:/n8n/officina-sonora/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/officina-sonora/src/lib-apprendimento.js', 'utf8');
+const libIb = fs.readFileSync('E:/n8n/officina-sonora/src/lib-ibroadcast.js', 'utf8');
+const cover = fs.readFileSync('E:/n8n/officina-sonora/src/cover.js', 'utf8');
 const AF = Object.getPrototypeOf(async function () {}).constructor;
 const brani = [];
 (function walk(d) {
@@ -15,7 +15,7 @@ const brani = [];
       if (fs.existsSync(j)) brani.push({ mp3: f, json: j });
     }
   }
-})('E:/Yoga Music');
+})('E:/libreria-storica');
 new AF('require', 'console', lib + '\n' + libIb + '\n' + cover + `
 const brani = ${JSON.stringify(brani)};
 let ok = 0, errori = 0;

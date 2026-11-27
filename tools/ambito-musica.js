@@ -1,7 +1,7 @@
 // Ambito dei generi: "yoga" per i generi di pratica, "musica" per i generi non yoga.
 // Cambia il nome delle playlist (Musica - ...) e il tag applicato su iBroadcast, e lo usa anche il controllo dei voti.
 const fs = require('fs');
-const base = 'E:/n8n/yoga/';
+const base = 'E:/n8n/officina-sonora/';
 
 // 1) Catalogo: ambito per ogni genere
 const cat = JSON.parse(fs.readFileSync(base + 'config/catalogo.json', 'utf8'));

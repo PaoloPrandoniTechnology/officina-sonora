@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream');
 
-const LIBRERIA = process.env.YMF_LIBRERIA || 'E:\\Musica di sottofondo';
+const LIBRERIA = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
 const ATTESA_MS = 15 * 60 * 1000; // i brani appena generati sono ancora in lavorazione nei blocchi
 const TIPI_AUDIO = { mp3: 'audio/mpeg', flac: 'audio/flac', wav: 'audio/wav', ogg: 'audio/ogg' };
 

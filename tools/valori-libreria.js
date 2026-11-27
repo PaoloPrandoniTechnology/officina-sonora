@@ -2,7 +2,7 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 function decode(d) { if (!d || !d.map) return d; const out = {}; for (const [id, row] of Object.entries(d)) { if (id === 'map') continue; const o = {}; for (const [k, i] of Object.entries(d.map)) o[k] = row[i]; out[id] = o; } return out; }
 const nostri = new Set();
-(function walk(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (f === '_scartati') continue; if (fs.statSync(p).isDirectory()) walk(p); else if (f.endsWith('.json') && f !== 'feedback.json') { const m = JSON.parse(fs.readFileSync(p, 'utf8')); if (m.ibroadcast && m.ibroadcast.track_id) nostri.add(String(m.ibroadcast.track_id)); } } })('E:/Yoga Music');
+(function walk(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (f === '_scartati') continue; if (fs.statSync(p).isDirectory()) walk(p); else if (f.endsWith('.json') && f !== 'feedback.json') { const m = JSON.parse(fs.readFileSync(p, 'utf8')); if (m.ibroadcast && m.ibroadcast.track_id) nostri.add(String(m.ibroadcast.track_id)); } } })('E:/libreria-storica');
 const r = http.request({ hostname: '127.0.0.1', port: 5790, path: '/ib/library', method: 'POST', headers: { 'Content-Length': 0 } }, (res) => {
   let s = ''; res.on('data', (c) => (s += c));
   res.on('end', () => {

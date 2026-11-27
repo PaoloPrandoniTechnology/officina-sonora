@@ -1,7 +1,7 @@
 # Ferma tutta l'automazione: watchdog, n8n (porta 5678), motore YuE2 e le eventuali finestre cmd residue.
 # LM Studio resta acceso.
 $ErrorActionPreference = 'SilentlyContinue'
-New-Item -ItemType File -Force -Path 'E:\n8n\yoga\state\STOP' | Out-Null
+New-Item -ItemType File -Force -Path 'E:\n8n\officina-sonora\state\STOP' | Out-Null
 
 # Finestre cmd/powershell rimaste da avvii precedenti
 Get-CimInstance Win32_Process -Filter "Name='cmd.exe' OR Name='powershell.exe'" |
@@ -15,4 +15,4 @@ foreach ($port in 5678, 18087, 5790) {
 }
 Get-Process yue-server -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Seconds 2
-Remove-Item -Force 'E:\n8n\yoga\state\STOP' -ErrorAction SilentlyContinue
+Remove-Item -Force 'E:\n8n\officina-sonora\state\STOP' -ErrorAction SilentlyContinue

@@ -11,7 +11,7 @@ const brani = [];
       if (m.titolo) brani.push({ f, m });
     }
   }
-})('E:/Yoga Music');
+})('E:/libreria-storica');
 brani.sort((a, b) => String(a.m.generato_il).localeCompare(String(b.m.generato_il)));
 const vecchiIds = [];
 brani.forEach((b, i) => {
@@ -19,6 +19,6 @@ brani.forEach((b, i) => {
   b.m.numero_traccia = i + 1;
   fs.writeFileSync(b.f, JSON.stringify(b.m, null, 2));
 });
-fs.writeFileSync('E:/n8n/yoga/state/contatore.json', JSON.stringify({ prossimo: brani.length + 1, aggiornato: new Date().toISOString() }, null, 2));
-fs.writeFileSync('E:/n8n/yoga/tools/da-cestinare-2.json', JSON.stringify([...new Set(vecchiIds)]));
+fs.writeFileSync('E:/n8n/officina-sonora/state/contatore.json', JSON.stringify({ prossimo: brani.length + 1, aggiornato: new Date().toISOString() }, null, 2));
+fs.writeFileSync('E:/n8n/officina-sonora/tools/da-cestinare-2.json', JSON.stringify([...new Set(vecchiIds)]));
 console.log('numerati', brani.length, 'ids da sostituire', new Set(vecchiIds).size);

@@ -1,8 +1,8 @@
 // Diagnosi: un solo tagtracks sul gateway, stampa il messaggio di iBroadcast (nessun token letto qui).
 const fs = require('fs'), http = require('http');
-const st = JSON.parse(fs.readFileSync('E:/n8n/yoga/state/state.json', 'utf8'));
+const st = JSON.parse(fs.readFileSync('E:/n8n/officina-sonora/state/state.json', 'utf8'));
 const tagId = Object.values(st.tags || {})[0];
-const brano = JSON.parse(fs.readFileSync('E:/Yoga Music/Meditazione/ambient-pad/eco-della-consapevolezza.json', 'utf8'));
+const brano = JSON.parse(fs.readFileSync('E:/libreria-storica/Meditazione/ambient-pad/eco-della-consapevolezza.json', 'utf8'));
 const trackId = Number(brano.ibroadcast.track_id);
 const body = { mode: 'tagtracks', args: { tagid: tagId, tracks: [trackId], untag: false } };
 const data = Buffer.from(JSON.stringify(body));

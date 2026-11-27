@@ -1,6 +1,6 @@
 // Telegram riceve avvisi di errore solo per casi gravi che richiedono un tuo intervento.
 const fs = require('fs');
-const file = 'E:/n8n/yoga/src/blocks/08-telegram.js';
+const file = 'E:/n8n/officina-sonora/src/blocks/08-telegram.js';
 let s = fs.readFileSync(file, 'utf8');
 const ancora = '  for (const [key, n] of Object.entries(conta)) {\n    if (n < 3) continue;';
 if (!s.includes(ancora)) throw new Error('ancora non trovata');

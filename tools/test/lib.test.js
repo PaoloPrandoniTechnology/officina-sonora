@@ -1,4 +1,4 @@
-// Test automatici delle funzioni critiche. Esecuzione (dalla cartella yoga):
+// Test automatici delle funzioni critiche. Esecuzione (dalla cartella del progetto):
 //   node --test tools/test/lib.test.js
 // Usa file temporanei dentro state\ (l'unica cartella di scrittura consentita dalle guardie di lib.js).
 const test = require('node:test');

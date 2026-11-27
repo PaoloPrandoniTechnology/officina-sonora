@@ -1,6 +1,6 @@
 // Migrazione one-off: il blocco 09 manda il rapporto tramite il gateway (nessun token).
 const fs = require('fs');
-const file = 'E:/n8n/yoga/src/blocks/09-riflessione.js';
+const file = 'E:/n8n/officina-sonora/src/blocks/09-riflessione.js';
 let s = fs.readFileSync(file, 'utf8');
 function taglia(da, a, nuovo) {
   const i = s.indexOf(da);

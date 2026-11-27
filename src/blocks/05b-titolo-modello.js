@@ -5,7 +5,7 @@ if (inp.skip) return [{ json: inp }];
 
 const cat = inp.cat;
 const [lo, hi] = cat.bpm;
-const system = 'Sei un compositore di musica per il yoga. Rispondi solo con JSON valido.';
+const system = 'Sei un compositore di musica di sottofondo. Rispondi solo con JSON valido.';
 const user = `Proponi titolo e descrizione per un brano STRUMENTALE (nessuna voce) di genere "${cat.genere || cat.name}".
 Attivita': ${cat.attivita}. Atmosfera del genere: ${cat.stile}.
 Variante: ${inp.variante ? inp.variante.nome : 'base'}.

@@ -1,6 +1,6 @@
 // Porta la tassonomia nel caricatore del catalogo e aggiunge i tag ambito e famiglia ai brani caricati.
 const fs = require('fs');
-const base = 'E:/n8n/yoga/src/';
+const base = 'E:/n8n/officina-sonora/src/';
 
 let lib = fs.readFileSync(base + 'lib.js', 'utf8');
 const a = "for (const k of ['artista', 'categories', 'strutture', 'tag_extra'])";

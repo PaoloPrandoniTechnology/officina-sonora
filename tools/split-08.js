@@ -1,6 +1,6 @@
 // Divide il blocco Telegram in due: 8a comandi/pulsanti, 8b avvisi di errore (entrambi con le stesse utilita').
 const fs = require('fs');
-const src = fs.readFileSync('E:/n8n/yoga/src/blocks/08-telegram.js', 'utf8');
+const src = fs.readFileSync('E:/n8n/officina-sonora/src/blocks/08-telegram.js', 'utf8');
 const iAvvisi = src.indexOf('// ---- Avvisi:');
 const iMain = src.indexOf('async function main()');
 if (iAvvisi < 0 || iMain < 0) throw new Error('marcatori non trovati');
@@ -13,7 +13,7 @@ const comune = src.slice(0, iAvvisi);
 // 8a: comandi. Il main non chiama piu' gli avvisi.
 const main8a = corpoMain.replace('  await avvisi();\n', '').replace(/\n+$/, '\n');
 const blocco8a = comune + main8a;
-fs.writeFileSync('E:/n8n/yoga/src/blocks/08a-comandi-telegram.js', blocco8a);
+fs.writeFileSync('E:/n8n/officina-sonora/src/blocks/08a-comandi-telegram.js', blocco8a);
 
 // 8b: avvisi. Usa la stessa configurazione e le stesse utilita' Telegram, senza comandi.
 const intestazione = `// BLOCCO 8b - Avvisi Telegram: segnala solo i casi gravi che richiedono il tuo intervento.
@@ -35,6 +35,6 @@ try {
   return [{ json: { avvisi: 'errore', message: e.message } }];
 }
 `;
-fs.writeFileSync('E:/n8n/yoga/src/blocks/08b-avvisi-telegram.js', intestazione + avvisiTesto + fine);
-fs.unlinkSync('E:/n8n/yoga/src/blocks/08-telegram.js');
+fs.writeFileSync('E:/n8n/officina-sonora/src/blocks/08b-avvisi-telegram.js', intestazione + avvisiTesto + fine);
+fs.unlinkSync('E:/n8n/officina-sonora/src/blocks/08-telegram.js');
 console.log('08 diviso in 08a (comandi) e 08b (avvisi)');

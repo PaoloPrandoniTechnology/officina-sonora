@@ -12,7 +12,7 @@ const nuovi = new Set();
       if (m.ibroadcast && m.ibroadcast.track_id) nuovi.add(String(m.ibroadcast.track_id));
     }
   }
-})('E:/Yoga Music');
+})('E:/libreria-storica');
 const ids = elenco.filter((x) => !nuovi.has(String(x))).map(Number);
 const data = Buffer.from(JSON.stringify({ mode: 'trash', args: { tracks: ids } }));
 const r = http.request({ hostname: '127.0.0.1', port: 5790, path: '/ib/api', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': data.length } }, (res) => {

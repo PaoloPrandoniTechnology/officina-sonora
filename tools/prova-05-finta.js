@@ -1,8 +1,8 @@
 // Prova a secco del blocco 05 con una risposta finta del modello (il modello di testo non e' caricato ora).
 // Il concept non viene salvato nello stato di produzione.
 const fs = require('fs');
-const lib = fs.readFileSync('E:/n8n/yoga/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/yoga/src/lib-apprendimento.js', 'utf8');
-const blocco = fs.readFileSync('E:/n8n/yoga/src/blocks/05-genera-concept.js', 'utf8');
+const lib = fs.readFileSync('E:/n8n/officina-sonora/src/lib.js', 'utf8') + '\n' + fs.readFileSync('E:/n8n/officina-sonora/src/lib-apprendimento.js', 'utf8');
+const blocco = fs.readFileSync('E:/n8n/officina-sonora/src/blocks/05-genera-concept.js', 'utf8');
 const finta = 'async function llmJson(){ return { titolo: "Prova", descrizione: "prova", bpm: 60, durata_s: 200 }; }';
 const AF = Object.getPrototypeOf(async function () {}).constructor;
 const st = { cursor: 0, queue: [], job: null, done: 0, experiments: [], recent: [] };

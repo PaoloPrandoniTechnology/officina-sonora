@@ -4,8 +4,8 @@ const path = require('path');
 const http = require('http');
 
 // Confinamento: i blocchi possono scrivere solo nelle cartelle del progetto
-const ZONE_SCRITTURA = ['E:\\Yoga Music', 'E:\\n8n\\yoga'].map((p) => p.toLowerCase());
-if (!fs.__yogaGuard) {
+const ZONE_SCRITTURA = ['E:\\Musica di sottofondo', 'E:\\n8n\\officina-sonora'].map((p) => p.toLowerCase());
+if (!fs.__osGuard) {
   const dentro = (p) => {
     const abs = path.resolve(String(p)).toLowerCase();
     return ZONE_SCRITTURA.some((z) => abs === z || abs.startsWith(z + path.sep));
@@ -20,11 +20,11 @@ if (!fs.__yogaGuard) {
       return originale.apply(this, args);
     };
   }
-  fs.__yogaGuard = true;
+  fs.__osGuard = true;
 }
 // Lettura: le cartelle dei segreti e del gateway non sono leggibili dai blocchi
-const LETTURA_VIETATA = ['E:\\n8n\\yoga\\secrets', 'E:\\n8n\\yoga\\gateway'].map((p) => p.toLowerCase());
-if (!fs.__yogaReadGuard) {
+const LETTURA_VIETATA = ['E:\\n8n\\officina-sonora\\secrets', 'E:\\n8n\\officina-sonora\\gateway'].map((p) => p.toLowerCase());
+if (!fs.__osReadGuard) {
   const letturaOriginale = fs.readFileSync;
   fs.readFileSync = function (p, ...args) {
     if (typeof p === 'string' && LETTURA_VIETATA.some((z) => path.resolve(p).toLowerCase().startsWith(z))) {
@@ -32,12 +32,12 @@ if (!fs.__yogaReadGuard) {
     }
     return letturaOriginale.call(this, p, ...args);
   };
-  fs.__yogaReadGuard = true;
+  fs.__osReadGuard = true;
 }
 
 const CFG = {
   root: 'E:\\Musica di sottofondo',
-  dir: 'E:\\n8n\\yoga',
+  dir: 'E:\\n8n\\officina-sonora',
   llm: 'http://127.0.0.1:1234/v1',
   llmModel: 'google/gemma-4-e4b',
   yue: 'http://127.0.0.1:18087',
@@ -69,7 +69,7 @@ const CFG = {
     loop: ['[Intro]', '[Main]', '[Main]', '[Peak]', '[Main]', '[Outro]'],
   },
   sections: ['[Intro]', '[Build]', '[Main]', '[Peak]', '[Release]', '[Outro]'],
-  artista: 'Yoga Music Factory',
+  artista: 'Officina Sonora',
 };
 CFG.stateFile = path.join(CFG.dir, 'state', 'state.json');
 CFG.logFile = path.join(CFG.dir, 'state', 'tick.log');

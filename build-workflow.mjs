@@ -1,4 +1,4 @@
-// Genera yoga-workflow.json (workflow n8n importabile) dai blocchi in src/blocks.
+// Genera officina-sonora-workflow.json (workflow n8n importabile) dai blocchi in src/blocks.
 // Ogni blocco e' un nodo Code separato; src/lib.js viene incollato in testa a ciascuno.
 // Uso: node build-workflow.mjs
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -106,12 +106,12 @@ for (const [from, out, to] of links) {
 
 const workflow = {
   id: 'yogaMusicFactory01',
-  name: 'Yoga Music Factory',
+  name: 'Officina Sonora',
   active: false,
   nodes: Object.keys(nodes).map((k) => ({ id: ids[k], ...nodes[k] })),
   connections,
   settings: { executionOrder: 'v1' },
 };
 
-writeFileSync(join(here, 'yoga-workflow.json'), JSON.stringify(workflow, null, 2), 'utf8');
-console.log(`yoga-workflow.json creato: ${workflow.nodes.length} nodi, ${links.length} collegamenti`);
+writeFileSync(join(here, 'officina-sonora-workflow.json'), JSON.stringify(workflow, null, 2), 'utf8');
+console.log(`officina-sonora-workflow.json creato: ${workflow.nodes.length} nodi, ${links.length} collegamenti`);

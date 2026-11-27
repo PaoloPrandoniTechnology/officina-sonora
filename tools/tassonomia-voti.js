@@ -3,7 +3,7 @@
 // - Tag su iBroadcast: ambito-*, famiglia-*, categoria-*, energia-*, voto tag/playlist.
 // - Parole di voto valide per ogni genere, e tag di tempo che regolano il bpm del genere (entro limiti fissi).
 const fs = require('fs');
-const base = 'E:/n8n/yoga/';
+const base = 'E:/n8n/officina-sonora/';
 
 // 1) Famiglia per ogni categoria
 const cat = JSON.parse(fs.readFileSync(base + 'config/catalogo.json', 'utf8'));

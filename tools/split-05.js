@@ -1,6 +1,6 @@
 // Divide "5 Genera concept" in tre nodi visibili: 5a scelta ricetta, 5b titolo (modello), 5c composizione.
 const fs = require('fs');
-const file = 'E:/n8n/yoga/build-workflow.mjs';
+const file = 'E:/n8n/officina-sonora/build-workflow.mjs';
 let s = fs.readFileSync(file, 'utf8');
 function sost(da, a) {
   if (!s.includes(da)) throw new Error('non trovato: ' + da.slice(0, 70));

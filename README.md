@@ -1,8 +1,8 @@
-# Yoga Music Factory
+# Officina Sonora
 
 Un sistema automatico che **crea musica di sottofondo strumentale** (e vocale senza parole) in modo continuo,
 la organizza in una libreria ordinata e la pubblica su **iBroadcast** con copertine, tag e playlist.
-Pensato per i centri yoga, ma utilizzabile per qualsiasi sottofondo.
+Adatto a qualsiasi sottofondo, compresi i centri yoga.
 
 Il sistema lavora da solo: crea un brano alla volta, lo controlla, lo carica, ti avvisa su Telegram
 e impara dai voti che dai dalla dashboard, su iBroadcast e su Telegram.
@@ -117,7 +117,7 @@ I due file di avvio si trovano in `E:\n8n` (accanto alla cartella di installazio
 
 Per l'avvio e l'arresto basta fare doppio clic sul file.
 
-**Controllo automatico.** Un'attività pianificata di Windows, chiamata `YogaMusicSupervisore`, controlla ogni
+**Controllo automatico.** Un'attività pianificata di Windows, chiamata `OfficinaSonoraSupervisor`, controlla ogni
 5 minuti che il watchdog sia vivo e lo riavvia se si è bloccato. Se hai fermato l'automazione a mano, non la riavvia.
 
 ---
@@ -295,7 +295,7 @@ La revisione delle linee guida tiene conto sia dei voti nuovi sia di quelli corr
 
 ## 7. Struttura delle cartelle
 
-### Questo repository (`E:\n8n\yoga`)
+### Questo repository (`E:\n8n\officina-sonora`)
 
 | Cartella / file | Contenuto |
 |---|---|
@@ -312,7 +312,7 @@ La revisione delle linee guida tiene conto sia dei voti nuovi sia di quelli corr
 | `tools\test\` | test automatici |
 | `watchdog.ps1`, `supervisore.ps1`, `supervisore.vbs`, `stop.ps1` | sorveglianza e arresto |
 | `build-workflow.mjs` | genera il workflow di n8n dai blocchi in `src\` |
-| `yoga-workflow.json` | il workflow generato, pronto per essere importato in n8n |
+| `officina-sonora-workflow.json` | il workflow generato, pronto per essere importato in n8n |
 
 ### Fuori dal repository
 
@@ -320,8 +320,8 @@ La revisione delle linee guida tiene conto sia dei voti nuovi sia di quelli corr
 |---|---|
 | `E:\Musica di sottofondo\` | la **libreria** dei brani (non va su Git: sono file audio) |
 | `E:\Musica di sottofondo\_scartati\` | brani scartati dal controllo qualità |
-| `E:\n8n\yoga\state\` | stato in esecuzione: coda, log, contatori, battito (non va su Git) |
-| `E:\n8n\yoga\secrets\` | token cifrati con DPAPI (non va su Git) |
+| `E:\n8n\officina-sonora\state\` | stato in esecuzione: coda, log, contatori, battito (non va su Git) |
+| `E:\n8n\officina-sonora\secrets\` | token cifrati con DPAPI (non va su Git) |
 
 Il vecchio file `feedback.csv` per i voti manuali **non è più usato**: scriverci non ha effetto.
 
@@ -427,7 +427,7 @@ rinomina `feedback.csv` in `feedback.csv.vecchio`. Prima di scrivere salva una c
 ```powershell
 node build-workflow.mjs
 ```
-Poi importa `yoga-workflow.json` in n8n e pubblicalo con il comando di n8n `publish:workflow --id=yogaMusicFactory01`.
+Poi importa `officina-sonora-workflow.json` in n8n e pubblicalo con il comando di n8n `publish:workflow --id=yogaMusicFactory01`.
 Prima di ripubblicare, verifica che non ci sia un render in corso (`state\pipeline.lock` assente), perché il riavvio
 di n8n interrompe la pipeline. Se sono cambiati anche i file in `gateway\`, riavvia il gateway insieme al workflow:
 i blocchi e il gateway devono essere della stessa versione.

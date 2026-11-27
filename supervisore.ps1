@@ -1,8 +1,8 @@
-# Supervisore del watchdog. Eseguito ogni 5 minuti dall'attivita' pianificata "YogaMusicSupervisore".
+# Supervisore del watchdog. Eseguito ogni 5 minuti dall'attivita' pianificata "OfficinaSonoraSupervisor".
 # Riavvia il watchdog solo se e' morto o se il suo battito (state\watchdog.heartbeat) e' fermo da troppo tempo.
 # Non fa nulla se l'automazione e' stata fermata a mano (file state\STOP).
 $ErrorActionPreference = 'SilentlyContinue'
-$StateDir = 'E:\n8n\yoga\state'
+$StateDir = 'E:\n8n\officina-sonora\state'
 $Log = "$StateDir\supervisore.log"
 $Heartbeat = "$StateDir\watchdog.heartbeat"
 $MaxMinuti = 15

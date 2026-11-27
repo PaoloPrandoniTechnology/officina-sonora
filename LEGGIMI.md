@@ -1,6 +1,6 @@
 # Musica di sottofondo: struttura del progetto
 
-Il progetto produce musica strumentale di sottofondo, per centri yoga e per qualsiasi altro uso.
+Il progetto produce musica strumentale di sottofondo, per qualsiasi uso, dallo yoga al lavoro e al tempo libero.
 Tre livelli definiscono ogni brano.
 
 ## 1. Ambito (il target)
@@ -60,7 +60,7 @@ generazione del brano. Il giudizio confronta gli ultimi 7 giorni con i 7 precede
 2. Nessun altro intervento: tag, playlist, voti, copertina e tempo funzionano da soli.
 
 ## Blocchi del workflow n8n
-Il workflow "Yoga Music Factory" e' costruito da `build-workflow.mjs` a partire dai blocchi in `src\blocks\`:
+Il workflow "Officina Sonora" e' costruito da `build-workflow.mjs` a partire dai blocchi in `src\blocks\`:
 - 1-2: stato e controllo del render
 - 3a-3b: scarica audio e scrive i metadati
 - 3c: controllo qualita
@@ -76,7 +76,7 @@ Il workflow "Yoga Music Factory" e' costruito da `build-workflow.mjs` a partire 
 ## Affidabilita'
 - **Lock di pipeline**: `state\pipeline.lock` impedisce esecuzioni sovrapposte del workflow. Scade dopo 15 minuti
   in caso di crash. I voti (10) aspettano che il lock sia libero prima di scrivere `guidance.json`.
-- **Supervisore**: l'attivita' pianificata `YogaMusicSupervisore` gira ogni 5 minuti (`supervisore.vbs`).
+- **Supervisore**: l'attivita' pianificata `OfficinaSonoraSupervisor` gira ogni 5 minuti (`supervisore.vbs`).
   Riavvia il watchdog se e' morto o se il suo battito (`state\watchdog.heartbeat`) e' fermo da 15 minuti.
   Non fa nulla se esiste `state\STOP`. Log: `state\supervisore.log`.
 - **Controllo audio (3c)**: il gateway analizza il brano (livello, silenzi, clipping) con `mpg123-decoder`.

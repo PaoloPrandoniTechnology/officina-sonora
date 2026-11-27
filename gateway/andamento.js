@@ -3,8 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const LIBRERIA = process.env.YMF_LIBRERIA || 'E:\\Musica di sottofondo';
-const STATE = 'E:\\n8n\\yoga\\state';
+const LIBRERIA = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
+const STATE = 'E:\\n8n\\officina-sonora\\state';
 const CONFIG = path.join(__dirname, '..', 'config');
 const ORA_MS = 3600000;
 const GIORNO_MS = 86400000;

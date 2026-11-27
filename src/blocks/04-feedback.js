@@ -41,7 +41,7 @@ try {
   }
   const current = readGuidance();
   const recent = voted;
-  const system = 'Sei il revisore artistico di un generatore di musica per centri yoga. Rispondi solo con JSON valido.';
+  const system = 'Sei il revisore artistico di un generatore di musica di sottofondo. Rispondi solo con JSON valido.';
   const user = `Brani votati dall'utente (voto da 1 a 5, le note sono indicazioni dirette; ogni voto utente pesa come 100 dati automatici):
 ${JSON.stringify(recent, null, 1)}
 
