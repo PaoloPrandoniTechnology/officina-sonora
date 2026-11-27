@@ -5,7 +5,7 @@ la organizza in una libreria ordinata e la pubblica su **iBroadcast** con copert
 Pensato per i centri yoga, ma utilizzabile per qualsiasi sottofondo.
 
 Il sistema lavora da solo: crea un brano alla volta, lo controlla, lo carica, ti avvisa su Telegram
-e impara dai voti che dai su iBroadcast e su Telegram.
+e impara dai voti che dai dalla dashboard, su iBroadcast e su Telegram.
 
 ---
 
@@ -36,7 +36,7 @@ e impara dai voti che dai su iBroadcast e su Telegram.
 - Salva il brano nella libreria, con i metadati (titolo, genere, bpm, tonalità, durata, ecc.) e la copertina.
 - Lo carica su **iBroadcast** con tag e playlist.
 - Ti manda un messaggio **Telegram** per ogni brano caricato.
-- Legge i tuoi voti su iBroadcast e su Telegram, e usa i voti per decidere i generi e le ricette da produrre.
+- Raccoglie i tuoi voti da dashboard, iBroadcast e Telegram, e usa i voti per decidere i generi e le ricette da produrre.
 - Ogni giorno, dopo le 8, invia un **rapporto** con lo stato del sistema.
 
 Non devi fare nulla di manuale: una volta avviato, continua da solo e si riprende in caso di blocchi.
@@ -123,12 +123,12 @@ Per l'avvio e l'arresto basta fare doppio clic sul file.
 
 ## 5. Dove guardare: dashboard, iBroadcast, Telegram
 
-### Dashboard (stato in tempo reale)
+### Dashboard (stato, ascolto e voto)
 
 **[http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard)**
 
 Si apre nel browser **solo dal tuo PC** (l'indirizzo `127.0.0.1` non è raggiungibile da altri dispositivi).
-Si aggiorna da sola ogni 5 secondi e mostra:
+Lo stato si aggiorna da solo ogni 5 secondi e mostra:
 
 - quali servizi sono attivi (n8n, motore YuE2, LM Studio, modello gemma);
 - il render in corso: titolo, genere, tempo trascorso, stima di avanzamento;
@@ -136,7 +136,34 @@ Si aggiorna da sola ogni 5 secondi e mostra:
 - il battito del watchdog e l'ultimo controllo del supervisore;
 - le ultime esecuzioni di n8n e le ultime righe del log di produzione.
 
+Dalla scheda **Voti** puoi anche ascoltare e votare i brani (vedi [come votare i brani](#6-come-votare-i-brani)).
+
 Se la pagina non si apre, l'automazione è ferma: avviala con `avvia-automazione.vbs`.
+
+### Andamento (il sistema sta migliorando?)
+
+La scheda **Andamento** mostra quattro grafici nel tempo:
+
+- **voto medio** (nel dettaglio di ogni punto c'è il numero di voti);
+- **brani scartati** in percentuale;
+- **secondi di render per secondo di musica buona** (conta solo i brani di cui è noto il tempo di render);
+- **errori**, presi da `state\errori.jsonl` e dal file ruotato `errori.jsonl.1`: restano visibili finché il registro li conserva.
+
+Il voto, come gli scarti, è collocato nel momento in cui il brano è stato **generato**, non in quello in cui l'hai votato.
+Il passo può essere **per ora** (ultime 48 ore) o **per giorno** (ultimi 60 giorni); quello automatico è per ora
+finché il brano più vecchio ha meno di 7 giorni. Il filtro per genere non si applica agli errori. I punti del voto
+medio con meno di 5 voti sono disegnati vuoti. Le linee verticali tratteggiate indicano le modifiche fatte dalla
+sezione Controllo (parametri, generi, linee guida, note; non i voti né i comandi di produzione) e le nuove versioni
+delle linee guida.
+
+In alto c'è il giudizio, che confronta i brani generati negli **ultimi 7 giorni** con quelli dei **7 precedenti**:
+
+| Giudizio su | Minimo in ciascun periodo | migliora | peggiora |
+|---|---|---|---|
+| Voto medio | 10 brani votati | almeno +0,2 stelle | almeno -0,2 stelle |
+| Brani scartati | 30 brani | almeno 5 punti percentuali in meno | almeno 5 punti percentuali in più |
+
+Tra le due soglie il giudizio è **stabile**; sotto il minimo è **dati insufficienti**.
 
 ### iBroadcast
 
@@ -162,6 +189,7 @@ Comandi disponibili:
 
 | Comando | Cosa fa |
 |---|---|
+| `/menu` | menu con i pulsanti, compreso **Vota un brano** |
 | `/stato` | a che punto siamo: brani, coda, errori |
 | `/annulla` | scarta le modifiche in attesa |
 | `/aiuto` | elenco dei comandi |
@@ -209,7 +237,32 @@ Le modifiche valgono dal prossimo brano.
 
 ## 6. Come votare i brani
 
-Vota direttamente dall'app iBroadcast, con le stesse regole per tutti i generi:
+Puoi votare in tre modi, con voti da 1 a 5: dalla dashboard, da Telegram e dall'app iBroadcast.
+Il voto è salvato nel file `.json` del brano, che è l'unica fonte dei voti; dashboard e Telegram identificano il
+brano con il numero di traccia.
+
+### Dalla dashboard
+
+Apri la scheda **Voti**. In alto trovi **Da votare**: un brano alla volta, con il lettore audio.
+
+- La coda propone prima i generi con meno voti e, a parità, i brani più recenti. Non contiene i brani scartati né
+  quelli generati da meno di 15 minuti. Puoi filtrarla per genere.
+- Vota con le stelle o con i tasti **1-5** (non mentre stai scrivendo la nota). Dopo il voto la pagina passa al
+  brano successivo e prova ad avviarlo. **Salta** passa oltre senza votare.
+- La **nota** è facoltativa (massimo 300 caratteri, senza `<` o `>`) e viene salvata insieme al voto: scrivila
+  prima di votare. La revisione delle linee guida ne tiene conto.
+- **Votati ora** elenca gli ultimi 20 brani votati: un clic riapre il brano per correggere voto o nota.
+
+I voti dati dalla dashboard compaiono nello **Storico** della sezione Controllo, con il valore precedente.
+
+### Da Telegram
+
+Scrivi `/menu` e scegli **Vota un brano**: il bot propone gli 8 brani più recenti. Scegli il brano e il voto;
+il messaggio successivo diventa la nota (`/annulla` se non vuoi aggiungerne). Anche questi voti finiscono nello Storico.
+
+### Da iBroadcast
+
+Usa le stesse regole per tutti i generi:
 
 - **Stelle** (da 1 a 5) sul brano.
 - **Tag** `preferito`, `scarta` oppure `voto-N` (N da 1 a 5).
@@ -217,9 +270,22 @@ Vota direttamente dall'app iBroadcast, con le stesse regole per tutti i generi:
 - **Tag** `piu-veloce` o `piu-lento`: spostano il bpm del genere di 6, entro un limite di 15 dalla fascia base.
 - **Cestino**: un brano nel cestino vale come voto 1, se non c'è un segnale migliore.
 
+Se un brano ha più segnali, le stelle prevalgono su tag e playlist, e questi sul cestino.
+
 I tag e le playlist creati dal sistema (`yoga`, `musica`, `famiglia-*`, `categoria-*`, ecc.) **non contano** come voti.
 
-I voti vengono letti ogni 10 minuti. Puoi anche votare da Telegram con i comandi del bot.
+### Regola "vince l'ultimo"
+
+Vale l'ultimo voto dato, ovunque tu l'abbia dato. I voti di iBroadcast vengono letti ogni 10 minuti, quindi il
+sistema vede una modifica fatta nell'app **fino a 10 minuti dopo** (di più se in quel momento la produzione è occupata),
+e per lui "ultimo" è quel momento.
+
+- Un segnale di iBroadcast sostituisce il voto solo quando **cambia**: se voti dalla dashboard o da Telegram, le
+  stelle già presenti nell'app non sovrascrivono il nuovo voto.
+- Se togli il segnale in iBroadcast, il voto salvato resta.
+- I voti dati dalla dashboard o da Telegram **non** vengono scritti su iBroadcast: nell'app le stelle restano quelle di prima.
+
+La revisione delle linee guida tiene conto sia dei voti nuovi sia di quelli corretti.
 
 ---
 
@@ -237,6 +303,7 @@ I voti vengono letti ogni 10 minuti. Puoi anche votare da Telegram con i comandi
 | `config\history\` | archivio delle versioni precedenti delle linee guida |
 | `gateway\` | il servizio locale che tiene i token e parla con iBroadcast e Telegram |
 | `gateway\dashboard.html`, `gateway\stato.js` | la dashboard di stato |
+| `gateway\voti.js`, `gateway\andamento.js` | ascolto e voto dei brani; andamento nel tempo |
 | `tools\` | script di manutenzione usati nel tempo (correzioni, migrazioni, prove) |
 | `tools\test\` | test automatici |
 | `watchdog.ps1`, `supervisore.ps1`, `supervisore.vbs`, `stop.ps1` | sorveglianza e arresto |
@@ -249,9 +316,10 @@ I voti vengono letti ogni 10 minuti. Puoi anche votare da Telegram con i comandi
 |---|---|
 | `E:\Musica di sottofondo\` | la **libreria** dei brani (non va su Git: sono file audio) |
 | `E:\Musica di sottofondo\_scartati\` | brani scartati dal controllo qualità |
-| `E:\Musica di sottofondo\feedback.csv` | voti manuali (file; voto; nota) |
 | `E:\n8n\yoga\state\` | stato in esecuzione: coda, log, contatori, battito (non va su Git) |
 | `E:\n8n\yoga\secrets\` | token cifrati con DPAPI (non va su Git) |
+
+Il vecchio file `feedback.csv` per i voti manuali **non è più usato**: scriverci non ha effetto.
 
 **Organizzazione della libreria:**
 ```
@@ -295,8 +363,10 @@ Il nuovo genere riceve subito i suoi tag, la sua playlist, i suoi voti e la sua 
 - I **token** (Telegram e iBroadcast) sono salvati cifrati in `secrets\` con **DPAPI**: possono essere letti solo
   dal tuo utente di Windows, su questo PC. Non sono nel repository.
 - Solo il **gateway** conosce i token. I blocchi di n8n chiamano il gateway su `127.0.0.1` e non li vedono mai.
-- Il gateway accetta solo richieste dal tuo PC e solo le operazioni previste.
-- La **dashboard** è di sola lettura e non mostra token.
+- Il gateway accetta solo richieste dal tuo PC e solo le operazioni previste. Rifiuta le richieste rivolte a un
+  nome diverso da `127.0.0.1:5790` o `localhost:5790` e le richieste di scrittura inviate da pagine di altri siti.
+- La **dashboard** non mostra token. Modifica solo ciò che prevedono la sezione Controllo e il voto dei brani;
+  l'audio si richiede con il numero di traccia, mai con un percorso.
 - Il file `config\telegram.json` (con il tuo chat ID) **non è nel repository**: va ricreato a mano (vedi sotto).
 
 **Se rigeneri i token** (per esempio dopo una password cambiata): esegui `ibroadcast-login.ps1` e segui le istruzioni,
@@ -337,9 +407,17 @@ Sostituisci il numero con il tuo chat ID Telegram.
 
 **Test automatici** (dalla cartella del progetto):
 ```powershell
-node --test tools/test/lib.test.js
-node --test tools/test/stato.test.js
+node --test tools/test/*.test.js
 ```
+Il test `rotazione` si basa sul caso e ogni tanto può fallire: in quel caso ripetilo.
+
+**Pulizia una tantum dei voti** (nel passaggio ai voti nel `.json`; `--applica` solo a produzione ferma):
+```powershell
+node tools/pulisci-voti.js            # prova a vuoto: non modifica nulla
+node tools/pulisci-voti.js --applica
+```
+Rimuove i voti senza fonte (copiati tra brani con lo stesso nome di file), segna quelli arrivati da iBroadcast e
+rinomina `feedback.csv` in `feedback.csv.vecchio`. Prima di scrivere salva una copia in `state\backup`.
 
 **Modificare un blocco e pubblicarlo in n8n:**
 ```powershell
@@ -347,7 +425,8 @@ node build-workflow.mjs
 ```
 Poi importa `yoga-workflow.json` in n8n e pubblicalo con il comando di n8n `publish:workflow --id=yogaMusicFactory01`.
 Prima di ripubblicare, verifica che non ci sia un render in corso (`state\pipeline.lock` assente), perché il riavvio
-di n8n interrompe la pipeline.
+di n8n interrompe la pipeline. Se sono cambiati anche i file in `gateway\`, riavvia il gateway insieme al workflow:
+i blocchi e il gateway devono essere della stessa versione.
 
 **Storico:** il repository contiene la storia completa delle modifiche. Ogni versione importante ha un messaggio di commit.
 
