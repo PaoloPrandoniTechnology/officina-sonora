@@ -975,6 +975,8 @@
     const pendenti = [];
     if (ctrl.comandi.svuotaCoda) pendenti.push('svuotamento della coda');
     if (ctrl.comandi.produciGenere) pendenti.push('genere forzato: ' + ctrl.comandi.produciGenere);
+    const sf = ctrl.sfondi || { fatti: 0, totale: 0 };
+    const scelto = $('#selGen') && $('#selGen').value;
     const opzioni = ctrl.generi.map((g) => `<option value="${esc(g.nome)}">${esc(g.nome)}</option>`).join('');
     $('#c-produzione').innerHTML = `
       <div class="grid">
@@ -995,6 +997,16 @@
           <button class="btn danger" id="bCoda">Svuota la coda</button>
         </div>
         <div class="card c12">
+          <h2>Sfondi delle copertine <small>${n0(sf.fatti)} su ${n0(sf.totale)} pronti</small></h2>
+          <p class="muted" style="margin:0 0 14px">${sf.inCorso
+            ? (sf.inChiusura ? 'Mi fermo dopo l’immagine in lavorazione, poi la produzione torna com’era.' : 'Generazione in corso: la produzione è in pausa.')
+            : 'La generazione mette in pausa la produzione, aspetta il brano in lavorazione e alla fine la ripristina. Puoi fermarla quando vuoi: riparte da dove era arrivata.'}</p>
+          ${sf.ultima ? `<p class="muted" style="margin:0 0 14px;font-size:12px" aria-live="polite">${esc(sf.ultima)}</p>` : ''}
+          ${sf.inCorso
+            ? `<button class="btn" id="bSfondiStop" ${sf.inChiusura ? 'disabled' : ''}>Ferma la generazione</button>`
+            : `<button class="btn warn" id="bSfondi" ${sf.fatti >= sf.totale ? 'disabled' : ''}>Metti in pausa e genera gli sfondi</button>`}
+        </div>
+        <div class="card c12">
           <h2>Produci ora un genere <small>ha la precedenza sulla rotazione, una sola volta</small></h2>
           <div class="addrow" style="max-width:640px">
             <select class="field" id="selGen">${opzioni}</select>
@@ -1013,6 +1025,13 @@
         esegui(() => invia('/api/controllo/comando', { azione: 'svuota_coda' }), 'Coda svuotata al prossimo giro');
       }
     };
+    if (scelto) $('#selGen').value = scelto;
+    if ($('#bSfondi')) $('#bSfondi').onclick = async () => {
+      if (await chiedi('Generare gli sfondi?', 'La produzione va in pausa finché la generazione non finisce o la fermi.', 'Genera')) {
+        esegui(() => invia('/api/controllo/comando', { azione: 'sfondi_avvia' }), 'Generazione degli sfondi avviata');
+      }
+    };
+    if ($('#bSfondiStop')) $('#bSfondiStop').onclick = () => esegui(() => invia('/api/controllo/comando', { azione: 'sfondi_ferma' }), 'Fermo la generazione');
     $('#bGen').onclick = () => {
       const g = $('#selGen').value;
       esegui(() => invia('/api/controllo/comando', { azione: 'produci', genere: g }), 'Genere in produzione: ' + g);
@@ -1542,6 +1561,8 @@
   aggiornaStato();
   aggiornaDati();
   setInterval(aggiornaStato, 5000);
+  // avanzamento degli sfondi mentre si generano
+  setInterval(() => { if (ctrl && ctrl.sfondi && ctrl.sfondi.inCorso && ctrlSub === 'produzione' && $('#bSfondiStop')) caricaControllo(true); }, 10000);
   setInterval(aggiornaDati, 30000);
 })();
 </script>

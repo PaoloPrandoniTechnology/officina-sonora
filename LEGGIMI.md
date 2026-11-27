@@ -91,3 +91,7 @@ Il workflow "Yoga Music Factory" e' costruito da `build-workflow.mjs` a partire 
 - Log di produzione: `state\tick.log`
 - Test: `node --test tools/test/*.test.js`
 - Dopo modifiche ai blocchi: `node build-workflow.mjs`, poi import e publish del workflow
+
+## Sfondi delle copertine
+Dashboard, Controllo, Produzione: "Metti in pausa e genera gli sfondi" (8 per genere, in `assets\sfondi`).
+Si ferma con "Ferma la generazione" e riparte dagli sfondi mancanti; per rifarne uno, cancellarlo.

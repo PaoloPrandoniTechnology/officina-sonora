@@ -12,6 +12,8 @@ const DIR = path.join(__dirname, '..');
 const SFONDI = path.join(DIR, 'assets', 'sfondi');
 const COMANDI = path.join(DIR, 'state', 'comandi.json');
 const STATO = path.join(DIR, 'state', 'state.json');
+const PID = path.join(DIR, 'state', 'sfondi.pid'); // letto dalla dashboard (gateway/sfondi.js)
+const FERMA = path.join(DIR, 'state', 'sfondi.stop'); // richiesta di stop dalla dashboard
 const LIBRERIA = 'E:\\Musica di sottofondo';
 const FFMPEG = 'E:\\MusicAI\\ffmpeg\\bin\\ffmpeg.exe';
 const WEBUI = 'E:\\StableDiffusion\\webui';
@@ -84,7 +86,7 @@ const pronta = () => webui('/sdapi/v1/sd-models', null, 5000).then(() => true, (
 async function avviaWebui(interrotto) {
   if (await pronta()) return () => {}; // gia' aperta da qualcun altro: la si usa e non la si chiude
   const log = fs.openSync(path.join(DIR, 'state', 'webui-sfondi.log'), 'w');
-  const p = spawn('cmd.exe', ['/d', '/c', `call .\\environment.bat && cd webui && python launch.py --api --lowvram --port ${PORTA}`], { cwd: WEBUI, stdio: ['ignore', log, log] });
+  const p = spawn('cmd.exe', ['/d', '/c', `call .\\environment.bat && cd webui && python launch.py --api --lowvram --port ${PORTA}`], { cwd: WEBUI, stdio: ['ignore', log, log], windowsHide: true });
   const chiudi = () => { try { execFileSync('taskkill', ['/PID', String(p.pid), '/T', '/F'], { stdio: 'ignore' }); } catch (e) { /* gia' chiusa */ } };
   pulizie.add(chiudi);
   const fine = Date.now() + 10 * 60000;
@@ -142,9 +144,12 @@ async function main() {
   for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { stop = true; console.log('interruzione richiesta: chiudo dopo la fase in corso'); });
   for (const s of ['SIGHUP', 'SIGBREAK']) process.on(s, () => { emergenza(); process.exit(1); });
   console.log('la produzione resta in pausa finche questo programma lavora');
+  fs.writeFileSync(PID, String(process.pid));
+  fs.rmSync(FERMA, { force: true });
+  process.on('exit', () => { fs.rmSync(PID, { force: true }); fs.rmSync(FERMA, { force: true }); });
 
   await conPausa(async (inPausa) => {
-    const interrotto = () => stop || !inPausa();
+    const interrotto = () => stop || !inPausa() || fs.existsSync(FERMA);
     const limite = Date.now() + 20 * 60000;
     while (leggi(STATO, {}).job) {
       if (interrotto()) return;
@@ -171,6 +176,7 @@ async function main() {
         }
       }
       if (!inPausa()) console.log('produzione ripresa dalla dashboard: mi fermo');
+      else if (fs.existsSync(FERMA)) console.log('generazione fermata dalla dashboard');
     } finally {
       chiudi();
     }

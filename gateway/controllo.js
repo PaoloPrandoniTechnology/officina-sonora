@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { datiAnalisi } = require('./analisi');
 const voti = require('./voti');
+const sfondi = require('./sfondi');
 
 const DIR = path.join(__dirname, '..');
 const PARAMETRI = path.join(DIR, 'config', 'parametri.json');
@@ -80,6 +81,7 @@ function lettura() {
       frequenze: M.MESSAGGI_FREQUENZE,
     },
     comandi: leggiJson(COMANDI, {}),
+    sfondi: sfondi.stato(),
     generi: catalogoNomi().map((nome) => {
       const s = generiSalvati[nome] || {};
       return { nome, peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
@@ -151,6 +153,11 @@ function impostaGenere({ nome, peso, attivo }) {
 }
 
 function comando({ azione, genere }) {
+  if (azione === 'sfondi_avvia' || azione === 'sfondi_ferma') {
+    if (azione === 'sfondi_avvia') sfondi.avvia(); else sfondi.ferma();
+    registra('comandi', azione, {}, {});
+    return { ok: true, sfondi: sfondi.stato() };
+  }
   const cur = leggiJson(COMANDI, {});
   let patch;
   if (azione === 'pausa') patch = { pausa: true };
