@@ -174,6 +174,10 @@ I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una prop
 | Folk, Celtic | slider acoustic folk |
 | Score cinematico | epic trailer |
 
+Se un render fallisce (per esempio perché le LoRA sovrapposte producono uno score illeggibile), il secondo
+tentativo parte senza la LoRA di genere e il terzo con la configurazione più collaudata (`yue2-instrumental-kto`,
+score di sola melodia).
+
 Una LoRA assente dal motore viene saltata e annotata nel log. Le scale scelte sono un punto di partenza,
 da correggere con l'ascolto.
 
@@ -366,6 +370,7 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 | La dashboard non si apre | l'automazione è ferma: `avvia-automazione.vbs` |
 | Nessun brano da molto | controlla i servizi in dashboard e che la produzione non sia in pausa |
 | Il motore non risponde | il watchdog lo riavvia; vedi `state\watchdog.log` |
+| "riaccodo ... failed" nel log | il motore non ha completato il render: il ripiego è automatico |
 | Molti brani "troppo corti" | limite noto (vedi miglioramenti); le soglie sono in *Controllo → Parametri* |
 | Voci in un brano strumentale | vota 1 con una nota; la LoRA in uso è registrata nella scheda |
 | "revisione non riuscita: LLM HTTP 400" | gemma non era caricato: le linee guida restano invariate |
@@ -435,4 +440,5 @@ In ordine di priorità. Il disegno completo è in
 | 5 | **Dashboard**: mostrare score, sezioni e LoRA di ogni brano; imparare dai voti anche su forme e LoRA | rendere visibile cosa funziona |
 | 6 | **Agente di ricerca locale** (DuckDuckGo e fonti di teoria, gemma): propone nuove idee compositive, da approvare in dashboard | miglioramento artistico continuo |
 | 7 | Eseguire la revisione delle linee guida quando gemma è caricato | oggi spesso fallisce durante i render |
-| 8 | Validazione più severa dello score (blocchi, ordine delle voci, nomi delle sezioni) | serve quando il compositore andrà in produzione |
+| 8 | Registrare in dashboard il motivo dei render falliti e le LoRA che li causano | tarare le scale con dati veri |
+| 9 | Validazione più severa dello score (blocchi, ordine delle voci, nomi delle sezioni) | serve quando il compositore andrà in produzione |

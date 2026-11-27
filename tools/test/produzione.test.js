@@ -12,7 +12,7 @@ const L = new Function('require', LIB + '\nreturn { CFG, extractAbc, componiStil
 const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'];
 
 // Esegue il blocco 6 con un motore finto; ritorna il corpo inviato a /synth e lo stato
-async function invia(categoria, { props, vocale = false } = {}) {
+async function invia(categoria, { props, vocale = false, attempts = 0 } = {}) {
   const finta = `
     CFG.comandi = {}; log = () => {}; engineUp = async () => true;
     req = async (m, url, o) => {
@@ -20,7 +20,7 @@ async function invia(categoria, { props, vocale = false } = {}) {
       $env.corpo = o.body; return { ok: true, status: 200, buf: Buffer.from('{"id":"j1"}') };
     };`;
   const env = { props };
-  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts: 0 };
+  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts };
   const input = { first: () => ({ json: { state: { job: null, queue: [concept] } } }) };
   const [r] = await new AF('require', '$input', '$env', LIB + finta + '\n' + leggi('src', 'blocks', '06-invia-render.js'))(require, input, env);
   return { corpo: env.corpo, job: r.json.state.job };
@@ -73,4 +73,15 @@ test('stile: nessuna frase ripetuta', () => {
   const s = L.componiStile(cat, { keywords: 'Heavy riffs, double bass drums' }, ['basso'], '', {});
   assert.equal(s.match(/heavy riffs/gi).length, 1, s);
   assert.equal(s.match(/double bass drums/g).length, 1, s);
+});
+
+// Visto in produzione: LoRA sovrapposte possono scrivere uno score che il motore non riesce a cantare
+test('dopo un render fallito si riducono le LoRA, poi si torna alla configurazione sicura', async () => {
+  const props = elenco('yue2-instrumental', 'yue2-instrumental-kto', 'yue2-epic-trailer');
+  const secondo = await invia('Score-cinematico', { props, attempts: 1 });
+  assert.equal(secondo.corpo.cot, 'full');
+  assert.deepEqual(secondo.corpo.adapters.map((a) => a.name), ['yue2-instrumental']);
+  const terzo = await invia('Score-cinematico', { props, attempts: 2 });
+  assert.equal(terzo.corpo.cot, 'melody');
+  assert.deepEqual(terzo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
 });

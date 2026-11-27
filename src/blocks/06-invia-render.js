@@ -20,20 +20,23 @@ try {
 } catch (e) {
   log(`elenco LoRA non disponibile: ${e.message}`);
 }
+// Ripiego dopo un render fallito (LoRA sovrapposte possono rovinare lo score): al secondo tentativo senza la
+// LoRA di genere, al terzo la configurazione gia' collaudata (KTO, score di sola melodia).
+const sicuro = (concept.attempts || 0) >= 2;
 const piena = (name) => ({ name, scale: 1.0, ar_scale: 1.0, nar_scale: 0.0 });
 const delGenere = ((CFG.categories || []).find((x) => x.name === concept.categoria) || {}).lora || [];
 const mancanti = delGenere.filter((a) => !presenti.includes(a.name));
 if (presenti.length && mancanti.length) log(`LoRA assente sul motore, brano senza: ${mancanti.map((a) => a.name).join(', ')}`);
 const adapters = concept.vocale ? [] : [
-  piena(presenti.includes('yue2-instrumental') ? 'yue2-instrumental' : 'yue2-instrumental-kto'),
+  piena(!sicuro && presenti.includes('yue2-instrumental') ? 'yue2-instrumental' : 'yue2-instrumental-kto'),
 ];
-adapters.push(...delGenere.filter((a) => presenti.includes(a.name)));
+if (!concept.attempts) adapters.push(...delGenere.filter((a) => presenti.includes(a.name)));
 
 const durata = Math.min(360, Math.round(concept.durata_s * 1.2)); // 360 s: limite del motore
 const body = {
   style: concept.style,
   lyrics: concept.lyrics,
-  cot: 'full', // score con melodia e accordi
+  cot: sicuro ? 'melody' : 'full', // full: score con melodia e accordi
   ...(adapters.length ? { adapters } : {}),
   // Il motore tronca il brano quando finisce i token: si chiede piu' durata e piu' margine,
   // cosi' il brano si chiude da solo e non si interrompe a meta'. Il controllo qualita' usa la durata di riferimento.
