@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { spawnSync } = require('child_process');
 
 const RADICE = path.join(__dirname, '..', '..');
 const codice = ['lib.js', 'lib-apprendimento.js']
@@ -201,3 +202,81 @@ test('aggiornaScheda: non cancella un voto scritto dopo la lettura', () => {
     fs.rmSync(f, { force: true });
   }
 });
+
+const PULIZIA = path.join(RADICE, 'tools', 'pulisci-voti.js');
+
+test('pulizia: rimuove i voti copiati, segna quelli di iBroadcast', () => {
+  const { pulisci } = require(PULIZIA);
+  const copiato = { voto: 5, nota_utente: 'valutazione iBroadcast' };
+  assert.equal(pulisci(copiato, 't1'), 'rimosso');
+  assert.deepEqual(copiato, { voto: null });
+  assert.equal(pulisci(copiato, 't2'), null);
+  assert.deepEqual(copiato, { voto: null });
+
+  for (const fonte of ['valutazione iBroadcast', 'tag voto-4', 'playlist Preferiti', 'cestino iBroadcast']) {
+    const m = { voto: 4, voto_fonte: fonte, nota_utente: fonte };
+    assert.equal(pulisci(m, 't1'), 'ibroadcast');
+    assert.deepEqual(m, { voto: 4, voto_fonte: fonte, voto_ib: 4, voto_il: 't1' });
+    assert.equal(pulisci(m, 't2'), null);
+    assert.equal(m.voto_il, 't1');
+  }
+  const conNota = { voto: 4, voto_fonte: 'valutazione iBroadcast', nota_utente: 'bella' };
+  pulisci(conNota, 't1');
+  assert.equal(conNota.nota_utente, 'bella');
+
+  for (const m of [{ voto: null }, { nota_utente: 'x' }, { voto: 3, voto_fonte: 'dashboard', nota_utente: 'n' }, { voto: 2, voto_fonte: 'telegram' }]) {
+    const prima = { ...m };
+    assert.equal(pulisci(m, 't1'), null);
+    assert.deepEqual(m, prima);
+  }
+});
+
+test('pulizia: a vuoto non scrive; --applica copia, scrive e rinomina il CSV; senza copia non cambia nulla', () => conLibreria(async (dir, lib) => {
+  const copie = path.join(dir, 'copie');
+  // due schede omonime in cartelle diverse e una illeggibile
+  fs.mkdirSync(path.join(lib, 'x'));
+  const a = path.join(lib, 'eco.json');
+  const b = path.join(lib, 'x', 'eco.json');
+  const rotta = path.join(lib, 'rotta.json');
+  const csv = path.join(lib, 'feedback.csv');
+  fs.writeFileSync(a, JSON.stringify({ titolo: 'Eco', numero_traccia: 1, voto: 5 }));
+  fs.writeFileSync(b, JSON.stringify({ titolo: 'Eco', numero_traccia: 2, voto: 4, voto_fonte: 'valutazione iBroadcast' }));
+  fs.writeFileSync(rotta, '{ troncato');
+  fs.writeFileSync(csv, 'file;voto;nota\n');
+  const file = [a, b, csv];
+  const originali = file.map((f) => fs.readFileSync(f, 'utf8'));
+  const invariati = () => assert.deepEqual(file.map((f) => fs.readFileSync(f, 'utf8')), originali);
+  const esegui = (backup, ...args) => spawnSync(process.execPath, [PULIZIA, ...args], { encoding: 'utf8', env: { ...process.env, YMF_LIBRERIA: lib, YMF_BACKUP: backup } });
+
+  const prova = esegui(copie);
+  assert.equal(prova.status, 0, prova.stderr);
+  assert.match(prova.stdout, /Voti copiati da rimuovere: 1 \(1\)/);
+  assert.match(prova.stdout, /Voti di iBroadcast da segnare: 1 \(2\)/);
+  assert.match(prova.stdout, /saltata: .*rotta\.json/);
+  invariati();
+  assert.equal(fs.existsSync(copie), false);
+
+  // la cartella delle copie non si puo' creare
+  const ostacolo = path.join(dir, 'ostacolo');
+  fs.writeFileSync(ostacolo, '');
+  assert.notEqual(esegui(ostacolo, '--applica').status, 0);
+  invariati();
+
+  const fatto = esegui(copie, '--applica');
+  assert.equal(fatto.status, 0, fatto.stderr);
+  assert.equal(leggi(a).voto, null);
+  assert.equal(leggi(b).voto_ib, 4);
+  assert.equal(fs.readFileSync(rotta, 'utf8'), '{ troncato');
+  assert.equal(fs.existsSync(csv), false);
+  assert.equal(fs.readFileSync(csv + '.vecchio', 'utf8'), originali[2]);
+  const [cartella] = fs.readdirSync(copie);
+  const copiati = file.map((f) => fs.readFileSync(path.join(copie, cartella, path.relative(lib, f)), 'utf8'));
+  assert.deepEqual(copiati, originali);
+  assert.deepEqual(fs.readdirSync(lib, { recursive: true }).filter((n) => n.endsWith('.tmp')), []);
+
+  // un nuovo CSV non sovrascrive quello gia' messo da parte
+  fs.writeFileSync(csv, 'nuovo');
+  assert.equal(esegui(copie, '--applica').status, 0);
+  assert.equal(fs.readFileSync(csv, 'utf8'), 'nuovo');
+  assert.equal(fs.readFileSync(csv + '.vecchio', 'utf8'), originali[2]);
+}));
