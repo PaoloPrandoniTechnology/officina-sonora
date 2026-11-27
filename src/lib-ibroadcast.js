@@ -8,7 +8,7 @@ function fnvAudio(raw) {
   }
   let h = 0x811c9dc5;
   for (let k = i; k < raw.length; k++) h = Math.imul(h ^ raw[k], 0x01000193) >>> 0;
-  return h.toString(16) + '-' + raw.length;
+  return h.toString(16) + '-' + (raw.length - i);
 }
 
 // ---- Tag ID3v2.3 completi, scritti nel file prima del caricamento ----
@@ -36,33 +36,77 @@ function commentFrame(text) {
   return frame('COMM', payload);
 }
 
+// "Do minore" -> "Cm" (formato TKEY); vuoto se non riconosciuta
+function chiaveId3(tonalita) {
+  const m = /^(do|re|mi|fa|sol|la|si)\s*(#|b|diesis|bemolle)?\s+(maggiore|minore)$/i.exec(String(tonalita || '').trim());
+  if (!m) return '';
+  const nota = { do: 'C', re: 'D', mi: 'E', fa: 'F', sol: 'G', la: 'A', si: 'B' }[m[1].toLowerCase()];
+  const alt = /^(#|diesis)$/i.test(m[2] || '') ? '#' : m[2] ? 'b' : '';
+  return nota + alt + (m[3].toLowerCase() === 'minore' ? 'm' : '');
+}
+// Testo libero con nome (TXXX)
+function userFrame(nome, value) {
+  if (value === undefined || value === null || value === '') return null;
+  return frame('TXXX', Buffer.concat([utf16(nome), Buffer.from([0, 0, 0xff, 0xfe]), Buffer.from(String(value), 'utf16le')]));
+}
+
+// Copertina del brano: composta dal gateway sullo sfondo del genere; se non si puo', quella disegnata qui.
+async function copertinaPer(meta) {
+  try {
+    const r = await gw('/copertina', { categoria: meta.categoria, titolo: meta.titolo, numero: Number(meta.numero_traccia) || 0 });
+    if (r.ok && r.jpeg) return { mime: 'image/jpeg', dati: Buffer.from(r.jpeg, 'base64'), definitiva: true };
+  } catch (e) { /* gateway non raggiungibile: copertina provvisoria */ }
+  return copertinaProvvisoria(meta);
+}
+function copertinaProvvisoria(meta) {
+  return { mime: 'image/png', dati: coverPng(meta.categoria, Number(meta.numero_traccia) || 1), definitiva: false };
+}
+
 // Scrive i tag nel file: rimuove un eventuale header ID3 esistente e ne mette uno nuovo.
-function tagFile(file, meta) {
+function tagFile(file, meta, cop = copertinaProvvisoria(meta)) {
   const raw = fs.readFileSync(file);
   let audio = raw;
   if (raw.length > 10 && raw.toString('ascii', 0, 3) === 'ID3') {
     const size = ((raw[6] & 0x7f) << 21) | ((raw[7] & 0x7f) << 14) | ((raw[8] & 0x7f) << 7) | (raw[9] & 0x7f);
     audio = raw.subarray(10 + size);
   }
-  const year = String(new Date(meta.generato_il || Date.now()).getFullYear());
-  const album = meta.categoria || 'Raccolta';
-  const comment = [meta.descrizione, meta.attivita && `Attivita': ${meta.attivita}`, meta.style && `Stile: ${meta.style}`,
+  const data = new Date(meta.generato_il || Date.now());
+  const due = (n) => String(n).padStart(2, '0');
+  const cat = (CFG.categories || []).find((c) => c.name === meta.categoria) || {};
+  const album = (cat.copertina && cat.copertina.etichetta) || String(meta.categoria || 'Raccolta').replace(/-/g, ' ');
+  const durata = (meta.qualita && meta.qualita.durata_reale_s) || meta.durata_s;
+  const editore = 'Yoga Music Factory';
+  const comment = [meta.descrizione, meta.attivita && `Attività: ${meta.attivita}`, meta.style && `Stile: ${meta.style}`,
     meta.energia && `Energia: ${meta.energia}/5`, meta.struttura && `Struttura: ${meta.struttura}`, 'Strumentale, generato con YuE2']
     .filter(Boolean).join(' | ');
   const frames = [
+    textFrame('TIT1', cat.famiglia),
     textFrame('TIT2', meta.titolo),
+    textFrame('TIT3', meta.tipo),
     textFrame('TPE1', CFG.artista),
     textFrame('TPE2', CFG.artista),
     textFrame('TALB', album),
-    textFrame('TCON', meta.genere || meta.categoria),
+    textFrame('TCON', meta.genere || album),
     textFrame('TRCK', meta.numero_traccia),
-    textFrame('TIT3', meta.tipo),
+    textFrame('TYER', String(data.getFullYear())),
+    textFrame('TDAT', due(data.getDate()) + due(data.getMonth() + 1)),
     textFrame('TBPM', meta.bpm),
-    textFrame('TKEY', meta.tonalita),
-    textFrame('TYER', year),
-    textFrame('TENC', 'Yoga Music Factory'),
+    textFrame('TKEY', chiaveId3(meta.tonalita)),
+    textFrame('TLEN', durata ? Math.round(durata * 1000) : ''),
+    textFrame('TLAN', 'zxx'),
+    textFrame('TCOM', editore),
+    textFrame('TPUB', editore),
+    textFrame('TCOP', `${data.getFullYear()} ${editore}`),
+    textFrame('TENC', editore),
+    userFrame('MOOD', MOOD_BY_ENERGIA[meta.energia]),
+    userFrame('ENERGIA', meta.energia),
+    userFrame('ATTIVITA', meta.attivita),
+    userFrame('STRUTTURA', meta.struttura),
+    userFrame('STRUMENTI', [].concat(meta.strumenti || []).join(', ')),
+    userFrame('VARIANTE', meta.variante),
+    userFrame('SEED', meta.seed),
     commentFrame(comment),
-    apicFrame(coverPng(meta.categoria, Number(meta.numero_traccia) || 1)),
+    apicFrame(cop.dati, cop.mime),
   ].filter(Boolean);
   const body = Buffer.concat(frames);
   const header = Buffer.concat([Buffer.from('ID3'), Buffer.from([0x03, 0x00, 0x00]), syncsafe(body.length)]);
