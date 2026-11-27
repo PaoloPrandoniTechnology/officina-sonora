@@ -25,6 +25,15 @@ function libraryTracks() {
   return out;
 }
 
+// Aggiorna solo alcuni campi di una scheda, rileggendola: un voto scritto nel frattempo resta.
+// Se la scheda manca o e' illeggibile lancia un errore, senza ricrearla con i soli campi.
+function aggiornaScheda(jsonPath, campi) {
+  const meta = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  const tmp = jsonPath + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(Object.assign(meta, campi), null, 2));
+  fs.renameSync(tmp, jsonPath);
+}
+
 // Numero progressivo globale dei brani: non si ripete mai e non torna indietro.
 // Il contatore vive in state/contatore.json e si incrementa a ogni brano salvato.
 CFG.contatoreFile = path.join(CFG.dir, 'state', 'contatore.json');

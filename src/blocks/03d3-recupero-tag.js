@@ -34,6 +34,11 @@ for (const { full, meta } of coda.slice(0, 3)) {
   } catch (e) {
     log(`iBroadcast: tag di ${meta.titolo} in attesa di elaborazione, nuovo tentativo al prossimo giro (n. ${ib.tag_tentativi}, ${e.message})`);
   }
-  fs.writeFileSync(full, JSON.stringify(meta, null, 2));
+  // Durante l'attesa puo' essere arrivato un voto: si riscrive solo il blocco ibroadcast
+  try {
+    aggiornaScheda(full, { ibroadcast: ib });
+  } catch (e) {
+    log(`iBroadcast: scheda di ${meta.titolo} non aggiornata: ${e.message}`);
+  }
 }
 return [{ json: { state, outcome: inp.outcome, caricati: inp.caricati || [] } }];
