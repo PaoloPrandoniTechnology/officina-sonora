@@ -103,3 +103,10 @@ test('durata e lyrics', () => {
   s.sezioni.push({ nome: 'interlude', battute: [battuta(null)] });
   assert.equal(A.lyricsDaScore(s, { forma: 'tempi' }), '[verse 0:00-0:02]\n\n[bridge 0:02-0:04]');
 });
+
+test('minore: sesta e settima alzate scritte sulla loro lettera, non col bemolle', () => {
+  const dm = A.scriviAbc(base([n(73, 16), n(71, 16)], { tonalita: 'Dm' }));
+  assert.ok(dm.includes('^c16') && dm.includes('=B16'), dm);
+  const gm = A.scriviAbc(base([n(66, 32)], { tonalita: 'Gm' }));
+  assert.ok(gm.includes('^F32'), gm);
+});

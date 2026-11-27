@@ -31,18 +31,18 @@ test('griglia: 14 prove, score validi, durata e lyrics', () => {
 });
 
 // Motore finto: risponde come yue-server
-async function motoreFinto({ adapters, rifiuta = [], secondi = 130 }) {
+async function motoreFinto({ adapters, rifiuta = [], secondi = 130, replica = '{"abc":"X:1"}', errore = 'no' }) {
   let invii = 0;
   const srv = http.createServer((req, res) => {
     const json = (code, o) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(o)); };
     req.resume();
     req.on('end', () => {
-      if (req.url === '/props') return json(200, { adapters: adapters.map((name) => ({ name, ok: true })) });
-      if (req.url === '/synth') return rifiuta.includes(++invii) ? json(400, { error: 'no' }) : json(200, { id: 'j' + invii });
+      if (req.url === '/props') return json(200, adapters ? { adapters: adapters.map((name) => ({ name, ok: true })) } : {});
+      if (req.url === '/synth') return rifiuta.includes(++invii) ? json(400, { error: errore }) : json(200, { id: 'j' + invii });
       if (req.url.includes('result=1')) {
         res.writeHead(200, { 'Content-Type': 'multipart/mixed; boundary=XX' });
         return res.end(Buffer.concat([
-          Buffer.from('--XX\r\nContent-Type: application/json\r\n\r\n{"abc":"X:1"}\r\n--XX\r\nContent-Type: audio/mpeg\r\nContent-Disposition: attachment; filename="a.mp3"\r\n\r\n'),
+          Buffer.from('--XX\r\nContent-Type: application/json\r\n\r\n' + replica + '\r\n--XX\r\nContent-Type: audio/mpeg\r\nContent-Disposition: attachment; filename="a.mp3"\r\n\r\n'),
           Buffer.alloc(secondi * 16000), Buffer.from('\r\n--XX--\r\n'),
         ]));
       }
@@ -104,4 +104,64 @@ test('motore spento: tutte fallite, pagina scritta lo stesso', async () => {
 test('pagina: il testo delle richieste non diventa HTML', () => {
   const html = pagina([{ id: 'x', brano: 'surf', variante: 'A', body: { style: '<script>alert(1)</script>', lyrics: '' } }], [{ id: 'x', stato: 'fallita', motivo: '<img>' }]);
   assert.ok(!html.includes('<script>alert') && !html.includes('<img>'));
+});
+
+test('cinematico: sensibile scritta Do diesis; sull\'accordo di La7 l\'ostinato non suona il Si bemolle', () => {
+  const abc = A.scriviAbc(SCORE.cinematico);
+  assert.ok(abc.includes('^c') && !abc.includes('_d'), abc);
+  for (const b of SCORE.cinematico.sezioni.find((s) => s.nome === 'interlude').battute) {
+    if (b.accordi[0].sigla === 'A7') assert.ok(b.ins.every((x) => x.midi % 12 !== 10));
+  }
+});
+
+test('audio arrivato al limite richiesto: segnalato', async () => {
+  const m = await motoreFinto({ adapters: TUTTI, secondi: 138 });
+  const cartella = tmp();
+  try {
+    const [e] = await esegui({ prove: griglia().slice(0, 1), motore: m.url, cartella, attesaMs: 1 });
+    assert.equal(e.alLimite, true);
+    assert.match(fs.readFileSync(path.join(cartella, 'index.html'), 'utf8'), /LIMITE/);
+  } finally { m.chiudi(); fs.rmSync(cartella, { recursive: true, force: true }); }
+});
+
+test('score restituito dal motore: durata ed errori in pagina', async () => {
+  const abc = A.scriviAbc({ bpm: 120, metro: '4/4', tonalita: 'C', sezioni: [{ nome: 'verse', battute: [{ accordi: [], vocal: null, ins: null }] }] });
+  const m = await motoreFinto({ adapters: TUTTI, replica: JSON.stringify({ abc }) });
+  const cartella = tmp();
+  try {
+    const [e] = await esegui({ prove: griglia().slice(1, 2), motore: m.url, cartella, attesaMs: 1 });
+    assert.deepEqual(e.score, { secondi: 2, errori: 0, file: 'risposta-1.json' });
+    assert.equal(e.troncato, true);
+    assert.match(fs.readFileSync(path.join(cartella, 'index.html'), 'utf8'), /score restituito: 2 s/);
+  } finally { m.chiudi(); fs.rmSync(cartella, { recursive: true, force: true }); }
+});
+
+test('richiesta cambiata: la prova riuscita si ripete', async () => {
+  const m = await motoreFinto({ adapters: TUTTI });
+  const cartella = tmp();
+  try {
+    const prove = griglia().slice(0, 1);
+    await esegui({ prove, motore: m.url, cartella, attesaMs: 1 });
+    prove[0].body.style += ', changed';
+    await esegui({ prove, motore: m.url, cartella, attesaMs: 1 });
+    assert.equal(m.invii(), 2);
+  } finally { m.chiudi(); fs.rmSync(cartella, { recursive: true, force: true }); }
+});
+
+test('adapter rifiutato da /synth o /props senza elenco: saltata, non fallita', async () => {
+  const m = await motoreFinto({ adapters: null, rifiuta: [1], errore: 'unknown adapter: yue2-instrumental' });
+  const cartella = tmp();
+  try {
+    const [e] = await esegui({ prove: griglia().slice(0, 1), motore: m.url, cartella, attesaMs: 1 });
+    assert.equal(e.stato, 'saltata');
+  } finally { m.chiudi(); fs.rmSync(cartella, { recursive: true, force: true }); }
+});
+
+test('/props senza elenco di adapter: la prova parte', async () => {
+  const m = await motoreFinto({ adapters: null });
+  const cartella = tmp();
+  try {
+    const [e] = await esegui({ prove: griglia().slice(0, 1), motore: m.url, cartella, attesaMs: 1 });
+    assert.equal(e.stato, 'ok');
+  } finally { m.chiudi(); fs.rmSync(cartella, { recursive: true, force: true }); }
 });

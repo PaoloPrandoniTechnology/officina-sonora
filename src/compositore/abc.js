@@ -27,11 +27,25 @@ function armatura(tonalita) {
 }
 
 // Altezza MIDI -> testo ABC, tenendo conto delle alterazioni in vigore nella battuta (valide per lettera)
-function nomeNota(midi, stato, bemolli) {
+function nomeNota(midi, stato, tonalita) {
+  const bemolli = QUINTE[tonalita] < 0;
   const lettere = Object.keys(BASE);
   const pc = (alt, l) => (((BASE[l] + alt) % 12) + 12) % 12;
-  let lettera = lettere.find((l) => pc(stato[l], l) === midi % 12);
   let segno = '';
+  let lettera;
+  // in minore la sesta e la settima alzate si scrivono sulla propria lettera (in Re minore Do#, non Reb)
+  if (tonalita.endsWith('m')) {
+    const tonica = lettere.indexOf(tonalita[0]);
+    const pcTonica = BASE[tonalita[0]] + (tonalita[1] === '#' ? 1 : tonalita[1] === 'b' ? -1 : 0);
+    for (const [gradi, semitoni] of [[6, 11], [5, 9]]) {
+      const l = lettere[(tonica + gradi) % 7];
+      const alt = ((midi - BASE[l] + 18) % 12) - 6;
+      if ((midi - pcTonica + 24) % 12 !== semitoni || Math.abs(alt) > 2) continue;
+      lettera = l;
+      if (stato[l] !== alt) { segno = Object.keys(SEGNI).find((s) => SEGNI[s] === alt); stato[l] = alt; }
+    }
+  }
+  lettera ||= lettere.find((l) => pc(stato[l], l) === midi % 12);
   if (!lettera) {
     lettera = lettere.find((l) => BASE[l] === midi % 12);
     if (lettera) segno = '=';
@@ -48,7 +62,7 @@ function nomeNota(midi, stato, bemolli) {
 }
 
 // Una nota o pausa di durata qualsiasi, spezzata nelle durate ammesse (le note restano legate)
-function scriviEvento(e, stato, bemolli) {
+function scriviEvento(e, stato, tonalita) {
   const pezzi = [];
   let resto = e.durata;
   while (resto > 0) {
@@ -61,7 +75,7 @@ function scriviEvento(e, stato, bemolli) {
     if (e.lega) throw new Error('legatura su una pausa');
     return pezzi.map((d) => `z${d}`).join('');
   }
-  return pezzi.map((d, i) => nomeNota(e.midi, stato, bemolli) + d + (i < pezzi.length - 1 || e.lega ? '-' : '')).join('');
+  return pezzi.map((d, i) => nomeNota(e.midi, stato, tonalita) + d + (i < pezzi.length - 1 || e.lega ? '-' : '')).join('');
 }
 
 // Una battuta di una voce: gli accordi spezzano l'evento in cui cadono (con legatura, se e' una nota)
@@ -78,7 +92,7 @@ function scriviBattuta(eventi, accordi, tonalita, lunghezza) {
     while (inizio < fine) {
       while (attesa.length && attesa[0].pos === inizio) testo += `"${attesa.shift().sigla}"`;
       const taglio = attesa.length && attesa[0].pos < fine ? attesa[0].pos : fine;
-      testo += scriviEvento({ midi: e.midi, durata: taglio - inizio, lega: taglio < fine ? e.midi !== null : e.lega }, stato, QUINTE[tonalita] < 0);
+      testo += scriviEvento({ midi: e.midi, durata: taglio - inizio, lega: taglio < fine ? e.midi !== null : e.lega }, stato, tonalita);
       inizio = taglio;
     }
     pos = fine;

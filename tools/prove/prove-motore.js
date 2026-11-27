@@ -1,7 +1,8 @@
 // Prove A/B sul motore YuE2: score, lyrics e LoRA. Uso (produzione ferma): node tools/prove/prove-motore.js [cartella]
-// I risultati restano in state\prove\<data>\, con index.html per l'ascolto. Le prove riuscite non si ripetono.
+// I risultati restano in state\prove\, con index.html per l'ascolto. Le prove riuscite non si ripetono.
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 const A = require('../../src/compositore/abc.js');
 const SCORE = require('./score-prova.js');
@@ -90,11 +91,19 @@ async function unaProva(p, motore, dir, attesaMs) {
     return r;
   };
   const props = await (await chiama('/props')).json();
-  const presenti = new Set((props.adapters || []).filter((a) => a.ok !== false).map((a) => a.name));
-  const manca = p.body.adapters.find((a) => !presenti.has(a.name));
+  // senza un elenco in /props si prova lo stesso: decide /synth
+  const presenti = Array.isArray(props.adapters) && new Set(props.adapters.filter((a) => a.ok !== false).map((a) => a.name || a));
+  const manca = presenti && p.body.adapters.find((a) => !presenti.has(a.name));
   if (manca) return { stato: 'saltata', motivo: `LoRA assente sul motore: ${manca.name}` };
 
-  const { id } = await (await chiama('/synth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p.body) })).json();
+  let invio;
+  try {
+    invio = await chiama('/synth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p.body) });
+  } catch (e) {
+    if (/HTTP 4\d\d.*adapter/i.test(e.message)) return { stato: 'saltata', motivo: e.message };
+    throw e;
+  }
+  const { id } = await invio.json();
   const scadenza = Date.now() + 45 * 60 * 1000;
   let guasti = 0;
   for (;;) {
@@ -112,11 +121,25 @@ async function unaProva(p, motore, dir, attesaMs) {
   const tutte = parti(Buffer.from(await r.arrayBuffer()), r.headers.get('content-type'));
   const audio = tutte.find((x) => /audio\/|filename/.test(x.testa));
   if (!audio) throw new Error('nessuna traccia audio nella risposta');
-  tutte.filter((x) => x !== audio).forEach((x, i) => fs.writeFileSync(path.join(dir, `risposta-${i + 1}.json`), x.dati));
+  let score;
+  tutte.filter((x) => x !== audio).forEach((x, i) => {
+    const nome = `risposta-${i + 1}.json`;
+    fs.writeFileSync(path.join(dir, nome), x.dati);
+    let abc;
+    try { abc = JSON.parse(x.dati.toString('utf8')).abc; } catch (e) { /* parte non JSON */ }
+    if (!abc) return;
+    const r = A.leggiAbc(abc);
+    score = { secondi: r.score ? Math.round(A.durataSecondi(r.score)) : null, errori: r.errori.length, file: nome };
+  });
   const file = path.join(dir, 'audio.mp3');
   fs.writeFileSync(file, audio.dati);
   const secondiAudio = Math.round(durataAudio(file));
-  return { stato: 'ok', file, secondiAudio, troncato: secondiAudio < p.secondi * 0.85 };
+  const corto = (s) => s < p.secondi * 0.85;
+  return {
+    stato: 'ok', file, secondiAudio, score,
+    troncato: corto(secondiAudio) || (score?.secondi != null && corto(score.secondi)),
+    alLimite: secondiAudio >= p.body.duration - 1, // il motore si e' fermato al limite richiesto: finale probabilmente tagliato
+  };
 }
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -128,7 +151,8 @@ function pagina(prove, esiti) {
     const e = esiti.find((x) => x.id === p.id) || { stato: 'non ancora eseguita' };
     const corpo = e.stato === 'ok'
       ? `<audio controls preload="none" src="${esc(p.id)}/audio.mp3"></audio>
-<p>${e.secondiAudio} s di audio (score: ${Math.round(p.secondi)} s)${e.troncato ? ' <b>TRONCATO</b>' : ''}</p>
+<p>${e.secondiAudio} s di audio, ${Math.round((e.secondiAudio / p.secondi) * 100)}% dei ${Math.round(p.secondi)} s previsti${e.troncato ? ' <b>TRONCATO</b>' : ''}${e.alLimite ? ' <b>ARRIVATO AL LIMITE</b>' : ''}</p>
+${e.score ? `<p><a href="${esc(p.id)}/${esc(e.score.file)}">score restituito: ${esc(e.score.secondi ?? 'illeggibile')} s, ${esc(e.score.errori)} errori</a></p>` : ''}
 <p>${voti.map((v) => `<label>${v} <select data-id="${esc(p.id)}" data-voto="${v}"><option></option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>`).join(' ')}</p>
 <label>note <input data-id="${esc(p.id)}" data-voto="note" size="50"></label>`
       : `<p><b>${esc(e.stato)}</b> ${esc(e.motivo)}</p>`;
@@ -164,10 +188,12 @@ async function esegui({ prove = griglia(), motore = 'http://127.0.0.1:18087', ca
     const fileEsito = path.join(dir, 'esito.json');
     let e = null;
     try { e = JSON.parse(fs.readFileSync(fileEsito, 'utf8')); } catch (err) { /* mai eseguita */ }
-    if (!e || e.stato !== 'ok') {
+    const impronta = crypto.createHash('sha256').update(JSON.stringify(p.body)).digest('hex');
+    if (!e || e.stato !== 'ok' || e.impronta !== impronta) {
       fs.writeFileSync(path.join(dir, 'richiesta.json'), JSON.stringify(p.body, null, 2));
       console.log(`${new Date().toISOString()} ${p.id}: avvio`);
       try { e = { id: p.id, ...(await unaProva(p, motore, dir, attesaMs)) }; } catch (err) { e = { id: p.id, stato: 'fallita', motivo: err.cause ? `${err.message}: ${err.cause.message}` : err.message }; }
+      e.impronta = impronta;
       fs.writeFileSync(fileEsito, JSON.stringify(e, null, 2));
       console.log(`${new Date().toISOString()} ${p.id}: ${e.stato}${e.motivo ? ` (${e.motivo})` : ''}${e.troncato ? ' TRONCATO' : ''}`);
     }
@@ -180,6 +206,6 @@ async function esegui({ prove = griglia(), motore = 'http://127.0.0.1:18087', ca
 module.exports = { griglia, esegui, pagina };
 
 if (require.main === module) {
-  const cartella = path.resolve(process.argv[2] || path.join(__dirname, '..', '..', 'state', 'prove', new Date().toISOString().slice(0, 10)));
+  const cartella = path.resolve(process.argv[2] || path.join(__dirname, '..', '..', 'state', 'prove'));
   esegui({ cartella }).then((e) => console.log(`${e.filter((x) => x.stato === 'ok').length}/${e.length} riuscite: ${path.join(cartella, 'index.html')}`));
 }

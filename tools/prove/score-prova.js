@@ -59,6 +59,7 @@ const temaOrnato = [tema[0], 'D5:4 E5:4 F5:8 Bb5:12 C6:4', tema[2], 'E5:4 F5:4 G
 // aggravamento: le prime due battute del tema in valori doppi, trasportate in Fa
 const temaLargo = ['F5:24 C6:8', 'A5:24 G5:8', 'F5:16 A5:16', 'D6:32'];
 const ostinato = ['D4:4 A4:4 D5:4 A4:4 F4:4 A4:4 E4:4', 'D4:4 Bb4:4 D5:4 Bb4:4 F4:4 Bb4:4 A4:4'];
+const ostinatoLa = 'C#4:4 A4:4 C#5:4 A4:4 E4:4 A4:4 G4:4';
 const climax = ['D6:12 A6:4 F6:12 E6:4', 'D6:8 F6:8 Bb6:16', 'Bb6:12 A6:4 G6:8 F6:4 E6:4', 'E6:4 F6:4 E6:4 C#6:4 A5:16'];
 
 const cinematico = {
@@ -67,7 +68,7 @@ const cinematico = {
     sezione('intro', 8, ['Dm', 'Dm', 'Bb', 'Bb', 'Gm', 'Gm', 'Asus4', 'A7'],
       [null, null, 'D4:24~', 'D4:24', 'G4:16 A4:8', 'Bb4:24', 'D5:24', 'C#5:24'], { metro: '3/4' }),
     sezione('verse', 12, ['Dm', 'Bb', 'Gm', 'A7'], [...tema, ...temaOrnato, ...tema]),
-    sezione('interlude', 8, ['Dm', 'Bbmaj7', 'Gm7', 'A7'], ostinato, { metro: '7/8' }),
+    sezione('interlude', 8, ['Dm', 'Bbmaj7', 'Gm7', 'A7'], [...ostinato, ostinato[0], ostinatoLa], { metro: '7/8' }),
     sezione('verse', 8, ['F', 'Dm7', 'Bbmaj7', 'Bb C7'], temaLargo, { tonalita: 'F' }),
     sezione('chorus', 8, ['Dm', 'Bb', 'Gm', 'A7'], climax),
     sezione('outro', 5, ['Dm', 'Bb', 'Gm', 'Asus4', 'Dm'], ['D5:12 A5:4 r:16', 'r:16 F5:12 E5:4', 'D5:32', 'E5:32', 'D5:24 r:8']),
