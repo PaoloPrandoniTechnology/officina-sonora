@@ -417,22 +417,3 @@ function extractAudio(buf, ct) {
   }
   throw new Error('nessuna traccia audio nella risposta');
 }
-
-// Voti utente da feedback.csv (colonne: file;voto;nota oppure file,voto,nota).
-function readVotes() {
-  let text = '';
-  try {
-    text = fs.readFileSync(CFG.feedbackFile, 'utf8');
-  } catch (e) {
-    return {};
-  }
-  const votes = {};
-  for (const line of text.split(/\r?\n/).slice(1)) {
-    if (!line.trim()) continue;
-    const cols = line.split(line.includes(';') ? ';' : ',');
-    const file = (cols[0] || '').trim();
-    const voto = Number((cols[1] || '').trim());
-    if (file && voto >= 1 && voto <= 5) votes[file] = { voto, nota: (cols[2] || '').trim() };
-  }
-  return votes;
-}

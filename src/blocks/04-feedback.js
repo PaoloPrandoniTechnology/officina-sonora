@@ -1,32 +1,24 @@
 // BLOCCO 4 - Feedback e miglioramento: ogni CFG.reviewEvery brani il modello rivede
-// i risultati (dati automatici + voti utente in feedback.csv) e aggiorna guidance.json.
+// i risultati (dati automatici + voti utente nei .json) e aggiorna guidance.json.
 const inp = $input.first().json;
 const state = inp.state;
 
-// Tutti i brani della libreria: il .json di ogni brano e' la fonte dei dati.
-const votes = readVotes();
-const votedCount = Object.keys(votes).length;
-const newVotes = votedCount !== (state.lastVoteCount || 0);
-const periodic = state.done % CFG.reviewEvery === 0 && state.lastReview !== state.done;
-
-if (inp.outcome !== 'saved' || state.done === 0 || !(periodic || newVotes)) {
+if (inp.outcome !== 'saved' || state.done === 0) {
   return [{ json: { state } }];
 }
 
+let voteMark = state.lastVoteMark;
 try {
-  // Sincronizza i voti nei .json di tutti i brani votati
+  // Tutti i brani della libreria: il .json di ogni brano e' la fonte dei dati.
   const tracks = libraryTracks();
-  for (const t of tracks) {
-    const v = votes[t.meta.file_name || (t.audio + '.mp3')] || votes[t.audio + '.mp3'] || votes[t.audio + '.flac'] || votes[t.audio + '.wav'];
-    if (v && t.meta.voto !== v.voto) {
-      t.meta.voto = v.voto;
-      t.meta.nota_utente = v.nota;
-      fs.writeFileSync(t.jsonPath, JSON.stringify(t.meta, null, 2));
-    }
+  voteMark = firmaVoti(tracks);
+  const periodic = state.done % CFG.reviewEvery === 0 && state.lastReview !== state.done;
+  if (!periodic && voteMark === state.lastVoteMark) {
+    return [{ json: { state } }];
   }
   const voted = tracks
-    .filter((t) => t.meta.voto)
-    .sort((a, b) => String(b.meta.generato_il).localeCompare(String(a.meta.generato_il)))
+    .filter((t) => votoUtente(t))
+    .sort((a, b) => String(b.meta.voto_il || b.meta.generato_il).localeCompare(String(a.meta.voto_il || a.meta.generato_il)))
     .slice(0, 30)
     .map((t) => ({
       titolo: t.meta.titolo,
@@ -44,7 +36,7 @@ try {
   if (voted.length === 0) {
     // Nessun voto ancora: non e' un errore, la revisione aspettera' i primi voti
     state.lastReview = state.done;
-    state.lastVoteCount = votedCount;
+    state.lastVoteMark = voteMark;
     return [{ json: { state } }];
   }
   const current = readGuidance();
@@ -110,5 +102,5 @@ Niente nomi di artisti o marchi.`;
   log(`revisione non riuscita (linee guida invariate): ${e.message}`);
 }
 state.lastReview = state.done;
-state.lastVoteCount = votedCount;
+state.lastVoteMark = voteMark;
 return [{ json: { state } }];

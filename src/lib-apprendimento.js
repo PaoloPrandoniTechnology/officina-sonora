@@ -47,16 +47,34 @@ function bandRange(range, band) {
   return [Math.round(lo + step * band), Math.round(lo + step * (band + 1))];
 }
 
-// Voto utente per un brano: dal feedback.csv (prevale) o dal campo voto del json
-function votoUtente(track, votes) {
-  const base = track.audio;
-  const v = votes[base + '.mp3'] || votes[base + '.flac'] || votes[base + '.wav'] || votes[base + '.ogg'];
-  if (v) return v.voto;
-  return track.meta.voto || null;
+// Voto utente di un brano: unica fonte e' il campo voto del suo json
+function votoUtente(track) {
+  const v = track.meta.voto;
+  return v >= 1 && v <= 5 ? v : null;
+}
+
+// Segnale di iBroadcast ({voto, fonte} o null): conta solo quando cambia, cosi' vince l'ultimo voto dato.
+// Ritorna true se meta.voto e' cambiato.
+function applicaSegnale(meta, segnale, oraIso) {
+  const nuovo = segnale?.voto ?? null;
+  if (nuovo === (meta.voto_ib ?? null)) return false;
+  meta.voto_ib = nuovo;
+  if (nuovo === null || nuovo === meta.voto) return false;
+  meta.voto = nuovo;
+  meta.voto_fonte = segnale.fonte;
+  meta.voto_il = oraIso;
+  return true;
+}
+
+// Impronta dei voti ("quanti|data dell'ultimo"): cambia anche correggendo un voto gia' dato
+function firmaVoti(tracks) {
+  const votati = tracks.filter((t) => votoUtente(t));
+  const ultimo = votati.map((t) => t.meta.voto_il || '').sort().pop() || '';
+  return `${votati.length}|${ultimo}`;
 }
 
 // Statistiche per ricetta: voti utente (peso CFG.pesoVoto) e dati automatici (peso 1)
-function recipeStats(tracks, votes) {
+function recipeStats(tracks) {
   const stats = {};
   for (const t of tracks) {
     const k = t.meta.ricetta;
@@ -64,7 +82,7 @@ function recipeStats(tracks, votes) {
     const s = (stats[k] = stats[k] || { nu: 0, u: 0, na: 0, a: 0 });
     s.na++;
     if (t.meta.qualita && t.meta.qualita.esito === 'ok') s.a++;
-    const v = votoUtente(t, votes);
+    const v = votoUtente(t);
     if (v) { s.nu++; s.u += (v - 1) / 4; } // voto 1..5 -> 0..1
   }
   return stats;
@@ -85,8 +103,7 @@ function ricettaScore(s, totale) {
 // Ricette non ancora affidabili entrano solo come esperimento, al massimo CFG.maxEsperimenti alla volta.
 function pickSlot(state, guidance) {
   const tracks = libraryTracks();
-  const votes = readVotes();
-  const stats = recipeStats(tracks, votes);
+  const stats = recipeStats(tracks);
   const totale = tracks.length;
 
   // Gli esperimenti terminano quando la ricetta diventa affidabile o dopo N brani
@@ -166,24 +183,24 @@ function durRangeBpm(guidance, cat) {
 // ---- Identita' dei generi: stile composto in codice, varianti scelte con UCB sui voti ----
 
 // Statistiche per variante di un genere (voti utente e dati automatici)
-function varianteStats(tracks, votes, nomeCategoria) {
+function varianteStats(tracks, nomeCategoria) {
   const stats = {};
   for (const t of tracks) {
     if (t.meta.categoria !== nomeCategoria || !t.meta.variante) continue;
     const s = (stats[t.meta.variante] = stats[t.meta.variante] || { nu: 0, u: 0, na: 0, a: 0 });
     s.na++;
     if (t.meta.qualita && t.meta.qualita.esito === 'ok') s.a++;
-    const v = votoUtente(t, votes);
+    const v = votoUtente(t);
     if (v) { s.nu++; s.u += (v - 1) / 4; }
   }
   return stats;
 }
 
 // Sceglie la variante del genere con il punteggio migliore (UCB), con un po' di esplorazione
-function pickVariante(cat, tracks, votes) {
+function pickVariante(cat, tracks) {
   const varianti = cat.varianti || [];
   if (!varianti.length) return null;
-  const stats = varianteStats(tracks, votes, cat.name);
+  const stats = varianteStats(tracks, cat.name);
   const totale = tracks.filter((t) => t.meta.categoria === cat.name).length;
   const scelte = varianti.map((v) => ({ v, ...ricettaScore(stats[v.nome], totale) }));
   scelte.sort((a, b) => b.score - a.score);

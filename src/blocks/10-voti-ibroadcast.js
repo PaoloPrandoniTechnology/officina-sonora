@@ -83,8 +83,6 @@ const nostri = [];
   }
 })(CFG.root);
 
-const righeCsv = (() => { try { return fs.readFileSync(CFG.feedbackFile, 'utf8').split(/\r?\n/).filter(Boolean); } catch (e) { return ['file;voto;nota']; } })();
-let csvCambiato = false;
 let aggiornati = 0;
 let ascoltiTot = 0;
 for (const b of nostri) {
@@ -122,21 +120,10 @@ for (const b of nostri) {
     giaApplicati.push(b.id);
     ultimo.tempoApplicati = giaApplicati.slice(-500);
   }
-  if (voto !== null && b.meta.voto !== voto) {
-    b.meta.voto = voto;
-    b.meta.voto_fonte = fonte;
-    // il voto va anche in feedback.csv, che il sistema legge per apprendere
-    const audio = path.basename(b.json).replace(/\.json$/, '') + '.mp3';
-    const idx = righeCsv.findIndex((r) => r.split(';')[0] === audio);
-    const nota = idx > 0 ? (righeCsv[idx].split(';')[2] || '') : '';
-    if (idx > 0) righeCsv[idx] = `${audio};${voto};${nota}`;
-    else righeCsv.push(`${audio};${voto};${fonte}`);
-    csvCambiato = true;
-    aggiornati++;
-  }
+  const segnale = voto === null ? null : { voto, fonte };
+  if (applicaSegnale(b.meta, segnale, new Date().toISOString())) aggiornati++;
   fs.writeFileSync(b.json, JSON.stringify(b.meta, null, 2));
 }
-if (csvCambiato) fs.writeFileSync(CFG.feedbackFile, righeCsv.join('\n') + '\n');
 fs.writeFileSync(VOTI_FILE, JSON.stringify({ lastRun: Date.now(), tempoApplicati: ultimo.tempoApplicati || [], ultimoEsito: { aggiornati, ascoltiTot } }, null, 2));
 if (aggiornati) log(`voti iBroadcast: ${aggiornati} brani aggiornati dai segnali dell'app`);
 return [{ json: { voti: 'ok', aggiornati, ascoltiTot } }];

@@ -8,7 +8,7 @@ const guidance = readGuidance();
 const slot = pickSlot(state, guidance);
 if (CFG.comandi.produciGenere) { log(`produzione forzata: genere ${CFG.comandi.produciGenere}`); aggiornaComandi({ produciGenere: null }); }
 const cat = slot.category;
-const variante = pickVariante(cat, libraryTracks(), readVotes());
+const variante = pickVariante(cat, libraryTracks());
 const strumenti = scegliStrumenti(cat);
 const influenza = scegliInfluenza(cat);
 const tonalita = (cat.tonalita && cat.tonalita.length) ? cat.tonalita[Math.floor(Math.random() * cat.tonalita.length)] : '';

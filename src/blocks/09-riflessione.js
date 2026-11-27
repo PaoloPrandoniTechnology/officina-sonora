@@ -19,8 +19,7 @@ async function tgSend(text) {
 }
 
 const tracks = libraryTracks();
-const votes = readVotes();
-const stats = recipeStats(tracks, votes);
+const stats = recipeStats(tracks);
 const totale = tracks.length;
 
 // Classifica delle ricette con almeno un dato
@@ -30,7 +29,7 @@ const classifica = Object.entries(stats).map(([k, s]) => {
 }).sort((a, b) => b.punteggio - a.punteggio);
 
 const ultime24 = tracks.filter((t) => Date.now() - Date.parse(t.meta.generato_il || 0) < 86400000);
-const votiOggi = Object.keys(votes).length;
+const votiTotali = tracks.filter((t) => votoUtente(t)).length;
 const erroriOggi = (() => {
   try {
     return fs.readFileSync(CFG.errorsFile, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l))
@@ -62,7 +61,7 @@ const salute = (() => {
 const dati = {
   brani_totali: totale,
   brani_ultime_24h: ultime24.length,
-  voti_totali: votiOggi,
+  voti_totali: votiTotali,
   errori_24h: erroriOggi,
   esperimenti_attivi: (state.experiments || []).map((e) => e.key),
   migliori_ricette: classifica.filter((c) => c.affidabile).slice(0, 3),
@@ -82,7 +81,7 @@ Scrivi un oggetto JSON con "sintesi" (2-3 frasi in italiano su cosa sta funziona
 
 const testo = [
   `Rapporto giornaliero ${oggi}`,
-  `Brani: ${totale} (ultime 24h: ${ultime24.length}) · voti: ${votiOggi} · errori 24h: ${erroriOggi}`,
+  `Brani: ${totale} (ultime 24h: ${ultime24.length}) · voti: ${votiTotali} · errori 24h: ${erroriOggi}`,
   `Esperimenti attivi: ${dati.esperimenti_attivi.length ? dati.esperimenti_attivi.join(', ') : 'nessuno'}`,
   `Salute: disco E: ${salute.liberoGb ?? '?'} GB liberi · coda ${salute.coda} · falliti ${salute.falliti} · scartati QC ${salute.scartati} · watchdog ${salute.batticoMin ?? '?'} min fa`,
   salute.liberoGb !== null && salute.liberoGb < 20 ? 'ATTENZIONE: spazio su disco sotto 20 GB' : null,
@@ -94,7 +93,7 @@ const testo = [
 try {
   await tgSend(testo);
   fs.writeFileSync(RIF_FILE, JSON.stringify({ ultimo: oggi, dati }, null, 2));
-  log(`riflessione giornaliera inviata (${totale} brani, ${votiOggi} voti)`);
+  log(`riflessione giornaliera inviata (${totale} brani, ${votiTotali} voti)`);
   return [{ json: { riflessione: 'inviata' } }];
 } catch (e) {
   log(`riflessione: invio Telegram fallito: ${e.message}`);
