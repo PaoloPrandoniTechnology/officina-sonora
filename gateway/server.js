@@ -187,6 +187,10 @@ const server = http.createServer(async (req, res) => {
       const { file } = JSON.parse(corpo.toString('utf8'));
       return rispondi(200, await analizzaAudio(file));
     }
+    if (req.url === '/copertina') {
+      const r = await require('./copertina').componi(JSON.parse(corpo.toString('utf8')));
+      return rispondi(200, r ? { ok: true, jpeg: r.jpeg.toString('base64') } : { ok: false, error: 'nessuno sfondo per il genere' });
+    }
     if (req.url === '/ib/library') {
       return rispondi(200, await ibLibrary());
     }

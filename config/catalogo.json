@@ -67,7 +67,13 @@
         "#e7c77a"
       ],
       "ambito": "yoga",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Meditazione",
+        "prompt": "single bronze tibetan singing bowl with wooden mallet on a flat stone, wide open rim, misty mountain lake at blue hour, soft golden light, serene minimal composition, fine art photography, muted indigo and gold",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Pranayama-respiro",
@@ -130,7 +136,13 @@
         "#f4efe1"
       ],
       "ambito": "yoga",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Pranayama",
+        "prompt": "soft swirling breath-like mist over a calm sea at dawn, a single white feather floating, airy minimal fine art photography, pale teal and cream",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Yin-Savasana",
@@ -193,7 +205,13 @@
         "#8a6fb3"
       ],
       "ambito": "yoga",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Yin & Savasana",
+        "prompt": "deep night sky over still dark water, one faint violet moon, velvet shadows, heavy calm, atmospheric painting, deep purple and black",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Restorative",
@@ -260,7 +278,13 @@
         "#f6e7c9"
       ],
       "ambito": "yoga",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Restorative",
+        "prompt": "warm linen blanket and cushions beside a window with soft afternoon light, dried flowers, cozy still life photography, sand and terracotta",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "name": "Sound-bath-rilassamento",
@@ -324,7 +348,13 @@
         "#e9d8ff"
       ],
       "ambito": "yoga",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Sound bath",
+        "prompt": "large hanging bronze gong and translucent crystal singing bowls, concentric light ripples, ethereal glow, violet and lavender, fine art photography",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Hatha-base",
@@ -391,7 +421,13 @@
         "#f5e9c4"
       ],
       "ambito": "yoga",
-      "famiglia": "ritmico"
+      "famiglia": "ritmico",
+      "copertina": {
+        "etichetta": "Hatha",
+        "prompt": "empty wooden yoga deck facing a green valley in morning light, bamboo and ferns, tranquil nature photography, sage green and ivory",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Vinyasa-dinamico",
@@ -459,7 +495,13 @@
         "#ffd27a"
       ],
       "ambito": "yoga",
-      "famiglia": "ritmico"
+      "famiglia": "ritmico",
+      "copertina": {
+        "etichetta": "Vinyasa",
+        "prompt": "flowing silk ribbons in motion across a sunset desert, dynamic curves, vivid orange and amber, painterly illustration",
+        "font": "Segoe UI",
+        "corsivo": false
+      }
     },
     {
       "name": "Power-yoga",
@@ -522,7 +564,13 @@
         "#ff5d73"
       ],
       "ambito": "yoga",
-      "famiglia": "ritmico"
+      "famiglia": "ritmico",
+      "copertina": {
+        "etichetta": "Power yoga",
+        "prompt": "powerful ocean wave breaking against black rock, electric teal and coral light, high energy photography, sharp contrast",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "name": "Funk-groove",
@@ -590,7 +638,13 @@
         "#ffd166"
       ],
       "ambito": "yoga",
-      "famiglia": "ritmico"
+      "famiglia": "ritmico",
+      "copertina": {
+        "etichetta": "Funk",
+        "prompt": "1970s funk record sleeve, glowing electric bass guitar and vinyl, concentric retro stripes, mustard orange and brown, screen print poster",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "name": "Afro-latin-groove",
@@ -659,7 +713,13 @@
         "#ffe08a"
       ],
       "ambito": "yoga",
-      "famiglia": "ritmico"
+      "famiglia": "ritmico",
+      "copertina": {
+        "etichetta": "Afro-latin",
+        "prompt": "conga hand drums on a sunlit street with bold woven textile patterns, vibrant festive gouache illustration, red yellow and turquoise",
+        "font": "Segoe UI",
+        "corsivo": false
+      }
     },
     {
       "name": "Trip-hop-dolce",
@@ -727,7 +787,13 @@
         "#e6c9a0"
       ],
       "ambito": "yoga",
-      "famiglia": "ritmico"
+      "famiglia": "ritmico",
+      "copertina": {
+        "etichetta": "Trip-hop",
+        "prompt": "rainy city window at night with blurred neon reflections, vintage electric piano silhouette, grainy film photography, muted blue and amber",
+        "font": "Bahnschrift",
+        "corsivo": false
+      }
     },
     {
       "name": "Reggae-dub-morbido",
@@ -791,7 +857,13 @@
         "#f2c94c"
       ],
       "ambito": "yoga",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Reggae dub",
+        "prompt": "stack of vintage wooden sound system speakers on a tropical beach at sunset, palm leaves, warm green gold and red, retro poster illustration",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "name": "Jazz-lounge",
@@ -859,7 +931,13 @@
         "#f4d6a0"
       ],
       "ambito": "yoga",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Jazz lounge",
+        "prompt": "upright double bass and grand piano in a dim smoky lounge, warm table lamp, cinematic photography, deep burgundy and brass",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "name": "Folk-strumming",
@@ -927,7 +1005,13 @@
         "#f7e3b5"
       ],
       "ambito": "yoga",
-      "famiglia": "ritmico"
+      "famiglia": "ritmico",
+      "copertina": {
+        "etichetta": "Folk",
+        "prompt": "acoustic guitar and banjo leaning on a wooden cabin porch, golden wheat fields, warm vintage illustration, ochre and green",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Surf-rock-strumentale",
@@ -995,7 +1079,13 @@
         "#ffb84d"
       ],
       "ambito": "musica",
-      "famiglia": "rock"
+      "famiglia": "rock",
+      "copertina": {
+        "etichetta": "Surf rock",
+        "prompt": "giant curling turquoise wave with a vintage surfboard and woodie car on the beach, 1960s screen print poster, teal cream and coral",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "name": "Post-rock-strumentale",
@@ -1063,7 +1153,13 @@
         "#e8d5b5"
       ],
       "ambito": "musica",
-      "famiglia": "rock"
+      "famiglia": "rock",
+      "copertina": {
+        "etichetta": "Post-rock",
+        "prompt": "lone radio tower on a vast foggy plain under an immense storm lit sky, cinematic wide landscape photography, slate blue and pale gold",
+        "font": "Bahnschrift",
+        "corsivo": false
+      }
     },
     {
       "name": "Blues-shuffle-strumentale",
@@ -1131,7 +1227,13 @@
         "#f5d27a"
       ],
       "ambito": "musica",
-      "famiglia": "rock"
+      "famiglia": "rock",
+      "copertina": {
+        "etichetta": "Blues",
+        "prompt": "resonator slide guitar on a chair at a delta crossroads at dusk, old gas station light, textured oil painting, indigo and rust",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "name": "Indie-rock-strumentale",
@@ -1199,7 +1301,13 @@
         "#ffd166"
       ],
       "ambito": "musica",
-      "famiglia": "rock"
+      "famiglia": "rock",
+      "copertina": {
+        "etichetta": "Indie rock",
+        "prompt": "vintage guitar amplifier and instant photo prints on a bedroom floor in sunlight, faded film photography, pastel yellow and sky blue",
+        "font": "Segoe UI",
+        "corsivo": false
+      }
     },
     {
       "name": "Rockabilly-strumentale",
@@ -1267,7 +1375,13 @@
         "#ffe066"
       ],
       "ambito": "musica",
-      "famiglia": "rock"
+      "famiglia": "rock",
+      "copertina": {
+        "etichetta": "Rockabilly",
+        "prompt": "1950s red convertible car in front of a neon diner with a hollow body guitar, retro americana illustration, cherry red and mint",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "name": "Techno-minimale",
@@ -1335,7 +1449,13 @@
         "#7ae7ff"
       ],
       "ambito": "musica",
-      "famiglia": "elettronico"
+      "famiglia": "elettronico",
+      "copertina": {
+        "etichetta": "Techno minimale",
+        "prompt": "minimal geometric composition of repeating light bars in a dark concrete tunnel, stark abstract, monochrome with a single cyan accent",
+        "font": "Bahnschrift",
+        "corsivo": false
+      }
     },
     {
       "name": "Piano-minimalista",
@@ -1402,7 +1522,13 @@
         "#f0e6d2"
       ],
       "ambito": "musica",
-      "famiglia": "meditativo"
+      "famiglia": "meditativo",
+      "copertina": {
+        "etichetta": "Piano minimalista",
+        "prompt": "close view of piano keys fading into white fog, one falling leaf, elegant minimal black and white fine art photography",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Score-cinematico",
@@ -1470,7 +1596,13 @@
         "#f2c57c"
       ],
       "ambito": "musica",
-      "famiglia": "orchestrale"
+      "famiglia": "orchestrale",
+      "copertina": {
+        "etichetta": "Cinematico",
+        "prompt": "epic mountain citadel above a sea of clouds with dramatic sun rays, cinematic matte painting, deep blue and gold",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Folk-balcanico",
@@ -1538,7 +1670,13 @@
         "#f6d37a"
       ],
       "ambito": "musica",
-      "famiglia": "world"
+      "famiglia": "world",
+      "copertina": {
+        "etichetta": "Folk balcanico",
+        "prompt": "accordion and clarinet in a festive village square with strings of lights and embroidered ribbons, lively folk art painting, red and ochre",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "name": "Beat-hip-hop",
@@ -1606,7 +1744,13 @@
         "#d7c49e"
       ],
       "ambito": "musica",
-      "famiglia": "elettronico"
+      "famiglia": "elettronico",
+      "copertina": {
+        "etichetta": "Hip-hop",
+        "prompt": "vintage sampler and turntable on a brick rooftop at golden hour, graffiti color shapes, urban illustration, purple and orange",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "name": "Manouche-swing",
@@ -1674,7 +1818,13 @@
         "#ffe9b0"
       ],
       "ambito": "musica",
-      "famiglia": "jazz"
+      "famiglia": "jazz",
+      "copertina": {
+        "etichetta": "Manouche swing",
+        "prompt": "gypsy jazz guitar and violin beside a painted wooden caravan with a campfire, 1930s paris poster illustration, wine red and cream",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "ambito": "musica",
@@ -1731,7 +1881,13 @@
         "#1a0b2e",
         "#ff2e88",
         "#00e5ff"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Synthwave",
+        "prompt": "retrowave, giant sunset sun cut by horizontal stripes, glowing magenta perspective grid floor to the horizon, wireframe mountains, retro sports car, 1980s airbrush illustration, magenta and cyan",
+        "font": "Bahnschrift",
+        "corsivo": true
+      }
     },
     {
       "ambito": "musica",
@@ -1787,7 +1943,13 @@
         "#3d0c02",
         "#c62828",
         "#ffd54f"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Flamenco",
+        "prompt": "spanish guitar with swirling red ruffled fabric around it, andalusian arches, passionate oil painting, crimson and black",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "ambito": "musica",
@@ -1843,7 +2005,13 @@
         "#1f3d2b",
         "#5fa776",
         "#e9f5c9"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Celtic",
+        "prompt": "carved celtic harp on a green cliff above a misty sea, standing stones, storybook painting, emerald and silver",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "ambito": "musica",
@@ -1900,7 +2068,13 @@
         "#0d1b2a",
         "#1b98e0",
         "#f1faee"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Drum and bass",
+        "prompt": "streaks of fast light trails over a futuristic night city seen from above, fluid motion blur, electric blue and lime",
+        "font": "Bahnschrift",
+        "corsivo": true
+      }
     },
     {
       "ambito": "musica",
@@ -1956,7 +2130,13 @@
         "#2e1a05",
         "#b8860b",
         "#fff1c1"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Gamelan",
+        "prompt": "ornate bronze gamelan metallophones in a balinese temple courtyard with incense haze, soft golden fine art photography, bronze and jade",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "ambito": "musica",
@@ -2012,7 +2192,13 @@
         "#2b3a2e",
         "#9ec5a0",
         "#fdf6e3"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Bossa nova",
+        "prompt": "vintage 1960s record sleeve, classical nylon guitar standing alone against a Rio de Janeiro balcony railing, sugarloaf mountain, warm sunset, flat gouache shapes, teal and orange",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "ambito": "musica",
@@ -2068,7 +2254,13 @@
         "#8e7cc3",
         "#f4ecff"
       ],
-      "vocale_senza_parole": true
+      "vocale_senza_parole": true,
+      "copertina": {
+        "etichetta": "Vocalise",
+        "prompt": "luminous soundwaves rising through a tall gothic cloister with soft light beams, ethereal painting, pearl and rose",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "ambito": "musica",
@@ -2123,7 +2315,13 @@
         "#4a6670",
         "#d6e6e8"
       ],
-      "vocale_senza_parole": true
+      "vocale_senza_parole": true,
+      "copertina": {
+        "etichetta": "Overtone",
+        "prompt": "concentric golden resonance rings over an endless steppe at twilight, mystical minimal painting, copper and deep blue",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "ambito": "musica",
@@ -2180,7 +2378,13 @@
         "#7a6a4f",
         "#f5ecd6"
       ],
-      "vocale_senza_parole": true
+      "vocale_senza_parole": true,
+      "copertina": {
+        "etichetta": "Canto monodico",
+        "prompt": "candlelit romanesque abbey nave with stone arches and a single shaft of light, reverent chiaroscuro painting, amber and shadow",
+        "font": "Georgia",
+        "corsivo": false
+      }
     },
     {
       "ambito": "musica",
@@ -2238,7 +2442,13 @@
         "#d1607a",
         "#ffd6a5"
       ],
-      "vocale_senza_parole": true
+      "vocale_senza_parole": true,
+      "copertina": {
+        "etichetta": "Soul",
+        "prompt": "vintage chrome microphone under a warm spotlight with velvet curtain, 1960s soul record sleeve, plum and gold",
+        "font": "Georgia",
+        "corsivo": true
+      }
     },
     {
       "ambito": "musica",
@@ -2295,7 +2505,13 @@
         "#050505",
         "#a4161a",
         "#e5e5e5"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Metal",
+        "prompt": "huge black wrought iron gate standing in the foreground on a volcanic cliff, lightning storm, molten lava, heavy metal album oil painting, black and blood red, high contrast",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "ambito": "musica",
@@ -2352,7 +2568,13 @@
         "#0b0b0b",
         "#5b5b5b",
         "#c0ff3e"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Industrial techno",
+        "prompt": "colossal rusted factory machinery with sparks and red warning light, brutalist industrial photography, steel grey and red",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "ambito": "musica",
@@ -2409,7 +2631,13 @@
         "#121212",
         "#7b2cbf",
         "#f72585"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Trap",
+        "prompt": "black luxury car under violet neon in an empty night parking garage with low fog, moody photography, violet and black",
+        "font": "Impact",
+        "corsivo": false
+      }
     },
     {
       "ambito": "musica",
@@ -2466,7 +2694,13 @@
         "#2a0a0a",
         "#d62828",
         "#f7b267"
-      ]
+      ],
+      "copertina": {
+        "etichetta": "Hard rock",
+        "prompt": "electric guitar planted in cracked desert ground with flames and a burning sunset sky, 1970s rock album painting, orange and charcoal",
+        "font": "Impact",
+        "corsivo": false
+      }
     }
   ],
   "tipi": [
