@@ -5,6 +5,7 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { leggiStato } = require('./stato');
 
 const PORT = 5790;
 const TOKEN_FILE = path.join(__dirname, 'token.json');
@@ -154,6 +155,12 @@ const server = http.createServer(async (req, res) => {
   const rispondi = (code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(obj)); };
   try {
     if (req.socket.remoteAddress !== '127.0.0.1' && req.socket.remoteAddress !== '::ffff:127.0.0.1') return rispondi(403, { ok: false });
+    // Dashboard di sola lettura (solo da questo PC)
+    if (req.method === 'GET' && req.url === '/dashboard') {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+      return res.end(fs.readFileSync(path.join(__dirname, 'dashboard.html')));
+    }
+    if (req.method === 'GET' && req.url === '/api/stato') return rispondi(200, await leggiStato());
     if (req.method !== 'POST') return rispondi(405, { ok: false });
     const corpo = await leggiCorpo(req);
     if (req.url === '/tg') {

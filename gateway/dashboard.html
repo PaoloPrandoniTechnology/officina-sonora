@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yoga Music Factory</title>
+<style>
+  :root { --bg:#f5f6f8; --card:#ffffff; --testo:#1d2330; --muto:#6b7280; --ok:#16a34a; --ko:#dc2626; --warn:#d97706; --linea:#e5e7eb; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0f1218; --card:#181d27; --testo:#e6e9ef; --muto:#9aa3b2; --linea:#262d3a; } }
+  :root[data-theme="dark"] { --bg:#0f1218; --card:#181d27; --testo:#e6e9ef; --muto:#9aa3b2; --linea:#262d3a; }
+  body { margin:0; background:var(--bg); color:var(--testo); font:14px/1.45 system-ui, "Segoe UI", sans-serif; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:16px; flex-wrap:wrap; gap:8px; }
+  h1 { font-size:18px; margin:0; }
+  #ora { color:var(--muto); font-size:12px; }
+  main { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px; padding:0 16px 24px; }
+  .card { background:var(--card); border:1px solid var(--linea); border-radius:10px; padding:14px; min-width:0; }
+  .card h2 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muto); margin:0 0 10px; }
+  .riga { display:flex; justify-content:space-between; gap:8px; padding:3px 0; }
+  .riga span:first-child { color:var(--muto); }
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; color:#fff; }
+  .ok { background:var(--ok); } .ko { background:var(--ko); } .warn { background:var(--warn); } .off { background:var(--muto); }
+  .log { font:12px/1.4 ui-monospace, Consolas, monospace; white-space:pre-wrap; word-break:break-word; max-height:260px; overflow:auto; color:var(--muto); }
+  .barra { height:8px; background:var(--linea); border-radius:4px; overflow:hidden; margin:8px 0; }
+  .barra > div { height:100%; background:var(--ok); width:0; transition:width .6s; }
+  .grande { font-size:16px; font-weight:600; }
+  .errore { color:var(--ko); padding:16px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Yoga Music Factory</h1>
+  <span id="ora">connessione...</span>
+</header>
+<main>
+  <section class="card"><h2>Servizi</h2><div id="servizi"></div></section>
+  <section class="card"><h2>Render in corso</h2><div id="render"></div></section>
+  <section class="card"><h2>Pipeline</h2><div id="pipeline"></div></section>
+  <section class="card"><h2>Watchdog e supervisore</h2><div id="sorveglianza"></div></section>
+  <section class="card"><h2>Ultime esecuzioni n8n</h2><div id="esecuzioni"></div></section>
+  <section class="card" style="grid-column:1/-1"><h2>Log di produzione</h2><div id="log" class="log"></div></section>
+</main>
+<script>
+  // Testo sempre tramite textContent: nessun HTML dai dati
+  function el(tag, attrs, testo) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (testo !== undefined) e.textContent = testo;
+    return e;
+  }
+  function riga(etichetta, valore) {
+    const r = el('div', { class: 'riga' });
+    r.appendChild(el('span', null, etichetta));
+    r.appendChild(el('span', null, valore));
+    return r;
+  }
+  function pill(attivo, testoOn, testoOff) {
+    return el('span', { class: 'pill ' + (attivo ? 'ok' : 'ko') }, attivo ? testoOn : testoOff);
+  }
+  function secondi(s) {
+    if (s === null || s === undefined) return '-';
+    if (s < 60) return s + ' s';
+    const m = Math.floor(s / 60), r = s % 60;
+    return m + ' min ' + (r < 10 ? '0' : '') + r + ' s';
+  }
+  function svuota(id) { const n = document.getElementById(id); n.textContent = ''; return n; }
+
+  function disegna(d) {
+    document.getElementById('ora').textContent = 'aggiornato ' + new Date(d.ora).toLocaleTimeString('it-IT');
+
+    const s = svuota('servizi');
+    s.appendChild(riga('n8n', '')); s.lastChild.appendChild(pill(d.servizi.n8n, 'attivo', 'non risponde'));
+    s.appendChild(riga('Motore YuE2', '')); s.lastChild.appendChild(pill(d.servizi.motoreYue, 'attivo', 'non risponde'));
+    s.appendChild(riga('LM Studio', '')); s.lastChild.appendChild(pill(d.servizi.lmStudio, 'attivo', 'spento'));
+    s.appendChild(riga('Modello gemma', '')); s.lastChild.appendChild(pill(d.servizi.gemmaCaricato, 'caricato', 'scaricato'));
+
+    const r = svuota('render');
+    if (!d.render) {
+      r.appendChild(el('div', { class: 'grande' }, 'Nessun render in corso'));
+      r.appendChild(el('div', { class: 'riga' }, 'In attesa del prossimo brano'));
+    } else {
+      const p = d.render;
+      r.appendChild(el('div', { class: 'grande' }, p.titolo || '(senza titolo)'));
+      r.appendChild(el('div', null, [p.genere, p.categoria].filter(Boolean).join(' · ')));
+      const pct = p.renderMedio_s ? Math.min(99, Math.round((p.trascorsi_s / p.renderMedio_s) * 100)) : null;
+      const barra = el('div', { class: 'barra' });
+      const dentro = el('div');
+      dentro.style.width = (pct === null ? 0 : pct) + '%';
+      barra.appendChild(dentro);
+      r.appendChild(barra);
+      r.appendChild(riga('Trascorsi', secondi(p.trascorsi_s)));
+      r.appendChild(riga('Render medio recente', secondi(p.renderMedio_s)));
+      r.appendChild(riga('Durata richiesta', secondi(p.durataRichiesta_s)));
+      r.appendChild(riga('Stato motore', p.statoMotore));
+      r.appendChild(el('div', { class: 'log' }, 'La barra e\' una stima basata sul render medio: il motore non espone la percentuale.'));
+    }
+
+    const pi = svuota('pipeline');
+    pi.appendChild(riga('Lock', d.pipeline.occupata ? 'occupato' : 'libero'));
+    pi.appendChild(riga('Coda', String(d.pipeline.coda)));
+    pi.appendChild(riga('Brani generati', String(d.pipeline.brani)));
+    pi.appendChild(riga('Scartati dal controllo', String(d.pipeline.scartati)));
+    pi.appendChild(riga('Disco E: libero', d.sistema.disco_E_liberoGb === null ? '-' : d.sistema.disco_E_liberoGb + ' GB'));
+
+    const so = svuota('sorveglianza');
+    so.appendChild(riga('Battito watchdog', secondi(d.watchdog.battito_s)));
+    so.appendChild(riga('Ultimo controllo supervisore', secondi(d.supervisore.ultimoRun_s)));
+    const ult = d.supervisore.ultimeRighe.slice(-1)[0];
+    if (ult) so.appendChild(el('div', { class: 'log' }, ult));
+
+    const es = svuota('esecuzioni');
+    if (!d.esecuzioni.length) es.appendChild(el('div', null, 'Nessun dato'));
+    for (const e of d.esecuzioni) {
+      const ok = e.status === 'success';
+      const r2 = el('div', { class: 'riga' });
+      r2.appendChild(el('span', null, e.startedAt));
+      r2.appendChild(el('span', { class: 'pill ' + (ok ? 'ok' : 'ko') }, e.status));
+      es.appendChild(r2);
+    }
+
+    const lg = svuota('log');
+    lg.textContent = d.logProduzione.join('\n');
+    lg.scrollTop = lg.scrollHeight;
+  }
+
+  async function aggiorna() {
+    try {
+      const r = await fetch('/api/stato', { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      disegna(await r.json());
+    } catch (e) {
+      document.getElementById('ora').textContent = 'errore di connessione: ' + e.message;
+    }
+  }
+  aggiorna();
+  setInterval(aggiorna, 5000);
+</script>
+</body>
+</html>
