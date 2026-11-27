@@ -122,8 +122,15 @@ function inLibreria(file) {
 const LMS = path.join(require('os').homedir(), '.cache', 'lm-studio', 'bin', 'lms.exe');
 function lms(args) {
   return new Promise((resolve) => {
-    require('child_process').execFile(LMS, args, { windowsHide: true, timeout: 180000 }, (e) => resolve(e ? { ok: false, error: e.message.slice(0, 200) } : { ok: true }));
+    // lms scrive diversi messaggi su stderr: si restituiscono entrambi i canali
+    require('child_process').execFile(LMS, args, { windowsHide: true, timeout: 180000 }, (e, out, err) => resolve(e ? { ok: false, error: e.message.slice(0, 200) } : { ok: true, testo: `${out}\n${err}` }));
   });
+}
+// gemma una sola volta: un secondo load creerebbe una seconda copia in memoria
+async function caricaGemma() {
+  const ps = await lms(['ps']);
+  if (/gemma/i.test(ps.testo || '')) return { ok: true };
+  return lms(['load', 'google/gemma-4-e4b', '-y', '-c', '16384']);
 }
 async function analizzaAudio(file) {
   const abs = inLibreria(file);
@@ -221,7 +228,7 @@ const server = http.createServer(async (req, res) => {
       return rispondi(200, { ok: true, ...(await require('./master').master(sorgente, destinazione)) });
     }
     // gemma e il motore audio non stanno insieme in 6 GB: i blocchi la caricano e scaricano quando serve
-    if (req.url === '/llm/carica') return rispondi(200, await lms(['load', 'google/gemma-4-e4b', '-y', '-c', '16384']));
+    if (req.url === '/llm/carica') return rispondi(200, await caricaGemma());
     if (req.url === '/llm/scarica') return rispondi(200, await lms(['unload', '--all']));
     if (req.url === '/copertina') {
       const r = await require('./copertina').componi(JSON.parse(corpo.toString('utf8')));

@@ -56,7 +56,8 @@ Proponi linee guida aggiornate SOLO se servono miglioramenti chiari. Rispondi co
 - "struttura_pref": oggetto categoria -> array di strutture preferite tra piatto, onda, arco, crescendo, loop (solo tra quelle gia' previste per la categoria)
 - "note": una frase in italiano che spiega il motivo delle modifiche
 Niente nomi di artisti o marchi.`;
-  await gw('/llm/carica'); // dopo un render gemma non e' ancora in memoria
+  const carico = await gw('/llm/carica'); // dopo un render gemma puo' non essere ancora in memoria
+  if (!carico.ok) throw new Error(`gemma non caricato: ${carico.error || carico.status}`);
   const j = await llmJson(system, user, 1500);
 
   const names = CFG.categories.map((c) => c.name);

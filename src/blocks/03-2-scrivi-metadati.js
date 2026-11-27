@@ -48,5 +48,6 @@ fs.writeFileSync(file.replace(/\.[^.]+$/, '.json'), JSON.stringify(meta, null, 2
 state.job = null;
 state.done++;
 state.recent = [...state.recent, { titolo: c.titolo, categoria: c.categoria, tipo: c.tipo, energia: c.energia, struttura: c.struttura, durata_s: c.durata_s, render_s: renderS, bpm: c.bpm, bytes_audio: inp.bytes, file: path.basename(file) }].slice(-10);
+saveState(state); // subito: finche' il job risulta in corso il watchdog scarica gemma, che serve al blocco 4
 log(`salvato ${file} (render ${renderS}s, durata richiesta ${c.durata_s}s)`);
 return [{ json: { state, outcome: 'saved', file } }];
