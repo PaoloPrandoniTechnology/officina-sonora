@@ -35,9 +35,9 @@ e impara dai voti che dai dalla dashboard, su iBroadcast e su Telegram.
 - Assegna un **numero progressivo unico**, che non si ripete mai.
 - Salva il brano nella libreria, con i metadati (titolo, genere, bpm, tonalità, durata, ecc.) e la copertina.
 - Lo carica su **iBroadcast** con tag e playlist.
-- Ti manda un messaggio **Telegram** per ogni brano caricato.
+- Ti manda su **Telegram** un riepilogo periodico dei brani caricati (predefinito: ogni ora, dalle 8 alle 22).
 - Raccoglie i tuoi voti da dashboard, iBroadcast e Telegram, e usa i voti per decidere i generi e le ricette da produrre.
-- Ogni giorno, dopo le 8, invia un **rapporto** con lo stato del sistema.
+- Ogni giorno, alla prima ora della fascia dei messaggi, invia un **rapporto** con lo stato del sistema.
 
 Non devi fare nulla di manuale: una volta avviato, continua da solo e si riprende in caso di blocchi.
 
@@ -67,7 +67,7 @@ Non devi fare nulla di manuale: una volta avviato, continua da solo e si riprend
     │                                  (tag e playlist dopo qualche minuto)
     │                                           │
     │                                           ▼
-    └──────────────────────────────────  notifica Telegram
+    └──────────────────────────────────  registrazione del brano
 ```
 
 Oltre al ciclo di produzione, n8n esegue in parallelo:
@@ -77,7 +77,8 @@ Oltre al ciclo di produzione, n8n esegue in parallelo:
 | Voti da iBroadcast | ogni 10 minuti | legge stelle, tag e playlist che hai messo sui brani |
 | Comandi Telegram | ogni minuto | risponde ai tuoi comandi e alle tue risposte |
 | Avvisi Telegram | ogni minuto | ti scrive solo per errori gravi che richiedono il tuo intervento |
-| Rapporto giornaliero | una volta al giorno, dopo le 8 | riepilogo di brani, voti, errori, stato del sistema |
+| Riepilogo Telegram | alla frequenza scelta, nella fascia oraria | un messaggio con i brani caricati dall'ultimo invio |
+| Rapporto giornaliero | una volta al giorno, alla prima ora della fascia | riepilogo di brani, voti, errori, stato del sistema |
 
 **Il meccanismo di apprendimento.** Ogni ricetta (genere, tipo, struttura, fascia di bpm) ha un punteggio.
 I tuoi voti pesano molto più dei dati automatici. Il sistema prova anche ricette nuove, in quantità limitata,
@@ -181,9 +182,11 @@ I tag e le playlist vengono applicati alcuni minuti dopo il caricamento, perché
 
 Il bot ti scrive:
 
-- **a ogni brano caricato**: titolo, categoria, genere, tipo, durata, bpm, tonalità, numero e tempo di render;
-- **ogni giorno dopo le 8**: il rapporto giornaliero;
+- **il riepilogo dei brani** caricati dall'ultimo invio (predefinito: ogni ora dalle 8 alle 22; quelli della notte arrivano alle 8);
+- **una volta al giorno**: il rapporto giornaliero;
 - **solo per errori gravi** che richiedono il tuo intervento (per esempio token scaduto o disco pieno).
+
+Fuori dalla fascia oraria non arriva nessun messaggio automatico (gli avvisi gravi attendono la riapertura); le risposte ai tuoi comandi arrivano sempre. Frequenza, orari e dati di ogni messaggio si regolano in **Controllo → Messaggi** nella dashboard e valgono dal giro successivo, entro un minuto.
 
 Comandi disponibili:
 
@@ -209,7 +212,7 @@ Ogni colore indica una fase:
 - **Controllo**: il lock della pipeline evita esecuzioni sovrapposte; poi si decide se c'è un render in corso.
 - **Composizione**: si sceglie il genere (rotazione e pesi), si scrive il titolo e si compone lo stile.
 - **Render e stato**: il brano viene inviato al motore YuE2; a fine render lo stato viene salvato.
-- **Audio e caricamento**: download, metadati, controllo qualità, upload su iBroadcast, tag e playlist, notifica.
+- **Audio e caricamento**: download, metadati, controllo qualità, upload su iBroadcast, tag e playlist.
 - **Apprendimento**: revisione periodica delle linee guida in base ai voti.
 - **Telegram** e **Rapporto e voti**: comandi, avvisi, rapporto giornaliero e lettura dei voti, in parallelo al ciclo principale.
 
@@ -231,6 +234,7 @@ La sezione **Controllo** della dashboard permette di intervenire senza toccare i
 - **Generi**: attiva o sospendi un genere, e regola il suo peso di frequenza (0 = mai, 5 = cinque volte più spesso).
 - **Linee guida**: stile da aggiungere o evitare, note, fasce di bpm per genere.
 - **Note per genere**: scrivi in italiano cosa vuoi sentire (per esempio *fai più assoli* o *usa il flauto di pan*). Il sistema la traduce in inglese e la aggiunge allo stile dei brani di quel genere.
+- **Messaggi**: frequenza del riepilogo Telegram, ora di inizio e di stop, e quali dati includere in ogni messaggio.
 - **Storico**: ogni modifica è registrata con il valore precedente.
 
 Le modifiche valgono dal prossimo brano.

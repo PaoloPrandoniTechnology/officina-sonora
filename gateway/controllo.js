@@ -14,6 +14,10 @@ const CATALOGO = path.join(DIR, 'config', 'catalogo.json');
 const STORICO = path.join(DIR, 'config', 'history', 'controllo.jsonl');
 const HISTORY = path.join(DIR, 'config', 'history');
 
+// Impostazioni dei messaggi Telegram: stessa definizione usata dai blocchi n8n
+const M = new Function(fs.readFileSync(path.join(DIR, 'src', 'lib-messaggi.js'), 'utf8')
+  + '\nreturn { MESSAGGI_DEF, MESSAGGI_FREQUENZE, orariValidi, impostazioniMessaggi };')();
+
 // Catalogo dei parametri: etichetta, gruppo, valore di default, limiti e spiegazione
 const PARAMETRI_DEF = [
   { chiave: 'durDefault', gruppo: 'Durata', etichetta: 'Durata di riferimento', unita: 's', def: 180, min: 60, max: 600, passo: 5, descrizione: 'Durata usata quando un brano non ne dichiara una.' },
@@ -70,6 +74,11 @@ function lettura() {
   const righe = fs.existsSync(STORICO) ? fs.readFileSync(STORICO, 'utf8').split('\n').filter(Boolean) : [];
   return {
     parametri: parametriAttuali(),
+    messaggi: {
+      impostazioni: M.impostazioniMessaggi(leggiJson(PARAMETRI, {}).messaggi),
+      definizioni: M.MESSAGGI_DEF,
+      frequenze: M.MESSAGGI_FREQUENZE,
+    },
     comandi: leggiJson(COMANDI, {}),
     generi: catalogoNomi().map((nome) => {
       const s = generiSalvati[nome] || {};
@@ -100,6 +109,25 @@ function impostaParametro({ chiave, valore }) {
   scriviJson(PARAMETRI, salvati);
   registra('parametri', chiave, prima, salvati[chiave]);
   return { ok: true, chiave, valore: salvati[chiave] };
+}
+
+function impostaMessaggi({ frequenzaMin, inizio, fine, tipi }) {
+  if (!M.MESSAGGI_FREQUENZE.includes(frequenzaMin)) throw new Error('frequenza non prevista');
+  if (!M.orariValidi(inizio, fine)) throw new Error('orari: l\'inizio deve venire prima dello stop');
+  const puliti = {};
+  for (const [nome, def] of Object.entries(M.MESSAGGI_DEF)) {
+    const t = (tipi || {})[nome];
+    if (!t || typeof t.attivo !== 'boolean' || !Array.isArray(t.dati)) throw new Error(`${def.etichetta}: impostazioni incomplete`);
+    if (!t.dati.every((d) => Object.hasOwn(def.dati, d))) throw new Error(`${def.etichetta}: dato sconosciuto`);
+    if (t.attivo && !t.dati.length) throw new Error(`${def.etichetta}: scegli almeno un dato oppure disattiva il messaggio`);
+    puliti[nome] = { attivo: t.attivo, dati: t.dati };
+  }
+  const salvati = leggiJson(PARAMETRI, {});
+  const prima = M.impostazioniMessaggi(salvati.messaggi);
+  salvati.messaggi = { frequenzaMin, inizio, fine, tipi: puliti };
+  scriviJson(PARAMETRI, salvati);
+  registra('messaggi', 'impostazioni', prima, salvati.messaggi);
+  return { ok: true };
 }
 
 function impostaGenere({ nome, peso, attivo }) {
@@ -272,6 +300,7 @@ function togliNota({ nome, indice }) {
 async function gestisci(url, dati) {
   try {
     if (url === '/api/controllo/parametro') return { codice: 200, corpo: impostaParametro(dati) };
+    if (url === '/api/controllo/messaggi') return { codice: 200, corpo: impostaMessaggi(dati) };
     if (url === '/api/controllo/genere') return { codice: 200, corpo: impostaGenere(dati) };
     if (url === '/api/controllo/comando') return { codice: 200, corpo: comando(dati) };
     if (url === '/api/controllo/guida') return { codice: 200, corpo: guida(dati) };

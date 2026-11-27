@@ -64,13 +64,14 @@ Il workflow "Yoga Music Factory" e' costruito da `build-workflow.mjs` a partire 
 - 1-2: stato e controllo del render
 - 3a-3b: scarica audio e scrive i metadati
 - 3c: controllo qualita
-- 3d1-3d4: prepara, carica su iBroadcast, recupera tag e playlist, notifica
+- 3d1-3d4: prepara, carica su iBroadcast, recupera tag e playlist, registrazione
 - 4: revisione delle linee guida
 - 5a-5c: scelta della ricetta, titolo, composizione dello stile
 - 6-7: invio del render e scrittura dello stato
 - 8a-8b: comandi Telegram e avvisi
 - 9: rapporto giornaliero
 - 10: voti da iBroadcast (ogni 10 minuti)
+- 11: riepilogo Telegram (impostazioni in `config\parametri.json`, logica in `src\lib-messaggi.js`)
 
 ## Affidabilita'
 - **Lock di pipeline**: `state\pipeline.lock` impedisce esecuzioni sovrapposte del workflow. Scade dopo 15 minuti

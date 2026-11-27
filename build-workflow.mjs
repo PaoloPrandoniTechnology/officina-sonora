@@ -7,7 +7,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const lib = readFileSync(join(here, 'src', 'lib.js'), 'utf8') + '\n' + readFileSync(join(here, 'src', 'lib-apprendimento.js'), 'utf8');
+const lib = readFileSync(join(here, 'src', 'lib.js'), 'utf8') + '\n' + readFileSync(join(here, 'src', 'lib-apprendimento.js'), 'utf8')
+  + '\n' + readFileSync(join(here, 'src', 'lib-messaggi.js'), 'utf8')
+  + `\nCFG.messaggi = impostazioniMessaggi(readJsonSafe(path.join(CFG.dir, 'config', 'parametri.json'), {}).messaggi);`;
 const blockFile = (prefix) => {
   const f = readdirSync(join(here, 'src', 'blocks')).find((n) => n.startsWith(prefix));
   if (!f) throw new Error(`blocco ${prefix} non trovato`);
@@ -49,7 +51,7 @@ const nodes = {
   prep: { name: '3d1 Prepara caricamento', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: codeIb('03d1-') }, position: pos(1500, 250) },
   carica: { name: '3d2 Carica su iBroadcast', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('03d2-') }, position: pos(1500, 330) },
   recupero: { name: '3d3 Recupero tag e playlist', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: codeIb('03d3-') }, position: pos(1500, 410) },
-  notifica: { name: '3d4 Notifica e registrazione', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('03d4-') }, position: pos(1500, 490) },
+  notifica: { name: '3d4 Registrazione', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('03d4-') }, position: pos(1500, 490) },
   feedback: { name: '4 Feedback e miglioramento', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('04-') }, position: pos(1500, 50) },
   scegli: { name: '5a Scegli ricetta', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('05a-') }, position: pos(750, 450) },
   titolo: { name: '5b Titolo (modello)', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('05b-') }, position: pos(750, 600) },
@@ -57,6 +59,7 @@ const nodes = {
   invia: { name: '6 Invia render', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('06-') }, position: pos(1000, 450) },
   scrivi: { name: '7 Scrivi stato', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('07-') }, position: pos(1750, 300) },
   riflessione: { name: '9 Riflessione giornaliera', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('09-') }, position: pos(250, -200) },
+  riepilogo: { name: '11 Riepilogo Telegram', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('11-') }, position: pos(250, -600) },
   voti: { name: '10 Voti da iBroadcast', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('10-') }, position: pos(250, -400) },
   comandi: { name: '8a Comandi Telegram', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('08a-') }, position: pos(250, 0) },
   avvisi: { name: '8b Avvisi Telegram', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('08b-') }, position: pos(250, 100) },
@@ -67,6 +70,7 @@ const links = [
   ['schedule', 0, 'leggi'],
   ['schedule', 0, 'comandi'],
   ['schedule', 0, 'avvisi'],
+  ['schedule', 0, 'riepilogo'], // ogni minuto controlla se e' ora del riepilogo
   ['schedule', 0, 'riflessione'],
   ['schedule', 0, 'voti'], // ogni minuto controlla se e' passata la cadenza di 10 minuti // ogni minuto controlla se e' l'ora del rapporto giornaliero // in parallelo: comandi e avvisi ogni minuto
   ['leggi', 0, 'libera'],

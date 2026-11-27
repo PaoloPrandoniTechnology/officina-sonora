@@ -9,7 +9,7 @@ async function say(text) { return tgRequest('sendMessage', { chat_id: CHAT, text
 // ---- Avvisi: un errore che si ripete 3 volte in un'ora viene segnalato (al massimo ogni 30 minuti) ----
 async function avvisi() {
   let righe = [];
-  try { righe = fs.readFileSync(CFG.errorsFile, 'utf8').split('\n').filter(Boolean).slice(-500).map((l) => JSON.parse(l)); } catch (e) { return; }
+  try { righe = fs.readFileSync(CFG.errorsFile, 'utf8').split('\n').filter(Boolean).slice(-500).map((l) => JSON.parse(l)); } catch (e) { /* nessun errore registrato */ }
   const dopo = Date.now() - 3600000;
   const conta = {};
   for (const r of righe) if (Date.parse(r.ts) >= dopo) conta[r.key] = (conta[r.key] || 0) + 1;
@@ -21,7 +21,16 @@ async function avvisi() {
     const ultimo = tgs.alerted[key] || 0;
     if (Date.now() - ultimo < 30 * 60000) continue;
     tgs.alerted[key] = Date.now();
-    await say(`Avviso: errore ripetuto ${n} volte nell'ultima ora:\n${key}`);
+    tgs.inAttesa = tgs.inAttesa || {};
+    tgs.inAttesa[key] = { n, ultimo: Date.now() };
+  }
+  // Fuori fascia gli avvisi restano in attesa e partono alla riapertura
+  const { attivo, dati } = CFG.messaggi.tipi.avvisi;
+  if (!attivo || !dati.length) { tgs.inAttesa = {}; return; }
+  if (!inFascia(CFG.messaggi, new Date())) return;
+  for (const [key, info] of Object.entries(tgs.inAttesa || {})) {
+    const r = await say(testoAvviso(key, info, dati));
+    if (r.ok) delete tgs.inAttesa[key];
   }
 }
 
