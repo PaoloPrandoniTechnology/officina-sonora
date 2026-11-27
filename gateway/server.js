@@ -6,6 +6,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { leggiStato } = require('./stato');
+const { datiAnalisi } = require('./analisi');
 
 const PORT = 5790;
 const TOKEN_FILE = path.join(__dirname, 'token.json');
@@ -161,6 +162,7 @@ const server = http.createServer(async (req, res) => {
       return res.end(fs.readFileSync(path.join(__dirname, 'dashboard.html')));
     }
     if (req.method === 'GET' && req.url === '/api/stato') return rispondi(200, await leggiStato());
+    if (req.method === 'GET' && req.url === '/api/dati') return rispondi(200, datiAnalisi());
     if (req.method !== 'POST') return rispondi(405, { ok: false });
     const corpo = await leggiCorpo(req);
     if (req.url === '/tg') {
