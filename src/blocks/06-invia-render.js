@@ -10,7 +10,7 @@ if (!(await engineUp())) {
 
 const concept = state.queue.shift();
 concept.durata_s = concept.durata_s || CFG.durDefault;
-const seed = Math.floor(Math.random() * 2147483647);
+const seed = nuovoSeed();
 // LoRA: la strumentale KTO piu' quella del genere, solo se il motore le ha davvero.
 // Non si usa yue2-instrumental: in produzione il motore chiudeva i brani a 30 secondi.
 // Senza elenco da /props si usa la sola KTO, per non farsi rifiutare il render.
@@ -31,29 +31,21 @@ const sicuro = (concept.attempts || 0) >= 2;
 const adapters = concept.vocale ? [] : [piena('yue2-instrumental-kto')];
 if (!concept.attempts && (concept.tentativi_render || 0) < 2) adapters.push(...delGenere.filter((a) => presenti.includes(a.name)));
 
-const durata = Math.min(360, Math.round(concept.durata_s * 1.2)); // 360 s: limite del motore
-// Il nostro score vale al primo tentativo; dopo un fallimento lo scrive il motore
-const nostro = Boolean(concept.abc) && !concept.attempts;
-const body = {
-  style: concept.style,
-  lyrics: concept.lyrics,
-  cot: sicuro ? 'melody' : 'full', // full: score con melodia e accordi
-  ...(adapters.length ? { adapters } : {}),
-  // Il motore tronca il brano quando finisce i token: si chiede piu' durata e piu' margine,
-  // cosi' il brano si chiude da solo e non si interrompe a meta'. Il controllo qualita' usa la durata di riferimento.
-  duration: durata,
-  semantic_sampling: { max_tokens: Math.min(9000, Math.round(durata * 25 * 1.2)) },
-  ...(nostro ? { abc: concept.abc } : { abc_sampling: { max_tokens: Math.max(512, Math.min(9000, Math.round(durata * 25 * 1.2))) } }),
-  output_format: 'mp3',
-  seed,
-};
-const r = await req('POST', `${CFG.yue}/synth`, { body, ms: 20000 });
-if (!r.ok) {
+// gemma esce dalla GPU prima del render: su 6 GB i due modelli insieme rallentano il caricamento
+try { await gw('/llm/scarica'); } catch (e) { log(`gemma non scaricato: ${e.message}`); }
+
+// Strumentale al primo tentativo: prima il solo score, poi il blocco 2 avvia il render.
+// Altrimenti render in un passo, con lo score del compositore (ripiego) o scritto dal motore.
+const piano = !concept.vocale && !concept.attempts && !concept.pianoFallito;
+const nostro = !piano && Boolean(concept.abc) && !concept.attempts;
+const body = piano ? corpoPiano(concept, adapters, seed)
+  : corpoRender(concept, adapters, seed, nostro ? concept.abc : null, nostro ? concept.durata_s : 0);
+const id = await inviaSynth(body);
+if (!id) {
   state.queue.unshift(concept);
-  log(`/synth rifiutato (HTTP ${r.status}): riprovo al prossimo giro`);
   return [{ json: { state } }];
 }
-const id = JSON.parse(r.buf.toString('utf8')).id;
-state.job = { id, seed, submittedAt: Date.now(), concept, adapters, abcNostro: nostro };
-log(`job ${id} inviato per "${concept.titolo}" (${concept.durata_s}s)`);
+state.job = { id, seed, submittedAt: Date.now(), concept, adapters, abcNostro: nostro, ...(piano ? { fase: 'piano', pianoN: 1 } : {}) };
+saveState(state); // subito: il watchdog non deve ricaricare gemma mentre il resto del giro prosegue
+log(`job ${id} inviato per "${concept.titolo}" (${piano ? 'score' : `${concept.durata_s}s`})`);
 return [{ json: { state } }];

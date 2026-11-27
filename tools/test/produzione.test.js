@@ -12,15 +12,15 @@ const L = new Function('require', LIB + '\nreturn { CFG, extractAbc, componiStil
 const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'];
 
 // Esegue il blocco 6 con un motore finto; ritorna il corpo inviato a /synth e lo stato
-async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0 } = {}) {
+async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0, pianoFallito } = {}) {
   const finta = `
-    CFG.comandi = {}; log = () => {}; engineUp = async () => true;
+    CFG.comandi = {}; log = () => {}; engineUp = async () => true; saveState = () => {}; gw = async () => ({});
     req = async (m, url, o) => {
       if (url.endsWith('/props')) { if (!$env.props) throw new Error('no'); return { ok: true, status: 200, buf: Buffer.from(JSON.stringify($env.props)) }; }
       $env.corpo = o.body; return { ok: true, status: 200, buf: Buffer.from('{"id":"j1"}') };
     };`;
   const env = { props };
-  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts, abc, tentativi_render: corti };
+  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts, abc, tentativi_render: corti, pianoFallito };
   const input = { first: () => ({ json: { state: { job: null, queue: [concept] } } }) };
   const [r] = await new AF('require', '$input', '$env', LIB + finta + '\n' + leggi('src', 'blocks', '06-invia-render.js'))(require, input, env);
   return { corpo: env.corpo, job: r.json.state.job };
@@ -118,15 +118,19 @@ test('blocco 5d: voci e richieste non componibili restano al motore', async () =
   assert.equal(rotto.lyrics, 'x');
 });
 
-test('blocco 6: al primo tentativo invia il nostro score, dopo un fallimento lo scrive il motore', async () => {
-  const props = elenco('yue2-instrumental');
+test('blocco 6: prima il solo score; col ripiego il nostro; dopo un fallimento lo scrive il motore', async () => {
+  const props = elenco('yue2-instrumental-kto');
   const primo = await invia('Surf-rock-strumentale', { props, abc: 'X:1' });
-  assert.equal(primo.corpo.abc, 'X:1');
-  assert.equal(primo.corpo.cot, 'full');
-  assert.equal(primo.corpo.abc_sampling, undefined);
-  assert.equal(primo.job.abcNostro, true);
+  assert.equal(primo.corpo.duration, 1);
+  assert.equal(primo.corpo.abc, undefined);
+  assert.equal(primo.job.fase, 'piano');
+  const ripiego = await invia('Surf-rock-strumentale', { props, abc: 'X:1', pianoFallito: true });
+  assert.equal(ripiego.corpo.abc, 'X:1');
+  assert.equal(ripiego.corpo.semantic_sampling.min_tokens, 6750);
+  assert.equal(ripiego.job.abcNostro, true);
   const secondo = await invia('Surf-rock-strumentale', { props, abc: 'X:1', attempts: 1 });
   assert.equal(secondo.corpo.abc, undefined);
+  assert.equal(secondo.corpo.output_format, 'mp3');
   assert.ok(secondo.corpo.abc_sampling.max_tokens > 0);
 });
 

@@ -10,3 +10,55 @@
 {"ts":"2026-11-27T10:22:34.337Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Post-rock-strumentale"}}
 {"ts":"2026-11-27T10:22:41.623Z","sezione":"comandi","chiave":"produci","prima":{"produciGenere":"Post-rock-strumentale"},"dopo":{"produciGenere":"Reggae-dub-morbido"}}
 {"ts":"2026-11-27T10:26:44.362Z","sezione":"note genere","chiave":"traduzione automatica","prima":null,"dopo":"1 note tradotte"}
+{"ts":"2026-11-27T10:38:28.836Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Vocalise-coro"}}
+{"ts":"2026-11-27T10:45:53.605Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Manouche-swing"}}
+{"ts":"2026-11-27T11:08:15.849Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Flamenco-chitarra"}}
+{"ts":"2026-11-27T11:26:27.871Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Rockabilly-strumentale"}}
+{"ts":"2026-11-27T13:55:45.714Z","sezione":"voti","chiave":"199 Onde Silenti","prima":{"voto":null,"nota":null},"dopo":{"voto":4,"nota":null}}
+{"ts":"2026-11-27T13:55:59.134Z","sezione":"voti","chiave":"198 Eco di Silenzi Stratificati","prima":{"voto":null,"nota":null},"dopo":{"voto":4,"nota":null}}
+{"ts":"2026-11-27T13:56:08.225Z","sezione":"voti","chiave":"197 Eco Ritmico al Tramonto","prima":{"voto":null,"nota":null},"dopo":{"voto":3,"nota":null}}
+{"ts":"2026-11-27T16:34:45.347Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Indie-rock-strumentale"}}
+{"ts":"2026-11-27T16:35:21.473Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Indie-rock-strumentale"}}
+{"ts":"2026-11-27T16:35:42.648Z","sezione":"comandi","chiave":"produci","prima":{"produciGenere":"Indie-rock-strumentale"},"dopo":{"produciGenere":"Funk-groove"}}
+{"ts":"2026-11-27T16:57:38.643Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Jazz-lounge"}}
+{"ts":"2026-11-27T16:58:32.383Z","sezione":"comandi","chiave":"pausa","prima":{"produciGenere":"Jazz-lounge"},"dopo":{"produciGenere":"Jazz-lounge","pausa":true}}
+{"ts":"2026-11-27T17:02:48.119Z","sezione":"comandi","chiave":"riprendi","prima":{"produciGenere":"Jazz-lounge","pausa":true},"dopo":{"produciGenere":"Jazz-lounge"}}
+{"ts":"2026-11-27T17:02:59.757Z","sezione":"generi","chiave":"Meditazione","prima":{"peso":1,"attivo":true,"note":[]},"dopo":{"peso":1,"attivo":true,"note":[]}}
+{"ts":"2026-11-27T17:02:59.768Z","sezione":"generi","chiave":"Pranayama-respiro","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.773Z","sezione":"generi","chiave":"Yin-Savasana","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.778Z","sezione":"generi","chiave":"Restorative","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.782Z","sezione":"generi","chiave":"Sound-bath-rilassamento","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.787Z","sezione":"generi","chiave":"Hatha-base","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.791Z","sezione":"generi","chiave":"Vinyasa-dinamico","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.797Z","sezione":"generi","chiave":"Power-yoga","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.803Z","sezione":"generi","chiave":"Funk-groove","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.808Z","sezione":"generi","chiave":"Afro-latin-groove","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.813Z","sezione":"generi","chiave":"Trip-hop-dolce","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.817Z","sezione":"generi","chiave":"Reggae-dub-morbido","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.822Z","sezione":"generi","chiave":"Jazz-lounge","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.827Z","sezione":"generi","chiave":"Folk-strumming","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.831Z","sezione":"generi","chiave":"Surf-rock-strumentale","prima":{"peso":1,"attivo":true,"note":[{"testo":"voglio piu assoli di chitarra elettrica","inglese":"Add more electric guitar solos and riffs throughout the track.","ts":"2026-11-27T09:53:48.278Z"}]},"dopo":{"peso":1,"attivo":true,"note":[{"testo":"voglio piu assoli di chitarra elettrica","inglese":"Add more electric guitar solos and riffs throughout the track.","ts":"2026-11-27T09:53:48.278Z"}]}}
+{"ts":"2026-11-27T17:02:59.847Z","sezione":"generi","chiave":"Post-rock-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.854Z","sezione":"generi","chiave":"Blues-shuffle-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-27T17:02:59.877Z","sezione":"generi","chiave":"Indie-rock-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.882Z","sezione":"generi","chiave":"Rockabilly-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.888Z","sezione":"generi","chiave":"Techno-minimale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.893Z","sezione":"generi","chiave":"Piano-minimalista","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.899Z","sezione":"generi","chiave":"Score-cinematico","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.903Z","sezione":"generi","chiave":"Folk-balcanico","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.908Z","sezione":"generi","chiave":"Beat-hip-hop","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.913Z","sezione":"generi","chiave":"Manouche-swing","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.919Z","sezione":"generi","chiave":"Synthwave","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.923Z","sezione":"generi","chiave":"Flamenco-chitarra","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.928Z","sezione":"generi","chiave":"Celtic-arpa-whistle","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.933Z","sezione":"generi","chiave":"Drum-and-bass-soft","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.938Z","sezione":"generi","chiave":"Gamelan-ambient","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.943Z","sezione":"generi","chiave":"Bossa-nova-chitarra","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.948Z","sezione":"generi","chiave":"Vocalise-coro","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.953Z","sezione":"generi","chiave":"Overtone-canto","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.958Z","sezione":"generi","chiave":"Canto-gregoriano-moderno","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.963Z","sezione":"generi","chiave":"Soul-vocalise","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.968Z","sezione":"generi","chiave":"Metal-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.973Z","sezione":"generi","chiave":"Industrial-techno","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.977Z","sezione":"generi","chiave":"Trap-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T17:02:59.982Z","sezione":"generi","chiave":"Hard-rock-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}

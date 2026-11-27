@@ -23,9 +23,32 @@ const { data, ext } = extractAudio(r.buf, r.headers['content-type']);
 if (c.tipo && typeof c.tipo === 'object') c.tipo = c.tipo.name;
 const dir = cartellaBrano(c.categoria, c.tipo);
 fs.mkdirSync(dir, { recursive: true });
-const file = uniquePath(dir, slugify(c.titolo), '.' + ext);
+let file = uniquePath(dir, slugify(c.titolo), '.' + ext);
 fs.writeFileSync(file, data);
+let bytes = data.length;
+// Il WAV del motore diventa l'MP3 della libreria nel gateway (loudness, dissolvenza, 320 kbps)
+if (ext === 'wav') {
+  const mp3 = uniquePath(dir, slugify(c.titolo), '.mp3');
+  try {
+    const m = await gw('/audio/master', { file, uscita: mp3 });
+    if (!m.ok) throw new Error(m.error || `HTTP ${m.status}`);
+    log(`mastering: ${m.lufs} LUFS, picco ${m.picco_db} dB`);
+    bytes = fs.statSync(mp3).size;
+    fs.unlinkSync(file);
+    file = mp3;
+  } catch (e) {
+    fs.rmSync(file, { force: true });
+    fs.rmSync(mp3, { force: true });
+    job.resultFails = (job.resultFails || 0) + 1;
+    log(`mastering fallito (${job.resultFails}): ${e.message}`);
+    if (job.resultFails >= CFG.resultFailsMax) {
+      requeue(state, 'mastering non riuscito'); // il tentativo successivo chiede l'MP3 al motore
+      return [{ json: { state, outcome: 'failed' } }];
+    }
+    return [{ json: { state, outcome: 'waiting' } }];
+  }
+}
 const abc = extractAbc(r.buf, r.headers['content-type']);
 if (abc) fs.writeFileSync(file.replace(/\.[^.]+$/, '.abc'), abc);
 log(`audio scritto: ${file}`);
-return [{ json: { state, outcome: 'audio', file, bytes: data.length } }];
+return [{ json: { state, outcome: 'audio', file, bytes } }];

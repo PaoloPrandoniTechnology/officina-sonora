@@ -67,9 +67,9 @@ test('durata: il valore resta entro i limiti', () => {
 test('stile: la chiusura dipende dal genere (strumentale o vocale senza parole)', () => {
   const base = { stile: 'ambient pad', enfasi: 'costruzione', melodia: 'tema', accordi: 'ciclico', ritmica: 'lenta' };
   const strumentale = L.componiStile({ ...base }, null, ['pad'], '', { style_extra: ['calm'] });
-  assert.match(strumentale, /instrumental, no vocals$/);
+  assert.match(strumentale, /^Instrumental, .*no vocals$/);
   const vocale = L.componiStile({ ...base, vocale_senza_parole: true }, null, ['voce'], '', { style_extra: [] });
-  assert.match(vocale, /wordless vocals, no lyrics$/);
+  assert.match(vocale, /^Wordless vocals, .*no lyrics$/);
   assert.doesNotMatch(vocale, /no vocals/);
 });
 
@@ -107,8 +107,8 @@ test('note: le direttive del produttore entrano nello stile del genere', () => {
     L.CFG.generiOverride = { 'Rock-test': { peso: 1, attivo: true, direttive: ['more guitar solos', 'use pan flute'] } };
     const cat = { name: 'Rock-test', stile: 'rock base', enfasi: 'x', melodia: 'y', accordi: 'z', ritmica: 'w' };
     const stile = L.componiStile(cat, null, ['chitarra'], '', { style_extra: [] });
-    assert.match(stile, /producer notes: more guitar solos; use pan flute/);
-    assert.match(stile, /instrumental, no vocals$/);
+    assert.match(stile, /more guitar solos, use pan flute/);
+    assert.match(stile, /^Instrumental, .*no vocals$/);
     const senza = L.componiStile({ ...cat, name: 'Altro' }, null, ['chitarra'], '', { style_extra: [] });
     assert.doesNotMatch(senza, /producer notes/);
   } finally {

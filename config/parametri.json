@@ -15,6 +15,154 @@
           "ts": "2026-11-27T09:53:48.278Z"
         }
       ]
+    },
+    "Pranayama-respiro": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Yin-Savasana": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Restorative": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Sound-bath-rilassamento": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Hatha-base": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Vinyasa-dinamico": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Power-yoga": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Funk-groove": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Afro-latin-groove": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Trip-hop-dolce": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Reggae-dub-morbido": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Jazz-lounge": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Folk-strumming": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Post-rock-strumentale": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Blues-shuffle-strumentale": {
+      "peso": 1,
+      "attivo": true
+    },
+    "Indie-rock-strumentale": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Rockabilly-strumentale": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Techno-minimale": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Piano-minimalista": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Score-cinematico": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Folk-balcanico": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Beat-hip-hop": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Manouche-swing": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Synthwave": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Flamenco-chitarra": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Celtic-arpa-whistle": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Drum-and-bass-soft": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Gamelan-ambient": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Bossa-nova-chitarra": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Vocalise-coro": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Overtone-canto": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Canto-gregoriano-moderno": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Soul-vocalise": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Metal-strumentale": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Industrial-techno": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Trap-strumentale": {
+      "peso": 1,
+      "attivo": false
+    },
+    "Hard-rock-strumentale": {
+      "peso": 1,
+      "attivo": false
     }
   },
   "messaggi": {

@@ -73,6 +73,22 @@
         "prompt": "single bronze tibetan singing bowl with wooden mallet on a flat stone, wide open rim, misty mountain lake at blue hour, soft golden light, serene minimal composition, fine art photography, muted indigo and gold",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "meditative drone ambient",
+        "instruments": {
+          "tanpura": "tanpura drone",
+          "campane tibetane": "resonant tibetan singing bowls",
+          "pad di sintetizzatore lungo": "long evolving synth pad",
+          "drone di organo": "sustained organ drone"
+        },
+        "rhythm": "free time, beatless",
+        "mood": "still, deep, serene",
+        "space": "wide long reverb, soft warm mix",
+        "influences": {
+          "ambient": "ambient",
+          "musica indiana": "indian classical"
+        }
       }
     },
     {
@@ -142,6 +158,22 @@
         "prompt": "soft swirling breath-like mist over a calm sea at dawn, a single white feather floating, airy minimal fine art photography, pale teal and cream",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "breathing ambient",
+        "instruments": {
+          "pad morbido": "soft airy synth pad",
+          "flauto di bambu": "breathy bamboo flute",
+          "sintetizzatore a respiro": "slow swelling synthesizer",
+          "vento sintetico": "gentle synthetic wind"
+        },
+        "rhythm": "free time, slow swells",
+        "mood": "calm, spacious, weightless",
+        "space": "airy reverb, soft mix",
+        "influences": {
+          "ambient": "ambient",
+          "new age": "new age"
+        }
       }
     },
     {
@@ -211,6 +243,22 @@
         "prompt": "deep night sky over still dark water, one faint violet moon, velvet shadows, heavy calm, atmospheric painting, deep purple and black",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "deep dark ambient",
+        "instruments": {
+          "sub bass": "deep sub bass",
+          "drone scuro": "dark warm drone",
+          "rumore di fondo naturale": "distant natural ambience",
+          "corde basse": "low bowed strings"
+        },
+        "rhythm": "beatless, very slow",
+        "mood": "heavy, warm, restful",
+        "space": "deep dark reverb, soft mix",
+        "influences": {
+          "dark ambient": "dark ambient",
+          "drone doom": "drone doom"
+        }
       }
     },
     {
@@ -284,6 +332,23 @@
         "prompt": "warm linen blanket and cushions beside a window with soft afternoon light, dried flowers, cozy still life photography, sand and terracotta",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "acoustic ambient",
+        "instruments": {
+          "arpa": "concert harp arpeggios",
+          "chitarra acustica con delay": "acoustic guitar with delay",
+          "flauto traverso": "warm concert flute",
+          "archi lontani": "distant soft strings"
+        },
+        "rhythm": "gentle slow pulse",
+        "mood": "nurturing, tender, calm",
+        "space": "warm hall reverb, intimate mix",
+        "influences": {
+          "ambient acustico": "acoustic ambient",
+          "folk": "folk",
+          "musica da camera": "chamber music"
+        }
       }
     },
     {
@@ -354,6 +419,22 @@
         "prompt": "large hanging bronze gong and translucent crystal singing bowls, concentric light ripples, ethereal glow, violet and lavender, fine art photography",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "sound bath",
+        "instruments": {
+          "gong": "deep gong swells",
+          "campane di cristallo": "shimmering crystal bowls",
+          "campane tibetane": "tibetan singing bowls",
+          "pad di risonanza": "resonant pad"
+        },
+        "rhythm": "free time, long decays",
+        "mood": "hypnotic, spacious",
+        "space": "vast reverb, natural dynamics",
+        "influences": {
+          "sound bath": "sound bath",
+          "ambient": "ambient"
+        }
       }
     },
     {
@@ -427,6 +508,23 @@
         "prompt": "empty wooden yoga deck facing a green valley in morning light, bamboo and ferns, tranquil nature photography, sage green and ivory",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "acoustic downtempo",
+        "instruments": {
+          "chitarra classica": "fingerpicked nylon guitar",
+          "shaker morbido": "soft shaker",
+          "basso acustico": "warm acoustic bass",
+          "kalimba": "kalimba"
+        },
+        "rhythm": "light relaxed groove",
+        "mood": "grounded, warm, gentle",
+        "space": "close organic mix",
+        "influences": {
+          "downtempo": "downtempo",
+          "bossa nova": "bossa nova",
+          "folk": "folk"
+        }
       }
     },
     {
@@ -501,6 +599,23 @@
         "prompt": "flowing silk ribbons in motion across a sunset desert, dynamic curves, vivid orange and amber, painterly illustration",
         "font": "Segoe UI",
         "corsivo": false
+      },
+      "en": {
+        "genre": "organic house",
+        "instruments": {
+          "percussioni tribali": "tribal hand percussion",
+          "kalimba": "plucked kalimba",
+          "basso pulsante": "pulsing warm bass",
+          "arpeggi di sintetizzatore": "synth arpeggios"
+        },
+        "rhythm": "steady flowing four on the floor groove",
+        "mood": "uplifting, flowing",
+        "space": "wide clean mix",
+        "influences": {
+          "organic house": "organic house",
+          "tribal": "tribal",
+          "world": "world"
+        }
       }
     },
     {
@@ -570,6 +685,22 @@
         "prompt": "powerful ocean wave breaking against black rock, electric teal and coral light, high energy photography, sharp contrast",
         "font": "Impact",
         "corsivo": false
+      },
+      "en": {
+        "genre": "electronic workout",
+        "instruments": {
+          "drum machine": "punchy drum machine",
+          "synth pulsante": "pulsing synth lead",
+          "basso sintetico": "driving synth bass",
+          "claps": "crisp claps"
+        },
+        "rhythm": "four on the floor",
+        "mood": "energetic, focused, bright",
+        "space": "clean modern punchy mix",
+        "influences": {
+          "electronic dance": "electronic dance",
+          "trance leggero": "melodic trance"
+        }
       }
     },
     {
@@ -652,7 +783,25 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "light funk",
+        "instruments": {
+          "basso slap": "slap bass",
+          "chitarra funk pulita": "clean funk guitar with muted strums",
+          "clavinet": "clavinet",
+          "batteria suonata con spazzole": "brushed drum kit",
+          "ottoni morbidi": "soft horn section"
+        },
+        "rhythm": "syncopated sixteenth note groove, slight swing",
+        "mood": "warm, joyful",
+        "space": "live band, warm vintage mix",
+        "influences": {
+          "funk": "funk",
+          "soul": "soul",
+          "disco leggero": "light disco"
+        }
+      }
     },
     {
       "name": "Afro-latin-groove",
@@ -735,7 +884,26 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "afro-latin groove",
+        "instruments": {
+          "congas": "congas",
+          "bongos": "bongos",
+          "shaker": "shakers",
+          "timbales leggeri": "light timbales",
+          "basso acustico": "acoustic bass",
+          "chitarra nylon ritmica": "rhythmic nylon guitar montuno"
+        },
+        "rhythm": "clave driven syncopated groove",
+        "mood": "sunny, flowing",
+        "space": "live percussion ensemble, natural room",
+        "influences": {
+          "afro-cuban": "afro-cuban",
+          "bossa nova": "bossa nova",
+          "world": "world"
+        }
+      }
     },
     {
       "name": "Trip-hop-dolce",
@@ -817,7 +985,25 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "soft trip-hop",
+        "instruments": {
+          "rhodes": "rhodes electric piano",
+          "basso elettrico morbido": "soft electric bass",
+          "batteria con beat spezzato": "dusty broken beat drums",
+          "vibrafono": "vibraphone",
+          "chitarra jazz pulita": "clean jazz guitar"
+        },
+        "rhythm": "laid back broken beat",
+        "mood": "melancholic, relaxed",
+        "space": "warm lo-fi mix",
+        "influences": {
+          "trip-hop": "trip-hop",
+          "jazz": "jazz",
+          "lo-fi": "lo-fi"
+        }
+      }
     },
     {
       "name": "Reggae-dub-morbido",
@@ -887,6 +1073,23 @@
         "prompt": "stack of vintage wooden sound system speakers on a tropical beach at sunset, palm leaves, warm green gold and red, retro poster illustration",
         "font": "Impact",
         "corsivo": false
+      },
+      "en": {
+        "genre": "soft roots reggae dub",
+        "instruments": {
+          "basso reggae": "deep reggae bass",
+          "organo hammond": "hammond organ",
+          "chitarra skank": "offbeat skank guitar",
+          "rullante con eco": "snare with tape echo",
+          "percussioni leggere": "light percussion"
+        },
+        "rhythm": "one drop groove",
+        "mood": "loose, warm, mellow",
+        "space": "spacious dub echoes and spring reverb",
+        "influences": {
+          "reggae": "reggae",
+          "dub": "dub"
+        }
       }
     },
     {
@@ -961,6 +1164,24 @@
         "prompt": "upright double bass and grand piano in a dim smoky lounge, warm table lamp, cinematic photography, deep burgundy and brass",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "lounge jazz",
+        "instruments": {
+          "pianoforte": "acoustic piano",
+          "contrabbasso": "walking upright bass",
+          "batteria con spazzole": "brushed drums",
+          "sassofono morbido": "breathy tenor saxophone",
+          "vibrafono": "vibraphone"
+        },
+        "rhythm": "light swing",
+        "mood": "intimate, relaxed",
+        "space": "small club, natural room",
+        "influences": {
+          "jazz": "jazz",
+          "bossa nova": "bossa nova",
+          "musica da camera": "chamber music"
+        }
       }
     },
     {
@@ -1043,7 +1264,25 @@
           "ar_scale": 0.3,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "acoustic folk",
+        "instruments": {
+          "chitarra acustica strumming": "strummed acoustic guitar",
+          "banjo": "fingerpicked banjo",
+          "armonica": "harmonica",
+          "basso acustico": "acoustic bass",
+          "shaker e cajon": "shaker and cajon"
+        },
+        "rhythm": "steady eighth note strumming",
+        "mood": "warm, honest, hopeful",
+        "space": "live ensemble, natural wooden room",
+        "influences": {
+          "folk": "folk",
+          "country leggero": "light country",
+          "americana": "americana"
+        }
+      }
     },
     {
       "name": "Surf-rock-strumentale",
@@ -1117,6 +1356,24 @@
         "prompt": "giant curling turquoise wave with a vintage surfboard and woodie car on the beach, 1960s screen print poster, teal cream and coral",
         "font": "Impact",
         "corsivo": false
+      },
+      "en": {
+        "genre": "surf rock",
+        "instruments": {
+          "chitarra elettrica con riverbero": "spring reverb electric guitar lead with tremolo picking",
+          "batteria con piatti": "drums with ride cymbal and tom fills",
+          "basso elettrico": "picked electric bass",
+          "chitarra ritmica twang": "twangy rhythm guitar",
+          "organo leggero": "light combo organ"
+        },
+        "rhythm": "driving straight beat",
+        "mood": "bright, playful",
+        "space": "live band, vintage room",
+        "influences": {
+          "surf rock": "surf rock",
+          "rock and roll": "rock and roll",
+          "rockabilly": "rockabilly"
+        }
       }
     },
     {
@@ -1199,7 +1456,25 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "post-rock",
+        "instruments": {
+          "chitarra elettrica con delay": "delayed electric guitar",
+          "chitarra clean arpeggiata": "arpeggiated clean guitar",
+          "batteria con crescendo": "building drums",
+          "basso profondo": "deep bass",
+          "glockenspiel": "glockenspiel"
+        },
+        "rhythm": "slow build to a full beat",
+        "mood": "cinematic, expansive, emotional",
+        "space": "wide layered mix, long reverb",
+        "influences": {
+          "post-rock": "post-rock",
+          "shoegaze": "shoegaze",
+          "ambient rock": "ambient rock"
+        }
+      }
     },
     {
       "name": "Blues-shuffle-strumentale",
@@ -1273,6 +1548,24 @@
         "prompt": "resonator slide guitar on a chair at a delta crossroads at dusk, old gas station light, textured oil painting, indigo and rust",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "blues shuffle",
+        "instruments": {
+          "chitarra slide": "slide guitar lead",
+          "batteria con shuffle": "shuffle drums",
+          "basso walking": "walking bass",
+          "organo hammond": "hammond organ",
+          "chitarra ritmica elettrica": "electric rhythm guitar"
+        },
+        "rhythm": "swinging shuffle",
+        "mood": "lively, soulful",
+        "space": "live band, warm tube amps",
+        "influences": {
+          "blues": "blues",
+          "rock": "rock",
+          "boogie": "boogie"
+        }
       }
     },
     {
@@ -1355,7 +1648,25 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "indie rock",
+        "instruments": {
+          "chitarra elettrica jangle": "jangly electric guitar",
+          "batteria rock": "driving rock drums",
+          "basso elettrico": "electric bass",
+          "chitarra ritmica con power chord": "power chord rhythm guitar",
+          "tastiera vintage": "vintage keyboard"
+        },
+        "rhythm": "driving beat with backbeat",
+        "mood": "bright, energetic",
+        "space": "live band, crisp mix",
+        "influences": {
+          "indie rock": "indie rock",
+          "power pop": "power pop",
+          "new wave": "new wave"
+        }
+      }
     },
     {
       "name": "Rockabilly-strumentale",
@@ -1429,6 +1740,24 @@
         "prompt": "1950s red convertible car in front of a neon diner with a hollow body guitar, retro americana illustration, cherry red and mint",
         "font": "Impact",
         "corsivo": false
+      },
+      "en": {
+        "genre": "rockabilly",
+        "instruments": {
+          "contrabbasso slap": "slap upright bass",
+          "chitarra elettrica twang": "twangy electric guitar",
+          "batteria rockabilly": "swinging drums",
+          "chitarra solista con bending": "lead guitar with string bends",
+          "claps": "handclaps"
+        },
+        "rhythm": "fast swinging beat",
+        "mood": "lively, joyful",
+        "space": "vintage slapback echo, live room",
+        "influences": {
+          "rockabilly": "rockabilly",
+          "rock and roll": "rock and roll",
+          "country": "country"
+        }
       }
     },
     {
@@ -1511,7 +1840,25 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "minimal techno",
+        "instruments": {
+          "drum machine kick": "deep drum machine kick",
+          "hi-hat sintetico": "crisp synthetic hi-hats",
+          "basso filtrato": "filtered synth bass",
+          "stab di sintetizzatore": "short dub synth stabs",
+          "rumore percussivo": "percussive noise"
+        },
+        "rhythm": "steady four on the floor",
+        "mood": "hypnotic, precise",
+        "space": "clean deep club mix",
+        "influences": {
+          "minimal techno": "minimal techno",
+          "deep house": "deep house",
+          "dub techno": "dub techno"
+        }
+      }
     },
     {
       "name": "Piano-minimalista",
@@ -1584,6 +1931,23 @@
         "prompt": "close view of piano keys fading into white fog, one falling leaf, elegant minimal black and white fine art photography",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "minimalist piano",
+        "instruments": {
+          "pianoforte acustico": "felt acoustic piano",
+          "pianoforte preparato leggero": "lightly prepared piano",
+          "violoncello lontano": "distant cello",
+          "celesta": "celesta"
+        },
+        "rhythm": "steady quiet pulse, repeating cells",
+        "mood": "delicate, contemplative",
+        "space": "close piano, soft hall reverb",
+        "influences": {
+          "minimalismo": "minimalism",
+          "musica da camera": "chamber music",
+          "neoclassica": "neoclassical"
+        }
       }
     },
     {
@@ -1666,7 +2030,25 @@
           "ar_scale": 0.5,
           "nar_scale": 0.375
         }
-      ]
+      ],
+      "en": {
+        "genre": "cinematic orchestral score",
+        "instruments": {
+          "archi sinfonici": "symphonic strings",
+          "corni": "french horns",
+          "timpani": "timpani",
+          "arpa": "harp",
+          "ottoni morbidi": "soft brass"
+        },
+        "rhythm": "slow broad build",
+        "mood": "sweeping, emotional",
+        "space": "wide concert hall",
+        "influences": {
+          "colonna sonora": "film score",
+          "musica sinfonica": "symphonic",
+          "epic": "epic"
+        }
+      }
     },
     {
       "name": "Folk-balcanico",
@@ -1740,6 +2122,24 @@
         "prompt": "accordion and clarinet in a festive village square with strings of lights and embroidered ribbons, lively folk art painting, red and ochre",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "balkan folk dance",
+        "instruments": {
+          "fisarmonica": "accordion",
+          "clarinetto": "virtuosic clarinet",
+          "tamburo a cornice": "frame drum",
+          "violino": "fiddle",
+          "basso acustico": "acoustic bass"
+        },
+        "rhythm": "fast dance rhythm in odd meter",
+        "mood": "festive, lively",
+        "space": "live folk ensemble, natural room",
+        "influences": {
+          "musica balcanica": "balkan brass",
+          "klezmer": "klezmer",
+          "folk": "folk"
+        }
       }
     },
     {
@@ -1822,7 +2222,25 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "boom bap hip-hop beat",
+        "instruments": {
+          "batteria boom-bap": "boom bap drums",
+          "campione di piano": "sampled piano",
+          "basso sub": "warm sub bass",
+          "giradischi con crackle": "vinyl crackle",
+          "vibrafono campionato": "sampled vibraphone"
+        },
+        "rhythm": "head nodding swung groove",
+        "mood": "dusty, relaxed",
+        "space": "warm sampled lo-fi mix",
+        "influences": {
+          "boom-bap": "boom-bap",
+          "jazz hop": "jazz hop",
+          "lo-fi": "lo-fi"
+        }
+      }
     },
     {
       "name": "Manouche-swing",
@@ -1896,6 +2314,24 @@
         "prompt": "gypsy jazz guitar and violin beside a painted wooden caravan with a campfire, 1930s paris poster illustration, wine red and cream",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "gypsy jazz manouche swing",
+        "instruments": {
+          "chitarra manouche ritmica": "pumping manouche rhythm guitar",
+          "chitarra solista": "virtuosic acoustic lead guitar",
+          "violino jazz": "swing violin",
+          "contrabbasso": "upright bass",
+          "chitarra acustica pizzicata": "plucked acoustic guitar"
+        },
+        "rhythm": "fast la pompe swing",
+        "mood": "joyful, agile",
+        "space": "acoustic quintet, intimate room",
+        "influences": {
+          "gypsy jazz": "gypsy jazz",
+          "swing": "swing",
+          "musette": "musette"
+        }
       }
     },
     {
@@ -1967,7 +2403,21 @@
           "ar_scale": 0.3,
           "nar_scale": 0.35
         }
-      ]
+      ],
+      "en": {
+        "genre": "synthwave",
+        "instruments": {
+          "synth analogico": "analog synth lead",
+          "arpeggiatore": "sequenced arpeggiator",
+          "batteria elettronica con reverb": "gated reverb drum machine",
+          "basso sintetico": "synth bass",
+          "pad analogico": "lush analog pads"
+        },
+        "rhythm": "steady retro drive",
+        "mood": "nostalgic, bright, neon",
+        "space": "wide 1980s production",
+        "influences": {}
+      }
     },
     {
       "ambito": "musica",
@@ -2029,6 +2479,19 @@
         "prompt": "spanish guitar with swirling red ruffled fabric around it, andalusian arches, passionate oil painting, crimson and black",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "flamenco",
+        "instruments": {
+          "chitarra flamenca": "flamenco guitar with rasgueado",
+          "palmas": "palmas handclaps",
+          "cajon": "cajon",
+          "basso acustico": "acoustic bass"
+        },
+        "rhythm": "bulerias inspired compas",
+        "mood": "passionate, fiery",
+        "space": "dry close acoustic mix",
+        "influences": {}
       }
     },
     {
@@ -2099,7 +2562,20 @@
           "ar_scale": 0.3,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "celtic folk",
+        "instruments": {
+          "arpa celtica": "celtic harp arpeggios",
+          "tin whistle": "tin whistle melody",
+          "bodhran leggero": "soft bodhran",
+          "violino celtico": "celtic fiddle"
+        },
+        "rhythm": "gentle lilting triple feel",
+        "mood": "storytelling, pastoral",
+        "space": "airy natural hall",
+        "influences": {}
+      }
     },
     {
       "ambito": "musica",
@@ -2162,6 +2638,20 @@
         "prompt": "streaks of fast light trails over a futuristic night city seen from above, fluid motion blur, electric blue and lime",
         "font": "Bahnschrift",
         "corsivo": true
+      },
+      "en": {
+        "genre": "liquid drum and bass",
+        "instruments": {
+          "breakbeat": "crisp breakbeat",
+          "basso sub": "deep sub bass",
+          "pad aereo": "airy pads",
+          "hi-hat veloci": "fast shuffled hi-hats",
+          "stab di sintetizzatore": "soft synth stabs"
+        },
+        "rhythm": "fast rolling breakbeat",
+        "mood": "smooth, uplifting",
+        "space": "clean deep wide mix",
+        "influences": {}
       }
     },
     {
@@ -2224,6 +2714,19 @@
         "prompt": "ornate bronze gamelan metallophones in a balinese temple courtyard with incense haze, soft golden fine art photography, bronze and jade",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "gamelan ambient",
+        "instruments": {
+          "metallofoni gamelan": "interlocking gamelan metallophones",
+          "gong sospeso": "suspended gong",
+          "bambu": "bamboo flute",
+          "drone leggero": "soft drone"
+        },
+        "rhythm": "slow cyclical interlocking pulse",
+        "mood": "shimmering, meditative",
+        "space": "resonant open space",
+        "influences": {}
       }
     },
     {
@@ -2286,6 +2789,19 @@
         "prompt": "vintage 1960s record sleeve, classical nylon guitar standing alone against a Rio de Janeiro balcony railing, sugarloaf mountain, warm sunset, flat gouache shapes, teal and orange",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "bossa nova",
+        "instruments": {
+          "chitarra classica": "syncopated nylon guitar",
+          "basso acustico": "soft acoustic bass",
+          "shaker": "shaker",
+          "flauto morbido": "mellow flute"
+        },
+        "rhythm": "relaxed bossa groove",
+        "mood": "warm, airy",
+        "space": "intimate acoustic mix",
+        "influences": {}
       }
     },
     {
@@ -2348,6 +2864,18 @@
         "prompt": "luminous soundwaves rising through a tall gothic cloister with soft light beams, ethereal painting, pearl and rose",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "sacred choral vocalise",
+        "instruments": {
+          "coro di voci su vocali": "soft choir singing ah and oh vowels",
+          "pad morbido": "warm pad",
+          "campane leggere": "light bells"
+        },
+        "rhythm": "free time, sustained",
+        "mood": "sacred, calm",
+        "space": "cathedral reverb",
+        "influences": {}
       }
     },
     {
@@ -2409,6 +2937,18 @@
         "prompt": "concentric golden resonance rings over an endless steppe at twilight, mystical minimal painting, copper and deep blue",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "overtone throat singing",
+        "instruments": {
+          "voce armonica": "harmonic overtone voice",
+          "drone di tanpura": "tanpura drone",
+          "campane": "bells"
+        },
+        "rhythm": "free time, sustained tones",
+        "mood": "hypnotic, deep",
+        "space": "resonant stone space",
+        "influences": {}
       }
     },
     {
@@ -2472,6 +3012,19 @@
         "prompt": "candlelit romanesque abbey nave with stone arches and a single shaft of light, reverent chiaroscuro painting, amber and shadow",
         "font": "Georgia",
         "corsivo": false
+      },
+      "en": {
+        "genre": "modern monodic chant",
+        "instruments": {
+          "voci monodiche su vocali": "male and female voices singing vowels in unison",
+          "campane": "church bells",
+          "organo": "pipe organ",
+          "pad": "soft pad"
+        },
+        "rhythm": "free chant rhythm",
+        "mood": "reverent, still",
+        "space": "cathedral reverb",
+        "influences": {}
       }
     },
     {
@@ -2536,6 +3089,20 @@
         "prompt": "vintage chrome microphone under a warm spotlight with velvet curtain, 1960s soul record sleeve, plum and gold",
         "font": "Georgia",
         "corsivo": true
+      },
+      "en": {
+        "genre": "neo soul vocalise",
+        "instruments": {
+          "voce soul su vocali": "soulful voice improvising on vowels",
+          "basso groove": "groovy electric bass",
+          "batteria soul": "soul drum kit",
+          "rhodes": "rhodes electric piano",
+          "fiati leggeri": "light horns"
+        },
+        "rhythm": "laid back soul groove",
+        "mood": "warm, expressive",
+        "space": "live band, warm mix",
+        "influences": {}
       }
     },
     {
@@ -2607,7 +3174,21 @@
           "ar_scale": 0.5,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "heavy metal",
+        "instruments": {
+          "chitarra distorta": "distorted rhythm guitars with palm muted riffs",
+          "batteria a doppio pedale": "double bass drums",
+          "basso distorto": "distorted bass",
+          "chitarra solista": "melodic lead guitar solos",
+          "tastiera di sfondo": "background keyboard"
+        },
+        "rhythm": "driving heavy beat",
+        "mood": "powerful, aggressive",
+        "space": "tight modern metal mix",
+        "influences": {}
+      }
     },
     {
       "ambito": "musica",
@@ -2678,7 +3259,21 @@
           "ar_scale": 0.5,
           "nar_scale": 0.5
         }
-      ]
+      ],
+      "en": {
+        "genre": "industrial techno",
+        "instruments": {
+          "kick potente": "heavy distorted kick",
+          "percussione metallica": "metallic percussion",
+          "synth distorto": "distorted synths",
+          "basso industriale": "industrial bass",
+          "rumore": "noise textures"
+        },
+        "rhythm": "relentless four on the floor",
+        "mood": "dark, driving",
+        "space": "raw warehouse mix",
+        "influences": {}
+      }
     },
     {
       "ambito": "musica",
@@ -2741,6 +3336,20 @@
         "prompt": "black luxury car under violet neon in an empty night parking garage with low fog, moody photography, violet and black",
         "font": "Impact",
         "corsivo": false
+      },
+      "en": {
+        "genre": "trap beat",
+        "instruments": {
+          "808": "booming 808 bass",
+          "hi-hat rapidi": "rolling hi-hats",
+          "kick": "punchy kick",
+          "campana melodica": "melodic bell",
+          "pad scuro": "dark pad"
+        },
+        "rhythm": "half time trap groove",
+        "mood": "dark, modern",
+        "space": "punchy low end, wide mix",
+        "influences": {}
       }
     },
     {
@@ -2812,7 +3421,21 @@
           "ar_scale": 0.35,
           "nar_scale": 0
         }
-      ]
+      ],
+      "en": {
+        "genre": "hard rock",
+        "instruments": {
+          "chitarra overdrive": "overdriven rhythm guitar riffs",
+          "batteria potente": "powerful drums",
+          "basso rock": "driving rock bass",
+          "chitarra solista": "soaring lead guitar solos",
+          "organo": "hammond organ"
+        },
+        "rhythm": "solid driving rock beat",
+        "mood": "bold, anthemic",
+        "space": "big live band mix",
+        "influences": {}
+      }
     }
   ],
   "tipi": [

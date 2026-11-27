@@ -34,6 +34,7 @@ const meta = {
   lyrics: c.lyrics,
   lora: job.adapters || [],
   score: job.abcNostro ? c.score : undefined, // assente = score scritto dal motore
+  score_fonte: job.scoreFonte || (job.abcNostro ? 'compositore' : 'motore'),
   seed: job.seed,
   job_id: job.id,
   bytes_audio: inp.bytes,

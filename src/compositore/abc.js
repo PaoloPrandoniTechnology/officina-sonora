@@ -140,7 +140,7 @@ function scriviAbc(score) {
 const PEZZO = /\s+|"([^"]*)"|Z(\d*)\||(\|)|(\^\^|\^|=|__|_)?([A-Ga-gz])([,']*)(\d*)(-?)/y;
 
 // Legge una riga di musica di una voce e aggiunge le battute
-function leggiRiga(riga, v, sezione, errori) {
+function leggiRiga(riga, v, sezione, errori, fattore) {
   const nuova = () => ({ sezione, metro: v.M, tonalita: v.K, eventi: [], accordi: [], pos: 0 });
   let b = nuova();
   let stato = { ...(armatura(v.K) || {}) };
@@ -166,8 +166,9 @@ function leggiRiga(riga, v, sezione, errori) {
       b = nuova();
       stato = { ...(armatura(v.K) || {}) };
     } else if (lettera) {
-      const durata = Number(cifre || 1);
-      if (!AMMESSE.includes(durata)) errori.push(`battuta: durata non ammessa ${durata}`);
+      // in L:1/32 (il nostro dialetto) le durate sono controllate; il motore scrive anche in L:1/16
+      if (fattore === 1 && !AMMESSE.includes(Number(cifre || 1))) errori.push(`battuta: durata non ammessa ${cifre}`);
+      const durata = Number(cifre || 1) * fattore;
       let midi = null;
       if (lettera !== 'z') {
         const L = lettera.toUpperCase();
@@ -200,7 +201,8 @@ function leggiAbc(testo) {
   const metro = campo('M:');
   const tonalita = campo('K:');
   const bpm = Number((/^1\/4=(\d+)$/.exec(campo('Q:')) || [])[1]);
-  if (k < 0 || !testa.includes('X:1') || campo('L:') !== '1/32' || !bpm || !unita(metro) || !armatura(tonalita)) errori.push('intestazione non valida');
+  const fattore = { '1/32': 1, '1/16': 2, '1/8': 4 }[campo('L:')];
+  if (k < 0 || !testa.includes('X:1') || !fattore || !bpm || !unita(metro) || !armatura(tonalita)) errori.push('intestazione non valida');
   for (const v of ['Vocal', 'Ins']) if (!testa.some((r) => r.startsWith(`V: ${v} `))) errori.push(`voce ${v} non dichiarata`);
   if (errori.length) return { errori, score: null };
 
@@ -217,7 +219,7 @@ function leggiAbc(testo) {
     if (!voce || !nomi.length) { errori.push(`riga fuori da una sezione o da una voce: ${r.slice(0, 20)}`); continue; }
     if (r.startsWith('M:')) { voce.M = r.slice(2).trim(); if (!unita(voce.M)) errori.push(`metro non valido: ${voce.M}`); continue; }
     if (r.startsWith('K:')) { voce.K = r.slice(2).trim(); if (!armatura(voce.K)) errori.push(`tonalità non valida: ${voce.K}`); continue; }
-    leggiRiga(r, voce, nomi.length - 1, errori);
+    leggiRiga(r, voce, nomi.length - 1, errori, fattore);
   }
   const { Vocal, Ins } = voci;
   if (Vocal.legata || Ins.legata) errori.push('legatura aperta alla fine dello score');
@@ -266,4 +268,47 @@ function lyricsDaScore(score, { forma, note = [] }) {
   }).join('\n\n');
 }
 
-module.exports = { scriviAbc, leggiAbc, durataSecondi, lyricsDaScore, unita, TAG };
+// Battuta con la melodia cantata spostata sullo strumento: il canto vince dove si sovrappone
+function fondiBattuta(vocal, ins, lunghezza) {
+  const celle = Array(lunghezza).fill(null);
+  for (const eventi of [ins, vocal]) {
+    let pos = 0;
+    for (const e of eventi || []) {
+      if (e.midi !== null) for (let i = pos; i < pos + e.durata; i++) celle[i] = { e, fine: i === pos + e.durata - 1 };
+      pos += e.durata;
+    }
+  }
+  const out = [];
+  for (const c of celle) {
+    const origine = c ? c.e : null;
+    let ultimo = out[out.length - 1];
+    if (ultimo && ultimo.origine === origine) ultimo.durata++;
+    else out.push((ultimo = { origine, midi: origine ? origine.midi : null, durata: 1 }));
+    // la legatura resta solo se il frammento arriva in fondo alla nota di partenza
+    ultimo.lega = Boolean(c && c.fine && c.e.lega);
+  }
+  return out.map(({ midi, durata, lega }) => ({ midi, durata, ...(lega ? { lega } : {}) }));
+}
+
+// Da uno score del motore a uno strumentale: Vocal tiene solo gli accordi, Ins la melodia
+function strumentale(testo) {
+  const { errori, score } = leggiAbc(testo);
+  if (!score) throw new Error(`score non valido: ${errori.slice(0, 3).join('; ')}`);
+  const battute = [];
+  for (const s of score.sezioni) {
+    const lunghezza = unita(s.metro || score.metro);
+    for (const b of s.battute) {
+      if (b.vocal) b.ins = fondiBattuta(b.vocal, b.ins, lunghezza);
+      b.vocal = null;
+      battute.push(b);
+    }
+  }
+  // una legatura rimasta senza la nota successiva alla stessa altezza si toglie
+  const eventi = battute.flatMap((b) => b.ins || [{ midi: null }]);
+  eventi.forEach((e, i) => { if (e.lega && (!eventi[i + 1] || eventi[i + 1].midi !== e.midi)) delete e.lega; });
+  const tag = (nome) => (nome === 'interlude' ? 'bridge' : TAG.includes(nome) ? nome : 'verse');
+  const perLyrics = { ...score, sezioni: score.sezioni.map((s) => ({ ...s, nome: tag(s.nome) })) };
+  return { abc: scriviAbc(score), secondi: Math.round(durataSecondi(score)), lyrics: lyricsDaScore(perLyrics, { forma: 'semplice' }) };
+}
+
+module.exports = { strumentale, scriviAbc, leggiAbc, durataSecondi, lyricsDaScore, unita, TAG };

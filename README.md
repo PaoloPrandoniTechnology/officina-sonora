@@ -56,7 +56,7 @@ Una volta avviato, il sistema lavora da solo: un'attività pianificata (`Officin
                          e scarica gemma dalla GPU durante i render
 
  n8n (ogni minuto)
-   1 Leggi stato ── render in corso? ──no──► 5a ricetta ► 5b titolo ► 5c stile ► 5d score ► 6 invio a YuE2
+   1 Leggi stato ── render in corso? ──no──► 5a ricetta ► 5b titolo ► 5c stile ► 5d ripiego ► 6 invio a YuE2
                           │
                           sì
                           ▼
@@ -88,7 +88,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | Blocco | Cosa fa |
 |---|---|
 | **1 Leggi stato** | Carica lo stato, prende il lock, esegue il comando "svuota coda" della dashboard e dice se c'è un render in corso. |
-| **2 Controlla render** | Chiede al motore lo stato del job. Se è fallito, sparito o fermo da oltre 4 ore, rimette il brano in coda; dopo 3 tentativi lo abbandona. |
+| **2 Controlla render** | Chiede al motore lo stato del job. Quando è pronto lo **score**, lo rende strumentale, ne ricava durata e lyrics e avvia il render dell'audio; se lo score non va bene ne chiede un altro (3 in tutto). Un render fallito, sparito o fermo da oltre 4 ore torna in coda; dopo 3 tentativi lo abbandona. |
 | **7 Scrivi stato** | Salva lo stato in modo atomico e rilascia il lock. Ci passano tutti i rami. |
 
 ### Composizione
@@ -97,15 +97,15 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 |---|---|
 | **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, strumenti (due fissi del genere più 1-2 che cambiano, dalla [memoria](#la-memoria-di-composizione)), un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
 | **5b Titolo** | Chiede a gemma titolo, descrizione, bpm e durata, entro i limiti del genere. Se il modello non è caricato, riprova al giro successivo. |
-| **5c Componi concept** | Compone il testo di **stile** e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
-| **5d Componi score** | Per i brani strumentali legge la [memoria](#la-memoria-di-composizione) del genere, scrive 30 score candidati, li fa valutare al **revisore** e allega il migliore, con lyrics e durata coerenti. Se non riesce, lo score lo scrive il motore. |
-| **6 Invia render** | Sceglie le **LoRA** presenti sul motore e invia a YuE2 stile, lyrics, score, durata, seed e `cot: full`. |
+| **5c Componi concept** | Compone il testo di **stile** in inglese e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
+| **5d Componi score** | Prepara lo score di **ripiego** del compositore (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere): si usa solo se il modello non ne scrive uno valido. |
+| **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali) oppure direttamente l'audio (voci e ripieghi). |
 
 ### Audio e pubblicazione
 
 | Blocco | Cosa fa |
 |---|---|
-| **3a Scarica audio** | Scarica l'MP3 e salva accanto lo **score** (`.abc`) che il motore ha scritto e seguito. |
+| **3a Scarica audio** | Scarica il WAV, lo fa passare dal [mastering](#mastering) (MP3 a 320 kbps) e salva accanto lo **score** (`.abc`) seguito dal motore. |
 | **3b Scrivi metadati** | Scrive la scheda `.json` (numero progressivo, genere, ricetta, sezioni, lyrics, LoRA, seed, tempo di render) e chiude il job. |
 | **3c Controllo qualità** | Verifica integrità, bitrate, durata (tra 85% e 125% di quella richiesta), livello e silenzi. Gli scartati vanno in `_scartati`; se il brano è troppo corto viene rigenerato fino a 2 volte, con uno score nuovo. Il clipping dà solo un avviso. |
 | **3d1 Prepara caricamento** | Mette in coda i brani da caricare, esclude i duplicati audio, compone la copertina e scrive i tag ID3. |
@@ -117,7 +117,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
 | Blocco | Cosa fa |
 |---|---|
-| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, gemma rivede gli ultimi 30 brani votati e propone nuove linee guida. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
+| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, il blocco carica gemma, che rivede gli ultimi 30 brani votati e propone nuove linee guida. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
 | **8a Comandi Telegram** | Risponde ai comandi, raccoglie voti e interpreta richieste in italiano, applicandole solo dopo il tuo **Conferma**. |
 | **8b Avvisi** | Un errore ripetuto 3 volte in un'ora genera un avviso (al massimo uno ogni 30 minuti per tipo). |
 | **9 Rapporto giornaliero** | Una volta al giorno: brani, voti, errori, salute del sistema, ricette migliori e peggiori, commento di gemma. |
@@ -138,8 +138,11 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 ## 4. Come nasce la musica
 
 ### Stile (prompt)
-Si compone dalla scheda del genere in `config\catalogo.json`: identità sonora, note del produttore, strumenti
-scelti, variante, influenza, enfasi, melodia, accordi, ritmica e linee guida. Le frasi ripetute vengono tolte.
+È in **inglese**, fatto di soli descrittori e sempre nello stesso ordine: `Instrumental`, genere, strumenti con
+timbro e tecnica, variante, ritmo, atmosfera, influenza, note del produttore, linee guida, spazio e mix,
+**BPM**, **tonalità**, `no vocals`. I descrittori di ogni genere sono nel campo `en` di `config\catalogo.json`
+(`genre`, `instruments`, `rhythm`, `mood`, `space`, `influences`). Il motore non ha un prompt negativo:
+i campi `vietati` e "stile da evitare" restano solo informativi.
 
 ### Lyrics: la mappa del brano
 Anche nei brani strumentali il campo è sempre compilato, con i soli tag che la LoRA strumentale conosce:
@@ -154,17 +157,26 @@ Anche nei brani strumentali il campo è sempre compilato, con i soli tag che la 
 | `loop` | intro, verse, chorus, verse, bridge, verse, chorus, chorus, outro |
 
 ### Score ABC
-Per gli strumentali lo score (melodia e accordi) lo scrive il **compositore** del progetto
-(`src\compositore\`), e YuE2 lo segue:
+Per gli strumentali segue la procedura ufficiale di YuE, in due passi:
 
-- un **tema** per sezione, sviluppato in frasi di quattro battute (domanda, risposta, ripresa, cadenza);
-- riprese trasformate (sequenza, inversione, ornamento, spostamento ritmico);
-- **armonie, scale e ritmi del genere**; bridge in 3/4 o 7/8 dove lo stile lo regge;
-- ritornello più alto, intro rarefatta, finale sulla tonica;
-- un **revisore** dà un punteggio (qualità e novità) a 30 candidati e tiene il migliore (scritto nel log e nella scheda).
+1. il **modello** scrive lo score (richiesta da un secondo di audio, senza LoRA);
+2. il codice sposta la melodia dalla voce `Vocal` agli strumenti, lasciando in `Vocal` pause e accordi, e controlla
+   la sintassi (`src\compositore\abc.js`);
+3. il motore rende l'audio seguendo quello score, con le LoRA.
 
-Per i generi vocali, e come ripiego, lo score lo scrive il motore. In entrambi i casi è salvato nel file `.abc`
-accanto al brano. Le regole di scrittura, con le fonti, sono in [`docs/score-abc.md`](docs/score-abc.md).
+Uno score illeggibile, troncato o di durata inadatta (meno del 75% di quella richiesta, meno di 2 minuti o più di
+5 minuti e mezzo) viene richiesto di nuovo. Dopo 3 tentativi si usa lo score del **compositore** del progetto
+(ripiego), e dopo un render fallito quello che il motore scrive da sé. La scheda del brano dice chi l'ha scritto
+(`score_fonte`: `modello`, `compositore` o `motore`). Le regole di scrittura sono in [`docs/score-abc.md`](docs/score-abc.md).
+
+### Durata
+La decide lo score. Il render chiede il 15% in più e impone un minimo (`min_tokens`, 90% dello score) sotto il
+quale il motore non può chiudere il brano.
+
+### Mastering
+Il gateway (`gateway\master.js`, con ffmpeg) porta ogni brano a **-16 LUFS** con picco massimo -1 dB, aggiunge una
+dissolvenza di 3 secondi e salva in **MP3 a 320 kbps**. Dopo un render fallito si chiede al motore direttamente
+l'MP3, senza mastering.
 
 ### La memoria di composizione
 `state\memoria-composizione.json` tiene, per ogni genere:
@@ -180,7 +192,7 @@ Come impara dai voti:
 - progressioni, celle e variazioni dei brani votati 4-5 vengono scelte **più spesso**, quelle dei brani votati 1-2 meno;
 - un elemento con almeno due voti e media 2 o meno **esce** dall'identità del genere e ne entra uno nuovo.
 
-Vale per gli score del compositore; i generi vocali e i ripieghi con lo score del motore non vi partecipano.
+Vale per gli score del compositore, oggi usati come ripiego; gli score del modello e i generi vocali non vi partecipano.
 La memoria non è su Git: va inclusa nei backup insieme alla libreria. Se il file si rovina viene messo da parte
 (`.corrotta`) e si riparte da vuota. Per ridare un'identità nuova a un genere, a produzione ferma elimina la
 sua voce dal file.
@@ -205,6 +217,8 @@ I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una prop
 | Folk, Celtic | slider acoustic folk |
 | Score cinematico | epic trailer |
 
+Lo score si chiede senza LoRA: agiscono solo sul render.
+
 Se un render fallisce (per esempio perché le LoRA sovrapposte producono uno score illeggibile), il secondo
 tentativo parte senza la LoRA di genere e con lo score scritto dal motore, e il terzo con lo score di sola melodia.
 Anche il secondo ritento di un brano troppo corto parte senza LoRA di genere.
@@ -216,7 +230,8 @@ da correggere con l'ascolto.
 > commerciale, verifica le condizioni con gli autori.
 
 ### Come impara
-- **Ricette.** Ogni combinazione genere, tipo, struttura e fascia di bpm ha un punteggio. Un tuo voto pesa
+- **Ricette.** Ogni combinazione genere, struttura e fascia di bpm (ciò che arriva al motore) ha un punteggio.
+  Il tipo (cartella e tag) segue l'energia del genere. Un tuo voto pesa
   come 100 dati automatici. Le ricette nuove entrano come esperimenti, in numero limitato.
 - **Rotazione.** I generi con meno brani in libreria hanno la precedenza, corretta dal peso che gli assegni;
   gli ultimi generi prodotti non tornano subito.
@@ -359,7 +374,7 @@ E:\Musica di sottofondo\
 
 I brani prodotti prima del salvataggio dello score non hanno il file `.abc`.
 
-**Aggiungere un genere:** in `config\catalogo.json` aggiungi `name`, `ambito`, `famiglia`, `energia` (1-5),
+**Aggiungere un genere:** in `config\catalogo.json` aggiungi il campo `en` (descrittori inglesi per ogni strumento), `name`, `ambito`, `famiglia`, `energia` (1-5),
 `bpm`, `attivita`, `strutture`, `genere`, `stile`, `strumenti`, `vietati`, `influenze`, `enfasi`, `melodia`,
 `accordi`, `ritmica`, `tonalita`, `varianti`, `colori`; facoltativi `lora`, `copertina` e
 `vocale_senza_parole`. Poi ricostruisci e pubblica il workflow.
@@ -374,7 +389,8 @@ Windows 11 con GPU NVIDIA (qui una RTX 3060 Laptop da 6 GB).
 |---|---|---|
 | n8n 2.x | `E:\n8n` | installato con npm |
 | Node.js 24 | nel PATH | gateway e test |
-| YuE2 Studio | `E:\MusicAI\YuE2 Studio` | motore yue2.cpp sulla porta 18087, LoRA in `data\adapters` |
+| YuE2 Studio | `E:\MusicAI\YuE2 Studio` | motore yue2.cpp sulla porta 18087 (CUDA), LoRA in `data\adapters` |
+| ffmpeg | `E:\MusicAI\ffmpeg` | mastering |
 | LM Studio | porta 1234 | modello `google/gemma-4-e4b` |
 | Account iBroadcast e bot Telegram | | token cifrati in `secrets\` |
 
@@ -402,6 +418,8 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 | Nessun brano da molto | controlla i servizi in dashboard e che la produzione non sia in pausa |
 | Il motore non risponde | il watchdog lo riavvia; vedi `state\watchdog.log` |
 | "riaccodo ... failed" nel log | il motore non ha completato il render: il ripiego è automatico |
+| "score del modello non riuscito" | il brano passa al ripiego da solo; se è frequente per un genere, controlla il suo campo `en` |
+| "mastering fallito" | verifica ffmpeg e riavvia il gateway; dopo 5 tentativi il motore consegna l'MP3 |
 | Molti brani "troppo corti" | limite noto (vedi miglioramenti); le soglie sono in *Controllo → Parametri* |
 | Voci in un brano strumentale | vota 1 con una nota; la LoRA in uso è registrata nella scheda |
 | "revisione non riuscita: LLM HTTP 400" | gemma non era caricato: le linee guida restano invariate |
@@ -464,12 +482,9 @@ In ordine di priorità. Il disegno completo è in
 
 | # | Miglioramento | Perché |
 |---|---|---|
-| 1 | **Giudicare a orecchio gli score del compositore** e correggere forme, ritmi e armonie in base ai voti | la qualità musicale non è verificabile dai test |
-| 2 | **Brani troppo corti**: controllare se con lo score nostro il problema sparisce, altrimenti agire su token e LoRA | circa un brano su tre è stato scartato finora |
-| 3 | **Compositore più ricco**: contrappunto, soli, fill, cambi di tonalità, finali | più varietà e dettagli |
-| 4 | **Schede artistiche per i 39 generi**: forme, progressioni, ritmi, chicche, prompt in inglese, durata 3-6 minuti | generi più distinti; oggi lo stile mescola italiano e inglese |
-| 5 | **Calibrazione delle LoRA** e forme delle lyrics (anche con tempi) | le scale attuali non sono validate a orecchio |
-| 6 | **Dashboard**: score, sezioni, punteggio del revisore e motivo dei render falliti; mostrare la memoria di ogni genere | rendere visibile cosa funziona |
-| 7 | **Agente di ricerca locale** (DuckDuckGo e fonti di teoria, gemma), con approvazione in dashboard | miglioramento artistico continuo |
-| 8 | Eseguire la revisione delle linee guida quando gemma è caricato | oggi spesso fallisce durante i render |
-| 9 | Validazione più severa dello score (blocchi, ordine delle voci, nomi delle sezioni) | allinearla al validatore ufficiale |
+| 1 | **Selezione sull'audio**: 2-3 versioni per brano e pubblicazione della migliore, giudicata da un modello (per esempio Meta Audiobox Aesthetics o SongEval) | richiede di scaricare pacchetto e pesi, e di verificarli sugli strumentali |
+| 2 | **Ascoltare e votare** i brani del nuovo percorso, poi correggere i descrittori `en` e le soglie dello score | la qualità musicale non è verificabile dai test |
+| 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |
+| 4 | **Dashboard**: score, chi l'ha scritto, sezioni e motivo dei render falliti | rendere visibile cosa funziona |
+| 5 | **Schede artistiche** più ricche per i generi attivi: forme e varianti vere al posto di quelle segnaposto | generi più distinti |
+| 6 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |

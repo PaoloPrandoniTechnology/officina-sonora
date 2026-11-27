@@ -24,7 +24,7 @@ const concept = {
   variante: variante ? variante.nome : '',
   strumenti,
   influenza: influenza || '',
-  style: componiStile(cat, variante, strumenti, influenza, guidance),
+  style: componiStile(cat, variante, strumenti, influenza, guidance, { bpm, tonalita }),
   avoid: divietiDi(cat, guidance),
   sezioni: slot.sezioni,
   lyrics: slot.sezioni.join('\n\n'),

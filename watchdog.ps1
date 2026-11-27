@@ -95,7 +95,7 @@ while (-not (Test-Path $StopFlag)) {
     if ($ps -match 'gemma') { Log 'render in corso: scarico gemma dalla GPU'; Invoke-Lms @('unload', '--all') | Out-Null }
   } elseif ($ps -notmatch 'gemma') {
     Log 'nessun render: carico gemma'
-    Invoke-Lms @('load', 'google/gemma-4-e4b', '-y', '-c', '131072') | Out-Null
+    Invoke-Lms @('load', 'google/gemma-4-e4b', '-y', '-c', '16384') | Out-Null
   }
 
   # Motore YuE2: riavvia solo se il processo non esiste (evita doppie istanze mentre lavora)
@@ -104,6 +104,9 @@ while (-not (Test-Path $StopFlag)) {
       Log 'motore YuE2 non attivo: avvio'
       $args2 = @('--model', "`"$Models\own\YuE2-3B-RS-TW-2.0x0.75-Q6_K.gguf`"", '--vae', "`"$Models\YuE2-Vae-F32.gguf`"",
         '--adapters', "`"$Studio\data\adapters`"", '--host', '127.0.0.1', '--port', '18087')
+      # CUDA, come fa YuE2 Studio: senza queste righe il motore sceglie Vulkan, molto piu' lento nel caricare
+      $cuda = "$Studio\resources\yue2-cpp\cuda13\ggml-cuda.dll"
+      if (Test-Path $cuda) { $env:GGML_BACKEND_PATH = $cuda; $args2 += @('--device', 'CUDA0') }
       Start-Process -FilePath "$Studio\resources\yue2-cpp\yue-server.exe" -ArgumentList $args2 -WindowStyle Hidden
     }
   }

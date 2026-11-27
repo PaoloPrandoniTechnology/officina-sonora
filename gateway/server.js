@@ -114,9 +114,19 @@ function leggiCorpo(req) {
 
 // Analisi PCM di un brano della libreria: livello, silenzi e clipping. Il decoder si carica solo qui.
 const LIBRERIA = 'e:\\musica di sottofondo';
-async function analizzaAudio(file) {
+function inLibreria(file) {
   const abs = path.resolve(String(file || ''));
   if (!abs.toLowerCase().startsWith(LIBRERIA + path.sep)) throw new Error('file fuori dalla libreria');
+  return abs;
+}
+const LMS = path.join(require('os').homedir(), '.cache', 'lm-studio', 'bin', 'lms.exe');
+function lms(args) {
+  return new Promise((resolve) => {
+    require('child_process').execFile(LMS, args, { windowsHide: true, timeout: 180000 }, (e) => resolve(e ? { ok: false, error: e.message.slice(0, 200) } : { ok: true }));
+  });
+}
+async function analizzaAudio(file) {
+  const abs = inLibreria(file);
   const { MPEGDecoder } = require('mpg123-decoder');
   const dec = new MPEGDecoder();
   await dec.ready;
@@ -203,6 +213,16 @@ const server = http.createServer(async (req, res) => {
       const { file } = JSON.parse(corpo.toString('utf8'));
       return rispondi(200, await analizzaAudio(file));
     }
+    if (req.url === '/audio/master') {
+      const { file, uscita } = JSON.parse(corpo.toString('utf8'));
+      const sorgente = inLibreria(file);
+      const destinazione = inLibreria(uscita);
+      if (path.extname(sorgente).toLowerCase() !== '.wav' || path.extname(destinazione).toLowerCase() !== '.mp3') throw new Error('formati non ammessi');
+      return rispondi(200, { ok: true, ...(await require('./master').master(sorgente, destinazione)) });
+    }
+    // gemma e il motore audio non stanno insieme in 6 GB: i blocchi la caricano e scaricano quando serve
+    if (req.url === '/llm/carica') return rispondi(200, await lms(['load', 'google/gemma-4-e4b', '-y', '-c', '16384']));
+    if (req.url === '/llm/scarica') return rispondi(200, await lms(['unload', '--all']));
     if (req.url === '/copertina') {
       const r = await require('./copertina').componi(JSON.parse(corpo.toString('utf8')));
       return rispondi(200, r ? { ok: true, jpeg: r.jpeg.toString('base64') } : { ok: false, error: 'nessuno sfondo per il genere' });

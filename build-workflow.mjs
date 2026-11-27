@@ -22,7 +22,8 @@ const codeIb = (prefix) => lib + '\n' + libIb + '\n' + coverJs + '\n' + blockFil
 
 // moduli CommonJS di src/compositore, ciascuno chiuso in una funzione
 const modulo = (nome, file) => `const ${nome} = (() => { const module = { exports: {} };\n${readFileSync(join(here, 'src', 'compositore', file), 'utf8')}\nreturn module.exports; })();`;
-const compositoreJs = modulo('ScoreAbc', 'abc.js') + '\n' + modulo('Compositore', 'compositore.js');
+const abcJs = modulo('ScoreAbc', 'abc.js');
+const compositoreJs = abcJs + '\n' + modulo('Compositore', 'compositore.js');
 const ifString = (left, right) => ({
   conditions: {
     options: { caseSensitive: true, leftValue: '', typeValidation: 'strict', version: 1 },
@@ -46,7 +47,7 @@ const nodes = {
   leggi: { name: '1 Leggi stato', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('01-') }, position: pos(250, 300) },
   libera: { name: 'Pipeline occupata?', type: 'n8n-nodes-base.if', typeVersion: 2, parameters: ifBoolTrue('={{ $json.locked }}'), position: pos(375, 300) },
   haRender: { name: 'Render in corso?', type: 'n8n-nodes-base.if', typeVersion: 2, parameters: ifBoolTrue('={{ $json.hasJob }}'), position: pos(500, 300) },
-  controlla: { name: '2 Controlla render', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('02-') }, position: pos(750, 150) },
+  controlla: { name: '2 Controlla render', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: lib + '\n' + abcJs + '\n' + blockFile('02-') }, position: pos(750, 150) },
   concluso: { name: 'Render concluso?', type: 'n8n-nodes-base.if', typeVersion: 2, parameters: ifString('={{ $json.outcome }}', 'done'), position: pos(1000, 150) },
   scarica: { name: '3a Scarica audio', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('03-1-') }, position: pos(1250, 50) },
   metadati: { name: '3b Scrivi metadati', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('03-2-') }, position: pos(1250, -50) },

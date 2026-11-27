@@ -378,6 +378,53 @@ function durRange(guidance, category) {
   return [clampDur(m[1]), clampDur(m[2])];
 }
 
+// ---- Richieste al motore: prima il solo score (lo scrive il modello), poi il render dell'audio ----
+function richiestaBase(concept, adapters, seed) {
+  return {
+    style: concept.style,
+    lyrics: concept.lyrics,
+    cot: (concept.attempts || 0) >= 2 ? 'melody' : 'full', // full: score con melodia e accordi
+    ...(adapters.length ? { adapters } : {}),
+    seed,
+  };
+}
+
+// Solo lo score: un secondo di audio e un passo, il resto della risposta si butta
+function corpoPiano(concept, adapters, seed) {
+  return {
+    ...richiestaBase(concept, adapters, seed),
+    duration: 1,
+    steps: 1,
+    semantic_sampling: { min_tokens: 1, max_tokens: 25 },
+    abc_sampling: { max_tokens: 6000 }, // circa 6 minuti: oltre, il modello sta girando a vuoto
+    output_format: 'mp3',
+  };
+}
+
+// Render dell'audio. secondi = durata dello score, se nota: il motore non puo' chiudere prima del 90%.
+function corpoRender(concept, adapters, seed, abc, secondi) {
+  // 360 s: limite del motore. Si chiede piu' durata dello score, cosi' il brano si chiude da solo
+  const durata = Math.min(360, secondi ? Math.ceil(secondi * 1.15) : Math.round(concept.durata_s * 1.2));
+  const token = Math.min(9000, Math.round(durata * 25 * 1.2));
+  return {
+    ...richiestaBase(concept, adapters, seed),
+    duration: durata,
+    semantic_sampling: { max_tokens: token, ...(secondi ? { min_tokens: Math.floor(secondi * 0.9 * 25) } : {}) },
+    ...(abc ? { abc } : { abc_sampling: { max_tokens: Math.max(512, token) } }),
+    // WAV per il mastering; dopo un fallimento si chiede l'MP3, che ne puo' fare a meno
+    output_format: concept.attempts ? 'mp3' : 'wav32',
+  };
+}
+
+// Invia una richiesta al motore; ritorna l'id del job, o null se rifiutata
+async function inviaSynth(body) {
+  const r = await req('POST', `${CFG.yue}/synth`, { body, ms: 20000 });
+  if (!r.ok) { log(`/synth rifiutato (HTTP ${r.status}): riprovo al prossimo giro`); return null; }
+  return JSON.parse(r.buf.toString('utf8')).id;
+}
+
+const nuovoSeed = () => Math.floor(Math.random() * 2147483647);
+
 // Rimette in coda il concept del job corrente, o lo scarta dopo maxAttempts tentativi.
 function requeue(state, reason) {
   const c = state.job.concept;
@@ -396,11 +443,16 @@ function requeue(state, reason) {
 function extractAbc(buf, ct) {
   const m = /boundary="?([^";]+)"?/i.exec(ct || '');
   if (!m) return null;
-  for (const parte of buf.toString('utf8').split('--' + m[1])) {
+  // si leggono come testo solo le parti JSON: l'audio WAV pesa oltre 100 MB
+  const sep = Buffer.from('--' + m[1]);
+  for (let da = buf.indexOf(sep); da !== -1;) {
+    const a = buf.indexOf(sep, da + sep.length);
+    const parte = buf.subarray(da + sep.length, a === -1 ? buf.length : a);
+    da = a;
     const i = parte.indexOf('\r\n\r\n');
-    if (i === -1 || !/application\/json/i.test(parte.slice(0, i))) continue;
+    if (i === -1 || !/application\/json/i.test(parte.subarray(0, i).toString('utf8'))) continue;
     try {
-      const abc = JSON.parse(parte.slice(i + 4).trim()).abc;
+      const abc = JSON.parse(parte.subarray(i + 4).toString('utf8').trim()).abc;
       if (abc) return abc;
     } catch (e) { /* parte JSON non valida */ }
   }

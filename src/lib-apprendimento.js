@@ -49,9 +49,15 @@ function numeroProgressivo() {
   return numero;
 }
 
-// Chiave di ricetta: categoria | tipo | struttura | fascia di bpm (b0, b1, b2)
-function recipeKey(categoria, tipo, struttura, band) {
-  return `${categoria}|${tipo}|${struttura}|b${band}`;
+// Chiave di ricetta: categoria | struttura | fascia di bpm (b0, b1, b2). Solo ciò che arriva al motore.
+function recipeKey(categoria, struttura, band) {
+  return `${categoria}|${struttura}|b${band}`;
+}
+
+// Il tipo serve a cartella e tag: segue l'energia del genere, non si impara
+function tipoDi(energia) {
+  const t = ['ambient-pad', 'melodico-dolce', 'ritmico-leggero', 'ritmico-energico', 'ritmico-energico'][(energia || 3) - 1];
+  return !CFG.tipi || CFG.tipi.includes(t) ? t : CFG.tipi[0];
 }
 
 // Sotto-intervallo bpm della fascia band (0 bassa, 1 media, 2 alta) dentro il range della categoria
@@ -91,8 +97,10 @@ function firmaVoti(tracks) {
 function recipeStats(tracks) {
   const stats = {};
   for (const t of tracks) {
-    const k = t.meta.ricetta;
-    if (!k) continue;
+    if (!t.meta.ricetta) continue;
+    // le chiavi vecchie avevano anche il tipo: categoria|tipo|struttura|fascia
+    const parti = t.meta.ricetta.split('|');
+    const k = parti.length === 4 ? recipeKey(parti[0], parti[2], parti[3].slice(1)) : t.meta.ricetta;
     const s = (stats[k] = stats[k] || { nu: 0, u: 0, na: 0, a: 0 });
     s.na++;
     if (t.meta.qualita && t.meta.qualita.esito === 'ok') s.a++;
@@ -132,13 +140,10 @@ function pickSlot(state, guidance) {
     const strutture = (guidance.struttura_pref && guidance.struttura_pref[cat.name]) || cat.strutture;
     const range = durRangeBpm(guidance, cat);
     for (const struttura of strutture) {
-      for (const tipo of CFG.tipi) {
-        for (let band = 0; band < 3; band++) {
-          const key = recipeKey(cat.name, tipo, struttura, band);
-          const s = stats[key];
-          const r = ricettaScore(s, totale);
-          candidati.push({ key, cat, tipo, struttura, band, range, ...r });
-        }
+      for (let band = 0; band < 3; band++) {
+        const key = recipeKey(cat.name, struttura, band);
+        const r = ricettaScore(stats[key], totale);
+        candidati.push({ key, cat, tipo: tipoDi(cat.energia), struttura, band, range, ...r });
       }
     }
   }
@@ -278,21 +283,36 @@ function scegliInfluenza(cat) {
   return lista[0].genere;
 }
 
-// Compone lo stile del brano dal genere: identita' fissa, strumenti del set, variante, influenza, melodia e ritmica
-function componiStile(cat, variante, strumenti, influenza, guidance) {
+// "Si bemolle minore" -> "Bb minor"; vuoto se non riconosciuta
+function tonalitaInglese(nome) {
+  const m = /^(do|re|mi|fa|sol|la|si)( bemolle| diesis)? (maggiore|minore)$/.exec(String(nome || '').trim().toLowerCase());
+  if (!m) return '';
+  const nota = { do: 'C', re: 'D', mi: 'E', fa: 'F', sol: 'G', la: 'A', si: 'B' }[m[1]];
+  const alterazione = m[2] === ' bemolle' ? 'b' : m[2] === ' diesis' ? '#' : '';
+  return `${nota}${alterazione} ${m[3] === 'minore' ? 'minor' : 'major'}`;
+}
+
+// Stile per YuE2: soli descrittori inglesi, nell'ordine tipo, genere, strumenti, ritmo, atmosfera, mix, bpm, tonalità.
+// I descrittori di ogni genere sono nel campo "en" del catalogo; il motore non ha un prompt negativo.
+function componiStile(cat, variante, strumenti, influenza, guidance, { bpm, tonalita } = {}) {
   const direttive = ((CFG.generiOverride || {})[cat.name] || {}).direttive || [];
+  const en = cat.en || { genre: cat.stile };
+  // le varianti segnaposto ripetono per intero la descrizione del genere: si saltano
+  const colore = variante && !(cat.en && variante.keywords === cat.stile) ? variante.keywords : '';
   const parti = [
-    cat.stile,
-    direttive.length ? `producer notes: ${direttive.join('; ')}` : '',
-    `instruments: ${strumenti.join(', ')}`,
-    variante ? variante.keywords : '',
-    influenza ? `influence: ${influenza}` : '',
-    cat.enfasi ? `emphasis: ${cat.enfasi}` : '',
-    cat.melodia ? `melody: ${cat.melodia}` : '',
-    cat.accordi ? `chords: ${cat.accordi}` : '',
-    cat.ritmica ? `rhythm: ${cat.ritmica}` : '',
+    cat.vocale_senza_parole ? 'Wordless vocals' : 'Instrumental',
+    en.genre,
+    ...strumenti.map((s) => (en.instruments || {})[s] || ''),
+    colore,
+    en.rhythm,
+    en.mood,
+    (en.influences || {})[influenza] || '',
+    direttive.map((d) => d.replace(/\.$/, '')).join(', '),
     (guidance.style_extra || []).join(', '),
-    cat.vocale_senza_parole ? 'wordless vocals, no lyrics' : 'instrumental, no vocals',
+    en.space,
+    bpm ? `${bpm} BPM` : '',
+    tonalitaInglese(tonalita),
+    cat.vocale_senza_parole ? 'no lyrics' : 'no vocals',
   ].filter(Boolean);
   // il motore pesa le parole: ogni frase compare una volta sola
   const viste = new Set();

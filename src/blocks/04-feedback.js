@@ -56,6 +56,7 @@ Proponi linee guida aggiornate SOLO se servono miglioramenti chiari. Rispondi co
 - "struttura_pref": oggetto categoria -> array di strutture preferite tra piatto, onda, arco, crescendo, loop (solo tra quelle gia' previste per la categoria)
 - "note": una frase in italiano che spiega il motivo delle modifiche
 Niente nomi di artisti o marchi.`;
+  await gw('/llm/carica'); // dopo un render gemma non e' ancora in memoria
   const j = await llmJson(system, user, 1500);
 
   const names = CFG.categories.map((c) => c.name);
@@ -100,6 +101,7 @@ Niente nomi di artisti o marchi.`;
   log(`linee guida aggiornate a v${next.versione}: ${next.note}`);
 } catch (e) {
   log(`revisione non riuscita (linee guida invariate): ${e.message}`);
+  return [{ json: { state } }]; // si riprova dopo il prossimo brano
 }
 state.lastReview = state.done;
 state.lastVoteMark = voteMark;
