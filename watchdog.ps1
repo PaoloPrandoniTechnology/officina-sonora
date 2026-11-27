@@ -45,7 +45,7 @@ function Avvia-Gateway {
   if ($ok) { return }
   $env:TELEGRAM_BOT_TOKEN = Leggi-Segreto "$SecretsDir\telegram.dpapi"
   $env:IBROADCAST_REFRESH = Leggi-Segreto "$SecretsDir\ibroadcast-refresh.dpapi"
-  $env:IBROADCAST_CLIENT_ID = 'CLIENT_ID_IN_SECRETS'
+  $env:IBROADCAST_CLIENT_ID = (Get-Content "$SecretsDir\ibroadcast-client.txt" -Raw).Trim()
   Start-Process -FilePath 'node' -ArgumentList "`"$GatewayDir\server.js`"" -WindowStyle Hidden -WorkingDirectory $GatewayDir
   Remove-Item Env:TELEGRAM_BOT_TOKEN, Env:IBROADCAST_REFRESH, Env:IBROADCAST_CLIENT_ID -ErrorAction SilentlyContinue
   Log 'gateway avviato'

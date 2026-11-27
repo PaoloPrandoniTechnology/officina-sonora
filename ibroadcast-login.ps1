@@ -2,7 +2,8 @@
 # Uso: powershell -File ibroadcast-login.ps1 -DeviceCode <device_code> -Interval 1 -ExpiresIn 179
 param([string]$DeviceCode, [int]$Interval = 1, [int]$ExpiresIn = 179)
 $ErrorActionPreference = 'Stop'
-$client = 'CLIENT_ID_IN_SECRETS'
+# L'identificativo del client sta in secrets\ibroadcast-client.txt (non nel repository)
+$client = (Get-Content 'E:\n8n\yoga\secrets\ibroadcast-client.txt' -Raw).Trim()
 $out = 'E:\n8n\yoga\secrets\ibroadcast-refresh.dpapi'
 $log = 'E:\n8n\yoga\state\ibroadcast-login.log'
 New-Item -ItemType Directory -Force -Path 'E:\n8n\yoga\secrets' | Out-Null

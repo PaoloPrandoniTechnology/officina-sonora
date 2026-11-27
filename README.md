@@ -305,7 +305,7 @@ oppure aggiorna il token Telegram in `secrets\telegram.dpapi`.
 **Ricreare `config\telegram.json`:**
 ```json
 {
-  "chat_id": 123456789
+  "chat_id": 000000000
 }
 ```
 Sostituisci il numero con il tuo chat ID Telegram.
