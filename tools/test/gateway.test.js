@@ -75,6 +75,17 @@ test('vota: scrive i campi, conserva nota e voto_ib', () => {
   assert.equal(fs.readdirSync(path.dirname(votato)).some((n) => n.endsWith('.tmp')), false);
 });
 
+test('vota: solo la nota tiene voto, fonte e data; serve un voto gia dato', () => {
+  const prima = leggi(votato);
+  const r = voti.vota({ numero: 1, nota: ' solo nota ', fonte: 'telegram' });
+  assert.deepEqual(r.dopo, { voto: prima.voto, nota: 'solo nota' });
+  assert.deepEqual(leggi(votato), { ...prima, nota_utente: 'solo nota' });
+  const senza = fs.readFileSync(due, 'utf8');
+  assert.throws(() => voti.vota({ numero: 2, nota: 'x', fonte: 'telegram' }), /ancora un voto/);
+  assert.throws(() => voti.vota({ numero: 1, voto: null }), /voto/);
+  assert.equal(fs.readFileSync(due, 'utf8'), senza);
+});
+
 const richiesta = (porta, percorso, { method = 'GET', headers = {}, body } = {}) => new Promise((resolve, reject) => {
   const r = http.request({ host: '127.0.0.1', port: porta, path: percorso, method, headers }, (res) => {
     const ch = [];

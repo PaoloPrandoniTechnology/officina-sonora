@@ -27,9 +27,11 @@ function schede(dir = LIBRERIA, out = []) {
 const trova = (numero) => schede().find((s) => s.meta.numero_traccia === numero);
 const votoValido = (v) => Number.isInteger(v) && v >= 1 && v <= 5;
 
+// Senza voto si salva solo la nota, su un brano gia' votato: voto, fonte e data restano quelli della scheda
 function vota({ numero, voto, nota, fonte }) {
-  if (!votoValido(voto)) throw new Error('voto: un numero intero da 1 a 5');
+  const soloNota = voto === undefined || voto === null;
   const conNota = nota !== undefined && nota !== null;
+  if (soloNota ? !conNota : !votoValido(voto)) throw new Error('voto: un numero intero da 1 a 5');
   if (conNota && (typeof nota !== 'string' || nota.length > 300 || /[<>]/.test(nota))) {
     throw new Error('nota: massimo 300 caratteri, senza < o >');
   }
@@ -38,14 +40,18 @@ function vota({ numero, voto, nota, fonte }) {
   // rilettura subito prima di scrivere: i blocchi possono aver aggiornato la scheda durante la ricerca
   const meta = JSON.parse(fs.readFileSync(s.file, 'utf8'));
   const prima = { voto: meta.voto ?? null, nota: meta.nota_utente ?? null };
-  meta.voto = voto;
-  meta.voto_fonte = fonte === 'telegram' ? 'telegram' : 'dashboard';
-  meta.voto_il = new Date().toISOString();
+  if (soloNota) {
+    if (!votoValido(meta.voto)) throw new Error('nota: il brano non ha ancora un voto');
+  } else {
+    meta.voto = voto;
+    meta.voto_fonte = fonte === 'telegram' ? 'telegram' : 'dashboard';
+    meta.voto_il = new Date().toISOString();
+  }
   if (conNota) meta.nota_utente = nota.trim();
   const tmp = s.file + '.voto.tmp'; // suffisso diverso da quello dei blocchi (.tmp)
   fs.writeFileSync(tmp, JSON.stringify(meta, null, 2));
   fs.renameSync(tmp, s.file);
-  return { ok: true, numero, titolo: meta.titolo, prima, dopo: { voto, nota: meta.nota_utente ?? null } };
+  return { ok: true, numero, titolo: meta.titolo, prima, dopo: { voto: meta.voto, nota: meta.nota_utente ?? null } };
 }
 
 function elenco(oraMs) {

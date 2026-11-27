@@ -259,12 +259,13 @@ async function gestisciTesto(msg) {
   if (!testo) return;
   // Nota a un voto appena dato: si salva direttamente
   if (tgs.flow && tgs.flow.contesto === 'nota-voto') {
-    const { numero, voto } = tgs.flow;
+    const { numero } = tgs.flow;
     // attesa di una nota rimasta dal formato precedente (nome del file)
     if (!numero) { tgs.flow = null; return say(PULSANTE_VECCHIO); }
-    const r = await salvaVoto({ numero, voto, nota: testo });
+    // solo la nota: il voto nella scheda puo' essere cambiato nel frattempo e non va riscritto
+    const r = await salvaVoto({ numero, nota: testo });
     // in caso di errore si resta in attesa, cosi' la nota si puo' riscrivere
-    if (!r.ok) return say(`Non ho salvato il voto: ${r.error}\nRiscrivi la nota oppure /annulla.`);
+    if (!r.ok) return say(`Non ho salvato la nota: ${r.error}\nRiscrivi la nota oppure /annulla.`);
     tgs.flow = null;
     return say('Nota salvata.').then(() => menu());
   }

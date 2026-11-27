@@ -59,10 +59,11 @@ test('firma: cambia correggendo un voto', () => {
 
 // Esegue un blocco vero su una libreria temporanea, con il gateway finto.
 // dopoLettura simula un altro processo che scrive appena il blocco ha letto una scheda.
-async function eseguiBlocco(nome, { gw, input = {}, dopoLettura = () => {}, cfg = {} }, dir) {
+const codiceIb = codice + '\n' + ['lib-ibroadcast.js', 'cover.js'].map((f) => fs.readFileSync(path.join(RADICE, 'src', f), 'utf8')).join('\n');
+async function eseguiBlocco(nome, { gw, input = {}, dopoLettura = () => {}, cfg = {}, ib = false }, dir) {
   const finto = { ...fs, readFileSync: (f, ...a) => { const r = fs.readFileSync(f, ...a); dopoLettura(f); return r; } };
   const c = vm.createContext({ require: (m) => (m === 'fs' ? finto : require(m)), console, process, Buffer, setTimeout, clearTimeout, URL, Promise });
-  vm.runInContext(codice, c);
+  vm.runInContext(ib ? codiceIb : codice, c);
   Object.assign(vm.runInContext('CFG', c), { dir, root: path.join(dir, 'libreria'), scartati: path.join(dir, 'libreria', '_scartati'), ...cfg });
   c.gw = gw;
   c.log = () => {};
@@ -135,6 +136,58 @@ for (const [caso, audio, esito] of [['tenuto', mp3Valido(), 'ok'], ['scartato', 
   }));
 }
 
+for (const caso of ['nuovo', 'duplicato']) {
+  test(`blocco 3d1: il voto dato durante la preparazione resta (${caso})`, () => conLibreria(async (dir, lib) => {
+    const file = path.join(lib, 'eco.mp3');
+    const scheda = path.join(lib, 'eco.json');
+    const audio = mp3Valido();
+    fs.writeFileSync(file, audio);
+    fs.writeFileSync(scheda, JSON.stringify({ titolo: 'Eco', categoria: 'Prova', numero_traccia: 1, voto: null }));
+    if (caso === 'duplicato') {
+      const c = vm.createContext({ require, console, process, Buffer, setTimeout, clearTimeout, URL, Promise });
+      vm.runInContext(codiceIb, c);
+      fs.writeFileSync(path.join(lib, 'gemello.json'), JSON.stringify({ titolo: 'Gemello', hash_audio: c.fnvAudio(audio), ibroadcast: { track_id: '9' } }));
+    }
+    let votato = false;
+    const r = await eseguiBlocco('03d1-prepara-caricamento.js', {
+      ib: true,
+      input: { state: { uploadQueue: [file], ibroadcastScanned: true, retagScanned: true } },
+      // nuovo: il voto arriva mentre si attende la copertina; duplicato: appena letta la scheda
+      gw: async () => { vota(scheda); return { ok: true, jpeg: Buffer.from('jpeg').toString('base64') }; },
+      dopoLettura: (f) => { if (caso === 'duplicato' && f === scheda && !votato) { votato = true; vota(scheda); } },
+    }, dir);
+    const m = leggi(scheda);
+    assert.equal(m.voto, 5);
+    assert.ok(m.hash_audio);
+    if (caso === 'nuovo') {
+      assert.equal(r[0].json.daCaricare.length, 1);
+      assert.equal(m.copertina, 'ai');
+      assert.equal(m.id3_versione, 2);
+    } else {
+      assert.equal(r[0].json.daCaricare.length, 0);
+      assert.equal(m.duplicato_di, 'Gemello');
+    }
+  }));
+}
+
+test('blocco 3d4: registra solo l id, il voto resta, una scheda illeggibile non si ricrea', () => conLibreria(async (dir, lib) => {
+  const a = path.join(lib, 'a.json');
+  const rotta = path.join(lib, 'rotta.json');
+  fs.writeFileSync(a, JSON.stringify({ titolo: 'A', voto: null, ibroadcast: { track_id: '1' } }));
+  fs.writeFileSync(rotta, '{ troncato');
+  let votato = false;
+  await eseguiBlocco('03d4-notifica-caricamento.js', {
+    input: { state: {}, caricati: [{ jsonPath: rotta, trackId: '7', nTags: 3 }, { jsonPath: a, trackId: '2', nTags: 12 }] },
+    dopoLettura: (f) => { if (f === a && !votato) { votato = true; vota(a); } },
+  }, dir);
+  const m = leggi(a);
+  assert.equal(m.voto, 5);
+  assert.equal(m.id3_frames, 12);
+  assert.equal(m.ibroadcast.track_id, '2');
+  assert.deepEqual(m.ibroadcast_precedente, { track_id: '1' });
+  assert.equal(fs.readFileSync(rotta, 'utf8'), '{ troncato');
+}));
+
 test('blocco 8a: voto e nota passano dal gateway col numero di traccia', () => conLibreria(async (dir, lib) => {
   for (let n = 1; n <= 10; n++) {
     fs.writeFileSync(path.join(lib, `b${n}.json`), JSON.stringify({ titolo: `T${n}`, categoria: 'Prova', numero_traccia: n, generato_il: `2026-11-${String(n).padStart(2, '0')}` }));
@@ -172,8 +225,9 @@ test('blocco 8a: voto e nota passano dal gateway col numero di traccia', () => c
 
   assert.deepEqual((await premi('vv:5:9')).voti, [{ numero: 9, voto: 5, fonte: 'telegram' }]);
   const rifiutata = await scrivi('a<b', { ok: false, error: 'nota: no' });
-  assert.match(rifiutata.detti[0].text, /^Non ho salvato il voto: nota: no/);
-  assert.deepEqual((await scrivi('calma; bella')).voti, [{ numero: 9, voto: 5, nota: 'calma; bella', fonte: 'telegram' }]);
+  assert.match(rifiutata.detti[0].text, /^Non ho salvato la nota: nota: no/);
+  // solo la nota: un voto cambiato nel frattempo (per esempio dalla dashboard) non torna indietro
+  assert.deepEqual((await scrivi('calma; bella')).voti, [{ numero: 9, nota: 'calma; bella', fonte: 'telegram' }]);
 
   const ko = await premi('vv:2:9', { ok: false, error: 'brano non trovato' });
   assert.match(ko.detti[0].text, /^Non ho salvato il voto: brano non trovato/);

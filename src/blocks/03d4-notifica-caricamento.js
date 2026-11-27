@@ -4,10 +4,14 @@ const inp = $input.first().json;
 const state = inp.state;
 
 for (const c of inp.caricati || []) {
-  const meta = readJsonSafe(c.jsonPath, {});
-  meta.id3_frames = c.nTags;
-  if (meta.ibroadcast && meta.ibroadcast.track_id !== c.trackId) meta.ibroadcast_precedente = meta.ibroadcast;
-  meta.ibroadcast = { track_id: c.trackId, caricato_il: new Date().toISOString(), organizzato: false };
-  fs.writeFileSync(c.jsonPath, JSON.stringify(meta, null, 2));
+  // solo i campi di questo blocco; una scheda illeggibile non si ricrea
+  try {
+    const meta = JSON.parse(fs.readFileSync(c.jsonPath, 'utf8'));
+    const campi = { id3_frames: c.nTags, ibroadcast: { track_id: c.trackId, caricato_il: new Date().toISOString(), organizzato: false } };
+    if (meta.ibroadcast && meta.ibroadcast.track_id !== c.trackId) campi.ibroadcast_precedente = meta.ibroadcast;
+    aggiornaScheda(c.jsonPath, campi);
+  } catch (e) {
+    log(`iBroadcast: scheda ${path.basename(c.jsonPath)} illeggibile (${e.message}), id ${c.trackId} non registrato`);
+  }
 }
 return [{ json: { state, outcome: inp.outcome } }];

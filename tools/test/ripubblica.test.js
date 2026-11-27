@@ -64,6 +64,15 @@ test('voto trasferito e confermato, poi playlist, tag e cestino', async () => {
   assert.equal(f.meta.voto_ib, 4, 'il voto trasferito non deve sembrare nuovo');
 });
 
+test('voto dato solo con un tag: dopo il trasferimento voto_ib torna quello di prima', async () => {
+  const f = finta(0);
+  const riga = { ...base, rating: 0, voto_ib: 3, playlists: [], tags: [20] };
+  await dopoOrganizzato(riga, f.io);
+  assert.equal(f.meta.voto_ib, 3);
+  assert.equal(f.meta.voto, 5);
+  assert.ok(!f.chiamate.some((c) => c[0] === 'ratetrack'));
+});
+
 test('voto non confermato: ci si ferma e il vecchio brano non si cestina', async () => {
   const f = finta(0);
   const riga = { ...base, playlists: [], tags: [] };

@@ -49,18 +49,15 @@ for (const file of pending) {
     const hashAudio = fnvAudio(fs.readFileSync(file));
     const gia = libraryTracks().find((t) => t.meta.hash_audio === hashAudio && t.meta.ibroadcast && t.meta.ibroadcast.track_id && t.jsonPath !== jsonPath);
     if (gia) {
-      meta.hash_audio = hashAudio;
-      meta.duplicato_di = gia.meta.titolo;
-      fs.writeFileSync(jsonPath, JSON.stringify(meta, null, 2));
+      aggiornaScheda(jsonPath, { hash_audio: hashAudio, duplicato_di: gia.meta.titolo });
       log(`iBroadcast: ${meta.titolo} identico a ${gia.meta.titolo}, non ricaricato`);
       continue;
     }
     meta.hash_audio = hashAudio;
     const cop = await copertinaPer(meta);
     const nTags = tagFile(file, meta, cop);
-    meta.id3_versione = 2;
-    meta.copertina = cop.definitiva ? 'ai' : 'provvisoria';
-    fs.writeFileSync(jsonPath, JSON.stringify(meta, null, 2));
+    // solo i campi di questo blocco: un voto arrivato durante l'attesa della copertina resta
+    aggiornaScheda(jsonPath, { hash_audio: hashAudio, id3_versione: 2, copertina: cop.definitiva ? 'ai' : 'provvisoria' });
     daCaricare.push({ file, jsonPath, nTags, titolo: meta.titolo, tentativi: state.uploadTries ? (state.uploadTries[file] || 0) : 0 });
   } catch (e) {
     log(`iBroadcast: preparazione di ${path.basename(file)} non riuscita: ${e.message}`);

@@ -61,6 +61,8 @@ async function dopoOrganizzato(r, io) {
     } else if (passo === 'playlist') {
       for (const p of r.playlists || []) await io.api('appendplaylist', { playlist: p, tracks: [nuovo] });
       for (const t of r.tags || []) await io.api('tagtracks', { tagid: t, tracks: [nuovo], untag: false });
+      // un voto dato solo con un tag torna con il tag: per il blocco 10 non deve sembrare nuovo
+      if (!(r.rating > 0) && 'voto_ib' in r) { const meta = io.leggiScheda(); meta.voto_ib = r.voto_ib; io.scriviScheda(meta); }
       r.playlist_ok = true;
     } else if (passo === 'cestina') {
       await io.api('trash', { tracks: [Number(r.vecchio)] });
@@ -75,7 +77,7 @@ async function motore() {
   const src = (f) => fs.readFileSync(path.join(DIR, 'src', f), 'utf8');
   const AF = Object.getPrototypeOf(async function () {}).constructor;
   const lib = src('lib.js') + '\n' + src('lib-apprendimento.js') + '\n' + src('lib-messaggi.js') + '\n' + src('lib-ibroadcast.js') + '\n' + src('cover.js');
-  const m = await new AF('require', lib + '\nreturn { CFG, gw, ibApi, libraryTracks, copertinaPer, acquireLock, releaseLock, loadState, saveState, readJsonSafe };')(require);
+  const m = await new AF('require', lib + '\nreturn { CFG, gw, ibApi, libraryTracks, copertinaPer, acquireLock, releaseLock, loadState, saveState, readJsonSafe, aggiornaScheda, scriviScheda };')(require);
   m.blocco = async (nome, json) => (await new AF('require', '$input', '$env', lib + '\n' + src(path.join('blocks', nome)))(require, { first: () => ({ json }) }, {}))[0].json;
   return m;
 }
@@ -113,7 +115,7 @@ async function main() {
     let r = mappa[b.jsonPath];
     if (!r || r.cestinato) {
       const id = String(meta.ibroadcast.track_id);
-      r = mappa[b.jsonPath] = { vecchio: id, ...segnali(await libreria(), id), organizzato: false, voto_ok: false, playlist_ok: false, cestinato: false };
+      r = mappa[b.jsonPath] = { vecchio: id, ...segnali(await libreria(), id), voto_ib: meta.voto_ib ?? null, organizzato: false, voto_ok: false, playlist_ok: false, cestinato: false };
       salva();
     }
     // interrotto dopo il caricamento ma prima di salvare la mappa
@@ -131,11 +133,9 @@ async function main() {
     const esito = await m.blocco('03d2-carica-ibroadcast.js', pronto);
     const c = esito.caricati[0];
     if (!c || !/^\d+$/.test(c.trackId) || c.trackId === r.vecchio) throw new Error(`${meta.titolo}: caricamento non riuscito (${c ? c.trackId : 'nessun id'})`);
-    const ora = m.readJsonSafe(b.jsonPath, null);
-    ora.id3_frames = c.nTags;
-    ora.ibroadcast_precedente = ora.ibroadcast;
-    ora.ibroadcast = { track_id: c.trackId, caricato_il: new Date().toISOString(), organizzato: false };
-    fs.writeFileSync(b.jsonPath, JSON.stringify(ora, null, 2));
+    // solo questi campi: un voto dato durante il caricamento resta
+    m.aggiornaScheda(b.jsonPath, { id3_frames: c.nTags, ibroadcast_precedente: meta.ibroadcast,
+      ibroadcast: { track_id: c.trackId, caricato_il: new Date().toISOString(), organizzato: false } });
     r.nuovo = c.trackId;
     salva();
     console.log(`caricato: ${meta.titolo} (${r.vecchio} -> ${r.nuovo})`);
@@ -154,7 +154,7 @@ async function main() {
         await dopoOrganizzato(r, {
           api: (mode, args) => m.ibApi(null, mode, args), libreria, attendi, salva,
           leggiScheda: () => m.readJsonSafe(b.jsonPath, null),
-          scriviScheda: (x) => fs.writeFileSync(b.jsonPath, JSON.stringify(x, null, 2)),
+          scriviScheda: (x) => m.scriviScheda(b.jsonPath, x),
         });
         ultimoAvanzamento = Date.now();
         console.log(`fatto: ${b.meta.titolo}`);
