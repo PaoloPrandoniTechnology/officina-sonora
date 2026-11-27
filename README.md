@@ -172,11 +172,31 @@ Tra le due soglie il giudizio è **stabile**; sotto il minimo è **dati insuffic
 Ogni brano ha:
 
 - **titolo**, **copertina** e un **numero di traccia** progressivo, unico per tutta la libreria;
-- **album**: il nome della categoria (per esempio *Vinyasa-dinamico*);
+- **album**: il nome leggibile del genere (per esempio *Vinyasa*; i brani caricati prima hanno ancora il nome della categoria);
 - **tag**: ambito (`yoga` o `musica`), famiglia, categoria, energia, struttura, tipo;
 - **playlist**: una per categoria, con nome `Yoga - <categoria>` o `Musica - <categoria>`.
 
 I tag e le playlist vengono applicati alcuni minuti dopo il caricamento, perché iBroadcast deve prima elaborare il brano.
+
+### Copertine e metadati
+
+Ogni MP3 esce con tag ID3 completi: titolo, artista, album, genere, numero di traccia, data, bpm, tonalità,
+durata, compositore, editore, descrizione e, come campi aggiuntivi, mood, energia, attività, struttura,
+strumenti, variante e seed. iBroadcast usa titolo, artista, album, traccia, genere, anno e copertina;
+il resto serve alla libreria locale.
+
+La copertina è uno **sfondo del genere** generato in locale con Stable Diffusion, con titolo, genere e artista
+scritti sopra. Finché un genere non ha sfondi, i suoi brani escono con una copertina provvisoria.
+
+1. **Sfondi** (8 per genere): in dashboard, *Controllo → Produzione*, **Metti in pausa e genera gli sfondi**.
+   **Ferma la generazione** interrompe; il lancio successivo riparte dai mancanti. Per rifarne uno, cancella il file
+   in `assets\sfondi\<categoria>` (nella stessa cartella `_foglio.jpg` li mostra tutti).
+2. **Descrizione del genere**: campo `copertina` in `config\catalogo.json` (etichetta, prompt, font).
+3. **Brani già online**: con gli sfondi completi, prima una prova su 3 brani, di cui almeno uno con le stelle:
+   `node tools\ripubblica.js --prova <brano1.json> <brano2.json> <brano3.json>`. Controlla il risultato
+   nell'app, poi `node tools\ripubblica.js --tutti`. Ogni vecchia copia si cestina solo dopo che la nuova è
+   organizzata e ha ricevuto stelle, playlist e tag; il conteggio degli ascolti su iBroadcast riparte da zero.
+   La mappa in `state\ripubblica.json` permette di riprendere dopo un'interruzione.
 
 ### Telegram
 
@@ -301,7 +321,10 @@ La revisione delle linee guida tiene conto sia dei voti nuovi sia di quelli corr
 |---|---|
 | `src\blocks\` | i blocchi del ciclo di produzione, uno per ogni nodo di n8n |
 | `src\lib.js`, `src\lib-apprendimento.js`, `src\lib-ibroadcast.js` | funzioni condivise: scelta delle ricette, file audio, upload, tag |
-| `src\cover.js` | generazione delle copertine PNG |
+| `src\cover.js` | copertina provvisoria e frame della copertina |
+| `gateway\copertina.js`, `gateway\sfondi.js` | composizione delle copertine; generazione degli sfondi dalla dashboard |
+| `assets\sfondi\` | sfondi per genere (non nel repository) |
+| `tools\genera-sfondi.js`, `tools\ripubblica.js` | sfondi delle copertine; aggiornamento dei brani già online |
 | `config\catalogo.json` | l'elenco dei generi: stile, strumenti, bpm, varianti, colori |
 | `config\guidance.json` | le linee guida correnti (stile, bpm, strutture preferite) |
 | `config\history\` | archivio delle versioni precedenti delle linee guida |

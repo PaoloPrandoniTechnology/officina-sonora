@@ -95,3 +95,7 @@ Il workflow "Officina Sonora" e' costruito da `build-workflow.mjs` a partire dai
 ## Sfondi delle copertine
 Dashboard, Controllo, Produzione: "Metti in pausa e genera gli sfondi" (8 per genere, in `assets\sfondi`).
 Si ferma con "Ferma la generazione" e riparte dagli sfondi mancanti; per rifarne uno, cancellarlo.
+
+## Aggiornare i brani gia' online
+Con gli sfondi completi: `node tools\ripubblica.js --prova a.json b.json c.json` (almeno un brano con le stelle),
+controllo nell'app, poi `node tools\ripubblica.js --tutti`. Mappa e ripresa in `state\ripubblica.json`.
