@@ -172,7 +172,7 @@ const server = http.createServer(async (req, res) => {
       if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
       let dati;
       try { dati = JSON.parse(corpo.toString('utf8') || '{}'); } catch (e) { return rispondi(400, { ok: false, error: 'JSON non valido' }); }
-      const r = controllo.gestisci(req.url, dati);
+      const r = await controllo.gestisci(req.url, dati);
       return rispondi(r.codice, r.corpo);
     }
     if (req.url === '/tg') {

@@ -113,7 +113,10 @@ const LIMITI_PARAMETRI = {
   for (const [nome, v] of Object.entries(p.generi || {})) {
     if (!v || typeof v !== 'object') continue;
     const peso = typeof v.peso === 'number' && v.peso >= 0 && v.peso <= 5 ? v.peso : 1;
-    CFG.generiOverride[nome] = { peso, attivo: v.attivo !== false };
+    // Direttive scritte dal produttore per questo genere (in inglese se tradotte), massimo 10
+    const direttive = (Array.isArray(v.note) ? v.note : [])
+      .map((n) => String((n && (n.inglese || n.testo)) || '').trim()).filter(Boolean).slice(0, 10);
+    CFG.generiOverride[nome] = { peso, attivo: v.attivo !== false, direttive };
   }
   CFG.comandi = readJsonSafe(path.join(CFG.dir, 'state', 'comandi.json'), {});
 })();

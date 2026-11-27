@@ -211,8 +211,10 @@ function scegliInfluenza(cat) {
 
 // Compone lo stile del brano dal genere: identita' fissa, strumenti del set, variante, influenza, melodia e ritmica
 function componiStile(cat, variante, strumenti, influenza, guidance) {
+  const direttive = ((CFG.generiOverride || {})[cat.name] || {}).direttive || [];
   const parti = [
     cat.stile,
+    direttive.length ? `producer notes: ${direttive.join('; ')}` : '',
     `instruments: ${strumenti.join(', ')}`,
     variante ? variante.keywords : '',
     influenza ? `influence: ${influenza}` : '',

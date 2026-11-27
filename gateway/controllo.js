@@ -72,7 +72,7 @@ function lettura() {
     comandi: leggiJson(COMANDI, {}),
     generi: catalogoNomi().map((nome) => {
       const s = generiSalvati[nome] || {};
-      return { nome, peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0 };
+      return { nome, peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
     }),
     guida: {
       versione: guida.versione || null,
@@ -106,7 +106,7 @@ function impostaGenere({ nome, peso, attivo }) {
   const salvati = leggiJson(PARAMETRI, {});
   salvati.generi = salvati.generi || {};
   const corrente = salvati.generi[nome] || { peso: 1, attivo: true };
-  const nuovo = { peso: corrente.peso, attivo: corrente.attivo };
+  const nuovo = { ...corrente, peso: corrente.peso, attivo: corrente.attivo }; // conserva le note del genere
   if (peso !== undefined) {
     if (typeof peso !== 'number' || peso < 0 || peso > 5) throw new Error('peso: deve essere tra 0 e 5');
     nuovo.peso = Math.round(peso * 100) / 100;
@@ -173,13 +173,103 @@ function guida({ campo, valori, categoria, valore }) {
   return { ok: true };
 }
 
-// Smista le richieste di scrittura. Ritorna { codice, corpo }.
-function gestisci(url, dati) {
+// ---- note per genere ----
+// Ogni nota viene scritta in italiano e tradotta in inglese (il motore YuE2 risponde meglio all'inglese).
+// La traduzione usa il modello di LM Studio; se non risponde, la nota resta in italiano e viene usata cosi'.
+const http = require('http');
+const LLM = { hostname: '127.0.0.1', port: 1234, model: 'google/gemma-4-e4b' };
+
+function traduci(testo) {
+  return new Promise((resolve) => {
+    const corpo = JSON.stringify({
+      model: LLM.model,
+      temperature: 0.2,
+      max_tokens: 90,
+      messages: [
+        { role: 'system', content: 'You translate producer notes for an AI instrumental music generator into concise English style directions (max 20 words). Output only the English text, nothing else.' },
+        { role: 'user', content: testo },
+      ],
+    });
+    const req = http.request({ ...LLM, path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(corpo) }, timeout: 20000 }, (res) => {
+      const ch = [];
+      res.on('data', (c) => ch.push(c));
+      res.on('end', () => {
+        try {
+          const j = JSON.parse(Buffer.concat(ch).toString('utf8'));
+          const t = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+          resolve(t ? String(t).replace(/^["']|["']$/g, '').trim().slice(0, 240) : null);
+        } catch (e) { resolve(null); }
+      });
+    });
+    req.on('timeout', () => { req.destroy(); resolve(null); });
+    req.on('error', () => resolve(null));
+    req.write(corpo);
+    req.end();
+  });
+}
+
+async function aggiungiNota({ nome, testo }) {
+  if (!catalogoNomi().includes(nome)) throw new Error(`genere sconosciuto: ${nome}`);
+  const t = String(testo || '').trim();
+  if (t.length < 3 || t.length > 300) throw new Error('nota: tra 3 e 300 caratteri');
+  if (/[<>]/.test(t)) throw new Error('nota: non usare i caratteri < o >');
+  const salvati = leggiJson(PARAMETRI, {});
+  salvati.generi = salvati.generi || {};
+  const corrente = salvati.generi[nome] || { peso: 1, attivo: true };
+  const note = corrente.note || [];
+  if (note.length >= 20) throw new Error('nota: massimo 20 note per genere');
+  const inglese = await traduci(t);
+  const nuova = { testo: t, inglese, ts: new Date().toISOString() };
+  salvati.generi[nome] = { ...corrente, note: [...note, nuova] };
+  scriviJson(PARAMETRI, salvati);
+  registra('note genere', nome, null, nuova);
+  return { ok: true, nome, nota: nuova, tradotta: !!inglese };
+}
+
+// Le note salvate senza traduzione (LM Studio spento o occupato) vengono ritradotte ogni 10 minuti
+async function ritraduciPendenti() {
+  const pendenti = [];
+  for (const [nome, corrente] of Object.entries(leggiJson(PARAMETRI, {}).generi || {})) {
+    for (const n of corrente.note || []) if (!n.inglese) pendenti.push({ nome, ts: n.ts, testo: n.testo });
+  }
+  if (!pendenti.length) return;
+  const risultati = [];
+  for (const p of pendenti) {
+    const t = await traduci(p.testo);
+    if (t) risultati.push({ ...p, inglese: t });
+  }
+  if (!risultati.length) return;
+  // rilettura prima della scrittura: nel frattempo l'utente puo' aver aggiunto o tolto note
+  const salvati = leggiJson(PARAMETRI, {});
+  let cambiate = 0;
+  for (const r of risultati) {
+    const nota = ((salvati.generi || {})[r.nome]?.note || []).find((n) => n.ts === r.ts && !n.inglese);
+    if (nota) { nota.inglese = r.inglese; cambiate++; }
+  }
+  if (cambiate) { scriviJson(PARAMETRI, salvati); registra('note genere', 'traduzione automatica', null, cambiate + ' note tradotte'); }
+}
+setInterval(() => { ritraduciPendenti().catch(() => {}); }, 10 * 60 * 1000).unref();
+
+function togliNota({ nome, indice }) {
+  const salvati = leggiJson(PARAMETRI, {});
+  const corrente = (salvati.generi || {})[nome];
+  if (!corrente || !Array.isArray(corrente.note) || !corrente.note[indice]) throw new Error('nota non trovata');
+  const rimossa = corrente.note[indice];
+  corrente.note = corrente.note.filter((_, i) => i !== indice);
+  scriviJson(PARAMETRI, salvati);
+  registra('note genere', nome, rimossa, null);
+  return { ok: true };
+}
+
+// Smista le richieste di scrittura. Ritorna una Promise di { codice, corpo }.
+async function gestisci(url, dati) {
   try {
     if (url === '/api/controllo/parametro') return { codice: 200, corpo: impostaParametro(dati) };
     if (url === '/api/controllo/genere') return { codice: 200, corpo: impostaGenere(dati) };
     if (url === '/api/controllo/comando') return { codice: 200, corpo: comando(dati) };
     if (url === '/api/controllo/guida') return { codice: 200, corpo: guida(dati) };
+    if (url === '/api/controllo/nota') return { codice: 200, corpo: await aggiungiNota(dati) };
+    if (url === '/api/controllo/nota/rimuovi') return { codice: 200, corpo: togliNota(dati) };
     return { codice: 404, corpo: { ok: false, error: 'percorso non previsto' } };
   } catch (e) {
     return { codice: 400, corpo: { ok: false, error: e.message } };

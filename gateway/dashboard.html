@@ -448,6 +448,7 @@
         <button data-s="parametri" aria-pressed="false">Parametri</button>
         <button data-s="generi" aria-pressed="false">Generi</button>
         <button data-s="guida" aria-pressed="false">Linee guida</button>
+        <button data-s="note" aria-pressed="false">Note per genere</button>
         <button data-s="storico" aria-pressed="false">Storico</button>
       </div>
       <div class="grid" id="cRiepilogo" style="margin-bottom:14px"></div>
@@ -455,6 +456,7 @@
       <div id="c-parametri" class="cpane" hidden></div>
       <div id="c-generi" class="cpane" hidden></div>
       <div id="c-guida" class="cpane" hidden></div>
+      <div id="c-note" class="cpane" hidden></div>
       <div id="c-storico" class="cpane" hidden></div>
     </section>
 
@@ -821,7 +823,8 @@
   // ---------- controllo ----------
   let ctrl = null;
   let ctrlSub = 'produzione';
-  const CTRL_SEZIONI = ['produzione', 'parametri', 'generi', 'guida', 'storico'];
+  const CTRL_SEZIONI = ['produzione', 'parametri', 'generi', 'guida', 'note', 'storico'];
+  let noteGenere = null;
 
   function toast(testo, tipo) {
     const box = $('#toasts');
@@ -899,6 +902,7 @@
     if (ctrlSub === 'parametri') disegnaParametri();
     if (ctrlSub === 'generi') disegnaGeneri();
     if (ctrlSub === 'guida') disegnaGuida();
+    if (ctrlSub === 'note') disegnaNote();
     if (ctrlSub === 'storico') disegnaStorico();
   }
 
@@ -1116,21 +1120,103 @@
       <p class="muted" style="font-size:12.5px;margin-top:10px">Ogni modifica fatta da questa pagina è registrata qui, con il valore precedente. Per tornare indietro, riporta il valore precedente dalla sezione corrispondente.</p>`;
   }
 
+  // Note per genere: istruzioni scritte dal produttore, tradotte in inglese e aggiunte allo stile
+  function disegnaNote() {
+    const generi = ctrl.generi;
+    if (!noteGenere || !generi.find((g) => g.nome === noteGenere)) {
+      const conNote = generi.find((g) => g.note.length);
+      noteGenere = conNote ? conNote.nome : generi[0].nome;
+    }
+    const g = generi.find((x) => x.nome === noteGenere);
+    const totNote = generi.reduce((a, x) => a + x.note.length, 0);
+    $('#c-note').innerHTML = `
+      <div class="grid">
+        <div class="card c4">
+          <h2>Generi <small>${n0(totNote)} note in totale</small></h2>
+          <input class="search" id="nQ" type="search" placeholder="Cerca un genere…" aria-label="Cerca genere" style="width:100%;margin-bottom:10px">
+          <div id="nLista" style="max-height:520px;overflow:auto;display:grid;gap:4px"></div>
+        </div>
+        <div class="card c8" id="nPannello"></div>
+      </div>`;
+    const disegnaLista = () => {
+      const q = $('#nQ').value.trim().toLowerCase();
+      $('#nLista').innerHTML = generi.filter((x) => x.nome.toLowerCase().includes(q)).map((x) => `
+        <button class="fchip" data-ng="${esc(x.nome)}" aria-pressed="${x.nome === noteGenere}" style="text-align:left;display:flex;justify-content:space-between;gap:8px;border-radius:9px">
+          <span>${esc(x.nome)}</span><span class="${x.note.length ? '' : 'muted'}">${n0(x.note.length)}</span></button>`).join('');
+      $('#nLista').querySelectorAll('button[data-ng]').forEach((b) => {
+        b.onclick = () => { noteGenere = b.dataset.ng; disegnaNote(); };
+      });
+    };
+    disegnaLista();
+    $('#nQ').addEventListener('input', disegnaLista);
+    const note = g.note;
+    $('#nPannello').innerHTML = `
+      <h2>${esc(g.nome)} <small>${esc(g.genere || '')}</small></h2>
+      <p class="muted" style="margin:0 0 14px;font-size:13px">Scrivi cosa vuoi sentire in questo genere, in italiano: per esempio <i>fai più assoli</i> oppure <i>usa il flauto di pan</i>. Il sistema la traduce in inglese e la aggiunge allo stile di ogni brano di questo genere.</p>
+      <div style="display:grid;gap:8px;margin-bottom:16px">
+        ${note.map((n, i) => `
+          <div class="card" style="padding:12px 14px;box-shadow:none">
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+              <div style="min-width:0">
+                <div style="font-weight:600">${esc(n.testo)}</div>
+                <div style="font-family:var(--mono);font-size:12px;margin-top:4px;color:${n.inglese ? 'var(--accent)' : 'var(--warn)'}">${n.inglese ? esc(n.inglese) : 'traduzione non disponibile: verrà usata la versione in italiano'}</div>
+                <div class="muted" style="font-size:11.5px;margin-top:4px">${data(n.ts)}</div>
+              </div>
+              <button class="btn small danger" data-del="${i}">Elimina</button>
+            </div>
+          </div>`).join('') || '<div class="empty">Nessuna nota per questo genere.</div>'}
+      </div>
+      <div style="display:grid;gap:8px">
+        <textarea class="field" id="nTxt" rows="3" maxlength="300" placeholder="Es.: più assoli di chitarra nel finale; usa il flauto di pan come melodia principale" style="resize:vertical;font:inherit"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="muted" style="font-size:12px">Massimo 300 caratteri · 20 note per genere</span>
+          <button class="btn" id="nAdd">Aggiungi nota</button>
+        </div>
+      </div>`;
+    $('#nAdd').onclick = async () => {
+      const testo = $('#nTxt').value.trim();
+      if (testo.length < 3) { toast('Scrivi una nota di almeno 3 caratteri', 'err'); return; }
+      const b = $('#nAdd');
+      b.disabled = true; b.textContent = 'Traduzione in corso…';
+      try {
+        const r = await invia('/api/controllo/nota', { nome: g.nome, testo });
+        toast(r.tradotta ? 'Nota aggiunta e tradotta' : 'Nota aggiunta (traduzione non disponibile)', 'ok');
+        await caricaControllo(true);
+      } catch (e) {
+        toast(e.message, 'err');
+        b.disabled = false; b.textContent = 'Aggiungi nota';
+      }
+    };
+    $('#nPannello').querySelectorAll('button[data-del]').forEach((b) => {
+      b.onclick = async () => {
+        const i = Number(b.dataset.del);
+        if (await chiedi('Eliminare la nota?', `"${note[i].testo}" non verrà più usata nei brani di questo genere.`, 'Elimina')) {
+          esegui(() => invia('/api/controllo/nota/rimuovi', { nome: g.nome, indice: i }), 'Nota eliminata');
+        }
+      };
+    });
+  }
+
   document.getElementById('csub').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-s]');
     if (!b) return;
     ctrlSub = b.dataset.s;
+    history.replaceState(null, '', '#controllo/' + ctrlSub);
     disegnaControllo();
   });
 
   // ---------- navigazione ----------
   const TITOLI = { panoramica: 'Panoramica', render: 'Render', generi: 'Generi', voti: 'Voti', qualita: 'Qualità', libreria: 'Libreria', controllo: 'Controllo', log: 'Log e sistema' };
-  function vai(tab) {
+  function vai(indirizzo) {
+    const parti = String(indirizzo || '').split('/');
+    let tab = parti[0];
+    if (parti[1] && CTRL_SEZIONI.includes(parti[1])) ctrlSub = parti[1]; // es. #controllo/note
     if (!TITOLI[tab]) tab = 'panoramica';
     document.querySelectorAll('section.tab').forEach((s) => s.classList.toggle('on', s.id === 't-' + tab));
     document.querySelectorAll('#nav button').forEach((b) => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
     $('#titolo').textContent = TITOLI[tab];
-    if (location.hash !== '#' + tab) history.replaceState(null, '', '#' + tab);
+    const hash = tab === 'controllo' ? '#controllo/' + ctrlSub : '#' + tab;
+    if (location.hash !== hash) history.replaceState(null, '', hash);
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (tab === 'controllo') caricaControllo();
   }

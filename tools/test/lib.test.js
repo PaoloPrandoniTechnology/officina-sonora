@@ -101,6 +101,21 @@ test('rotazione: i generi senza brani vengono scelti', () => {
   for (const n of senza) assert.ok(scelte[n] > 0, `genere senza brani mai scelto: ${n}`);
 });
 
+test('note: le direttive del produttore entrano nello stile del genere', () => {
+  const oldOv = L.CFG.generiOverride;
+  try {
+    L.CFG.generiOverride = { 'Rock-test': { peso: 1, attivo: true, direttive: ['more guitar solos', 'use pan flute'] } };
+    const cat = { name: 'Rock-test', stile: 'rock base', enfasi: 'x', melodia: 'y', accordi: 'z', ritmica: 'w' };
+    const stile = L.componiStile(cat, null, ['chitarra'], '', { style_extra: [] });
+    assert.match(stile, /producer notes: more guitar solos; use pan flute/);
+    assert.match(stile, /instrumental, no vocals$/);
+    const senza = L.componiStile({ ...cat, name: 'Altro' }, null, ['chitarra'], '', { style_extra: [] });
+    assert.doesNotMatch(senza, /producer notes/);
+  } finally {
+    L.CFG.generiOverride = oldOv;
+  }
+});
+
 test('controllo: un genere sospeso non esce, "produci ora" forza il genere', () => {
   const guidance = L.readGuidance();
   const tuttiNomi = L.CFG.categories.map((c) => c.name);

@@ -15,25 +15,28 @@ test('controllo: la lettura contiene parametri, generi, guida e storico', () => 
   }
 });
 
-test('controllo: parametri fuori scala vengono rifiutati', () => {
-  const r = controllo.gestisci('/api/controllo/parametro', { chiave: 'durMin', valore: 9999 });
-  assert.equal(r.codice, 400);
-  const r2 = controllo.gestisci('/api/controllo/parametro', { chiave: 'nonEsiste', valore: 1 });
-  assert.equal(r2.codice, 400);
-  const r3 = controllo.gestisci('/api/controllo/parametro', { chiave: 'durMin', valore: 'abc' });
-  assert.equal(r3.codice, 400);
+test('controllo: parametri fuori scala vengono rifiutati', async () => {
+  assert.equal((await controllo.gestisci('/api/controllo/parametro', { chiave: 'durMin', valore: 9999 })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/parametro', { chiave: 'nonEsiste', valore: 1 })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/parametro', { chiave: 'durMin', valore: 'abc' })).codice, 400);
 });
 
-test('controllo: generi sconosciuti e pesi fuori scala vengono rifiutati', () => {
-  assert.equal(controllo.gestisci('/api/controllo/genere', { nome: 'Genere inventato', peso: 1 }).codice, 400);
-  assert.equal(controllo.gestisci('/api/controllo/genere', { nome: 'Meditazione', peso: 9 }).codice, 400);
-  assert.equal(controllo.gestisci('/api/controllo/genere', { nome: 'Meditazione', attivo: 'si' }).codice, 400);
+test('controllo: generi sconosciuti e pesi fuori scala vengono rifiutati', async () => {
+  assert.equal((await controllo.gestisci('/api/controllo/genere', { nome: 'Genere inventato', peso: 1 })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/genere', { nome: 'Meditazione', peso: 9 })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/genere', { nome: 'Meditazione', attivo: 'si' })).codice, 400);
 });
 
-test('controllo: comandi e linee guida non validi vengono rifiutati', () => {
-  assert.equal(controllo.gestisci('/api/controllo/comando', { azione: 'cancella_tutto' }).codice, 400);
-  assert.equal(controllo.gestisci('/api/controllo/comando', { azione: 'produci', genere: 'Inventato' }).codice, 400);
-  assert.equal(controllo.gestisci('/api/controllo/guida', { campo: 'bpm_range', categoria: 'Meditazione', valore: '90-40' }).codice, 400);
-  assert.equal(controllo.gestisci('/api/controllo/guida', { campo: 'style_extra', valori: ['<script>x</script>'] }).codice, 400);
-  assert.equal(controllo.gestisci('/api/controllo/percorso-inesistente', {}).codice, 404);
+test('controllo: comandi e linee guida non validi vengono rifiutati', async () => {
+  assert.equal((await controllo.gestisci('/api/controllo/comando', { azione: 'cancella_tutto' })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/comando', { azione: 'produci', genere: 'Inventato' })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/guida', { campo: 'bpm_range', categoria: 'Meditazione', valore: '90-40' })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/guida', { campo: 'style_extra', valori: ['<script>x</script>'] })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/percorso-inesistente', {})).codice, 404);
+});
+
+test('controllo: le note per genere vengono validate', async () => {
+  assert.equal((await controllo.gestisci('/api/controllo/nota', { nome: 'Genere inventato', testo: 'piu assoli' })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/nota', { nome: 'Meditazione', testo: 'ab' })).codice, 400);
+  assert.equal((await controllo.gestisci('/api/controllo/nota', { nome: 'Meditazione', testo: '<b>x</b>' })).codice, 400);
 });
