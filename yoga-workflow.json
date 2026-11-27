@@ -4,7 +4,7 @@
   "active": false,
   "nodes": [
     {
-      "id": "4ecec789-eaed-48a9-a594-98307c7c3cb5",
+      "id": "5704a5c7-d4ea-49ee-a01f-f363e2ff1ce1",
       "name": "Ogni minuto",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
@@ -24,7 +24,7 @@
       ]
     },
     {
-      "id": "87d576b3-e844-4a94-acac-759ad80b0c89",
+      "id": "0ae62b48-c51f-45fe-8d5e-89ae4ad25b97",
       "name": "1 Leggi stato",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -37,7 +37,7 @@
       ]
     },
     {
-      "id": "6923850f-ba50-4ef4-83df-0dee3c10733d",
+      "id": "b2d0d5fb-a2c5-4f12-a11b-c95d3749bd5c",
       "name": "Pipeline occupata?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
@@ -70,7 +70,7 @@
       ]
     },
     {
-      "id": "fa61ec58-7959-4616-b8e5-2e7d052bc82f",
+      "id": "4b0a1863-fcbc-436c-bfed-f52b00d8c002",
       "name": "Render in corso?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
@@ -103,7 +103,7 @@
       ]
     },
     {
-      "id": "abf7a79c-20e4-49d2-ab09-c647102cea6d",
+      "id": "9c76d6f4-e949-44ff-855f-c2bc1dff03da",
       "name": "2 Controlla render",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -116,7 +116,7 @@
       ]
     },
     {
-      "id": "8c210ee1-43ee-45e7-9bfa-f94ea36c50ca",
+      "id": "7b9bcfe0-2443-4f2b-967e-a02a01e68784",
       "name": "Render concluso?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
@@ -148,7 +148,7 @@
       ]
     },
     {
-      "id": "e08a554d-3839-49ef-b2f4-2ec5f8d3c244",
+      "id": "1755b13b-af24-4b4e-b2f4-668e7276c5d1",
       "name": "3a Scarica audio",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "id": "2e202f6e-662a-438f-b3fb-32f85b2631c1",
+      "id": "ee3b71ef-99be-45fe-a2ca-24d79be74a0b",
       "name": "3b Scrivi metadati",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -174,7 +174,7 @@
       ]
     },
     {
-      "id": "623e0d4b-074c-405e-9403-1bf4f17d3821",
+      "id": "e02e55f0-0058-46e6-9546-21488196b36e",
       "name": "3c Controllo qualita",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -187,7 +187,7 @@
       ]
     },
     {
-      "id": "3f55748b-470c-41ee-a351-47a460ed3c2b",
+      "id": "1d08ebdd-2a79-478f-b1e3-67d594cff465",
       "name": "3d1 Prepara caricamento",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -200,7 +200,7 @@
       ]
     },
     {
-      "id": "7f68a5a8-68da-414f-acce-8a260497fb2c",
+      "id": "916d0930-1973-41f5-a75c-60e2db05786e",
       "name": "3d2 Carica su iBroadcast",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -213,7 +213,7 @@
       ]
     },
     {
-      "id": "b3389a2c-54a4-40d5-8bf0-3632f7306153",
+      "id": "cdfd1134-49e9-430e-bdf5-5668ca80349b",
       "name": "3d3 Recupero tag e playlist",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -226,7 +226,7 @@
       ]
     },
     {
-      "id": "695526a6-a505-49e5-a1d1-c524c79fb967",
+      "id": "4dde169c-e1a9-4b70-aa94-6d5cc630d065",
       "name": "3d4 Notifica e registrazione",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -239,7 +239,7 @@
       ]
     },
     {
-      "id": "27a087a7-3cae-4055-8a45-c8bfff1f78f3",
+      "id": "905ccccf-cdc4-477f-a6a2-59698056d207",
       "name": "4 Feedback e miglioramento",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -252,7 +252,7 @@
       ]
     },
     {
-      "id": "91ff6d0d-1941-404f-939b-1d37153cc100",
+      "id": "bb8ac072-cd78-4868-99cd-614fd4c975ac",
       "name": "5a Scegli ricetta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -265,7 +265,7 @@
       ]
     },
     {
-      "id": "28bf99c4-0c07-4041-b238-01b21032b507",
+      "id": "7b925775-1e3b-4d20-9dee-7a92fa0f9e65",
       "name": "5b Titolo (modello)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -278,7 +278,7 @@
       ]
     },
     {
-      "id": "08648d2e-fa4f-4a85-b005-cf358fbc9bc1",
+      "id": "023b7ff9-42e1-4301-b074-079eeeb145e9",
       "name": "5c Componi concept",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -291,7 +291,7 @@
       ]
     },
     {
-      "id": "fc4c0f3e-c3d9-4407-9746-694e2e8b8ac4",
+      "id": "01a00573-8835-4699-904d-bd96e84f05f3",
       "name": "6 Invia render",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -304,7 +304,7 @@
       ]
     },
     {
-      "id": "e57f9392-9788-4c35-8920-fcc5c9540260",
+      "id": "cc9355ea-283c-41f9-bdb0-fdc6a34608fc",
       "name": "7 Scrivi stato",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -317,7 +317,7 @@
       ]
     },
     {
-      "id": "3fe70d2b-c367-46fc-8b2a-592f7184b6d8",
+      "id": "0dcfb08e-9296-453f-bfe1-419080a612a5",
       "name": "9 Riflessione giornaliera",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -330,7 +330,7 @@
       ]
     },
     {
-      "id": "d6045571-0817-41cc-9fda-50ada8378a12",
+      "id": "e54ae6fc-45fc-4d4c-807e-0a586d946884",
       "name": "10 Voti da iBroadcast",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -343,7 +343,7 @@
       ]
     },
     {
-      "id": "cbc369f0-c69b-4f14-bcb3-0e0d9363ee77",
+      "id": "a40fed6c-7d01-45ad-87ce-ff4f9b1dcf6f",
       "name": "8a Comandi Telegram",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -356,7 +356,7 @@
       ]
     },
     {
-      "id": "7343c8b1-b391-42da-8cf3-b6d2e63ccce8",
+      "id": "ff9ed74f-1d13-4b4d-a194-afb9eb8bbf20",
       "name": "8b Avvisi Telegram",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,

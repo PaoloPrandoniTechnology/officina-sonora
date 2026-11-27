@@ -209,6 +209,72 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
+
+  /* ---------- sezione Controllo ---------- */
+  [hidden] { display: none !important; }
+  .sub-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; width: fit-content; max-width: 100%; }
+  .sub-nav button { all: unset; cursor: pointer; padding: 7px 14px; border-radius: 9px; color: var(--muted); font-size: 13px; transition: all .2s; }
+  .sub-nav button:hover { color: var(--text); }
+  .sub-nav button[aria-pressed="true"] { background: rgba(94,234,212,.12); color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+  .btn { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 9px; font-size: 13px; font-weight: 600; background: rgba(94,234,212,.12); color: var(--accent); border: 1px solid rgba(94,234,212,.32); transition: transform .15s, background .2s, box-shadow .2s; white-space: nowrap; }
+  .btn:hover { background: rgba(94,234,212,.2); box-shadow: 0 6px 18px -8px rgba(94,234,212,.5); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.warn { background: rgba(251,191,36,.12); color: var(--warn); border-color: rgba(251,191,36,.35); }
+  .btn.danger { background: rgba(248,113,113,.12); color: var(--danger); border-color: rgba(248,113,113,.35); }
+  .btn.ghost { background: transparent; color: var(--muted); border-color: var(--line2); }
+  .btn.small { padding: 5px 10px; font-size: 12px; }
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+  .field { background: rgba(5,7,11,.45); border: 1px solid var(--line2); border-radius: 9px; padding: 8px 10px; color: var(--text); font: inherit; min-width: 0; transition: border-color .2s, box-shadow .2s; }
+  .field:focus { outline: none; border-color: rgba(94,234,212,.55); box-shadow: 0 0 0 3px rgba(94,234,212,.12); }
+  select.field { cursor: pointer; }
+  .field.num { width: 92px; text-align: right; font-family: var(--mono); }
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent2)) 0 / var(--p, 50%) 100% no-repeat, rgba(148,163,184,.18); outline: none; cursor: pointer; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(94,234,212,.22), 0 2px 8px rgba(0,0,0,.5); transition: transform .15s; }
+  input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
+  input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: #fff; }
+  .switch { position: relative; display: inline-block; width: 40px; height: 22px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch span { position: absolute; inset: 0; border-radius: 999px; background: rgba(148,163,184,.25); transition: background .2s; cursor: pointer; }
+  .switch span::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+  .switch input:checked + span { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .switch input:checked + span::after { transform: translateX(18px); }
+  .switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .prow { display: grid; grid-template-columns: minmax(180px, 1.1fr) minmax(200px, 2fr) auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .prow:last-child { border-bottom: 0; }
+  .prow .nm { font-weight: 600; }
+  .prow .ds { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .prow .ctl { display: flex; align-items: center; gap: 10px; }
+  .prow .ctl input[type="range"] { flex: 1; min-width: 120px; }
+  .badge { display: inline-block; font-size: 10.5px; padding: 2px 7px; border-radius: 6px; background: rgba(129,140,248,.15); color: #a5b4fc; border: 1px solid rgba(129,140,248,.3); margin-left: 6px; vertical-align: middle; }
+  .badge.def { background: rgba(148,163,184,.1); color: var(--faint); border-color: var(--line); }
+  @media (max-width: 880px) { .prow { grid-template-columns: 1fr; } }
+  .cgroup { margin-bottom: 14px; }
+  .cgroup h3 { margin: 0 0 4px; font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: .02em; }
+  .kpi-mini { display: flex; flex-direction: column; gap: 4px; }
+  .kpi-mini b { font-size: 22px; font-weight: 650; letter-spacing: -.01em; }
+  .kpi-mini span { color: var(--muted); font-size: 12px; }
+  .stato-on { color: var(--ok); } .stato-off { color: var(--warn); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 30px; }
+  .chipx { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 999px; background: rgba(94,234,212,.08); border: 1px solid rgba(94,234,212,.25); font-size: 12.5px; }
+  .chipx.avoid { background: rgba(248,113,113,.08); border-color: rgba(248,113,113,.28); }
+  .chipx button { all: unset; cursor: pointer; width: 18px; height: 18px; border-radius: 50%; text-align: center; color: var(--muted); line-height: 18px; }
+  .chipx button:hover { background: rgba(248,113,113,.2); color: var(--danger); }
+  .addrow { display: flex; gap: 8px; }
+  .addrow .field { flex: 1; }
+  .gtable td input[type="range"] { width: 160px; }
+  .gtable td { white-space: nowrap; }
+  .gtable .nm { font-weight: 600; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(3,5,9,.6); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 50; animation: fadeIn .2s ease; }
+  .modal { background: var(--surface-solid); border: 1px solid var(--line2); border-radius: 16px; padding: 22px; max-width: 420px; width: calc(100% - 32px); box-shadow: 0 30px 80px -20px rgba(0,0,0,.8); animation: su .25s cubic-bezier(.2,.7,.2,1); }
+  .modal h3 { margin: 0 0 8px; font-size: 16px; }
+  .modal p { color: var(--muted); margin: 0 0 18px; font-size: 13.5px; }
+  .modal .acts { display: flex; gap: 10px; justify-content: flex-end; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .toasts { position: fixed; right: 18px; bottom: 18px; display: grid; gap: 8px; z-index: 60; }
+  .toast { min-width: 240px; max-width: 380px; padding: 11px 14px; border-radius: 11px; background: var(--surface-solid); border: 1px solid var(--line2); box-shadow: 0 16px 40px -18px rgba(0,0,0,.8); font-size: 13px; animation: su .3s cubic-bezier(.2,.7,.2,1); border-left: 3px solid var(--accent); }
+  .toast.err { border-left-color: var(--danger); }
+  .toast.out { opacity: 0; transition: opacity .4s; }
 </style>
 </head>
 <body>
@@ -225,6 +291,7 @@
       <button data-tab="voti"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l1.8 3.8 4.2.5-3.1 2.9.8 4.1L8 11.2 4.3 13.3l.8-4.1L2 6.3l4.2-.5z"/></svg>Voti</button>
       <button data-tab="qualita"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/></svg>Qualità</button>
       <button data-tab="libreria"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 6.5h12"/></svg>Libreria</button>
+      <button data-tab="controllo"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.3 3.3l1.4 1.4M11.3 11.3l1.4 1.4M3.3 12.7l1.4-1.4M11.3 4.7l1.4-1.4"/></svg>Controllo</button>
       <button data-tab="log"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h7M3 12h9"/></svg>Log e sistema</button>
     </nav>
     <div class="sidefoot">Solo lettura · 127.0.0.1</div>
@@ -374,6 +441,23 @@
       </div>
     </section>
 
+    <!-- CONTROLLO: sottosezioni separate; ogni modifica viene validata dal gateway e registrata nello storico -->
+    <section class="tab" id="t-controllo">
+      <div class="sub-nav" id="csub" role="tablist">
+        <button data-s="produzione" aria-pressed="true">Produzione</button>
+        <button data-s="parametri" aria-pressed="false">Parametri</button>
+        <button data-s="generi" aria-pressed="false">Generi</button>
+        <button data-s="guida" aria-pressed="false">Linee guida</button>
+        <button data-s="storico" aria-pressed="false">Storico</button>
+      </div>
+      <div class="grid" id="cRiepilogo" style="margin-bottom:14px"></div>
+      <div id="c-produzione" class="cpane"></div>
+      <div id="c-parametri" class="cpane" hidden></div>
+      <div id="c-generi" class="cpane" hidden></div>
+      <div id="c-guida" class="cpane" hidden></div>
+      <div id="c-storico" class="cpane" hidden></div>
+    </section>
+
     <!-- LOG -->
     <section class="tab" id="t-log">
       <div class="grid">
@@ -395,6 +479,12 @@
         </div>
       </div>
     </section>
+
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+    <div class="modal-bg" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTit">
+      <div class="modal"><h3 id="mTit"></h3><p id="mTesto"></p>
+        <div class="acts"><button class="btn ghost" id="mNo">Annulla</button><button class="btn danger" id="mSi">Conferma</button></div></div>
+    </div>
 
     <footer>Dati letti dal gateway locale. Aggiornamento in tempo reale ogni 5 secondi, analisi della libreria ogni 30 secondi.</footer>
   </main>
@@ -728,8 +818,313 @@
     }).join('') || '<div class="empty">Nessun genere corrisponde alla ricerca.</div>';
   }
 
+  // ---------- controllo ----------
+  let ctrl = null;
+  let ctrlSub = 'produzione';
+  const CTRL_SEZIONI = ['produzione', 'parametri', 'generi', 'guida', 'storico'];
+
+  function toast(testo, tipo) {
+    const box = $('#toasts');
+    const t = el('div', { class: 'toast' + (tipo === 'err' ? ' err' : '') }, testo);
+    box.appendChild(t);
+    setTimeout(() => t.classList.add('out'), 3200);
+    setTimeout(() => t.remove(), 3700);
+  }
+  function chiedi(titolo, testo, etichetta = 'Conferma') {
+    return new Promise((ok) => {
+      const m = $('#modal');
+      $('#mTit').textContent = titolo;
+      $('#mTesto').textContent = testo;
+      $('#mSi').textContent = etichetta;
+      m.hidden = false;
+      const chiudi = (esito) => {
+        m.hidden = true;
+        $('#mSi').onclick = null; $('#mNo').onclick = null; m.onclick = null;
+        ok(esito);
+      };
+      $('#mSi').onclick = () => chiudi(true);
+      $('#mNo').onclick = () => chiudi(false);
+      m.onclick = (e) => { if (e.target === m) chiudi(false); };
+      document.addEventListener('keydown', function k(e) {
+        if (m.hidden) { document.removeEventListener('keydown', k); return; }
+        if (e.key === 'Escape') { document.removeEventListener('keydown', k); chiudi(false); }
+      });
+      $('#mSi').focus();
+    });
+  }
+  // invio di una modifica: intestazione X-Controllo obbligatoria lato gateway
+  async function invia(url, corpo) {
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Controllo': '1' }, body: JSON.stringify(corpo), cache: 'no-store' });
+    const j = await r.json().catch(() => ({ ok: false, error: 'risposta non valida' }));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  }
+  async function esegui(fn, messaggio) {
+    try {
+      await fn();
+      if (messaggio) toast(messaggio, 'ok');
+      await caricaControllo(true);
+    } catch (e) {
+      toast(e.message, 'err');
+      await caricaControllo(true);
+    }
+  }
+  function alPasso(input) {
+    const min = Number(input.min), max = Number(input.max);
+    input.style.setProperty('--p', ((Number(input.value) - min) / (max - min) * 100) + '%');
+  }
+
+  async function caricaControllo(silenzioso) {
+    try {
+      ctrl = await leggi('/api/controllo');
+      disegnaControllo();
+    } catch (e) {
+      if (!silenzioso) toast('Impossibile leggere i dati di controllo: ' + e.message, 'err');
+    }
+  }
+
+  function disegnaControllo() {
+    if (!ctrl) return;
+    const personalizzati = ctrl.parametri.filter((p) => p.personalizzato).length;
+    const sospesi = ctrl.generi.filter((g) => !g.attivo).length;
+    const pausa = ctrl.comandi.pausa === true;
+    $('#cRiepilogo').innerHTML = `
+      <div class="card kpi c3"><div class="kpi-mini"><b class="${pausa ? 'stato-off' : 'stato-on'}">${pausa ? 'In pausa' : 'Attiva'}</b><span>stato della produzione</span></div></div>
+      <div class="card kpi c3"><div class="kpi-mini"><b>${n0(statoUltimo ? statoUltimo.pipeline.coda : 0)}</b><span>brani in coda</span></div></div>
+      <div class="card kpi c3"><div class="kpi-mini"><b>${n0(personalizzati)}</b><span>parametri personalizzati</span></div></div>
+      <div class="card kpi c3"><div class="kpi-mini"><b>${n0(sospesi)}</b><span>generi sospesi</span></div></div>`;
+    document.querySelectorAll('#csub button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.s === ctrlSub ? 'true' : 'false'));
+    CTRL_SEZIONI.forEach((s) => { $('#c-' + s).hidden = s !== ctrlSub; });
+    if (ctrlSub === 'produzione') disegnaProduzione();
+    if (ctrlSub === 'parametri') disegnaParametri();
+    if (ctrlSub === 'generi') disegnaGeneri();
+    if (ctrlSub === 'guida') disegnaGuida();
+    if (ctrlSub === 'storico') disegnaStorico();
+  }
+
+  function disegnaProduzione() {
+    const pausa = ctrl.comandi.pausa === true;
+    const pendenti = [];
+    if (ctrl.comandi.svuotaCoda) pendenti.push('svuotamento della coda');
+    if (ctrl.comandi.produciGenere) pendenti.push('genere forzato: ' + ctrl.comandi.produciGenere);
+    const opzioni = ctrl.generi.map((g) => `<option value="${esc(g.nome)}">${esc(g.nome)}</option>`).join('');
+    $('#c-produzione').innerHTML = `
+      <div class="grid">
+        <div class="card c6">
+          <h2>Stato della produzione</h2>
+          <p class="muted" style="margin:0 0 14px">${pausa
+            ? 'La produzione è in pausa: il render in corso finisce, ma non ne partono di nuovi.'
+            : 'La produzione è attiva: il sistema crea un brano alla volta.'}</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            ${pausa
+              ? '<button class="btn" id="bPausa">Riprendi la produzione</button>'
+              : '<button class="btn warn" id="bPausa">Metti in pausa</button>'}
+          </div>
+        </div>
+        <div class="card c6">
+          <h2>Coda</h2>
+          <p class="muted" style="margin:0 0 14px">I brani in attesa di render. Svuotarla non interrompe il brano in lavorazione.</p>
+          <button class="btn danger" id="bCoda">Svuota la coda</button>
+        </div>
+        <div class="card c12">
+          <h2>Produci ora un genere <small>ha la precedenza sulla rotazione, una sola volta</small></h2>
+          <div class="addrow" style="max-width:640px">
+            <select class="field" id="selGen">${opzioni}</select>
+            <button class="btn" id="bGen">Produci questo genere</button>
+          </div>
+        </div>
+        <div class="card c12">
+          <h2>Comandi in attesa</h2>
+          ${pendenti.length ? pendenti.map((p) => `<div class="srv"><span>${esc(p)}</span><span class="pill w">in attesa</span></div>`).join('') : '<div class="empty">Nessun comando in attesa.</div>'}
+        </div>
+      </div>`;
+    $('#bPausa').onclick = () => esegui(() => invia('/api/controllo/comando', { azione: pausa ? 'riprendi' : 'pausa' }),
+      pausa ? 'Produzione ripresa' : 'Produzione in pausa');
+    $('#bCoda').onclick = async () => {
+      if (await chiedi('Svuotare la coda?', 'I brani in attesa verranno eliminati dalla coda. Il render in corso non viene toccato.', 'Svuota')) {
+        esegui(() => invia('/api/controllo/comando', { azione: 'svuota_coda' }), 'Coda svuotata al prossimo giro');
+      }
+    };
+    $('#bGen').onclick = () => {
+      const g = $('#selGen').value;
+      esegui(() => invia('/api/controllo/comando', { azione: 'produci', genere: g }), 'Genere in produzione: ' + g);
+    };
+  }
+
+  function disegnaParametri() {
+    const gruppi = {};
+    for (const p of ctrl.parametri) (gruppi[p.gruppo] = gruppi[p.gruppo] || []).push(p);
+    const html = Object.entries(gruppi).map(([g, lista]) => `
+      <div class="card cgroup"><h3>${esc(g)}</h3>
+        ${lista.map((p) => `
+          <div class="prow">
+            <div><div class="nm">${esc(p.etichetta)}${p.personalizzato ? '<span class="badge">personalizzato</span>' : '<span class="badge def">predefinito</span>'}</div>
+              <div class="ds">${esc(p.descrizione)}</div></div>
+            <div class="ctl">
+              <input type="range" min="${p.min}" max="${p.max}" step="${p.passo}" value="${p.valore}" data-k="${esc(p.chiave)}" aria-label="${esc(p.etichetta)}">
+              <input class="field num" type="number" min="${p.min}" max="${p.max}" step="${p.passo}" value="${p.valore}" data-n="${esc(p.chiave)}" aria-label="${esc(p.etichetta)} valore">
+              <span class="muted" style="min-width:34px;font-size:12px">${esc(p.unita)}</span>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button class="btn small" data-salva="${esc(p.chiave)}">Salva</button>
+              <button class="btn small ghost" data-def="${esc(p.chiave)}" data-val="${p.def}" ${p.personalizzato ? '' : 'disabled'}>Predefinito</button>
+            </div>
+          </div>`).join('')}
+      </div>`).join('');
+    $('#c-parametri').innerHTML = html;
+    const cerca = (k) => ctrl.parametri.find((p) => p.chiave === k);
+    $('#c-parametri').querySelectorAll('input[type="range"]').forEach((r) => {
+      alPasso(r);
+      r.addEventListener('input', () => {
+        const n = document.querySelector(`input[data-n="${r.dataset.k}"]`);
+        n.value = r.value; alPasso(r);
+      });
+    });
+    $('#c-parametri').querySelectorAll('input[type="number"]').forEach((n) => {
+      n.addEventListener('input', () => {
+        const r = document.querySelector(`input[data-k="${n.dataset.n}"]`);
+        if (n.value !== '') { r.value = n.value; alPasso(r); }
+      });
+    });
+    $('#c-parametri').querySelectorAll('button[data-salva]').forEach((b) => {
+      b.onclick = () => {
+        const k = b.dataset.salva;
+        const v = Number(document.querySelector(`input[data-n="${k}"]`).value);
+        const p = cerca(k);
+        if (Number.isNaN(v) || v < p.min || v > p.max) { toast(`${p.etichetta}: valore tra ${p.min} e ${p.max}`, 'err'); return; }
+        esegui(() => invia('/api/controllo/parametro', { chiave: k, valore: v }), p.etichetta + ' salvato');
+      };
+    });
+    $('#c-parametri').querySelectorAll('button[data-def]').forEach((b) => {
+      b.onclick = async () => {
+        const k = b.dataset.def, p = cerca(k);
+        if (await chiedi('Ripristinare il valore predefinito?', `${p.etichetta} tornerà a ${p.def}${p.unita ? ' ' + p.unita : ''}.`, 'Ripristina')) {
+          esegui(() => invia('/api/controllo/parametro', { chiave: k, valore: p.def }), p.etichetta + ' ripristinato');
+        }
+      };
+    });
+  }
+
+  function disegnaGeneri() {
+    // La struttura (barra di ricerca e tabella) si crea una sola volta; a ogni modifica si aggiorna solo il corpo
+    if (!$('#gTbody')) {
+      $('#c-generi').innerHTML = `
+      <div class="toolbar">
+        <input class="search" id="cGenQ" type="search" placeholder="Cerca un genere…" aria-label="Cerca genere">
+        <button class="btn small" id="bAttTutti">Attiva tutti</button>
+        <button class="btn small ghost" id="bPesiUno">Pesi a 1</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="scroll"><table class="gtable">
+          <thead><tr><th>Genere</th><th class="num">Brani</th><th>Attivo</th><th>Peso di frequenza</th></tr></thead>
+          <tbody id="gTbody"></tbody>
+        </table></div>
+      </div>
+      <p class="muted" style="font-size:12.5px;margin-top:10px">Il peso indica quanto spesso esce un genere: 1 è la norma, 0 non esce mai, 5 esce cinque volte più spesso. I generi con pochi brani restano privilegiati dalla rotazione.</p>`;
+      $('#cGenQ').addEventListener('input', () => disegnaGeneri());
+      $('#bAttTutti').onclick = async () => {
+        const sospesi = ctrl.generi.filter((g) => !g.attivo);
+        if (!sospesi.length) { toast('Tutti i generi sono già attivi', 'ok'); return; }
+        await esegui(async () => { for (const g of sospesi) await invia('/api/controllo/genere', { nome: g.nome, attivo: true }); }, 'Generi attivati: ' + sospesi.length);
+      };
+      $('#bPesiUno').onclick = async () => {
+        const diversi = ctrl.generi.filter((g) => g.peso !== 1);
+        if (!diversi.length) { toast('Tutti i pesi sono già a 1', 'ok'); return; }
+        if (await chiedi('Riportare tutti i pesi a 1?', `Verranno riportati a 1 i pesi di ${diversi.length} generi.`, 'Riporta a 1')) {
+          esegui(async () => { for (const g of diversi) await invia('/api/controllo/genere', { nome: g.nome, peso: 1 }); }, 'Pesi riportati a 1');
+        }
+      };
+    }
+    const q = $('#cGenQ').value.trim().toLowerCase();
+    const lista = ctrl.generi.filter((g) => g.nome.toLowerCase().includes(q));
+    $('#gTbody').innerHTML = lista.map((g) => `
+            <tr>
+              <td class="nm">${esc(g.nome)}</td>
+              <td class="num">${n0(g.brani)}</td>
+              <td><label class="switch"><input type="checkbox" data-att="${esc(g.nome)}" ${g.attivo ? 'checked' : ''}><span></span></label></td>
+              <td><div style="display:flex;align-items:center;gap:10px">
+                <input type="range" min="0" max="5" step="0.05" value="${g.peso}" data-peso="${esc(g.nome)}" aria-label="peso ${esc(g.nome)}">
+                <span class="num" style="min-width:40px">${n1(g.peso)}</span></div></td>
+            </tr>`).join('') || '<tr><td colspan="4" class="empty">Nessun genere corrisponde.</td></tr>';
+    $('#c-generi').querySelectorAll('input[data-att]').forEach((c) => {
+      c.onchange = () => esegui(() => invia('/api/controllo/genere', { nome: c.dataset.att, attivo: c.checked }),
+        `${c.dataset.att}: ${c.checked ? 'attivato' : 'sospeso'}`);
+    });
+    $('#c-generi').querySelectorAll('input[data-peso]').forEach((r) => {
+      alPasso(r);
+      r.addEventListener('input', () => { r.parentElement.querySelector('span').textContent = n1(Number(r.value)); alPasso(r); });
+      r.onchange = () => esegui(() => invia('/api/controllo/genere', { nome: r.dataset.peso, peso: Number(r.value) }),
+        `${r.dataset.peso}: peso ${n1(Number(r.value))}`);
+    });
+  }
+
+  function disegnaGuida() {
+    const g = ctrl.guida;
+    const chipList = (campo, lista, classe) => `
+      <div class="chips">${lista.map((v, i) => `<span class="chipx ${classe}">${esc(v)}<button aria-label="rimuovi" data-rm="${campo}" data-i="${i}">×</button></span>`).join('') || '<span class="muted" style="font-size:12.5px">Nessuna voce</span>'}</div>
+      <div class="addrow"><input class="field" id="in-${campo}" placeholder="Aggiungi una voce e premi Invio" maxlength="160"><button class="btn small" data-add="${campo}">Aggiungi</button></div>`;
+    const bpm = Object.entries(g.bpm_range).sort((a, b) => a[0].localeCompare(b[0]));
+    $('#c-guida').innerHTML = `
+      <div class="grid">
+        <div class="card c6"><h2>Da aggiungere allo stile <small>${n0(g.style_extra.length)} voci</small></h2>${chipList('style_extra', g.style_extra, '')}</div>
+        <div class="card c6"><h2>Da evitare nello stile <small>${n0(g.style_avoid.length)} voci</small></h2>${chipList('style_avoid', g.style_avoid, 'avoid')}</div>
+        <div class="card c6"><h2>Note per il sistema <small>lette dalla revisione periodica</small></h2>
+          ${g.note.map((n, i) => `<div class="srv"><span style="font-size:13px">${esc(n)}</span><button class="btn small ghost" data-rm="note" data-i="${i}">Rimuovi</button></div>`).join('') || '<div class="empty">Nessuna nota.</div>'}
+          <div class="addrow" style="margin-top:10px"><input class="field" id="in-note" placeholder="Scrivi una nota, per esempio: più pause tra le sezioni" maxlength="300"><button class="btn small" data-add="note">Aggiungi</button></div></div>
+        <div class="card c6"><h2>Fasce di bpm per genere <small>formato minimo-massimo</small></h2>
+          <div class="scroll" style="max-height:340px;overflow:auto"><table>
+            ${bpm.map(([nome, v]) => `<tr><td>${esc(nome)}</td><td class="num" style="width:120px"><input class="field num" style="width:110px" value="${esc(v)}" data-bpm="${esc(nome)}" aria-label="bpm ${esc(nome)}"></td></tr>`).join('') || '<tr><td class="muted">Nessuna fascia salvata: usa quelle del catalogo.</td></tr>'}
+          </table></div></div>
+        <div class="card c12 muted" style="font-size:12.5px">Versione linee guida ${esc(g.versione ?? '—')} · aggiornate ${data(g.aggiornato)}. Le modifiche vengono applicate al prossimo brano.</div>
+      </div>`;
+    const salvaLista = (campo, lista) => esegui(() => invia('/api/controllo/guida', { campo, valori: lista }), 'Linee guida aggiornate');
+    $('#c-guida').querySelectorAll('button[data-rm]').forEach((b) => {
+      b.onclick = () => {
+        const campo = b.dataset.rm, i = Number(b.dataset.i);
+        const lista = (campo === 'note' ? g.note : g[campo]).filter((_, k) => k !== i);
+        salvaLista(campo, lista);
+      };
+    });
+    $('#c-guida').querySelectorAll('button[data-add]').forEach((b) => {
+      b.onclick = () => {
+        const campo = b.dataset.add, input = $('#in-' + campo);
+        const testo = input.value.trim();
+        if (!testo) { toast('Scrivi prima una voce', 'err'); return; }
+        const lista = (campo === 'note' ? g.note : g[campo]).concat([testo]);
+        salvaLista(campo, lista);
+      };
+    });
+    ['style_extra', 'style_avoid', 'note'].forEach((c) => {
+      const input = $('#in-' + c);
+      if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') document.querySelector(`button[data-add="${c}"]`).click(); });
+    });
+    $('#c-guida').querySelectorAll('input[data-bpm]').forEach((i) => {
+      i.onchange = () => esegui(() => invia('/api/controllo/guida', { campo: 'bpm_range', categoria: i.dataset.bpm, valore: i.value.trim() }),
+        `Bpm di ${i.dataset.bpm}: ${i.value.trim()}`);
+    });
+  }
+
+  function disegnaStorico() {
+    const righe = ctrl.storico || [];
+    const breve = (v) => { const s = typeof v === 'string' ? v : JSON.stringify(v); return s.length > 90 ? s.slice(0, 87) + '…' : s; };
+    $('#c-storico').innerHTML = `
+      <div class="card" style="padding:0;overflow:hidden"><div class="scroll"><table>
+        <thead><tr><th>Quando</th><th>Sezione</th><th>Voce</th><th>Prima</th><th>Dopo</th></tr></thead>
+        <tbody>${righe.map((r) => `<tr><td class="muted">${data(r.ts)}</td><td><span class="tag">${esc(r.sezione)}</span></td><td>${esc(r.chiave)}</td>
+          <td class="muted" style="font-family:var(--mono);font-size:11.5px">${esc(breve(r.prima))}</td><td style="font-family:var(--mono);font-size:11.5px">${esc(breve(r.dopo))}</td></tr>`).join('') || '<tr><td colspan="5" class="empty">Nessuna modifica registrata.</td></tr>'}</tbody>
+      </table></div></div>
+      <p class="muted" style="font-size:12.5px;margin-top:10px">Ogni modifica fatta da questa pagina è registrata qui, con il valore precedente. Per tornare indietro, riporta il valore precedente dalla sezione corrispondente.</p>`;
+  }
+
+  document.getElementById('csub').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-s]');
+    if (!b) return;
+    ctrlSub = b.dataset.s;
+    disegnaControllo();
+  });
+
   // ---------- navigazione ----------
-  const TITOLI = { panoramica: 'Panoramica', render: 'Render', generi: 'Generi', voti: 'Voti', qualita: 'Qualità', libreria: 'Libreria', log: 'Log e sistema' };
+  const TITOLI = { panoramica: 'Panoramica', render: 'Render', generi: 'Generi', voti: 'Voti', qualita: 'Qualità', libreria: 'Libreria', controllo: 'Controllo', log: 'Log e sistema' };
   function vai(tab) {
     if (!TITOLI[tab]) tab = 'panoramica';
     document.querySelectorAll('section.tab').forEach((s) => s.classList.toggle('on', s.id === 't-' + tab));
@@ -737,6 +1132,7 @@
     $('#titolo').textContent = TITOLI[tab];
     if (location.hash !== '#' + tab) history.replaceState(null, '', '#' + tab);
     window.scrollTo({ top: 0, behavior: 'instant' });
+    if (tab === 'controllo') caricaControllo();
   }
   document.getElementById('nav').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-tab]');
