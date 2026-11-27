@@ -12,7 +12,7 @@ const L = new Function('require', LIB + '\nreturn { CFG, extractAbc, componiStil
 const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'];
 
 // Esegue il blocco 6 con un motore finto; ritorna il corpo inviato a /synth e lo stato
-async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0, pianoFallito } = {}) {
+async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0, pianoFallito = true } = {}) {
   const finta = `
     CFG.comandi = {}; log = () => {}; engineUp = async () => true; saveState = () => {}; gw = async () => ({});
     req = async (m, url, o) => {
@@ -120,10 +120,12 @@ test('blocco 5d: voci e richieste non componibili restano al motore', async () =
 
 test('blocco 6: prima il solo score; col ripiego il nostro; dopo un fallimento lo scrive il motore', async () => {
   const props = elenco('yue2-instrumental-kto');
-  const primo = await invia('Surf-rock-strumentale', { props, abc: 'X:1' });
+  const primo = await invia('Surf-rock-strumentale', { props, abc: 'X:1', pianoFallito: false });
   assert.equal(primo.corpo.duration, 1);
   assert.equal(primo.corpo.abc, undefined);
   assert.equal(primo.job.fase, 'piano');
+  assert.equal(primo.corpo.adapters, undefined, 'lo score si chiede senza LoRA');
+  assert.ok(primo.job.adapters.length, 'le LoRA restano per il render');
   const ripiego = await invia('Surf-rock-strumentale', { props, abc: 'X:1', pianoFallito: true });
   assert.equal(ripiego.corpo.abc, 'X:1');
   assert.equal(ripiego.corpo.semantic_sampling.min_tokens, 6750);

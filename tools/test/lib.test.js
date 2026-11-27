@@ -88,6 +88,7 @@ test('numerazione: il progressivo cresce e non si ripete', () => {
 });
 
 test('rotazione: i generi senza brani vengono scelti', () => {
+  L.CFG.generiOverride = {}; // pesi e generi sospesi della produzione non contano
   const guidance = L.readGuidance();
   const conta = {};
   for (const t of L.libraryTracks()) conta[t.meta.categoria] = (conta[t.meta.categoria] || 0) + 1;

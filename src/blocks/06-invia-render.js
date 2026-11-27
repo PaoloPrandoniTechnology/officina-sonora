@@ -38,7 +38,7 @@ try { await gw('/llm/scarica'); } catch (e) { log(`gemma non scaricato: ${e.mess
 // Altrimenti render in un passo, con lo score del compositore (ripiego) o scritto dal motore.
 const piano = !concept.vocale && !concept.attempts && !concept.pianoFallito;
 const nostro = !piano && Boolean(concept.abc) && !concept.attempts;
-const body = piano ? corpoPiano(concept, adapters, seed)
+const body = piano ? corpoPiano(concept, seed)
   : corpoRender(concept, adapters, seed, nostro ? concept.abc : null, nostro ? concept.durata_s : 0);
 const id = await inviaSynth(body);
 if (!id) {

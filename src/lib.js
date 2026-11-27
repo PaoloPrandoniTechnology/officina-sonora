@@ -389,10 +389,10 @@ function richiestaBase(concept, adapters, seed) {
   };
 }
 
-// Solo lo score: un secondo di audio e un passo, il resto della risposta si butta
-function corpoPiano(concept, adapters, seed) {
+// Solo lo score, senza LoRA (agiscono sul render): un secondo di audio e un passo, il resto si butta
+function corpoPiano(concept, seed) {
   return {
-    ...richiestaBase(concept, adapters, seed),
+    ...richiestaBase(concept, [], seed),
     duration: 1,
     steps: 1,
     semantic_sampling: { min_tokens: 1, max_tokens: 25 },

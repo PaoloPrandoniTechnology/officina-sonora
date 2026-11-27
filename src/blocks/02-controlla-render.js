@@ -11,7 +11,7 @@ async function altroPiano(motivo) {
   const c = job.concept;
   if (job.pianoN < PIANI_MAX) {
     const seed = nuovoSeed();
-    const id = await inviaSynth(corpoPiano(c, job.adapters, seed));
+    const id = await inviaSynth(corpoPiano(c, seed));
     if (!id) return 'waiting';
     state.job = { ...job, id, seed, pianoN: job.pianoN + 1, submittedAt: Date.now() };
     log(`score di "${c.titolo}" non usato (${motivo}): ne chiedo un altro`);
