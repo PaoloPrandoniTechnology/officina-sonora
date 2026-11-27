@@ -54,6 +54,56 @@ test('andamento: resa e quota di scarti di un intervallo', () => {
   assert.deepEqual([vuoto.voto, vuoto.scartoPct, vuoto.resa], [null, null, null]);
 });
 
+test('andamento: la resa conta solo i brani con render_s', () => {
+  const lista = [
+    { generato_il: iso(ORA - 3600000), scartato: false, categoria: 'Yin', voto: null, durata_s: 200, render_s: 300 },
+    { generato_il: iso(ORA - 3500000), scartato: false, categoria: 'Yin', voto: null, durata_s: 200, render_s: null },
+  ];
+  const r = andamento.calcola({ brani: lista, errori: [], modifiche: [], genere: '', passo: 'ora', ora: ORA });
+  assert.equal(r.punti.find((x) => x.brani > 0).resa, 1.5);
+  const senza = andamento.calcola({ brani: [lista[1]], errori: [], modifiche: [], genere: '', passo: 'ora', ora: ORA });
+  assert.equal(senza.punti.find((x) => x.brani > 0).resa, null);
+});
+
+test('andamento: fine dell\'ora legale, le due ore 02:00 restano separate', () => {
+  const { spawnSync } = require('child_process');
+  const codice = `
+    const a = require(${JSON.stringify(path.join(__dirname, '..', '..', 'gateway', 'andamento.js'))});
+    const b = (t) => ({ generato_il: t, scartato: false, categoria: 'Yin', voto: null, durata_s: 100, render_s: 100 });
+    // 00:30Z = 02:30 ora legale, 01:30Z = 02:30 ora solare (Roma, 25 ottobre 2026)
+    const r = a.calcola({ brani: [b('2026-10-24T22:10:00Z'), b('2026-10-25T00:30:00Z'), b('2026-10-25T01:30:00Z')], errori: [], modifiche: [], genere: '', passo: 'ora', ora: Date.parse('2026-10-25T03:30:00Z') });
+    console.log(JSON.stringify(r.punti.map((p) => [p.da, p.brani])));`;
+  const out = spawnSync(process.execPath, ['-e', codice], { env: { ...process.env, TZ: 'Europe/Rome' }, encoding: 'utf8' });
+  assert.equal(out.status, 0, out.stderr);
+  const punti = JSON.parse(out.stdout);
+  assert.deepEqual(punti.map((p) => p[0]), ['2026-10-24T22:00:00.000Z', '2026-10-24T23:00:00.000Z', '2026-10-25T00:00:00.000Z', '2026-10-25T01:00:00.000Z', '2026-10-25T02:00:00.000Z', '2026-10-25T03:00:00.000Z']);
+  assert.deepEqual(punti.map((p) => p[1]), [1, 0, 1, 1, 0, 0]);
+});
+
+test('andamento: una modifica delle linee guida dalla plancia compare una volta', () => {
+  const T = Date.parse('2026-11-20T10:00:00Z');
+  const modifiche = [{ ts: iso(T), sezione: 'linee guida', chiave: 'style_extra' }];
+  andamento.aggiungiGuide(modifiche, [
+    { nome: 'guidance.json', versione: 3, aggiornato: iso(T + 2000) },
+    { nome: 'guidance-v2.json', versione: 2, aggiornato: iso(T - 86400000) },
+    { nome: 'guidance-v2b.json', versione: 2, aggiornato: iso(T - 86400000) },
+    { nome: 'guidance-x.json' },
+  ]);
+  assert.deepEqual(modifiche.map((m) => m.chiave), ['style_extra', 'versione 2']);
+});
+
+test('andamento: soglia del voto senza arrotondamenti, giudizio uguale per ora e per giorno', () => {
+  // 3,0 contro 3,196: differenza 0,196, sotto 0,2
+  const dopo = [...ripeti(49, 4), ...ripeti(201, 3)];
+  assert.equal(esito([...conVoti(10, ripeti(10, 3)), ...conVoti(2, dopo)]).voto, 'stabile');
+  // 14 giorni di dati: i punti per ora sono solo 48, ma il giudizio usa tutti i brani
+  const lista = [...conVoti(12, ripeti(10, 3)), ...conVoti(5, [...ripeti(7, 3), ...ripeti(3, 4)])];
+  const per = (passo) => andamento.calcola({ brani: lista, errori: [], modifiche: [], genere: '', passo, ora: ORA }).esito;
+  assert.equal(andamento.calcola({ brani: lista, errori: [], modifiche: [], genere: '', passo: 'ora', ora: ORA }).punti.length, 48);
+  assert.deepEqual(per('ora'), per('giorno'));
+  assert.equal(per('ora').voto, 'migliora');
+});
+
 test('andamento: lista vuota e filtro genere', () => {
   const r = andamento.calcola({ brani: [], errori: [{ ts: iso(ORA - 1000) }], modifiche: [], genere: '', passo: '', ora: ORA });
   assert.deepEqual(r.punti, []);

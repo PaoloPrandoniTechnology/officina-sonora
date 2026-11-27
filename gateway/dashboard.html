@@ -1427,7 +1427,7 @@
       const cx = x(Date.parse(p.da)).toFixed(1), cy = y(p[campo]).toFixed(1), cavo = vuoto(p);
       return `<g><title>${esc(quando(p.da) + ': ' + formato(p[campo]) + dettaglio(p))}</title><circle cx="${cx}" cy="${cy}" r="10" fill="transparent"/><circle cx="${cx}" cy="${cy}" r="4" fill="${cavo ? 'var(--bg)' : '#5eead4'}" stroke="#5eead4" stroke-width="2"/></g>`;
     }).join('');
-    return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(campo)} nel tempo">${g}${linee}<path d="${d}" fill="none" stroke="#5eead4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
+    return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(opz.titolo || '')} nel tempo">${g}${linee}<path d="${d}" fill="none" stroke="#5eead4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
   }
 
   const ESITI = { migliora: ['↑', 'var(--ok)'], stabile: ['→', 'var(--muted)'], peggiora: ['↓', 'var(--danger)'], 'dati insufficienti': ['–', 'var(--faint)'] };
@@ -1446,10 +1446,10 @@
     $('#aEsito').innerHTML = voce('Voto', r.esito.voto) + voce('Scarti', r.esito.scarti) +
       `<div>Passo: <b>${r.passo === 'ora' ? 'per ora' : 'per giorno'}</b></div><div>Modifiche nel periodo: <b>${r.modifiche.length}</b></div>`;
     const p = r.punti, m = r.modifiche, n0f = (v) => String(v).replace('.', ',');
-    $('#aVoto').innerHTML = lineaTempo(p, m, 'voto', { passo: r.passo, min: 1, maxFisso: 5, formato: n0f, vuoto: (x) => x.votati < 5, dettaglio: (x) => ` (${x.votati} voti)` });
-    $('#aScarti').innerHTML = lineaTempo(p, m, 'scartoPct', { passo: r.passo, maxFisso: 100, formato: (v) => n0f(v) + '%', dettaglio: (x) => ` (${x.scartati} su ${x.brani})` });
-    $('#aResa').innerHTML = lineaTempo(p, m, 'resa', { passo: r.passo, formato: n0f, dettaglio: (x) => ` (${x.brani} brani)` });
-    $('#aErrori').innerHTML = lineaTempo(p, m, 'errori', { passo: r.passo, intero: true, formato: n0f });
+    $('#aVoto').innerHTML = lineaTempo(p, m, 'voto', { titolo: 'Voto medio', passo: r.passo, min: 1, maxFisso: 5, formato: n0f, vuoto: (x) => x.votati < 5, dettaglio: (x) => ` (${x.votati} voti)` });
+    $('#aScarti').innerHTML = lineaTempo(p, m, 'scartoPct', { titolo: 'Brani scartati (%)', passo: r.passo, maxFisso: 100, formato: (v) => n0f(v) + '%', dettaglio: (x) => ` (${x.scartati} su ${x.brani})` });
+    $('#aResa').innerHTML = lineaTempo(p, m, 'resa', { titolo: 'Secondi di render per secondo di musica buona', passo: r.passo, formato: n0f, dettaglio: (x) => ` (${x.brani} brani)` });
+    $('#aErrori').innerHTML = lineaTempo(p, m, 'errori', { titolo: 'Errori', passo: r.passo, intero: true, formato: n0f });
   }
   $('#aGenere').addEventListener('change', caricaAndamento);
   $('#aPasso').addEventListener('change', caricaAndamento);

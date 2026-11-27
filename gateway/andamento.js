@@ -16,7 +16,7 @@ const mediaDi = (v) => (v.length ? v.reduce((a, b) => a + b, 0) / v.length : nul
 // Giudizio sugli ultimi 7 giorni contro i 7 precedenti
 function giudizio(prima, dopo, minimo, valore, soglia, piuEMeglio) {
   if (prima.length < minimo || dopo.length < minimo) return 'dati insufficienti';
-  const diff = arrotonda(valore(dopo) - valore(prima), 2) * (piuEMeglio ? 1 : -1);
+  const diff = arrotonda(valore(dopo) - valore(prima), 6) * (piuEMeglio ? 1 : -1);
   return diff >= soglia ? 'migliora' : diff <= -soglia ? 'peggiora' : 'stabile';
 }
 
@@ -28,7 +28,13 @@ function calcola({ brani, errori, modifiche, genere, passo, ora }) {
   if (passo !== 'ora' && passo !== 'giorno') passo = tutti.length && ora - primo < 7 * GIORNO_MS ? 'ora' : 'giorno';
 
   // Intervalli in ora locale
-  const inizio = (ms) => { const d = new Date(ms); if (passo === 'ora') d.setMinutes(0, 0, 0); else d.setHours(0, 0, 0, 0); return d.getTime(); };
+  // per ora si sottrae il tempo trascorso nell'ora: setMinutes(0) sull'ora doppia di fine ora legale salta all'altra
+  const inizio = (ms) => {
+    const d = new Date(ms);
+    if (passo === 'ora') return ms - (d.getMinutes() * 60000 + d.getSeconds() * 1000 + d.getMilliseconds());
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  };
   const seguente = (ms) => { if (passo === 'ora') return ms + ORA_MS; const d = new Date(ms); d.setDate(d.getDate() + 1); return d.getTime(); };
   const starts = [];
   if (tutti.length) {
@@ -45,8 +51,10 @@ function calcola({ brani, errori, modifiche, genere, passo, ora }) {
     const accettati = lista.filter((b) => !b.scartato);
     const voti = accettati.map((b) => b.voto).filter((v) => Number.isInteger(v));
     const scartati = lista.length - accettati.length;
-    const musica = accettati.reduce((a, b) => a + (b.durata_s || 0), 0);
-    const render = lista.reduce((a, b) => a + (b.render_s || 0), 0);
+    // solo i brani con render_s (le schede piu' vecchie non lo hanno), altrimenti la resa risulta piu' bassa
+    const conRender = lista.filter((b) => typeof b.render_s === 'number');
+    const musica = conRender.filter((b) => !b.scartato).reduce((a, b) => a + (b.durata_s || 0), 0);
+    const render = conRender.reduce((a, b) => a + b.render_s, 0);
     return {
       da: new Date(t).toISOString(),
       brani: lista.length,
@@ -54,8 +62,7 @@ function calcola({ brani, errori, modifiche, genere, passo, ora }) {
       scartoPct: lista.length ? arrotonda((scartati / lista.length) * 100, 1) : null,
       voto: voti.length ? arrotonda(mediaDi(voti), 2) : null,
       votati: voti.length,
-      // le schede piu' vecchie non hanno render_s: senza nessun dato di render la resa manca, non e' zero
-      resa: musica && lista.some((b) => typeof b.render_s === 'number') ? arrotonda(render / musica, 2) : null,
+      resa: musica ? arrotonda(render / musica, 2) : null,
       errori: nErrori,
     };
   });
@@ -102,24 +109,31 @@ function schede(dir, scartato, out) {
   return out;
 }
 
+// Versioni delle linee guida (attuale e archiviate): ogni data di aggiornamento e' una modifica,
+// salvo se lo storico della plancia ha gia' una modifica delle linee guida entro 5 s (la stessa)
+function aggiungiGuide(modifiche, guide) {
+  for (const g of guide) {
+    const t = Date.parse(g.aggiornato);
+    if (!Number.isFinite(t)) continue;
+    if (modifiche.some((m) => m.sezione === 'linee guida' && Math.abs(Date.parse(m.ts) - t) <= 5000)) continue;
+    modifiche.push({ ts: g.aggiornato, sezione: 'linee guida', chiave: g.versione ? `versione ${g.versione}` : g.nome });
+  }
+  return modifiche;
+}
+
 function leggi({ genere, passo }) {
   const brani = schede(LIBRERIA, false, []);
   const errori = [...righeJson(path.join(STATE, 'errori.jsonl.1')), ...righeJson(path.join(STATE, 'errori.jsonl'))];
   const modifiche = righeJson(path.join(CONFIG, 'history', 'controllo.jsonl'));
-  // Versioni delle linee guida (attuale e archiviate): ogni data di aggiornamento e' una modifica
-  const visti = new Set();
+  const guide = [];
   for (const dir of [CONFIG, path.join(CONFIG, 'history')]) {
     let nomi = [];
     try { nomi = fs.readdirSync(dir); } catch (e) { continue; }
-    for (const n of nomi.filter((x) => /^guidance.*\.json$/.test(x))) {
-      const g = leggiJson(path.join(dir, n));
-      if (!g || !g.aggiornato || visti.has(g.aggiornato)) continue;
-      visti.add(g.aggiornato);
-      modifiche.push({ ts: g.aggiornato, sezione: 'linee guida', chiave: g.versione ? `versione ${g.versione}` : n });
-    }
+    for (const n of nomi.filter((x) => /^guidance.*\.json$/.test(x))) guide.push({ nome: n, ...(leggiJson(path.join(dir, n)) || {}) });
   }
+  aggiungiGuide(modifiche, guide);
   const generi = [...new Set(brani.map((b) => b.categoria).filter(Boolean))].sort();
   return { ...calcola({ brani, errori, modifiche, genere: genere || '', passo: passo || '', ora: Date.now() }), generi };
 }
 
-module.exports = { calcola, leggi };
+module.exports = { calcola, leggi, aggiungiGuide };
