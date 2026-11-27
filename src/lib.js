@@ -94,6 +94,44 @@ CFG.errorsFile = path.join(CFG.dir, 'state', 'errori.jsonl');
   } catch (e) { /* catalogo assente: restano i default del codice */ }
 })();
 
+// Parametri modificabili dalla dashboard (config/parametri.json) e comandi di produzione (state/comandi.json).
+// Ogni valore e' accettato solo entro i limiti: un valore fuori scala viene ignorato e resta quello di default.
+const LIMITI_PARAMETRI = {
+  durMin: [60, 240], durMax: [120, 600], durDefault: [60, 600],
+  maxAttempts: [1, 10], reviewEvery: [1, 50],
+  pesoVoto: [0, 1000], minVotiAffidabili: [1, 20], maxEsperimenti: [0, 10],
+  esplorazione: [0, 2], durataEsperimentoBrani: [1, 100],
+  qcSilenzioDb: [-80, -20], qcSilenzioFrazione: [0.1, 1], qcDurataMin: [0.5, 1], qcDurataMax: [1, 2],
+};
+(function caricaParametri() {
+  const p = readJsonSafe(path.join(CFG.dir, 'config', 'parametri.json'), {});
+  for (const [k, [min, max]] of Object.entries(LIMITI_PARAMETRI)) {
+    if (typeof p[k] === 'number' && p[k] >= min && p[k] <= max) CFG[k] = p[k];
+  }
+  // Generi: peso (0..5) e attivo (true/false) per nome di categoria
+  CFG.generiOverride = {};
+  for (const [nome, v] of Object.entries(p.generi || {})) {
+    if (!v || typeof v !== 'object') continue;
+    const peso = typeof v.peso === 'number' && v.peso >= 0 && v.peso <= 5 ? v.peso : 1;
+    CFG.generiOverride[nome] = { peso, attivo: v.attivo !== false };
+  }
+  CFG.comandi = readJsonSafe(path.join(CFG.dir, 'state', 'comandi.json'), {});
+})();
+
+// Aggiorna state\comandi.json: null/false/undefined rimuovono la chiave. Scrittura atomica.
+function aggiornaComandi(patch) {
+  const file = path.join(CFG.dir, 'state', 'comandi.json');
+  const cur = readJsonSafe(file, {});
+  for (const [k, v] of Object.entries(patch)) {
+    if (v === null || v === undefined || v === false) delete cur[k];
+    else cur[k] = v;
+  }
+  const tmp = file + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(cur, null, 2));
+  fs.renameSync(tmp, file);
+  CFG.comandi = cur;
+}
+
 const DEFAULT_GUIDANCE = {
   versione: 1,
   style_extra: [],

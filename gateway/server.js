@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const { leggiStato } = require('./stato');
 const { datiAnalisi } = require('./analisi');
+const controllo = require('./controllo');
 
 const PORT = 5790;
 const TOKEN_FILE = path.join(__dirname, 'token.json');
@@ -163,8 +164,17 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && req.url === '/api/stato') return rispondi(200, await leggiStato());
     if (req.method === 'GET' && req.url === '/api/dati') return rispondi(200, datiAnalisi());
+    if (req.method === 'GET' && req.url === '/api/controllo') return rispondi(200, controllo.lettura());
     if (req.method !== 'POST') return rispondi(405, { ok: false });
     const corpo = await leggiCorpo(req);
+    // Plancia di controllo: le scritture richiedono l'intestazione X-Controllo (un sito esterno non puo' inviarla)
+    if (req.url.startsWith('/api/controllo/')) {
+      if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
+      let dati;
+      try { dati = JSON.parse(corpo.toString('utf8') || '{}'); } catch (e) { return rispondi(400, { ok: false, error: 'JSON non valido' }); }
+      const r = controllo.gestisci(req.url, dati);
+      return rispondi(r.codice, r.corpo);
+    }
     if (req.url === '/tg') {
       const { method, body } = JSON.parse(corpo.toString('utf8'));
       return rispondi(200, await telegram(method, body));

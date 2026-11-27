@@ -2,9 +2,11 @@
 // la variante del genere e il set di strumenti. Non chiama il modello.
 const state = $input.first().json.state;
 if (state.queue.length > 0 || state.job) return [{ json: { state, skip: true } }];
+if (CFG.comandi.pausa) return [{ json: { state, skip: true } }]; // produzione in pausa dalla dashboard
 
 const guidance = readGuidance();
 const slot = pickSlot(state, guidance);
+if (CFG.comandi.produciGenere) { log(`produzione forzata: genere ${CFG.comandi.produciGenere}`); aggiornaComandi({ produciGenere: null }); }
 const cat = slot.category;
 const variante = pickVariante(cat, libraryTracks(), readVotes());
 const strumenti = scegliStrumenti(cat);

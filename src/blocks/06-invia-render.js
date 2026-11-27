@@ -1,6 +1,7 @@
 // BLOCCO 6 - Invia render: se non c'e' un job e la coda ha un brano, lo invia a YuE2.
 const state = $input.first().json.state;
 if (state.job || state.queue.length === 0) return [{ json: { state } }];
+if (CFG.comandi.pausa) return [{ json: { state } }]; // in pausa non si avviano nuovi render
 
 if (!(await engineUp())) {
   log('motore YuE2 non attivo: attendo il watchdog');

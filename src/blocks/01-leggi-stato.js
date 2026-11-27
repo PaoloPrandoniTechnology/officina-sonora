@@ -7,4 +7,10 @@ if (!token) {
   return [{ json: { state, hasJob: !!state.job, locked: true } }];
 }
 state.lockToken = token; // non viene salvato: 07 lo rimuove prima di scrivere
+// Comando dalla dashboard: svuota la coda dei brani in attesa (il render in corso non si tocca)
+if (CFG.comandi.svuotaCoda) {
+  log(`coda svuotata dalla dashboard (${(state.queue || []).length} brani)`);
+  state.queue = [];
+  aggiornaComandi({ svuotaCoda: null });
+}
 return [{ json: { state, hasJob: !!state.job, locked: false } }];

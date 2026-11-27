@@ -72,9 +72,9 @@ const target = meta.durata_s || CFG.durDefault;
 if (mp3.frames === 0) esito.problemi.push('file audio non leggibile');
 if (mp3.frames > 0 && mp3.corrotti / mp3.frames > 0.02) esito.problemi.push('file danneggiato (troppi frame non validi)');
 // Brano troppo corto: il motore a volte si ferma prima. Lo si rigenera (max 2 volte), non si carica.
-const durataCorta = mp3.durata_s > 0 && mp3.durata_s < target * 0.85;
+const durataCorta = mp3.durata_s > 0 && mp3.durata_s < target * (CFG.qcDurataMin ?? 0.85);
 if (durataCorta) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo corta rispetto a ${target}s`);
-if (mp3.durata_s > target * 1.25) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo lunga rispetto a ${target}s`);
+if (mp3.durata_s > target * (CFG.qcDurataMax ?? 1.25)) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo lunga rispetto a ${target}s`);
 if (mp3.bitrate_medio_kbps > 0 && mp3.bitrate_medio_kbps < 48) esito.problemi.push('bitrate troppo basso: possibile audio vuoto o degradato');
 
 // Analisi del suono (gateway): livello, silenzi e clipping. Se non disponibile, il brano passa come prima.
@@ -88,8 +88,8 @@ try {
   log(`qualita': analisi audio non disponibile (${e.message}): controllo solo strutturale`);
 }
 if (aud) {
-  if (aud.rms_db < -45) esito.problemi.push(`audio quasi silenzioso (${aud.rms_db} dB)`);
-  if (aud.frazione_silenzio > 0.5) esito.problemi.push('oltre meta\' del brano silenzioso');
+  if (aud.rms_db < (CFG.qcSilenzioDb ?? -45)) esito.problemi.push(`audio quasi silenzioso (${aud.rms_db} dB)`);
+  if (aud.frazione_silenzio > (CFG.qcSilenzioFrazione ?? 0.5)) esito.problemi.push('oltre meta\' del brano silenzioso');
   esito.audio = { rms_db: aud.rms_db, picco_db: aud.picco_db, frazione_silenzio: +aud.frazione_silenzio.toFixed(2), frazione_clip: +aud.frazione_clip.toFixed(4) };
   if (aud.frazione_clip > 0.01) esito.avviso_clipping = `${(aud.frazione_clip * 100).toFixed(2)}% dei campioni saturi`; // solo avviso
 }

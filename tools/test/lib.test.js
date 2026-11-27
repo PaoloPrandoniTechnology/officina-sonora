@@ -101,6 +101,29 @@ test('rotazione: i generi senza brani vengono scelti', () => {
   for (const n of senza) assert.ok(scelte[n] > 0, `genere senza brani mai scelto: ${n}`);
 });
 
+test('controllo: un genere sospeso non esce, "produci ora" forza il genere', () => {
+  const guidance = L.readGuidance();
+  const tuttiNomi = L.CFG.categories.map((c) => c.name);
+  const oldOv = L.CFG.generiOverride, oldCmd = L.CFG.comandi;
+  try {
+    L.CFG.generiOverride = Object.fromEntries(tuttiNomi.map((n) => [n, { peso: 1, attivo: n !== 'Synthwave' }]));
+    L.CFG.comandi = {};
+    for (let i = 0; i < 150; i++) {
+      const s = L.pickSlot({ recent: [], experiments: [], queue: [] }, guidance);
+      assert.notEqual(s.category.name, 'Synthwave', 'un genere sospeso e\' stato scelto');
+    }
+    L.CFG.generiOverride = {};
+    L.CFG.comandi = { produciGenere: 'Gamelan-ambient' };
+    for (let i = 0; i < 10; i++) {
+      const s = L.pickSlot({ recent: [], experiments: [], queue: [] }, guidance);
+      assert.equal(s.category.name, 'Gamelan-ambient');
+    }
+  } finally {
+    L.CFG.generiOverride = oldOv;
+    L.CFG.comandi = oldCmd;
+  }
+});
+
 test('catalogo: ogni genere e\' completo e coerente', () => {
   const cat = JSON.parse(fs.readFileSync(path.join(RADICE, 'config', 'catalogo.json'), 'utf8'));
   const nomi = new Set();

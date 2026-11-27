@@ -1,10 +1,11 @@
 // ---- Apprendimento: ricette, punteggi e scelta del brano successivo (UCB) ----
 // Incollato dopo lib.js in ogni blocco. Un voto utente vale CFG.pesoVoto; i dati automatici valgono 1.
-CFG.pesoVoto = 100;
-CFG.minVotiAffidabili = 3;
-CFG.maxEsperimenti = 2;
-CFG.durataEsperimentoBrani = 10;
-CFG.esplorazione = 0.3;
+// Default, a meno che config\parametri.json (caricato in lib.js) non li sostituisca
+CFG.pesoVoto = CFG.pesoVoto ?? 100;
+CFG.minVotiAffidabili = CFG.minVotiAffidabili ?? 3;
+CFG.maxEsperimenti = CFG.maxEsperimenti ?? 2;
+CFG.durataEsperimentoBrani = CFG.durataEsperimentoBrani ?? 10;
+CFG.esplorazione = CFG.esplorazione ?? 0.3;
 
 // Tutti i brani della libreria (ogni .json con titolo)
 function libraryTracks() {
@@ -114,12 +115,18 @@ function pickSlot(state, guidance) {
   const ultime = (state.recent || []).slice(-5).map((r) => r.categoria);
   const altre = candidati.filter((c) => !ultime.includes(c.cat.name));
   let pool = altre.length ? altre : candidati;
+  if (CFG.comandi && CFG.comandi.produciGenere) pool = candidati; // "produci ora" ignora la varieta' recente
   // Rotazione tra i generi: prima si sceglie il genere, con peso piu' alto per quelli meno rappresentati
   // in libreria (i generi senza brani pesano di piu'). Poi si applica la logica di ricetta solo a quel genere.
   const conta = {};
   for (const t of tracks) conta[t.meta.categoria] = (conta[t.meta.categoria] || 0) + 1;
-  const nomi = [...new Set(pool.map((c) => c.cat.name))];
-  const pesi = nomi.map((n) => 1 / Math.pow(1 + (conta[n] || 0), 2));
+  // Peso e stato (attivo/sospeso) per genere da config\parametri.json; "produci ora" forza un genere
+  const ov = (n) => CFG.generiOverride[n] || { peso: 1, attivo: true };
+  const tutti = [...new Set(pool.map((c) => c.cat.name))];
+  let nomi = tutti.filter((n) => ov(n).attivo);
+  if (CFG.comandi && CFG.comandi.produciGenere && tutti.includes(CFG.comandi.produciGenere)) nomi = [CFG.comandi.produciGenere];
+  if (!nomi.length) nomi = tutti; // tutti sospesi: la produzione non si ferma
+  const pesi = nomi.map((n) => ov(n).peso / Math.pow(1 + (conta[n] || 0), 2));
   let r = Math.random() * pesi.reduce((a, b) => a + b, 0);
   let sceltaCat = nomi[nomi.length - 1];
   for (let i = 0; i < nomi.length; i++) { r -= pesi[i]; if (r <= 0) { sceltaCat = nomi[i]; break; } }
