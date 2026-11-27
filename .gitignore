@@ -4,3 +4,4 @@ gateway/token.json
 state/
 *.dpapi
 node_modules/
+config/telegram.json
