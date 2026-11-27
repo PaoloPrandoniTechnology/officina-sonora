@@ -195,6 +195,11 @@
 
   .empty { color: var(--faint); font-size: 13px; padding: 14px 0; }
   .err { color: var(--danger); font-size: 13px; }
+  #aNota { color: var(--faint); font-size: 12px; }
+  .esiti { display: flex; gap: 12px; flex-wrap: wrap; }
+  .esiti div { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 10px; font-size: 13px; color: var(--muted); }
+  .esiti b { color: var(--text); font-weight: 600; }
+  .esiti i { font-style: normal; font-weight: 700; width: 1em; text-align: center; }
   footer { color: var(--faint); font-size: 11px; margin-top: 26px; }
 
   @media (max-width: 880px) {
@@ -299,6 +304,7 @@
       <button data-tab="render"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 7 L8 10 L11 4 L14 8"/></svg>Render</button>
       <button data-tab="generi"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10M3 8h10M3 13h6"/></svg>Generi</button>
       <button data-tab="voti"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l1.8 3.8 4.2.5-3.1 2.9.8 4.1L8 11.2 4.3 13.3l.8-4.1L2 6.3l4.2-.5z"/></svg>Voti</button>
+      <button data-tab="andamento"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13h12M3 10l3-3 2.5 2L13 4.5"/><path d="M10.5 4.5H13V7"/></svg>Andamento</button>
       <button data-tab="qualita"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/></svg>Qualità</button>
       <button data-tab="libreria"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 6.5h12"/></svg>Libreria</button>
       <button data-tab="controllo"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.3 3.3l1.4 1.4M11.3 11.3l1.4 1.4M3.3 12.7l1.4-1.4M11.3 4.7l1.4-1.4"/></svg>Controllo</button>
@@ -427,6 +433,27 @@
           <h2>Linee guida correnti <small id="gNota"></small></h2>
           <div id="guida"></div>
         </div>
+      </div>
+    </section>
+
+    <!-- ANDAMENTO -->
+    <section class="tab" id="t-andamento">
+      <div class="grid">
+        <div class="card c12">
+          <h2>Il sistema sta migliorando? <small>ultimi 7 giorni contro i 7 precedenti</small></h2>
+          <div class="toolbar">
+            <select class="field" id="aGenere" aria-label="Filtra per genere"><option value="">Tutti i generi</option></select>
+            <select class="field" id="aPasso" aria-label="Passo dei grafici">
+              <option value="">Passo automatico</option><option value="ora">Per ora</option><option value="giorno">Per giorno</option>
+            </select>
+            <small class="muted" id="aNota">Il filtro genere non si applica agli errori</small>
+          </div>
+          <div class="esiti" id="aEsito"><div class="empty">Caricamento…</div></div>
+        </div>
+        <div class="card c6"><h2>Voto medio <small>punti vuoti: meno di 5 voti</small></h2><div id="aVoto"></div></div>
+        <div class="card c6"><h2>Brani scartati (%)</h2><div id="aScarti"></div></div>
+        <div class="card c6"><h2>Secondi di render per secondo di musica buona</h2><div id="aResa"></div></div>
+        <div class="card c6"><h2>Errori <small>tutti i generi</small></h2><div id="aErrori"></div></div>
       </div>
     </section>
 
@@ -1366,8 +1393,70 @@
     votaBrano(Number(e.key));
   });
 
+  // ---------- andamento ----------
+  // Grafico a linea nel tempo: la linea si interrompe sui valori mancanti, le modifiche sono linee verticali
+  function lineaTempo(punti, modifiche, campo, opz = {}) {
+    const { passo = 'giorno', min = 0, maxFisso = null, formato = (v) => String(v), vuoto = () => false, dettaglio = () => '' } = opz;
+    if (!punti.some((p) => p[campo] !== null)) return '<div class="empty">Dati insufficienti</div>';
+    const w = 640, h = 200, pad = { l: 40, r: 14, t: 14, b: 26 };
+    const valori = punti.map((p) => p[campo]).filter((v) => v !== null);
+    const alto = Math.max(...valori, min + 1) * 1.1;
+    const max = maxFisso ?? (opz.intero ? Math.ceil(alto / 4) * 4 : alto); // conteggi: tacche intere
+    const t0 = Date.parse(punti[0].da), t1 = Date.parse(punti[punti.length - 1].da);
+    const x = (t) => t1 > t0 ? pad.l + ((t - t0) / (t1 - t0)) * (w - pad.l - pad.r) : (pad.l + w - pad.r) / 2;
+    const y = (v) => pad.t + (h - pad.t - pad.b) * (1 - (v - min) / (max - min));
+    const quando = (iso) => new Date(iso).toLocaleString('it-IT', passo === 'ora' ? { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' } : { day: '2-digit', month: '2-digit' });
+    let g = '';
+    for (let i = 0; i <= 4; i++) {
+      const v = min + (max - min) * i / 4, yy = y(v);
+      g += `<line class="gridline" x1="${pad.l}" x2="${w - pad.r}" y1="${yy}" y2="${yy}"/><text class="axis" x="${pad.l - 8}" y="${yy + 3}" text-anchor="end">${esc(formato(Math.round(v * 10) / 10))}</text>`;
+    }
+    const tacche = [...new Set([0, Math.floor((punti.length - 1) / 2), punti.length - 1])];
+    g += tacche.map((i) => `<text class="axis" x="${x(Date.parse(punti[i].da))}" y="${h - 8}" text-anchor="middle">${esc(quando(punti[i].da))}</text>`).join('');
+    let d = '', aperto = false;
+    for (const p of punti) {
+      if (p[campo] === null) { aperto = false; continue; }
+      d += (aperto ? 'L' : 'M') + x(Date.parse(p.da)).toFixed(1) + ' ' + y(p[campo]).toFixed(1) + ' ';
+      aperto = true;
+    }
+    const linee = modifiche.map((m) => {
+      const xx = Math.min(x(Date.parse(m.ts)), w - pad.r).toFixed(1);
+      return `<g><title>${esc(data(m.ts) + ' · ' + m.sezione + ': ' + m.chiave)}</title><line x1="${xx}" x2="${xx}" y1="${pad.t}" y2="${h - pad.b}" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/><line x1="${xx}" x2="${xx}" y1="${pad.t}" y2="${h - pad.b}" stroke="transparent" stroke-width="10"/></g>`;
+    }).join('');
+    const dots = punti.filter((p) => p[campo] !== null).map((p) => {
+      const cx = x(Date.parse(p.da)).toFixed(1), cy = y(p[campo]).toFixed(1), cavo = vuoto(p);
+      return `<g><title>${esc(quando(p.da) + ': ' + formato(p[campo]) + dettaglio(p))}</title><circle cx="${cx}" cy="${cy}" r="10" fill="transparent"/><circle cx="${cx}" cy="${cy}" r="4" fill="${cavo ? 'var(--bg)' : '#5eead4'}" stroke="#5eead4" stroke-width="2"/></g>`;
+    }).join('');
+    return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(campo)} nel tempo">${g}${linee}<path d="${d}" fill="none" stroke="#5eead4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
+  }
+
+  const ESITI = { migliora: ['↑', 'var(--ok)'], stabile: ['→', 'var(--muted)'], peggiora: ['↓', 'var(--danger)'], 'dati insufficienti': ['–', 'var(--faint)'] };
+  const an = { richiesta: 0, generi: '' };
+  async function caricaAndamento() {
+    const genere = $('#aGenere').value, passo = $('#aPasso').value, n = ++an.richiesta;
+    let r;
+    try { r = await leggi('/api/andamento?genere=' + encodeURIComponent(genere) + '&passo=' + encodeURIComponent(passo)); }
+    catch (e) { if (n === an.richiesta) $('#aEsito').innerHTML = '<span class="err">Impossibile leggere l\'andamento: ' + esc(e.message) + '</span>'; return; }
+    if (n !== an.richiesta) return; // e' gia' partita una richiesta piu' recente
+    if (r.generi.join('|') !== an.generi) {
+      an.generi = r.generi.join('|');
+      $('#aGenere').innerHTML = '<option value="">Tutti i generi</option>' + r.generi.map((g) => `<option value="${esc(g)}"${g === genere ? ' selected' : ''}>${esc(g)}</option>`).join('');
+    }
+    const voce = (nome, esito) => { const [segno, c] = ESITI[esito] || ESITI['dati insufficienti']; return `<div><i style="color:${c}" aria-hidden="true">${segno}</i>${nome}: <b>${esc(esito)}</b></div>`; };
+    $('#aEsito').innerHTML = voce('Voto', r.esito.voto) + voce('Scarti', r.esito.scarti) +
+      `<div>Passo: <b>${r.passo === 'ora' ? 'per ora' : 'per giorno'}</b></div><div>Modifiche nel periodo: <b>${r.modifiche.length}</b></div>`;
+    const p = r.punti, m = r.modifiche, n0f = (v) => String(v).replace('.', ',');
+    $('#aVoto').innerHTML = lineaTempo(p, m, 'voto', { passo: r.passo, min: 1, maxFisso: 5, formato: n0f, vuoto: (x) => x.votati < 5, dettaglio: (x) => ` (${x.votati} voti)` });
+    $('#aScarti').innerHTML = lineaTempo(p, m, 'scartoPct', { passo: r.passo, maxFisso: 100, formato: (v) => n0f(v) + '%', dettaglio: (x) => ` (${x.scartati} su ${x.brani})` });
+    $('#aResa').innerHTML = lineaTempo(p, m, 'resa', { passo: r.passo, formato: n0f, dettaglio: (x) => ` (${x.brani} brani)` });
+    $('#aErrori').innerHTML = lineaTempo(p, m, 'errori', { passo: r.passo, intero: true, formato: n0f });
+  }
+  $('#aGenere').addEventListener('change', caricaAndamento);
+  $('#aPasso').addEventListener('change', caricaAndamento);
+  setInterval(() => { if ($('#t-andamento').classList.contains('on')) caricaAndamento(); }, 30000);
+
   // ---------- navigazione ----------
-  const TITOLI = { panoramica: 'Panoramica', render: 'Render', generi: 'Generi', voti: 'Voti', qualita: 'Qualità', libreria: 'Libreria', controllo: 'Controllo', log: 'Log e sistema' };
+  const TITOLI = { panoramica: 'Panoramica', render: 'Render', generi: 'Generi', voti: 'Voti', andamento: 'Andamento', qualita: 'Qualità', libreria: 'Libreria', controllo: 'Controllo', log: 'Log e sistema' };
   function vai(indirizzo) {
     const parti = String(indirizzo || '').split('/');
     let tab = parti[0];
@@ -1381,6 +1470,7 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (tab === 'controllo') caricaControllo();
     if (tab === 'voti') caricaVoti();
+    if (tab === 'andamento') caricaAndamento();
   }
   document.getElementById('nav').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-tab]');

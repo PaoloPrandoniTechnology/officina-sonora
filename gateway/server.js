@@ -9,6 +9,7 @@ const { leggiStato } = require('./stato');
 const { datiAnalisi } = require('./analisi');
 const controllo = require('./controllo');
 const voti = require('./voti');
+const andamento = require('./andamento');
 const { ammessa } = require('./protezione');
 
 const PORT = process.env.YMF_PORTA || 5790;
@@ -173,6 +174,10 @@ const server = http.createServer(async (req, res) => {
       const n = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('n');
       if (!/^\d{1,9}$/.test(n || '')) return rispondi(400, { ok: false, error: 'numero di brano non valido' });
       return voti.inviaAudio(req, res, Number(n));
+    }
+    if (req.method === 'GET' && (req.url === '/api/andamento' || req.url.startsWith('/api/andamento?'))) {
+      const q = new URLSearchParams(req.url.slice('/api/andamento'.length));
+      return rispondi(200, andamento.leggi({ genere: q.get('genere') || '', passo: q.get('passo') || '' }));
     }
     if (req.method !== 'POST') return rispondi(405, { ok: false });
     const corpo = await leggiCorpo(req);
