@@ -5,3 +5,4 @@ state/
 *.dpapi
 node_modules/
 config/telegram.json
+assets/
