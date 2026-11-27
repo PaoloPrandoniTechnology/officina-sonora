@@ -58,11 +58,11 @@ test('firma: cambia correggendo un voto', () => {
 
 // Esegue un blocco vero su una libreria temporanea, con il gateway finto.
 // dopoLettura simula un altro processo che scrive appena il blocco ha letto una scheda.
-async function eseguiBlocco(nome, { gw, input = {}, dopoLettura = () => {} }, dir) {
+async function eseguiBlocco(nome, { gw, input = {}, dopoLettura = () => {}, cfg = {} }, dir) {
   const finto = { ...fs, readFileSync: (f, ...a) => { const r = fs.readFileSync(f, ...a); dopoLettura(f); return r; } };
   const c = vm.createContext({ require: (m) => (m === 'fs' ? finto : require(m)), console, process, Buffer, setTimeout, clearTimeout, URL, Promise });
   vm.runInContext(codice, c);
-  Object.assign(vm.runInContext('CFG', c), { dir, root: path.join(dir, 'libreria'), scartati: path.join(dir, 'libreria', '_scartati') });
+  Object.assign(vm.runInContext('CFG', c), { dir, root: path.join(dir, 'libreria'), scartati: path.join(dir, 'libreria', '_scartati'), ...cfg });
   c.gw = gw;
   c.log = () => {};
   const blocco = fs.readFileSync(path.join(RADICE, 'src', 'blocks', nome), 'utf8');
@@ -133,6 +133,50 @@ for (const [caso, audio, esito] of [['tenuto', mp3Valido(), 'ok'], ['scartato', 
     assert.equal(fs.existsSync(scheda), esito === 'ok');
   }));
 }
+
+test('blocco 8a: voto e nota passano dal gateway col numero di traccia', () => conLibreria(async (dir, lib) => {
+  for (let n = 1; n <= 10; n++) {
+    fs.writeFileSync(path.join(lib, `b${n}.json`), JSON.stringify({ titolo: `T${n}`, categoria: 'Prova', numero_traccia: n, generato_il: `2026-11-${String(n).padStart(2, '0')}` }));
+  }
+  const telegramFile = path.join(dir, 'telegram.json');
+  fs.writeFileSync(telegramFile, JSON.stringify({ chat_id: 7 }));
+  let seq = 0;
+  // un giro del blocco con un solo aggiornamento Telegram; ritorna i voti inviati e i messaggi mandati
+  const giro = async (update, esito = { ok: true, titolo: 'T9' }) => {
+    const voti = [], detti = [];
+    await eseguiBlocco('08a-comandi-telegram.js', {
+      cfg: { telegramFile },
+      gw: async (rotta, corpo) => {
+        if (rotta === '/voto') { voti.push({ ...corpo }); return esito; }
+        assert.equal(rotta, '/tg');
+        if (corpo.method === 'getUpdates') return { result: [{ update_id: ++seq, ...update }] };
+        if (corpo.method === 'sendMessage') detti.push(JSON.parse(JSON.stringify(corpo.body)));
+        return { ok: true };
+      },
+    }, dir);
+    return { voti, detti };
+  };
+  const premi = (data, esito) => giro({ callback_query: { id: 'c', from: { id: 7 }, data } }, esito);
+  const scrivi = (text, esito) => giro({ message: { chat: { id: 7 }, text } }, esito);
+
+  const menu = (await premi('m:vota')).detti[0].reply_markup.inline_keyboard;
+  assert.deepEqual(menu.map((riga) => riga[0].callback_data), [10, 9, 8, 7, 6, 5, 4, 3].map((n) => `v:${n}`));
+  assert.equal((await premi('v:9')).detti[0].reply_markup.inline_keyboard[0][4].callback_data, 'vv:5:9');
+
+  for (const vecchio of ['v:eco.mp3', 'vv:5:eco.mp3']) {
+    const r = await premi(vecchio);
+    assert.deepEqual(r.voti, []);
+    assert.match(r.detti[0].text, /non e' piu' valido/);
+  }
+
+  assert.deepEqual((await premi('vv:5:9')).voti, [{ numero: 9, voto: 5, fonte: 'telegram' }]);
+  const rifiutata = await scrivi('a<b', { ok: false, error: 'nota: no' });
+  assert.match(rifiutata.detti[0].text, /^Non ho salvato il voto: nota: no/);
+  assert.deepEqual((await scrivi('calma; bella')).voti, [{ numero: 9, voto: 5, nota: 'calma; bella', fonte: 'telegram' }]);
+
+  const ko = await premi('vv:2:9', { ok: false, error: 'brano non trovato' });
+  assert.match(ko.detti[0].text, /^Non ho salvato il voto: brano non trovato/);
+}));
 
 test('aggiornaScheda: non cancella un voto scritto dopo la lettura', () => {
   const dir = path.join(RADICE, 'state');

@@ -75,7 +75,6 @@ CFG.stateFile = path.join(CFG.dir, 'state', 'state.json');
 CFG.logFile = path.join(CFG.dir, 'state', 'tick.log');
 CFG.guidanceFile = path.join(CFG.dir, 'config', 'guidance.json');
 CFG.historyDir = path.join(CFG.dir, 'config', 'history');
-CFG.feedbackFile = path.join(CFG.root, 'feedback.csv');
 CFG.ffmpeg = 'E:\\MusicAI\\ffmpeg\\bin\\ffmpeg.exe';
 CFG.scartati = path.join(CFG.root, '_scartati');
 CFG.catalogoFile = path.join(CFG.dir, 'config', 'catalogo.json');

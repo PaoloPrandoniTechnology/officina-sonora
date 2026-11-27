@@ -8,6 +8,8 @@ const path = require('path');
 const { leggiStato } = require('./stato');
 const { datiAnalisi } = require('./analisi');
 const controllo = require('./controllo');
+const voti = require('./voti');
+const { ammessa } = require('./protezione');
 
 const PORT = 5790;
 const TOKEN_FILE = path.join(__dirname, 'token.json');
@@ -157,6 +159,7 @@ const server = http.createServer(async (req, res) => {
   const rispondi = (code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(obj)); };
   try {
     if (req.socket.remoteAddress !== '127.0.0.1' && req.socket.remoteAddress !== '::ffff:127.0.0.1') return rispondi(403, { ok: false });
+    if (!ammessa(req.method, req.headers)) return rispondi(403, { ok: false });
     // Dashboard di sola lettura (solo da questo PC)
     if (req.method === 'GET' && req.url === '/dashboard') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
@@ -165,14 +168,22 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/stato') return rispondi(200, await leggiStato());
     if (req.method === 'GET' && req.url === '/api/dati') return rispondi(200, datiAnalisi());
     if (req.method === 'GET' && req.url === '/api/controllo') return rispondi(200, controllo.lettura());
+    if (req.method === 'GET' && req.url === '/api/voti') return rispondi(200, voti.elenco(Date.now()));
+    if (req.method === 'GET' && req.url.startsWith('/audio/brano?')) {
+      const n = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('n');
+      if (!/^\d{1,9}$/.test(n || '')) return rispondi(400, { ok: false, error: 'numero di brano non valido' });
+      return voti.inviaAudio(req, res, Number(n));
+    }
     if (req.method !== 'POST') return rispondi(405, { ok: false });
     const corpo = await leggiCorpo(req);
     // Plancia di controllo: le scritture richiedono l'intestazione X-Controllo (un sito esterno non puo' inviarla)
-    if (req.url.startsWith('/api/controllo/')) {
-      if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
+    // /voto e' il voto da Telegram (blocco 8a): stessa validazione e stesso Storico
+    const daTelegram = req.url === '/voto';
+    if (daTelegram || req.url.startsWith('/api/controllo/')) {
+      if (!daTelegram && req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
       let dati;
       try { dati = JSON.parse(corpo.toString('utf8') || '{}'); } catch (e) { return rispondi(400, { ok: false, error: 'JSON non valido' }); }
-      const r = await controllo.gestisci(req.url, dati);
+      const r = await controllo.gestisci(daTelegram ? '/api/controllo/voto' : req.url, dati);
       return rispondi(r.codice, r.corpo);
     }
     if (req.url === '/tg') {

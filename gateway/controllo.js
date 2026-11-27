@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { datiAnalisi } = require('./analisi');
+const voti = require('./voti');
 
 const DIR = path.join(__dirname, '..');
 const PARAMETRI = path.join(DIR, 'config', 'parametri.json');
@@ -173,6 +174,12 @@ function guida({ campo, valori, categoria, valore }) {
   return { ok: true };
 }
 
+function voto(dati) {
+  const r = voti.vota(dati);
+  registra('voti', `${r.numero} ${r.titolo}`, r.prima, r.dopo);
+  return r;
+}
+
 // ---- note per genere ----
 // Ogni nota viene scritta in italiano e tradotta in inglese (il motore YuE2 risponde meglio all'inglese).
 // La traduzione usa il modello di LM Studio; se non risponde, la nota resta in italiano e viene usata cosi'.
@@ -270,6 +277,7 @@ async function gestisci(url, dati) {
     if (url === '/api/controllo/guida') return { codice: 200, corpo: guida(dati) };
     if (url === '/api/controllo/nota') return { codice: 200, corpo: await aggiungiNota(dati) };
     if (url === '/api/controllo/nota/rimuovi') return { codice: 200, corpo: togliNota(dati) };
+    if (url === '/api/controllo/voto') return { codice: 200, corpo: voto(dati) };
     return { codice: 404, corpo: { ok: false, error: 'percorso non previsto' } };
   } catch (e) {
     return { codice: 400, corpo: { ok: false, error: e.message } };

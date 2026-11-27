@@ -16,7 +16,8 @@ async function tgRequest(method, body) {
 
 async function say(text, buttons) {
   const body = { chat_id: CHAT, text: String(text).slice(0, 3900) };
-  if (buttons) body.reply_markup = { inline_keyboard: [buttons] };
+  // buttons: una riga di bottoni, oppure gia' un elenco di righe
+  if (buttons) body.reply_markup = { inline_keyboard: Array.isArray(buttons[0]) ? buttons : [buttons] };
   return tgRequest('sendMessage', body);
 }
 
@@ -170,10 +171,12 @@ async function sezione(nome) {
   if (nome === 'aiuto') return say(AIUTO).then(() => menu());
   if (nome === 'annulla') { tgs.flow = null; tgs.pending = {}; return menu('Annullato.'); }
   if (nome === 'vota') {
-    const s = readJsonSafe(CFG.stateFile, {}) || {};
-    const recenti = (s.recent || []).slice(-8).reverse();
+    const recenti = libraryTracks()
+      .filter((t) => Number.isInteger(t.meta.numero_traccia))
+      .sort((a, b) => String(b.meta.generato_il || '').localeCompare(String(a.meta.generato_il || '')))
+      .slice(0, 8);
     if (!recenti.length) return say('Ancora nessun brano da votare.');
-    return say('Quale brano vuoi votare?', listaBottoni(recenti.map((b) => ({ label: `${b.titolo} (${b.categoria})`, value: b.file })), 'v'));
+    return say('Quale brano vuoi votare?', listaBottoni(recenti.map(({ meta }) => ({ label: `${meta.titolo} (${meta.categoria})`, value: meta.numero_traccia })), 'v'));
   }
   if (nome === 'cat') {
     const cats = (CFG.categories || []).map((c) => ({ label: `${c.name} (energia ${c.energia})`, value: c.name }));
@@ -203,14 +206,17 @@ async function menuPulsante(data) {
   const valore = resto.join(':');
   if (tipo === 'm') { await sezione(valore); return true; }
   if (tipo === 'v') {
-    return say(`Voto per "${valore}"`, [1, 2, 3, 4, 5].map((n) => ({ text: String(n), callback_data: `vv:${n}:${valore}` }))).then(() => true);
+    // i pulsanti vecchi portano il nome del file al posto del numero di traccia
+    if (!/^\d+$/.test(valore)) return say(PULSANTE_VECCHIO).then(() => true);
+    return say(`Voto per il brano n. ${valore}`, [1, 2, 3, 4, 5].map((n) => ({ text: String(n), callback_data: `vv:${n}:${valore}` }))).then(() => true);
   }
   if (tipo === 'vv') {
-    const [voto, ...fileParts] = valore.split(':');
-    const file = fileParts.join(':');
-    setVote(file, Number(voto));
-    await say(`Voto ${voto}/5 salvato per ${file}. Vuoi aggiungere una nota? Scrivila ora (oppure /annulla).`);
-    tgs.flow = { contesto: 'nota-voto', file };
+    if (!/^\d:\d+$/.test(valore)) { await say(PULSANTE_VECCHIO); return true; }
+    const [voto, numero] = valore.split(':').map(Number);
+    const r = await salvaVoto({ numero, voto });
+    if (!r.ok) { await say(`Non ho salvato il voto: ${r.error}`); return true; }
+    tgs.flow = { contesto: 'nota-voto', numero, voto };
+    await say(`Voto ${voto}/5 salvato per "${r.titolo}". Vuoi aggiungere una nota? Scrivila ora (oppure /annulla).`);
     return true;
   }
   if (tipo === 'c') {
@@ -234,14 +240,15 @@ async function menuPulsante(data) {
   return false;
 }
 
-// Salva il voto nel file feedback.csv (una riga per brano: file;voto;nota)
-function setVote(file, voto) {
-  let righe = [];
-  try { righe = fs.readFileSync(CFG.feedbackFile, 'utf8').split(/\r?\n/).filter(Boolean); } catch (e) { righe = ['file;voto;nota']; }
-  const head = righe[0] || 'file;voto;nota';
-  const altre = righe.slice(1).filter((r) => r.split(';')[0] !== file);
-  const nota = ((righe.slice(1).find((r) => r.split(';')[0] === file) || '').split(';')[2] || '');
-  fs.writeFileSync(CFG.feedbackFile, [head, ...altre, `${file};${voto};${nota}`].join('\n') + '\n');
+const PULSANTE_VECCHIO = 'Questo pulsante non e\' piu\' valido. Riapri "Vota un brano" dal /menu.';
+
+// Voto e nota passano dal gateway, che li scrive nella scheda del brano
+async function salvaVoto(dati) {
+  try {
+    return await gw('/voto', { ...dati, fonte: 'telegram' });
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
 }
 
 async function gestisciTesto(msg) {
@@ -252,10 +259,12 @@ async function gestisciTesto(msg) {
   if (!testo) return;
   // Nota a un voto appena dato: si salva direttamente
   if (tgs.flow && tgs.flow.contesto === 'nota-voto') {
-    const righe = fs.readFileSync(CFG.feedbackFile, 'utf8').split(/\r?\n/).filter(Boolean);
-    const voto = (righe.find((r) => r.split(';')[0] === tgs.flow.file) || '').split(';')[1] || '';
-    const altre = righe.filter((r) => r.split(';')[0] !== tgs.flow.file);
-    fs.writeFileSync(CFG.feedbackFile, [...altre, `${tgs.flow.file};${voto};${testo.replace(/;/g, ',')}`].join('\n') + '\n');
+    const { numero, voto } = tgs.flow;
+    // attesa di una nota rimasta dal formato precedente (nome del file)
+    if (!numero) { tgs.flow = null; return say(PULSANTE_VECCHIO); }
+    const r = await salvaVoto({ numero, voto, nota: testo });
+    // in caso di errore si resta in attesa, cosi' la nota si puo' riscrivere
+    if (!r.ok) return say(`Non ho salvato il voto: ${r.error}\nRiscrivi la nota oppure /annulla.`);
     tgs.flow = null;
     return say('Nota salvata.').then(() => menu());
   }
