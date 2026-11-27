@@ -63,6 +63,17 @@ Script in `tools/`, con prova a vuoto e copia di sicurezza in `state/backup`:
 - La scritta "Solo lettura" diventa "Solo da questo PC".
 - Correzione dei grafici piccoli: "ore" e "voti" con dati propri, nessun grafico se il dato non esiste.
 
+### Sezione Andamento (aggiunta e approvata il 2026-11-27, si realizza dopo ascolto e voto)
+Scopo: vedere nel tempo se il sistema sta migliorando. Sostituisce l'esclusione di nuovi grafici e analisi.
+- Quattro grafici temporali: voto medio (con numero di voti), brani scartati %, secondi di render per secondo
+  di musica buona, errori. Il voto è collocato nel momento in cui il brano è stato generato.
+- Passo "per ora" o "per giorno"; filtro per genere (non si applica agli errori, e la pagina lo dice).
+- Giudizio "migliora / stabile / peggiora": ultimi 7 giorni contro i 7 precedenti. Servono in ciascun periodo
+  10 voti per il voto e 30 brani per gli scarti, altrimenti "dati insufficienti". Soglie (mie): ±0,2 stelle, ±5 punti di scarto.
+- Punti con meno di 5 voti disegnati vuoti. Linee verticali sulle modifiche a parametri, generi, linee guida e note.
+- Calcolo dai file esistenti, nessun nuovo archivio. Gli errori restano finché il registro non viene ruotato.
+- Alternative scartate: archivio giornaliero (non serve, i brani conservano la storia); strumento esterno come Grafana (sproporzionato).
+
 ## Rischi e vincoli
 - Più processi scrivono i `.json` (gateway, blocchi di caricamento e tag). La coda esclude i brani generati
   da meno di 15 minuti; il piano deve verificare che nessun blocco riscriva un `.json` letto prima di un'attesa.
