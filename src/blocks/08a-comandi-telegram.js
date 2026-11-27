@@ -30,7 +30,7 @@ const AIUTO = [
   'Oppure scrivi in italiano cosa vuoi cambiare, per esempio:',
   '- "Vinyasa piu ritmato, bpm tra 100 e 120"',
   '- "Aggiungi la categoria Batfit: energia 4, strutture loop e crescendo"',
-  '- "Aggiungi una struttura breve con solo intro, main e outro"',
+  '- "Aggiungi una struttura breve con solo intro, verse e outro"',
   'Ti mostro sempre il riepilogo e applico solo dopo il tuo Conferma.',
 ].join('\n');
 

@@ -29,10 +29,11 @@ $pagine = @(
   @{ n = '10-controllo-guida';      h = 'controllo/guida' },
   @{ n = '11-controllo-note';       h = 'controllo/note' },
   @{ n = '12-controllo-storico';    h = 'controllo/storico' },
-  @{ n = '13-log';               h = 'log' }
+  @{ n = '13-log';               h = 'log' },
+  @{ n = '14-andamento';         h = 'andamento' }
 )
 
-$profilo = Join-Path $env:TEMP 'ymf-screenshot-profile'
+$profilo = Join-Path $env:TEMP 'os-screenshot-profile'
 # Chrome scrive avvisi sul registro di errore: non devono fermare lo script
 $ErrorActionPreference = 'Continue'
 foreach ($p in $pagine) {
