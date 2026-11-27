@@ -14,7 +14,7 @@ const codice = ['lib.js', 'lib-apprendimento.js']
 // Le funzioni di lib.js sono scritte per la sandbox di n8n: le carichiamo in un contesto isolato
 const ctx = vm.createContext({ require, console, process, Buffer, setTimeout, clearTimeout, URL, Promise });
 vm.runInContext(codice, ctx);
-const L = vm.runInContext('({ CFG, acquireLock, releaseLock, lockOccupato, slugify, clampDur, componiStile, numeroProgressivo })', ctx);
+const L = vm.runInContext('({ CFG, acquireLock, releaseLock, lockOccupato, slugify, clampDur, componiStile, numeroProgressivo, pickSlot, readGuidance, libraryTracks })', ctx);
 
 const nomeLock = () => 'test-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
 const fileLock = (n) => path.join(L.CFG.dir, 'state', n + '.lock');
@@ -85,6 +85,20 @@ test('numerazione: il progressivo cresce e non si ripete', () => {
   } finally {
     fs.rmSync(file, { force: true });
   }
+});
+
+test('rotazione: i generi senza brani vengono scelti', () => {
+  const guidance = L.readGuidance();
+  const conta = {};
+  for (const t of L.libraryTracks()) conta[t.meta.categoria] = (conta[t.meta.categoria] || 0) + 1;
+  const senza = L.CFG.categories.map((c) => c.name).filter((n) => !conta[n]);
+  const scelte = {};
+  for (let i = 0; i < 200; i++) {
+    const slot = L.pickSlot({ recent: [], experiments: [], queue: [] }, guidance);
+    scelte[slot.category.name] = (scelte[slot.category.name] || 0) + 1;
+  }
+  assert.ok(senza.length > 0, 'ci devono essere generi senza brani');
+  for (const n of senza) assert.ok(scelte[n] > 0, `genere senza brani mai scelto: ${n}`);
 });
 
 test('catalogo: ogni genere e\' completo e coerente', () => {

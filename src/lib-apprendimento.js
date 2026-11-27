@@ -113,7 +113,18 @@ function pickSlot(state, guidance) {
   // Varieta': le categorie degli ultimi due brani non tornano subito, se esistono alternative
   const ultime = (state.recent || []).slice(-5).map((r) => r.categoria);
   const altre = candidati.filter((c) => !ultime.includes(c.cat.name));
-  if (altre.length) candidati.splice(0, candidati.length, ...altre);
+  let pool = altre.length ? altre : candidati;
+  // Rotazione tra i generi: prima si sceglie il genere, con peso piu' alto per quelli meno rappresentati
+  // in libreria (i generi senza brani pesano di piu'). Poi si applica la logica di ricetta solo a quel genere.
+  const conta = {};
+  for (const t of tracks) conta[t.meta.categoria] = (conta[t.meta.categoria] || 0) + 1;
+  const nomi = [...new Set(pool.map((c) => c.cat.name))];
+  const pesi = nomi.map((n) => 1 / Math.pow(1 + (conta[n] || 0), 2));
+  let r = Math.random() * pesi.reduce((a, b) => a + b, 0);
+  let sceltaCat = nomi[nomi.length - 1];
+  for (let i = 0; i < nomi.length; i++) { r -= pesi[i]; if (r <= 0) { sceltaCat = nomi[i]; break; } }
+  pool = pool.filter((c) => c.cat.name === sceltaCat);
+  candidati.splice(0, candidati.length, ...pool);
 
   // Prima le ricette affidabili con punteggio migliore; le non affidabili solo se c'e' posto negli esperimenti
   const affidabili = candidati.filter((c) => c.affidabile).sort((a, b) => b.score - a.score);
