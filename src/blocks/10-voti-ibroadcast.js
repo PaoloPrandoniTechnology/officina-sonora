@@ -95,9 +95,6 @@ for (const b of nostri) {
   else if (fonteVoto[b.id]) { voto = fonteVoto[b.id].voto; fonte = fonteVoto[b.id].fonte; }
   else if (t.trashed) { voto = 1; fonte = 'cestino iBroadcast'; }
 
-  b.meta.ascolti = ascolti;
-  b.meta.ibroadcast.ascolti = ascolti;
-
   // Tag di tempo: sposta il bpm del genere di un passo, una sola volta per brano, entro i limiti
   const dir = tempoPerTraccia[b.id];
   const giaApplicati = ultimo.tempoApplicati || [];
@@ -121,8 +118,18 @@ for (const b of nostri) {
     ultimo.tempoApplicati = giaApplicati.slice(-500);
   }
   const segnale = voto === null ? null : { voto, fonte };
-  if (applicaSegnale(b.meta, segnale, new Date().toISOString())) aggiornati++;
-  fs.writeFileSync(b.json, JSON.stringify(b.meta, null, 2));
+  // La scheda si rilegge subito prima di scriverla: un voto arrivato nel frattempo resta
+  const meta = readJsonSafe(b.json, null);
+  if (!meta || !meta.ibroadcast) continue;
+  meta.ascolti = ascolti;
+  meta.ibroadcast.ascolti = ascolti;
+  const cambiato = applicaSegnale(meta, segnale, new Date().toISOString());
+  try {
+    scriviScheda(b.json, meta);
+    if (cambiato) aggiornati++;
+  } catch (e) {
+    log(`voti iBroadcast: scheda di ${meta.titolo} non aggiornata: ${e.message}`);
+  }
 }
 fs.writeFileSync(VOTI_FILE, JSON.stringify({ lastRun: Date.now(), tempoApplicati: ultimo.tempoApplicati || [], ultimoEsito: { aggiornati, ascoltiTot } }, null, 2));
 if (aggiornati) log(`voti iBroadcast: ${aggiornati} brani aggiornati dai segnali dell'app`);

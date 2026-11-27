@@ -95,7 +95,12 @@ if (aud) {
 }
 
 meta.qualita = { ...esito, esito: esito.problemi.length ? 'scartato' : 'ok', controllato_il: new Date().toISOString() };
-fs.writeFileSync(jsonPath, JSON.stringify(meta, null, 2));
+// Durante l'analisi puo' essere arrivato un voto: si aggiunge solo l'esito
+try {
+  aggiornaScheda(jsonPath, { qualita: meta.qualita });
+} catch (e) {
+  log(`qualita': scheda di ${path.basename(file)} non aggiornata: ${e.message}`);
+}
 
 if (esito.problemi.length) {
   // Sposta il brano fuori dalla libreria: non viene caricato

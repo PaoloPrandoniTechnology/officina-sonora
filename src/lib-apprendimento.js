@@ -25,13 +25,18 @@ function libraryTracks() {
   return out;
 }
 
+// Scrittura atomica di una scheda: chi legge non la trova mai a meta'
+function scriviScheda(jsonPath, meta) {
+  const tmp = jsonPath + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(meta, null, 2));
+  fs.renameSync(tmp, jsonPath);
+}
+
 // Aggiorna solo alcuni campi di una scheda, rileggendola: un voto scritto nel frattempo resta.
 // Se la scheda manca o e' illeggibile lancia un errore, senza ricrearla con i soli campi.
 function aggiornaScheda(jsonPath, campi) {
   const meta = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-  const tmp = jsonPath + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(Object.assign(meta, campi), null, 2));
-  fs.renameSync(tmp, jsonPath);
+  scriviScheda(jsonPath, Object.assign(meta, campi));
 }
 
 // Numero progressivo globale dei brani: non si ripete mai e non torna indietro.
