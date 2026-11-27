@@ -170,6 +170,21 @@ Puoi anche scrivere in italiano cosa vuoi cambiare, per esempio: *"Vinyasa più 
 
 ---
 
+### Flusso di produzione (n8n)
+
+![Flusso del workflow n8n](docs/flusso-n8n.png)
+
+Il diagramma è generato automaticamente dal workflow (`tools\diagramma.mjs`), quindi resta allineato alla versione pubblicata.
+Ogni colore indica una fase:
+
+- **Avvio**: il trigger parte ogni minuto e lancia in parallelo i controlli periodici.
+- **Controllo**: il lock della pipeline evita esecuzioni sovrapposte; poi si decide se c'è un render in corso.
+- **Composizione**: si sceglie il genere (rotazione e pesi), si scrive il titolo e si compone lo stile.
+- **Render e stato**: il brano viene inviato al motore YuE2; a fine render lo stato viene salvato.
+- **Audio e caricamento**: download, metadati, controllo qualità, upload su iBroadcast, tag e playlist, notifica.
+- **Apprendimento**: revisione periodica delle linee guida in base ai voti.
+- **Telegram** e **Rapporto e voti**: comandi, avvisi, rapporto giornaliero e lettura dei voti, in parallelo al ciclo principale.
+
 ### Schermate della dashboard
 
 | Panoramica | Controllo: produzione |

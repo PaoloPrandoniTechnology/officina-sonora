@@ -7,6 +7,19 @@ $ErrorActionPreference = 'Continue'
 $radice = Split-Path -Parent $PSScriptRoot
 Set-Location $radice
 
+# Diagramma del flusso n8n: dal file del workflow, poi PNG
+node (Join-Path $PSScriptRoot 'diagramma.mjs') | Out-Null
+$chrome = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
+if (Test-Path $chrome) {
+  $svg = Join-Path $radice 'docs\flusso-n8n.svg'
+  $raw = Get-Content $svg -Raw
+  $w = [regex]::Match($raw, 'width="(\d+)"').Groups[1].Value
+  $h = [regex]::Match($raw, 'height="(\d+)"').Groups[1].Value
+  & $chrome --headless=new --disable-gpu --no-first-run --hide-scrollbars --user-data-dir="$env:TEMP\ymf-svg-profile" "--window-size=$w,$h" "--screenshot=$(Join-Path $radice 'docs\flusso-n8n.png')" ('file:///' + $svg.Replace('\', '/')) 2>$null | Out-Null
+  Write-Output 'diagramma del flusso aggiornato'
+}
+
+# Screenshot della dashboard (solo se il gateway risponde)
 try {
   $null = Invoke-WebRequest -Uri 'http://127.0.0.1:5790/api/controllo' -UseBasicParsing -TimeoutSec 10
   powershell -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'screenshot.ps1') | Out-Null
