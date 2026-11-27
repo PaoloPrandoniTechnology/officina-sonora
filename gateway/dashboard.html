@@ -3,136 +3,774 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yoga Music Factory</title>
+<title>Yoga Music Factory · Controllo</title>
 <style>
-  :root { --bg:#f5f6f8; --card:#ffffff; --testo:#1d2330; --muto:#6b7280; --ok:#16a34a; --ko:#dc2626; --warn:#d97706; --linea:#e5e7eb; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0f1218; --card:#181d27; --testo:#e6e9ef; --muto:#9aa3b2; --linea:#262d3a; } }
-  :root[data-theme="dark"] { --bg:#0f1218; --card:#181d27; --testo:#e6e9ef; --muto:#9aa3b2; --linea:#262d3a; }
-  body { margin:0; background:var(--bg); color:var(--testo); font:14px/1.45 system-ui, "Segoe UI", sans-serif; }
-  header { display:flex; justify-content:space-between; align-items:center; padding:16px; flex-wrap:wrap; gap:8px; }
-  h1 { font-size:18px; margin:0; }
-  #ora { color:var(--muto); font-size:12px; }
-  main { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px; padding:0 16px 24px; }
-  .card { background:var(--card); border:1px solid var(--linea); border-radius:10px; padding:14px; min-width:0; }
-  .card h2 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muto); margin:0 0 10px; }
-  .riga { display:flex; justify-content:space-between; gap:8px; padding:3px 0; }
-  .riga span:first-child { color:var(--muto); }
-  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; color:#fff; }
-  .ok { background:var(--ok); } .ko { background:var(--ko); } .warn { background:var(--warn); } .off { background:var(--muto); }
-  .log { font:12px/1.4 ui-monospace, Consolas, monospace; white-space:pre-wrap; word-break:break-word; max-height:260px; overflow:auto; color:var(--muto); }
-  .barra { height:8px; background:var(--linea); border-radius:4px; overflow:hidden; margin:8px 0; }
-  .barra > div { height:100%; background:var(--ok); width:0; transition:width .6s; }
-  .grande { font-size:16px; font-weight:600; }
-  .errore { color:var(--ko); padding:16px; }
+  :root {
+    --bg: #0a0d13;
+    --bg2: #0f131c;
+    --surface: rgba(20, 26, 38, .72);
+    --surface-solid: #141a26;
+    --line: rgba(148, 163, 184, .12);
+    --line2: rgba(148, 163, 184, .2);
+    --text: #e6eaf2;
+    --muted: #8a94a8;
+    --faint: #5b6478;
+    --accent: #5eead4;
+    --accent2: #818cf8;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --radius: 14px;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    --sans: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 var(--sans); font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  /* sfondo: due aloni lenti, appena percettibili */
+  body::before, body::after {
+    content: ""; position: fixed; width: 60vmax; height: 60vmax; border-radius: 50%;
+    filter: blur(90px); opacity: .16; pointer-events: none; z-index: 0;
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  body::before { background: var(--accent); top: -30vmax; left: -20vmax; }
+  body::after { background: var(--accent2); bottom: -30vmax; right: -20vmax; animation-delay: -13s; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(6vmax,4vmax) scale(1.12); } }
+
+  .app { position: relative; z-index: 1; display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+
+  /* barra laterale */
+  aside { border-right: 1px solid var(--line); padding: 22px 16px; background: rgba(10,13,19,.6); backdrop-filter: blur(12px); position: sticky; top: 0; height: 100vh; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 22px; }
+  .mark { width: 30px; height: 30px; border-radius: 9px; background: conic-gradient(from 200deg, var(--accent), var(--accent2), var(--accent)); box-shadow: 0 0 24px rgba(94,234,212,.25); }
+  .brand b { font-size: 14px; letter-spacing: .01em; display: block; }
+  .brand small { color: var(--muted); font-size: 11px; }
+  nav { display: grid; gap: 2px; }
+  nav button {
+    all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px;
+    color: var(--muted); transition: background .2s, color .2s;
+  }
+  nav button:hover { background: rgba(148,163,184,.08); color: var(--text); }
+  nav button[aria-current="page"] { background: rgba(94,234,212,.1); color: var(--text); box-shadow: inset 2px 0 0 var(--accent); }
+  nav svg { width: 16px; height: 16px; flex: none; opacity: .9; }
+  .sidefoot { position: absolute; bottom: 18px; left: 16px; right: 16px; color: var(--faint); font-size: 11px; }
+
+  /* area principale */
+  main { padding: 22px 28px 48px; min-width: 0; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .topbar h1 { font-size: 22px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
+  .topbar p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .live { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
+  .dot.ok { background: var(--ok); box-shadow: 0 0 0 0 rgba(52,211,153,.6); animation: pulse 2s infinite; }
+  .dot.ko { background: var(--danger); }
+  .dot.warn { background: var(--warn); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52,211,153,.55); } 70% { box-shadow: 0 0 0 9px rgba(52,211,153,0); } 100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); } }
+
+  section.tab { display: none; animation: su .5s cubic-bezier(.2,.7,.2,1); }
+  section.tab.on { display: block; }
+  @keyframes su { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .c3 { grid-column: span 3; } .c4 { grid-column: span 4; } .c5 { grid-column: span 5; }
+  .c6 { grid-column: span 6; } .c7 { grid-column: span 7; } .c8 { grid-column: span 8; } .c12 { grid-column: span 12; }
+  @media (max-width: 1180px) { .c3 { grid-column: span 6; } .c4, .c5, .c7, .c8 { grid-column: span 12; } .c6 { grid-column: span 6; } }
+  @media (max-width: 720px) { .c3, .c6 { grid-column: span 12; } }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 18px; backdrop-filter: blur(14px); min-width: 0;
+    box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 30px -18px rgba(0,0,0,.6);
+    transition: transform .25s ease, border-color .25s ease;
+  }
+  .card:hover { border-color: var(--line2); }
+  .card h2 { margin: 0 0 12px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card h2 small { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--faint); }
+
+  /* indicatori principali */
+  .kpi { position: relative; overflow: hidden; }
+  .kpi .v { font-size: 30px; font-weight: 650; letter-spacing: -.02em; line-height: 1.1; }
+  .kpi .l { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .kpi .spark { position: absolute; right: 12px; bottom: 10px; width: 120px; height: 36px; opacity: .9; }
+  .kpi::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 100% 0%, rgba(94,234,212,.12), transparent 60%); pointer-events: none; }
+
+  /* grafici */
+  .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .bar { transform-box: fill-box; transform-origin: bottom; animation: grow .9s cubic-bezier(.2,.7,.2,1) both; transition: opacity .2s; }
+  .bar:hover { opacity: .75; }
+  @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  .axis { fill: var(--faint); font-size: 10px; font-family: var(--mono); }
+  .gridline { stroke: var(--line); stroke-dasharray: 2 4; }
+  .legend { display: grid; gap: 6px; margin-top: 10px; }
+  .legend div { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .legend i { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+  .legend b { margin-left: auto; color: var(--text); font-weight: 600; }
+
+  /* barre orizzontali */
+  .hb { display: grid; grid-template-columns: 150px 1fr 44px; align-items: center; gap: 10px; padding: 5px 0; font-size: 12.5px; }
+  .hb span { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hb .tr { height: 8px; background: rgba(148,163,184,.1); border-radius: 6px; overflow: hidden; }
+  .hb .fi { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0; animation: fill 1.1s cubic-bezier(.2,.7,.2,1) forwards; }
+  .hb em { font-style: normal; text-align: right; color: var(--text); font-weight: 600; }
+  @keyframes fill { to { width: var(--w); } }
+
+  /* tabella */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover { background: rgba(148,163,184,.05); }
+  .num { text-align: right; font-family: var(--mono); }
+  .scroll { overflow-x: auto; }
+
+  /* badge e pillole */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; background: rgba(148,163,184,.1); color: var(--muted); margin: 2px 4px 2px 0; border: 1px solid var(--line); }
+  .tag.acc { color: var(--accent); border-color: rgba(94,234,212,.3); background: rgba(94,234,212,.06); }
+  .tag.vox { color: #f0abfc; border-color: rgba(240,171,252,.3); background: rgba(240,171,252,.06); }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .pill.ok { color: #052e1d; background: var(--ok); }
+  .pill.ko { color: #3b0a0a; background: var(--danger); }
+  .pill.w { color: #3b2a02; background: var(--warn); }
+  .pill.n { color: var(--muted); background: rgba(148,163,184,.14); }
+  .stars { color: var(--warn); letter-spacing: 1px; font-size: 12px; }
+  .stars .off { color: var(--faint); }
+  .muted { color: var(--muted); }
+
+  /* stati dei servizi */
+  .srv { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .srv:last-child { border-bottom: 0; }
+  .srv span { display: flex; align-items: center; gap: 9px; color: var(--muted); }
+
+  /* render in corso */
+  .now h3 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.01em; }
+  .now .sub { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .bigbar { position: relative; height: 10px; border-radius: 999px; background: rgba(148,163,184,.12); overflow: hidden; margin: 14px 0 8px; }
+  .bigbar i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .8s ease; overflow: hidden; }
+  .bigbar i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%); transform: translateX(-100%); animation: shimmer 2.4s infinite; }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 12.5px; }
+  .kv span:nth-child(odd) { color: var(--muted); }
+  .kv span:nth-child(even) { text-align: right; font-family: var(--mono); }
+
+  /* schede generi */
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .search { flex: 1 1 260px; min-width: 200px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; color: var(--text); font: inherit; outline: none; transition: border-color .2s, box-shadow .2s; }
+  .search:focus { border-color: rgba(94,234,212,.5); box-shadow: 0 0 0 3px rgba(94,234,212,.12); }
+  .fchip { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 999px; font-size: 12px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); transition: all .2s; }
+  .fchip:hover { color: var(--text); }
+  .fchip[aria-pressed="true"] { color: #04211b; background: var(--accent); border-color: var(--accent); }
+  .gcards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .gc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: transform .25s ease, box-shadow .25s ease, border-color .25s; animation: su .5s both; }
+  .gc:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -20px rgba(0,0,0,.7); border-color: var(--line2); }
+  .gc .hd { height: 74px; position: relative; overflow: hidden; }
+  .gc .hd::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 20%, rgba(10,13,19,.85)); }
+  .gc .hd .nm { position: absolute; left: 14px; bottom: 10px; z-index: 1; font-weight: 650; font-size: 15px; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+  .gc .bd { padding: 12px 14px 14px; }
+  .gc .gn { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .gc .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0; }
+  .gc .row div { background: rgba(148,163,184,.06); border-radius: 9px; padding: 7px 8px; }
+  .gc .row small { display: block; color: var(--faint); font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; }
+  .gc .row b { font-size: 14px; font-weight: 650; }
+  .energy { display: flex; gap: 3px; margin-top: 3px; }
+  .energy i { width: 12px; height: 4px; border-radius: 2px; background: rgba(148,163,184,.2); }
+  .energy i.on { background: var(--accent); }
+  .gc details { margin-top: 8px; }
+  .gc summary { cursor: pointer; color: var(--accent); font-size: 12px; list-style: none; }
+  .gc summary::-webkit-details-marker { display: none; }
+  .gc summary::before { content: "+ "; }
+  .gc details[open] summary::before { content: "− "; }
+  .gc .det { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+  .gc .det p { margin: 6px 0; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 3px; vertical-align: middle; }
+
+  .log { font: 12px/1.6 var(--mono); background: rgba(5,7,11,.6); border: 1px solid var(--line); border-radius: 10px; padding: 12px; max-height: 360px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+  .log div { padding: 1px 0; color: var(--muted); }
+  .log .e { color: var(--danger); } .log .o { color: var(--ok); } .log .w { color: var(--warn); }
+
+  .empty { color: var(--faint); font-size: 13px; padding: 14px 0; }
+  .err { color: var(--danger); font-size: 13px; }
+  footer { color: var(--faint); font-size: 11px; margin-top: 26px; }
+
+  @media (max-width: 880px) {
+    .app { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px; }
+    .brand { padding: 0 0 10px; }
+    nav { grid-auto-flow: column; overflow-x: auto; }
+    .sidefoot { display: none; }
+    main { padding: 16px 16px 40px; }
+    .hb { grid-template-columns: 110px 1fr 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>Yoga Music Factory</h1>
-  <span id="ora">connessione...</span>
-</header>
-<main>
-  <section class="card"><h2>Servizi</h2><div id="servizi"></div></section>
-  <section class="card"><h2>Render in corso</h2><div id="render"></div></section>
-  <section class="card"><h2>Pipeline</h2><div id="pipeline"></div></section>
-  <section class="card"><h2>Watchdog e supervisore</h2><div id="sorveglianza"></div></section>
-  <section class="card"><h2>Ultime esecuzioni n8n</h2><div id="esecuzioni"></div></section>
-  <section class="card" style="grid-column:1/-1"><h2>Log di produzione</h2><div id="log" class="log"></div></section>
-</main>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <div class="mark" aria-hidden="true"></div>
+      <div><b>Yoga Music Factory</b><small>pannello di controllo</small></div>
+    </div>
+    <nav id="nav">
+      <button data-tab="panoramica" aria-current="page"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Panoramica</button>
+      <button data-tab="render"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 7 L8 10 L11 4 L14 8"/></svg>Render</button>
+      <button data-tab="generi"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10M3 8h10M3 13h6"/></svg>Generi</button>
+      <button data-tab="voti"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2l1.8 3.8 4.2.5-3.1 2.9.8 4.1L8 11.2 4.3 13.3l.8-4.1L2 6.3l4.2-.5z"/></svg>Voti</button>
+      <button data-tab="qualita"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/></svg>Qualità</button>
+      <button data-tab="libreria"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 6.5h12"/></svg>Libreria</button>
+      <button data-tab="log"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h7M3 12h9"/></svg>Log e sistema</button>
+    </nav>
+    <div class="sidefoot">Solo lettura · 127.0.0.1</div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div>
+        <h1 id="titolo">Panoramica</h1>
+        <p id="sotto">Caricamento dei dati…</p>
+      </div>
+      <div class="live">
+        <span class="chip" id="cSistema"><span class="dot"></span>sistema</span>
+        <span class="chip" id="cLm"><span class="dot"></span>LM Studio</span>
+        <span class="chip" id="cYue"><span class="dot"></span>YuE2</span>
+        <span class="chip" id="cPipe"><span class="dot"></span>pipeline</span>
+        <span class="chip" id="cAgg">—</span>
+      </div>
+    </div>
+
+    <!-- PANORAMICA -->
+    <section class="tab on" id="t-panoramica">
+      <div class="grid">
+        <div class="card kpi c3"><div class="v" data-count="0" id="k-tot">0</div><div class="l">brani in libreria</div><svg class="spark" id="sp-tot"></svg></div>
+        <div class="card kpi c3"><div class="v" id="k-ore">0</div><div class="l">ore di musica</div><svg class="spark" id="sp-ore"></svg></div>
+        <div class="card kpi c3"><div class="v" id="k-voti">0</div><div class="l">brani votati</div><svg class="spark" id="sp-voti"></svg></div>
+        <div class="card kpi c3"><div class="v" id="k-media">—</div><div class="l">voto medio</div><svg class="spark" id="sp-media"></svg></div>
+        <div class="card c8">
+          <h2>Brani generati, ultimi 14 giorni <small id="tl-tot"></small></h2>
+          <div id="timeline"></div>
+        </div>
+        <div class="card c4 now" id="cardRender"></div>
+        <div class="card c4">
+          <h2>Servizi</h2>
+          <div id="servizi"></div>
+        </div>
+        <div class="card c4">
+          <h2>Famiglie <small>quota della libreria</small></h2>
+          <div id="donut"></div>
+        </div>
+        <div class="card c8">
+          <h2>Brani per categoria <small>prime 12</small></h2>
+          <div id="topCat"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RENDER -->
+    <section class="tab" id="t-render">
+      <div class="grid">
+        <div class="card c8 now" id="cardRender2"></div>
+        <div class="card c4">
+          <h2>Tempi di render <small>ultimi 40</small></h2>
+          <div id="rStats"></div>
+        </div>
+        <div class="card c12">
+          <h2>Render: tempo reale contro durata richiesta</h2>
+          <div id="rChart"></div>
+        </div>
+        <div class="card c6">
+          <h2>Tipi di brano</h2>
+          <div id="tipi"></div>
+        </div>
+        <div class="card c6">
+          <h2>Distribuzione dei bpm <small>fasce da 10</small></h2>
+          <div id="bpmChart"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GENERI -->
+    <section class="tab" id="t-generi">
+      <div class="toolbar">
+        <input class="search" id="q" type="search" placeholder="Cerca un genere, uno strumento, uno stile…" aria-label="Cerca genere">
+        <div id="fam" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+      <div class="gcards" id="gcards"></div>
+    </section>
+
+    <!-- VOTI -->
+    <section class="tab" id="t-voti">
+      <div class="grid">
+        <div class="card c4">
+          <h2>Esiti delle votazioni</h2>
+          <div id="vDonut"></div>
+        </div>
+        <div class="card c8">
+          <h2>Voto medio per categoria <small id="vNota"></small></h2>
+          <div id="vCat"></div>
+        </div>
+        <div class="card c6">
+          <h2>Brani più apprezzati</h2>
+          <div id="vMiglio"></div>
+        </div>
+        <div class="card c6">
+          <h2>Brani da rivedere</h2>
+          <div id="vPeggio"></div>
+        </div>
+        <div class="card c12">
+          <h2>Linee guida correnti <small id="gNota"></small></h2>
+          <div id="guida"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUALITA -->
+    <section class="tab" id="t-qualita">
+      <div class="grid">
+        <div class="card c4">
+          <h2>Tasso di scarto</h2>
+          <div id="qRing"></div>
+        </div>
+        <div class="card c8">
+          <h2>Motivi di scarto</h2>
+          <div id="qMotivi"></div>
+        </div>
+        <div class="card c6">
+          <h2>Scartati per categoria</h2>
+          <div id="qCat"></div>
+        </div>
+        <div class="card c6">
+          <h2>Errori nelle ultime 24 ore <small id="eTot"></small></h2>
+          <div id="eTop"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRERIA -->
+    <section class="tab" id="t-libreria">
+      <div class="grid">
+        <div class="card c4">
+          <h2>Ambito</h2>
+          <div id="lAmbito"></div>
+        </div>
+        <div class="card c4">
+          <h2>Tipi</h2>
+          <div id="lTipo"></div>
+        </div>
+        <div class="card c4">
+          <h2>Caricati su iBroadcast</h2>
+          <div id="lCar"></div>
+        </div>
+        <div class="card c12">
+          <h2>Brani recenti <small>ultimi 25</small></h2>
+          <div class="scroll"><table id="recenti"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOG -->
+    <section class="tab" id="t-log">
+      <div class="grid">
+        <div class="card c4">
+          <h2>Stato dei servizi</h2>
+          <div id="servizi2"></div>
+        </div>
+        <div class="card c4">
+          <h2>Sorveglianza</h2>
+          <div id="sorv"></div>
+        </div>
+        <div class="card c4">
+          <h2>Ultime esecuzioni n8n</h2>
+          <div id="esec"></div>
+        </div>
+        <div class="card c12">
+          <h2>Log di produzione <small>ultime righe</small></h2>
+          <div class="log" id="logBox"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>Dati letti dal gateway locale. Aggiornamento in tempo reale ogni 5 secondi, analisi della libreria ogni 30 secondi.</footer>
+  </main>
+</div>
+
 <script>
-  // Testo sempre tramite textContent: nessun HTML dai dati
-  function el(tag, attrs, testo) {
-    const e = document.createElement(tag);
-    if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
-    if (testo !== undefined) e.textContent = testo;
-    return e;
-  }
-  function riga(etichetta, valore) {
-    const r = el('div', { class: 'riga' });
-    r.appendChild(el('span', null, etichetta));
-    r.appendChild(el('span', null, valore));
-    return r;
-  }
-  function pill(attivo, testoOn, testoOff) {
-    return el('span', { class: 'pill ' + (attivo ? 'ok' : 'ko') }, attivo ? testoOn : testoOff);
-  }
-  function secondi(s) {
-    if (s === null || s === undefined) return '-';
-    if (s < 60) return s + ' s';
-    const m = Math.floor(s / 60), r = s % 60;
-    return m + ' min ' + (r < 10 ? '0' : '') + r + ' s';
-  }
-  function svuota(id) { const n = document.getElementById(id); n.textContent = ''; return n; }
+(() => {
+  'use strict';
 
-  function disegna(d) {
-    document.getElementById('ora').textContent = 'aggiornato ' + new Date(d.ora).toLocaleTimeString('it-IT');
+  // ---------- utilità ----------
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const n0 = (n) => (n === null || n === undefined || Number.isNaN(n)) ? '—' : Number(n).toLocaleString('it-IT');
+  const n1 = (n) => (n === null || n === undefined || Number.isNaN(n)) ? '—' : Number(n).toLocaleString('it-IT', { maximumFractionDigits: 1 });
+  const sec = (s) => {
+    if (s === null || s === undefined || Number.isNaN(s)) return '—';
+    if (s < 60) return Math.round(s) + ' s';
+    const m = Math.floor(s / 60), r = Math.round(s % 60);
+    return m + ' min ' + String(r).padStart(2, '0') + ' s';
+  };
+  const data = (iso) => iso ? new Date(iso).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+  const ago = (s) => {
+    if (s === null || s === undefined) return '—';
+    if (s < 90) return s + ' s fa';
+    if (s < 5400) return Math.round(s / 60) + ' min fa';
+    return Math.round(s / 3600) + ' h fa';
+  };
+  const PALETTE = ['#5eead4', '#818cf8', '#f0abfc', '#fbbf24', '#34d399', '#60a5fa', '#f87171', '#a3e635', '#fb923c', '#c084fc'];
+  const colore = (i) => PALETTE[i % PALETTE.length];
+  const pct = (v, max) => max > 0 ? Math.max(0, Math.min(100, (v / max) * 100)) : 0;
 
-    const s = svuota('servizi');
-    s.appendChild(riga('n8n', '')); s.lastChild.appendChild(pill(d.servizi.n8n, 'attivo', 'non risponde'));
-    s.appendChild(riga('Motore YuE2', '')); s.lastChild.appendChild(pill(d.servizi.motoreYue, 'attivo', 'non risponde'));
-    s.appendChild(riga('LM Studio', '')); s.lastChild.appendChild(pill(d.servizi.lmStudio, 'attivo', 'spento'));
-    s.appendChild(riga('Modello gemma', '')); s.lastChild.appendChild(pill(d.servizi.gemmaCaricato, 'caricato', 'scaricato'));
+  // contatore animato per i numeri grandi
+  function conta(el, a) {
+    if (!el) return;
+    const to = Number(a);
+    const from = Number(el.dataset.v || 0);
+    el.dataset.v = to;
+    if (Number.isNaN(to)) { el.textContent = '—'; return; }
+    const t0 = performance.now(), dur = 900;
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = n0(Math.round(from + (to - from) * e));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
 
-    const r = svuota('render');
-    if (!d.render) {
-      r.appendChild(el('div', { class: 'grande' }, 'Nessun render in corso'));
-      r.appendChild(el('div', { class: 'riga' }, 'In attesa del prossimo brano'));
-    } else {
-      const p = d.render;
-      r.appendChild(el('div', { class: 'grande' }, p.titolo || '(senza titolo)'));
-      r.appendChild(el('div', null, [p.genere, p.categoria].filter(Boolean).join(' · ')));
-      const pct = p.renderMedio_s ? Math.min(99, Math.round((p.trascorsi_s / p.renderMedio_s) * 100)) : null;
-      const barra = el('div', { class: 'barra' });
-      const dentro = el('div');
-      dentro.style.width = (pct === null ? 0 : pct) + '%';
-      barra.appendChild(dentro);
-      r.appendChild(barra);
-      r.appendChild(riga('Trascorsi', secondi(p.trascorsi_s)));
-      r.appendChild(riga('Render medio recente', secondi(p.renderMedio_s)));
-      r.appendChild(riga('Durata richiesta', secondi(p.durataRichiesta_s)));
-      r.appendChild(riga('Stato motore', p.statoMotore));
-      r.appendChild(el('div', { class: 'log' }, 'La barra e\' una stima basata sul render medio: il motore non espone la percentuale.'));
+  // mini grafico a linea per le card KPI
+  function sparkline(svg, valori, colorePx) {
+    if (!svg || !valori || valori.length < 2) { if (svg) svg.innerHTML = ''; return; }
+    const w = 120, h = 36, max = Math.max(...valori, 1), min = Math.min(...valori, 0);
+    const step = w / (valori.length - 1);
+    const pts = valori.map((v, i) => [i * step, h - 4 - ((v - min) / ((max - min) || 1)) * (h - 8)]);
+    const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    const id = 'g' + Math.random().toString(36).slice(2, 8);
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.innerHTML = `<defs><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${colorePx}" stop-opacity=".35"/><stop offset="1" stop-color="${colorePx}" stop-opacity="0"/></linearGradient></defs>
+      <path d="${d} L${w} ${h} L0 ${h} Z" fill="url(#${id})"/><path d="${d}" fill="none" stroke="${colorePx}" stroke-width="1.6" stroke-linecap="round"/>`;
+  }
+
+  // grafico a barre verticali (SVG, con etichette e tooltip)
+  function barre(valori, opzioni = {}) {
+    const { h = 200, colore: c = '#5eead4', etichetta = (x) => x.etichetta, valore = (x) => x.valore, titolo = (x) => x.etichetta + ': ' + x.valore } = opzioni;
+    if (!valori.length) return '<div class="empty">Nessun dato</div>';
+    const w = 640, pad = { l: 30, r: 8, t: 12, b: 26 };
+    const max = Math.max(...valori.map(valore), 1);
+    const bw = (w - pad.l - pad.r) / valori.length;
+    let g = '';
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.t + (h - pad.t - pad.b) * (1 - i / 4);
+      g += `<line class="gridline" x1="${pad.l}" x2="${w - pad.r}" y1="${y}" y2="${y}"/><text class="axis" x="${pad.l - 6}" y="${y + 3}" text-anchor="end">${Math.round(max * i / 4)}</text>`;
     }
-
-    const pi = svuota('pipeline');
-    pi.appendChild(riga('Lock', d.pipeline.occupata ? 'occupato' : 'libero'));
-    pi.appendChild(riga('Coda', String(d.pipeline.coda)));
-    pi.appendChild(riga('Brani generati', String(d.pipeline.brani)));
-    pi.appendChild(riga('Scartati dal controllo', String(d.pipeline.scartati)));
-    pi.appendChild(riga('Disco E: libero', d.sistema.disco_E_liberoGb === null ? '-' : d.sistema.disco_E_liberoGb + ' GB'));
-
-    const so = svuota('sorveglianza');
-    so.appendChild(riga('Battito watchdog', secondi(d.watchdog.battito_s)));
-    so.appendChild(riga('Ultimo controllo supervisore', secondi(d.supervisore.ultimoRun_s)));
-    const ult = d.supervisore.ultimeRighe.slice(-1)[0];
-    if (ult) so.appendChild(el('div', { class: 'log' }, ult));
-
-    const es = svuota('esecuzioni');
-    if (!d.esecuzioni.length) es.appendChild(el('div', null, 'Nessun dato'));
-    for (const e of d.esecuzioni) {
-      const ok = e.status === 'success';
-      const r2 = el('div', { class: 'riga' });
-      r2.appendChild(el('span', null, e.startedAt));
-      r2.appendChild(el('span', { class: 'pill ' + (ok ? 'ok' : 'ko') }, e.status));
-      es.appendChild(r2);
-    }
-
-    const lg = svuota('log');
-    lg.textContent = d.logProduzione.join('\n');
-    lg.scrollTop = lg.scrollHeight;
+    const ch = h - pad.t - pad.b;
+    const barsHtml = valori.map((x, i) => {
+      const v = valore(x), bh = (v / max) * ch, xx = pad.l + i * bw + bw * 0.18, ww = bw * 0.64;
+      const delay = (i * 0.03).toFixed(2);
+      return `<g><rect class="bar" style="animation-delay:${delay}s" x="${xx}" y="${pad.t + ch - bh}" width="${ww}" height="${Math.max(bh, 1)}" rx="4" fill="${c}"><title>${esc(titolo(x))}</title></rect>
+        <text class="axis" x="${xx + ww / 2}" y="${h - 8}" text-anchor="middle">${esc(etichetta(x))}</text></g>`;
+    }).join('');
+    return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img">${g}${barsHtml}</svg>`;
   }
 
-  async function aggiorna() {
-    try {
-      const r = await fetch('/api/stato', { cache: 'no-store' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      disegna(await r.json());
-    } catch (e) {
-      document.getElementById('ora').textContent = 'errore di connessione: ' + e.message;
-    }
+  // ciambella con legenda
+  function ciambella(voci, centro) {
+    const tot = voci.reduce((a, v) => a + v.valore, 0);
+    if (!tot) return '<div class="empty">Nessun dato</div>';
+    const r = 62, C = 2 * Math.PI * r;
+    let off = 0;
+    const segs = voci.map((v, i) => {
+      const len = (v.valore / tot) * C;
+      const s = `<circle r="${r}" cx="90" cy="90" fill="none" stroke="${v.colore || colore(i)}" stroke-width="22" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}" style="transition:stroke-dasharray .9s ease"><title>${esc(v.nome)}: ${v.valore}</title></circle>`;
+      off += len;
+      return s;
+    }).join('');
+    const leg = voci.map((v, i) => `<div><i style="background:${v.colore || colore(i)}"></i>${esc(v.nome)}<b>${n0(v.valore)}</b></div>`).join('');
+    return `<div style="display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center">
+      <svg viewBox="0 0 180 180" class="chart" style="width:180px"><g transform="rotate(-90 90 90)">${segs}</g>
+      <text x="90" y="86" text-anchor="middle" style="fill:var(--text);font-size:22px;font-weight:650">${n0(tot)}</text>
+      <text x="90" y="104" text-anchor="middle" style="fill:var(--muted);font-size:11px">${esc(centro || 'brani')}</text></svg>
+      <div class="legend">${leg}</div></div>`;
   }
-  aggiorna();
-  setInterval(aggiorna, 5000);
+
+  // barre orizzontali
+  function barreOrizz(voci, opz = {}) {
+    if (!voci.length) return '<div class="empty">Nessun dato</div>';
+    const max = Math.max(...voci.map((v) => v.valore), 1);
+    return voci.map((v, i) => `<div class="hb"><span title="${esc(v.nome)}">${esc(v.nome)}</span>
+      <div class="tr"><div class="fi" style="--w:${pct(v.valore, max).toFixed(1)}%;animation-delay:${(i * 0.05).toFixed(2)}s"></div></div>
+      <em>${opz.decimali ? n1(v.valore) : n0(v.valore)}</em></div>`).join('');
+  }
+
+  function stelle(v) {
+    if (v === null || v === undefined) return '<span class="muted">non votato</span>';
+    let s = '';
+    for (let i = 1; i <= 5; i++) s += i <= Math.round(v) ? '★' : '<span class="off">★</span>';
+    return `<span class="stars">${s}</span>`;
+  }
+
+  function servizioRiga(nome, attivo, on = 'attivo', off = 'non risponde') {
+    return `<div class="srv"><span><i class="dot ${attivo ? 'ok' : 'ko'}"></i>${esc(nome)}</span><span class="pill ${attivo ? 'ok' : 'ko'}">${attivo ? on : off}</span></div>`;
+  }
+
+  // ---------- stato in tempo reale (ogni 5 s) ----------
+  let statoUltimo = null;
+  function disegnaStato(s) {
+    statoUltimo = s;
+    const chip = (id, ok, testo, warn) => {
+      const c = $(id); if (!c) return;
+      c.innerHTML = `<span class="dot ${ok ? (warn ? 'warn' : 'ok') : 'ko'}"></span>${esc(testo)}`;
+    };
+    chip('#cSistema', s.servizi.n8n && s.servizi.motoreYue, s.servizi.n8n && s.servizi.motoreYue ? 'sistema attivo' : 'sistema fermo');
+    chip('#cLm', s.servizi.lmStudio, s.servizi.gemmaCaricato ? 'LM Studio · gemma caricato' : (s.servizi.lmStudio ? 'LM Studio · gemma scaricato' : 'LM Studio spento'), !s.servizi.gemmaCaricato && s.servizi.lmStudio);
+    chip('#cYue', s.servizi.motoreYue, s.servizi.motoreYue ? 'YuE2 pronto' : 'YuE2 non risponde');
+    chip('#cPipe', true, s.pipeline.occupata ? 'pipeline in lavoro' : 'pipeline in attesa', s.pipeline.occupata);
+    $('#cAgg').textContent = 'aggiornato ' + new Date(s.ora).toLocaleTimeString('it-IT');
+
+    const r = s.render;
+    const html = r
+      ? `<div class="now"><h3>${esc(r.titolo || '(senza titolo)')}</h3><div class="sub">${esc([r.genere, r.categoria].filter(Boolean).join(' · '))}</div>
+         <div class="bigbar"><i style="width:${Math.min(99, r.renderMedio_s ? Math.round(r.trascorsi_s / r.renderMedio_s * 100) : 0)}%"></i></div>
+         <div class="kv"><span>Trascorsi</span><span>${sec(r.trascorsi_s)}</span><span>Render medio recente</span><span>${sec(r.renderMedio_s)}</span>
+         <span>Durata richiesta</span><span>${sec(r.durataRichiesta_s)}</span><span>Stato motore</span><span>${esc(r.statoMotore)}</span></div>
+         <div class="sub" style="margin-top:10px">La barra è una stima sul render medio: il motore non espone la percentuale.</div></div>`
+      : `<h2>Render</h2><div class="now"><h3>Nessun render in corso</h3><div class="sub">In attesa del prossimo brano.</div></div>`;
+    $('#cardRender').innerHTML = html;
+    $('#cardRender2').innerHTML = html.replace('<h2>Render</h2>', '');
+
+    $('#servizi').innerHTML = servizioRiga('n8n', s.servizi.n8n) + servizioRiga('Motore YuE2', s.servizi.motoreYue)
+      + servizioRiga('LM Studio', s.servizi.lmStudio, 'attivo', 'spento') + servizioRiga('Modello gemma', s.servizi.gemmaCaricato, 'caricato', 'scaricato');
+    $('#servizi2').innerHTML = $('#servizi').innerHTML;
+
+    const sorv = `<div class="kv"><span>Battito watchdog</span><span>${ago(s.watchdog.battito_s)}</span>
+      <span>Ultimo controllo supervisore</span><span>${ago(s.supervisore.ultimoRun_s)}</span>
+      <span>Coda</span><span>${n0(s.pipeline.coda)}</span><span>Brani generati</span><span>${n0(s.pipeline.brani)}</span>
+      <span>Scartati dal controllo</span><span>${n0(s.pipeline.scartati)}</span>
+      <span>Disco E: libero</span><span>${s.sistema.disco_E_liberoGb === null ? '—' : n0(s.sistema.disco_E_liberoGb) + ' GB'}</span></div>`;
+    $('#sorv').innerHTML = sorv;
+
+    $('#esec').innerHTML = (s.esecuzioni || []).map((e) => `<div class="srv"><span>${esc(e.startedAt.slice(5, 16))}</span><span class="pill ${e.status === 'success' ? 'ok' : 'ko'}">${esc(e.status)}</span></div>`).join('') || '<div class="empty">Nessun dato</div>';
+
+    const box = $('#logBox');
+    box.innerHTML = (s.logProduzione || []).map((l) => {
+      const cls = /errore|fallit|non riuscit|scartat/i.test(l) ? 'e' : /salvato|caricat|applicati|inviat|ok/i.test(l) ? 'o' : /attenzione|troppo|rigener|occupat/i.test(l) ? 'w' : '';
+      return `<div class="${cls}">${esc(l)}</div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // ---------- analisi (ogni 30 s) ----------
+  let dati = null;
+  let filtro = { q: '', famiglia: 'tutte' };
+
+  function disegnaDati(d) {
+    dati = d;
+    const L = d.libreria, V = d.voti, Q = d.qualita, R = d.render;
+    $('#sotto').textContent = `${n0(L.totale)} brani · ${n0(d.generi.length)} generi · aggiornato ${data(d.aggiornato)}`;
+
+    conta($('#k-tot'), L.totale);
+    $('#k-ore').textContent = n1(L.durataTot_h);
+    conta($('#k-voti'), V.totale);
+    $('#k-media').textContent = V.mediaGlobale === null ? '—' : n1(V.mediaGlobale);
+    sparkline($('#sp-tot'), L.timeline.map((x) => x.brani), '#5eead4');
+    sparkline($('#sp-ore'), L.timeline.map((x) => x.brani), '#818cf8');
+    sparkline($('#sp-voti'), L.timeline.map((x) => x.brani), '#f0abfc');
+    sparkline($('#sp-media'), (R.ultimi || []).map((x) => x.render), '#fbbf24');
+
+    $('#tl-tot').textContent = n0(L.timeline.reduce((a, x) => a + x.brani, 0)) + ' nel periodo';
+    $('#timeline').innerHTML = barre(L.timeline, {
+      h: 190, colore: '#5eead4',
+      etichetta: (x) => x.giorno.slice(8, 10) + '/' + x.giorno.slice(5, 7),
+      valore: (x) => x.brani, titolo: (x) => x.giorno + ': ' + x.brani + ' brani',
+    });
+
+    const famColori = { meditativo: '#5eead4', ritmico: '#fbbf24', rock: '#f87171', elettronico: '#818cf8', orchestrale: '#f0abfc', world: '#34d399', jazz: '#60a5fa' };
+    const fam = Object.entries(L.perFamiglia).sort((a, b) => b[1] - a[1]).map(([nome, valore], i) => ({ nome, valore, colore: famColori[nome] || colore(i) }));
+    $('#donut').innerHTML = ciambella(fam, 'brani');
+    $('#topCat').innerHTML = barreOrizz(d.generi.filter((g) => g.brani > 0).sort((a, b) => b.brani - a.brani).slice(0, 12).map((g) => ({ nome: g.nome, valore: g.brani })));
+
+    // Render
+    const ult = R.ultimi || [];
+    $('#rStats').innerHTML = `<div class="kv"><span>Medio</span><span>${sec(R.medio_s)}</span><span>Minimo</span><span>${sec(R.min_s)}</span>
+      <span>Massimo</span><span>${sec(R.max_s)}</span><span>Caricati nelle ultime 24 h</span><span>${n0(R.caricati24h)}</span>
+      <span>Rigenerazioni (totali)</span><span>${n0(Q.rigenerazioni)}</span></div>`;
+    $('#rChart').innerHTML = ult.length ? lineaRender(ult) : '<div class="empty">Nessun render registrato</div>';
+    $('#tipi').innerHTML = barreOrizz(Object.entries(L.perTipo).sort((a, b) => b[1] - a[1]).map(([nome, valore]) => ({ nome, valore })));
+    $('#bpmChart').innerHTML = barre(L.bpmIstogramma, {
+      h: 180, colore: '#818cf8', etichetta: (x) => x.da, valore: (x) => x.n, titolo: (x) => x.da + '–' + (x.da + 9) + ' bpm: ' + x.n,
+    });
+
+    // Generi
+    renderGeneri();
+
+    // Voti
+    const dv = [1, 2, 3, 4, 5].map((k, i) => ({ nome: k + ' stelle', valore: V.distribuzione[k] || 0, colore: ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399'][i] }));
+    $('#vDonut').innerHTML = V.totale ? ciambella(dv, 'voti') : '<div class="empty">Nessun brano ancora votato. I voti arrivano da iBroadcast e da Telegram.</div>';
+    $('#vNota').textContent = V.totale ? V.totale + ' brani votati su ' + V.su : '';
+    $('#vCat').innerHTML = V.perCategoria.length
+      ? V.perCategoria.map((c) => `<div class="hb"><span>${esc(c.categoria)}</span><div class="tr"><div class="fi" style="--w:${pct(c.media, 5).toFixed(1)}%"></div></div><em>${n1(c.media)}</em></div>`).join('')
+      : '<div class="empty">Ancora nessun voto per categoria.</div>';
+    const brano = (x) => `<div class="srv"><span>${esc(x.titolo)}<br><small class="muted">${esc(x.categoria || '')}</small></span>${stelle(x.voto)}</div>`;
+    $('#vMiglio').innerHTML = V.migliori.map(brano).join('') || '<div class="empty">Nessun brano con voto alto.</div>';
+    $('#vPeggio').innerHTML = V.peggiori.map(brano).join('') || '<div class="empty">Nessun brano con voto basso.</div>';
+    $('#guida').innerHTML = `<div class="kv" style="margin-bottom:12px"><span>Versione</span><span>${esc(d.guida.versione ?? '—')}</span>
+      <span>Aggiornata</span><span>${data(d.guida.aggiornato)}</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+        <div><div class="muted" style="font-size:12px;margin-bottom:6px">Stile da aggiungere</div>${(d.guida.styleExtra || []).map((t) => `<span class="tag acc">${esc(t)}</span>`).join('') || '<span class="muted">—</span>'}</div>
+        <div><div class="muted" style="font-size:12px;margin-bottom:6px">Da evitare</div>${(d.guida.styleAvoid || []).map((t) => `<span class="tag">${esc(t)}</span>`).join('') || '<span class="muted">—</span>'}</div>
+        <div><div class="muted" style="font-size:12px;margin-bottom:6px">Fasce di bpm</div>${Object.entries(d.guida.bpmRange || {}).slice(0, 14).map(([k, v]) => `<div class="kv" style="grid-template-columns:1fr auto;margin-bottom:3px"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('') || '<span class="muted">—</span>'}</div>
+      </div>
+      ${(d.guida.note || []).length ? '<div class="muted" style="margin-top:12px;font-size:12.5px">' + d.guida.note.map((n) => '<p style="margin:4px 0">' + esc(n) + '</p>').join('') + '</div>' : ''}`;
+    $('#gNota').textContent = d.guida.note && d.guida.note.length ? '' : '';
+
+    // Qualita'
+    const tasso = Q.tassoScarto || 0;
+    $('#qRing').innerHTML = `<div style="display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center">
+      <svg viewBox="0 0 150 150" class="chart" style="width:150px">
+        <circle cx="75" cy="75" r="56" fill="none" stroke="rgba(148,163,184,.14)" stroke-width="14"/>
+        <circle cx="75" cy="75" r="56" fill="none" stroke="${tasso > 25 ? '#f87171' : tasso > 10 ? '#fbbf24' : '#34d399'}" stroke-width="14" stroke-linecap="round"
+          stroke-dasharray="${(tasso / 100) * 2 * Math.PI * 56} 999" transform="rotate(-90 75 75)" style="transition:stroke-dasharray 1s ease"/>
+        <text x="75" y="82" text-anchor="middle" style="fill:var(--text);font-size:24px;font-weight:650">${n1(tasso)}%</text>
+      </svg>
+      <div class="kv"><span>Accettati</span><span>${n0(Q.accettati)}</span><span>Scartati</span><span>${n0(Q.scartati)}</span>
+      <span>Rigenerazioni</span><span>${n0(Q.rigenerazioni)}</span></div></div>`;
+    $('#qMotivi').innerHTML = barreOrizz(Q.motivi.map((m) => ({ nome: m.motivo, valore: m.n }))) || '<div class="empty">Nessuno scarto registrato.</div>';
+    $('#qCat').innerHTML = barreOrizz(Q.perCategoria.map((c) => ({ nome: c.categoria, valore: c.n }))) || '<div class="empty">Nessuno scarto.</div>';
+    $('#eTot').textContent = n0(d.errori.totale24h) + ' nelle ultime 24 h';
+    $('#eTop').innerHTML = d.errori.top.map((e) => `<div class="srv"><span style="font-size:12px">${esc(e.errore)}</span><span class="pill n">${n0(e.n)}</span></div>`).join('') || '<div class="empty">Nessun errore.</div>';
+
+    // Libreria
+    $('#lAmbito').innerHTML = barreOrizz(Object.entries(L.perAmbito).map(([nome, valore]) => ({ nome, valore })));
+    $('#lTipo').innerHTML = barreOrizz(Object.entries(L.perTipo).map(([nome, valore]) => ({ nome, valore })));
+    $('#lCar').innerHTML = `<div class="kv"><span>Caricati su iBroadcast</span><span>${n0(L.caricati)} di ${n0(L.totale)}</span>
+      <span>Ascolti totali</span><span>${n0(L.ascoltiTot)}</span><span>Caricamenti nelle ultime 24 h</span><span>${n0(R.caricati24h)}</span></div>`;
+    $('#recenti').innerHTML = `<thead><tr><th>Titolo</th><th>Categoria</th><th>Tipo</th><th class="num">Durata</th><th class="num">BPM</th><th>Voto</th><th>Esito</th><th>iBroadcast</th><th>Generato</th></tr></thead><tbody>${
+      L.recenti.map((t) => `<tr><td>${esc(t.titolo)}</td><td>${esc(t.categoria || '')}</td><td><span class="tag">${esc(t.tipo || '')}</span></td>
+        <td class="num">${sec(t.durata_s)}</td><td class="num">${n0(t.bpm)}</td><td>${stelle(t.voto)}</td>
+        <td><span class="pill ${t.esito === 'ok' ? 'ok' : t.esito ? 'ko' : 'n'}">${esc(t.esito || '—')}</span></td>
+        <td>${t.caricato ? '<span class="pill ok">sì</span>' : '<span class="pill n">no</span>'}</td><td class="muted">${data(t.generato_il)}</td></tr>`).join('')
+    }</tbody>`;
+  }
+
+  function lineaRender(ult) {
+    const w = 760, h = 230, pad = { l: 40, r: 14, t: 16, b: 28 };
+    const max = Math.max(...ult.map((x) => Math.max(x.render, x.richiesti)), 1) * 1.08;
+    const step = (w - pad.l - pad.r) / Math.max(1, ult.length - 1);
+    const y = (v) => pad.t + (h - pad.t - pad.b) * (1 - v / max);
+    const pts = ult.map((x, i) => [pad.l + i * step, y(x.render)]);
+    const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    const ref = ult.map((x, i) => [pad.l + i * step, y(x.richiesti)]);
+    const dRef = ref.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    let g = '';
+    for (let i = 0; i <= 4; i++) {
+      const v = max * i / 4, yy = y(v);
+      g += `<line class="gridline" x1="${pad.l}" x2="${w - pad.r}" y1="${yy}" y2="${yy}"/><text class="axis" x="${pad.l - 8}" y="${yy + 3}" text-anchor="end">${Math.round(v)}s</text>`;
+    }
+    const dots = pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.2" fill="#5eead4"><title>render ${ult[i].render}s · richiesti ${ult[i].richiesti}s</title></circle>`).join('');
+    return `<svg class="chart" viewBox="0 0 ${w} ${h}">
+      <defs><linearGradient id="lg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5eead4" stop-opacity=".28"/><stop offset="1" stop-color="#5eead4" stop-opacity="0"/></linearGradient></defs>
+      ${g}
+      <path d="${d} L${pts[pts.length - 1][0]} ${h - pad.b} L${pad.l} ${h - pad.b} Z" fill="url(#lg)"/>
+      <path d="${dRef}" fill="none" stroke="#818cf8" stroke-width="1.4" stroke-dasharray="5 5" opacity=".8"/>
+      <path d="${d}" fill="none" stroke="#5eead4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+    </svg>
+    <div class="legend" style="flex-direction:row;gap:18px;flex-wrap:wrap">
+      <div><i style="background:#5eead4"></i>tempo di render</div><div><i style="background:#818cf8"></i>durata richiesta</div></div>`;
+  }
+
+  // ---------- generi ----------
+  function renderGeneri() {
+    if (!dati) return;
+    const famiglie = [...new Set(dati.generi.map((g) => g.famiglia).filter(Boolean))].sort();
+    $('#fam').innerHTML = ['tutte', ...famiglie].map((f) => `<button class="fchip" data-f="${esc(f)}" aria-pressed="${filtro.famiglia === f}">${esc(f)}</button>`).join('');
+    const q = filtro.q.trim().toLowerCase();
+    const lista = dati.generi.filter((g) => {
+      if (filtro.famiglia !== 'tutte' && g.famiglia !== filtro.famiglia) return false;
+      if (!q) return true;
+      return [g.nome, g.genere, g.stile, g.attivita, ...(g.strumenti || []), ...(g.varianti || []), ...(g.influenze || [])].join(' ').toLowerCase().includes(q);
+    });
+    $('#gcards').innerHTML = lista.map((g, i) => {
+      const c = g.colori && g.colori.length ? g.colori : ['#1e293b', '#334155', '#64748b'];
+      const energia = [1, 2, 3, 4, 5].map((k) => `<i class="${k <= g.energia ? 'on' : ''}"></i>`).join('');
+      return `<article class="gc" style="animation-delay:${Math.min(i, 12) * 0.03}s">
+        <div class="hd" style="background:linear-gradient(135deg, ${c[0]}, ${c[1] || c[0]} 60%, ${c[2] || c[1] || c[0]})">
+          <div class="nm">${esc(g.nome)}</div></div>
+        <div class="bd">
+          <div class="gn">${esc(g.genere)} · ${esc(g.famiglia || '')}</div>
+          <div>${g.vocale ? '<span class="tag vox">voci senza parole</span>' : '<span class="tag acc">strumentale</span>'}<span class="tag">${esc(g.ambito || '')}</span></div>
+          <div class="row">
+            <div><small>BPM</small><b>${g.bpm[0]}–${g.bpm[1]}</b></div>
+            <div><small>Brani</small><b>${n0(g.brani)}</b></div>
+            <div><small>Voto</small><b>${g.votoMedio === null ? '—' : n1(g.votoMedio)}</b></div>
+          </div>
+          <div class="energy" title="energia ${g.energia}/5">${energia}</div>
+          <div class="muted" style="font-size:12px;margin-top:8px">${esc(g.attivita)}</div>
+          <details><summary>Specifiche complete</summary>
+            <div class="det">
+              <p><b>Stile</b><br>${esc(g.stile)}</p>
+              <p><b>Strumenti</b><br>${(g.strumenti || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</p>
+              <p><b>Strutture</b><br>${(g.strutture || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</p>
+              <p><b>Varianti</b><br>${(g.varianti || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</p>
+              <p><b>Influenze</b><br>${(g.influenze || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</p>
+              <p><b>Tonalità</b><br>${(g.tonalita || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</p>
+              <p><b>Evitare</b><br>${(g.vietati || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</p>
+              <p><b>Brani</b>: ${n0(g.brani)} · caricati ${n0(g.caricati)} · ascolti ${n0(g.ascoltiTot)} · scartati ${n0(g.scartati)}</p>
+              <p><b>Ultimo brano</b>: ${data(g.ultimo)} · durata media ${sec(g.durataMedia_s)}</p>
+              <p><b>Colori</b>: ${(g.colori || []).map((x) => `<i class="sw" style="background:${esc(x)}"></i>`).join(' ')}</p>
+            </div>
+          </details>
+        </div></article>`;
+    }).join('') || '<div class="empty">Nessun genere corrisponde alla ricerca.</div>';
+  }
+
+  // ---------- navigazione ----------
+  const TITOLI = { panoramica: 'Panoramica', render: 'Render', generi: 'Generi', voti: 'Voti', qualita: 'Qualità', libreria: 'Libreria', log: 'Log e sistema' };
+  function vai(tab) {
+    if (!TITOLI[tab]) tab = 'panoramica';
+    document.querySelectorAll('section.tab').forEach((s) => s.classList.toggle('on', s.id === 't-' + tab));
+    document.querySelectorAll('#nav button').forEach((b) => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
+    $('#titolo').textContent = TITOLI[tab];
+    if (location.hash !== '#' + tab) history.replaceState(null, '', '#' + tab);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  document.getElementById('nav').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-tab]');
+    if (b) vai(b.dataset.tab);
+  });
+  document.getElementById('fam').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-f]');
+    if (!b) return;
+    filtro.famiglia = b.dataset.f;
+    renderGeneri();
+  });
+  $('#q').addEventListener('input', (e) => { filtro.q = e.target.value; renderGeneri(); });
+  vai((location.hash || '#panoramica').slice(1));
+  window.addEventListener('hashchange', () => vai(location.hash.slice(1)));
+
+  // ---------- caricamento ----------
+  async function leggi(url) {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+  async function aggiornaStato() {
+    try { disegnaStato(await leggi('/api/stato')); }
+    catch (e) { $('#cAgg').textContent = 'connessione persa'; }
+  }
+  async function aggiornaDati() {
+    try { disegnaDati(await leggi('/api/dati')); }
+    catch (e) { $('#sotto').innerHTML = '<span class="err">Impossibile leggere i dati: ' + esc(e.message) + '</span>'; }
+  }
+  aggiornaStato();
+  aggiornaDati();
+  setInterval(aggiornaStato, 5000);
+  setInterval(aggiornaDati, 30000);
+})();
 </script>
 </body>
 </html>
