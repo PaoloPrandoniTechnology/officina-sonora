@@ -170,6 +170,11 @@ Verifica finale: nessun riferimento residuo oltre all'ambito `yoga`.
 5. Dashboard e apprendimento.
 6. Agente di ricerca.
 
+**Modifica del 27/11 (decisione dell'utente):** la produzione non si ferma per le prove della fase 2.
+I miglioramenti vanno direttamente in produzione, a piccoli passi, e si giudicano con ascolto e voti.
+Primo passo applicato: tag riconosciuti e forme piu' lunghe, `cot: full`, `yue2-instrumental` con LoRA di
+genere (campo `lora` di `catalogo.json`), score `.abc` salvato, stile senza ripetizioni.
+
 ## 15. Verifiche
 Test automatici: ogni score generato (39 generi, molti seed) supera il parser; durata entro il 5%;
 distinzione tra generi; lyrics coerenti con lo score; proposte malevole rifiutate; produzione che continua

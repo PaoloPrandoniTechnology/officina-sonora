@@ -644,7 +644,15 @@
         "prompt": "1970s funk record sleeve, glowing electric bass guitar and vinyl, concentric retro stripes, mustard orange and brown, screen print poster",
         "font": "Impact",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-disco-funk",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Afro-latin-groove",
@@ -719,7 +727,15 @@
         "prompt": "conga hand drums on a sunlit street with bold woven textile patterns, vibrant festive gouache illustration, red yellow and turquoise",
         "font": "Segoe UI",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-afrobeats",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Trip-hop-dolce",
@@ -793,7 +809,15 @@
         "prompt": "rainy city window at night with blurred neon reflections, vintage electric piano silhouette, grainy film photography, muted blue and amber",
         "font": "Bahnschrift",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-lofi",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Reggae-dub-morbido",
@@ -1011,7 +1035,15 @@
         "prompt": "acoustic guitar and banjo leaning on a wooden cabin porch, golden wheat fields, warm vintage illustration, ochre and green",
         "font": "Georgia",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-acoustic-folk",
+          "scale": 1,
+          "ar_scale": 0.3,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Surf-rock-strumentale",
@@ -1159,7 +1191,15 @@
         "prompt": "lone radio tower on a vast foggy plain under an immense storm lit sky, cinematic wide landscape photography, slate blue and pale gold",
         "font": "Bahnschrift",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-indie-rock",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Blues-shuffle-strumentale",
@@ -1307,7 +1347,15 @@
         "prompt": "vintage guitar amplifier and instant photo prints on a bedroom floor in sunlight, faded film photography, pastel yellow and sky blue",
         "font": "Segoe UI",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-indie-rock",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Rockabilly-strumentale",
@@ -1455,7 +1503,15 @@
         "prompt": "minimal geometric composition of repeating light bars in a dark concrete tunnel, stark abstract, monochrome with a single cyan accent",
         "font": "Bahnschrift",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-house",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Piano-minimalista",
@@ -1602,7 +1658,15 @@
         "prompt": "epic mountain citadel above a sea of clouds with dramatic sun rays, cinematic matte painting, deep blue and gold",
         "font": "Georgia",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-epic-trailer",
+          "scale": 1,
+          "ar_scale": 0.5,
+          "nar_scale": 0.375
+        }
+      ]
     },
     {
       "name": "Folk-balcanico",
@@ -1750,7 +1814,15 @@
         "prompt": "vintage sampler and turntable on a brick rooftop at golden hour, graffiti color shapes, urban illustration, purple and orange",
         "font": "Impact",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-lofi",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "name": "Manouche-swing",
@@ -1887,7 +1959,15 @@
         "prompt": "retrowave, giant sunset sun cut by horizontal stripes, glowing magenta perspective grid floor to the horizon, wireframe mountains, retro sports car, 1980s airbrush illustration, magenta and cyan",
         "font": "Bahnschrift",
         "corsivo": true
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-keygen-music",
+          "scale": 1,
+          "ar_scale": 0.3,
+          "nar_scale": 0.35
+        }
+      ]
     },
     {
       "ambito": "musica",
@@ -2011,7 +2091,15 @@
         "prompt": "carved celtic harp on a green cliff above a misty sea, standing stones, storybook painting, emerald and silver",
         "font": "Georgia",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-acoustic-folk",
+          "scale": 1,
+          "ar_scale": 0.3,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "ambito": "musica",
@@ -2511,7 +2599,15 @@
         "prompt": "huge black wrought iron gate standing in the foreground on a volcanic cliff, lightning storm, molten lava, heavy metal album oil painting, black and blood red, high contrast",
         "font": "Impact",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-metal",
+          "scale": 1,
+          "ar_scale": 0.5,
+          "nar_scale": 0
+        }
+      ]
     },
     {
       "ambito": "musica",
@@ -2574,7 +2670,15 @@
         "prompt": "colossal rusted factory machinery with sparks and red warning light, brutalist industrial photography, steel grey and red",
         "font": "Impact",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-industrial-rock",
+          "scale": 1,
+          "ar_scale": 0.5,
+          "nar_scale": 0.5
+        }
+      ]
     },
     {
       "ambito": "musica",
@@ -2700,7 +2804,15 @@
         "prompt": "electric guitar planted in cracked desert ground with flames and a burning sunset sky, 1970s rock album painting, orange and charcoal",
         "font": "Impact",
         "corsivo": false
-      }
+      },
+      "lora": [
+        {
+          "name": "yue2-slider-metal",
+          "scale": 1,
+          "ar_scale": 0.35,
+          "nar_scale": 0
+        }
+      ]
     }
   ],
   "tipi": [
@@ -2731,40 +2843,52 @@
   ],
   "strutture": {
     "piatto": [
-      "[Intro]",
-      "[Main]",
-      "[Outro]"
+      "[intro]",
+      "[verse]",
+      "[bridge]",
+      "[verse]",
+      "[outro]"
     ],
     "onda": [
-      "[Intro]",
-      "[Main]",
-      "[Release]",
-      "[Main]",
-      "[Outro]"
+      "[intro]",
+      "[verse]",
+      "[chorus]",
+      "[verse]",
+      "[bridge]",
+      "[chorus]",
+      "[outro]"
     ],
     "arco": [
-      "[Intro]",
-      "[Build]",
-      "[Peak]",
-      "[Release]",
-      "[Outro]"
+      "[intro]",
+      "[verse]",
+      "[pre-chorus]",
+      "[chorus]",
+      "[verse]",
+      "[bridge]",
+      "[chorus]",
+      "[outro]"
     ],
     "crescendo": [
-      "[Intro]",
-      "[Build]",
-      "[Build]",
-      "[Main]",
-      "[Peak]",
-      "[Release]",
-      "[Outro]"
+      "[intro]",
+      "[verse]",
+      "[verse]",
+      "[pre-chorus]",
+      "[chorus]",
+      "[bridge]",
+      "[pre-chorus]",
+      "[chorus]",
+      "[outro]"
     ],
     "loop": [
-      "[Intro]",
-      "[Main]",
-      "[Main]",
-      "[Peak]",
-      "[Main]",
-      "[Outro]"
+      "[intro]",
+      "[verse]",
+      "[chorus]",
+      "[verse]",
+      "[bridge]",
+      "[verse]",
+      "[chorus]",
+      "[chorus]",
+      "[outro]"
     ]
   },
   "tag_extra": {},

@@ -25,5 +25,7 @@ const dir = cartellaBrano(c.categoria, c.tipo);
 fs.mkdirSync(dir, { recursive: true });
 const file = uniquePath(dir, slugify(c.titolo), '.' + ext);
 fs.writeFileSync(file, data);
+const abc = extractAbc(r.buf, r.headers['content-type']);
+if (abc) fs.writeFileSync(file.replace(/\.[^.]+$/, '.abc'), abc);
 log(`audio scritto: ${file}`);
 return [{ json: { state, outcome: 'audio', file, bytes: data.length } }];

@@ -256,7 +256,9 @@ function componiStile(cat, variante, strumenti, influenza, guidance) {
     (guidance.style_extra || []).join(', '),
     cat.vocale_senza_parole ? 'wordless vocals, no lyrics' : 'instrumental, no vocals',
   ].filter(Boolean);
-  return parti.join(', ');
+  // il motore pesa le parole: ogni frase compare una volta sola
+  const viste = new Set();
+  return parti.join(', ').split(', ').filter((p) => !viste.has(p.toLowerCase()) && viste.add(p.toLowerCase())).join(', ');
 }
 
 // Divieti del genere e quelli generali

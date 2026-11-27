@@ -31,6 +31,8 @@ const meta = {
   style: c.style,
   avoid: c.avoid,
   sezioni: c.sezioni,
+  lyrics: c.lyrics,
+  lora: job.adapters || [],
   seed: job.seed,
   job_id: job.id,
   bytes_audio: inp.bytes,

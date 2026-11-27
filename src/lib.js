@@ -62,13 +62,14 @@ const CFG = {
   tipi: ['ambient-pad', 'ambient-profondo', 'melodico-dolce', 'drone-spaziale', 'ritmico-leggero', 'ritmico-energico'],
   // Strutture: sezioni in ordine. Ogni categoria ne usa solo alcune.
   strutture: {
-    piatto: ['[Intro]', '[Main]', '[Outro]'],
-    onda: ['[Intro]', '[Main]', '[Release]', '[Main]', '[Outro]'],
-    arco: ['[Intro]', '[Build]', '[Peak]', '[Release]', '[Outro]'],
-    crescendo: ['[Intro]', '[Build]', '[Build]', '[Main]', '[Peak]', '[Release]', '[Outro]'],
-    loop: ['[Intro]', '[Main]', '[Main]', '[Peak]', '[Main]', '[Outro]'],
+    piatto: ['[intro]', '[verse]', '[bridge]', '[verse]', '[outro]'],
+    onda: ['[intro]', '[verse]', '[chorus]', '[verse]', '[bridge]', '[chorus]', '[outro]'],
+    arco: ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[verse]', '[bridge]', '[chorus]', '[outro]'],
+    crescendo: ['[intro]', '[verse]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[pre-chorus]', '[chorus]', '[outro]'],
+    loop: ['[intro]', '[verse]', '[chorus]', '[verse]', '[bridge]', '[verse]', '[chorus]', '[chorus]', '[outro]'],
   },
-  sections: ['[Intro]', '[Build]', '[Main]', '[Peak]', '[Release]', '[Outro]'],
+  // solo i tag che la LoRA strumentale conosce
+  sections: ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'],
   artista: 'Officina Sonora',
 };
 CFG.stateFile = path.join(CFG.dir, 'state', 'state.json');
@@ -389,6 +390,21 @@ function requeue(state, reason) {
     state.queue.unshift(c);
     log(`riaccodo "${c.titolo}" (tentativo ${c.attempts}): ${reason}`);
   }
+}
+
+// Lo score ABC che il motore ha seguito, dalle parti JSON della risposta; null se assente.
+function extractAbc(buf, ct) {
+  const m = /boundary="?([^";]+)"?/i.exec(ct || '');
+  if (!m) return null;
+  for (const parte of buf.toString('utf8').split('--' + m[1])) {
+    const i = parte.indexOf('\r\n\r\n');
+    if (i === -1 || !/application\/json/i.test(parte.slice(0, i))) continue;
+    try {
+      const abc = JSON.parse(parte.slice(i + 4).trim()).abc;
+      if (abc) return abc;
+    } catch (e) { /* parte JSON non valida */ }
+  }
+  return null;
 }
 
 // Estrae la traccia audio dalla risposta multipart del motore.

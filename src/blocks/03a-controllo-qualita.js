@@ -106,7 +106,7 @@ if (esito.problemi.length) {
   // Sposta il brano fuori dalla libreria: non viene caricato
   const dest = path.join(CFG.scartati, meta.categoria || 'senza-categoria', meta.tipo || 'senza-tipo');
   fs.mkdirSync(dest, { recursive: true });
-  for (const f of [file, jsonPath]) {
+  for (const f of [file, jsonPath, file.replace(/\.[^.]+$/, '.abc')]) {
     if (fs.existsSync(f)) fs.renameSync(f, path.join(dest, path.basename(f)));
   }
   state.scartati = (state.scartati || 0) + 1;
