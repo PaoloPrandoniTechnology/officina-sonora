@@ -1,4 +1,4 @@
-// BLOCCO 9 - Riflessione giornaliera: una volta al giorno (dopo le 8) prepara il rapporto
+// BLOCCO 9 - Riflessione giornaliera: una volta al giorno (nella fascia dei messaggi) prepara il rapporto
 // su ricette, voti ed errori, lo invia su Telegram e registra cosa ha imparato il sistema.
 // Stato proprio in state/riflessione.json (parallelo alla produzione, nessun conflitto).
 // il token Telegram sta nel gateway locale
@@ -8,7 +8,9 @@ const ora = new Date();
 const oggi = ora.toISOString().slice(0, 10);
 const rif = readJsonSafe(RIF_FILE, { ultimo: null });
 
-if (!CHAT || rif.ultimo === oggi || ora.getHours() < 8) {
+const { attivo, dati: scelti } = CFG.messaggi.tipi.rapporto;
+const con = (d) => scelti.includes(d);
+if (!CHAT || !attivo || !scelti.length || rif.ultimo === oggi || !inFascia(CFG.messaggi, ora)) {
   return [{ json: { riflessione: 'non dovuta oggi' } }];
 }
 
@@ -71,7 +73,7 @@ const dati = {
 };
 
 let commento = '';
-try {
+if (con('commento')) try {
   const j = await llmJson('Sei l\'analista di un generatore di musica per yoga. Rispondi solo con JSON valido.',
     `Dati di oggi: ${JSON.stringify(dati)}
 Scrivi un oggetto JSON con "sintesi" (2-3 frasi in italiano su cosa sta funzionando e cosa no) e "suggerimento" (una sola modifica concreta, o "nessuno"). Non proporre codice.`, 600);
@@ -82,13 +84,13 @@ Scrivi un oggetto JSON con "sintesi" (2-3 frasi in italiano su cosa sta funziona
 
 const testo = [
   `Rapporto giornaliero ${oggi}`,
-  `Brani: ${totale} (ultime 24h: ${ultime24.length}) · voti: ${votiOggi} · errori 24h: ${erroriOggi}`,
-  `Esperimenti attivi: ${dati.esperimenti_attivi.length ? dati.esperimenti_attivi.join(', ') : 'nessuno'}`,
-  `Salute: disco E: ${salute.liberoGb ?? '?'} GB liberi · coda ${salute.coda} · falliti ${salute.falliti} · scartati QC ${salute.scartati} · watchdog ${salute.batticoMin ?? '?'} min fa`,
-  salute.liberoGb !== null && salute.liberoGb < 20 ? 'ATTENZIONE: spazio su disco sotto 20 GB' : null,
-  salute.top.length ? `Errori principali 24h: ${salute.top.map(([k, n]) => `${k} (${n})`).join('; ')}` : 'Errori 24h: nessuno',
-  `Migliori ricette: ${dati.migliori_ricette.map((c) => `${c.ricetta} (${c.punteggio.toFixed(2)})`).join('; ') || 'ancora pochi dati'}`,
-  `Da rivedere: ${dati.peggiori_ricette.map((c) => `${c.ricetta} (${c.punteggio.toFixed(2)})`).join('; ') || 'nessuna'}`,
+  con('conteggi') && `Brani: ${totale} (ultime 24h: ${ultime24.length}) · voti: ${votiOggi} · errori 24h: ${erroriOggi}`,
+  con('esperimenti') && `Esperimenti attivi: ${dati.esperimenti_attivi.length ? dati.esperimenti_attivi.join(', ') : 'nessuno'}`,
+  con('salute') && `Salute: disco E: ${salute.liberoGb ?? '?'} GB liberi · coda ${salute.coda} · falliti ${salute.falliti} · scartati QC ${salute.scartati} · watchdog ${salute.batticoMin ?? '?'} min fa`,
+  con('salute') && salute.liberoGb !== null && salute.liberoGb < 20 && 'ATTENZIONE: spazio su disco sotto 20 GB',
+  con('errori') && (salute.top.length ? `Errori principali 24h: ${salute.top.map(([k, n]) => `${k} (${n})`).join('; ')}` : 'Errori 24h: nessuno'),
+  con('migliori') && `Migliori ricette: ${dati.migliori_ricette.map((c) => `${c.ricetta} (${c.punteggio.toFixed(2)})`).join('; ') || 'ancora pochi dati'}`,
+  con('rivedere') && `Da rivedere: ${dati.peggiori_ricette.map((c) => `${c.ricetta} (${c.punteggio.toFixed(2)})`).join('; ') || 'nessuna'}`,
 ].filter(Boolean).join('\n') + commento;
 
 try {

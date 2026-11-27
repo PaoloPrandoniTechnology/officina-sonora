@@ -4,6 +4,58 @@
       "peso": 1,
       "attivo": true,
       "note": []
+    },
+    "Surf-rock-strumentale": {
+      "peso": 1,
+      "attivo": true,
+      "note": [
+        {
+          "testo": "voglio piu assoli di chitarra elettrica",
+          "inglese": null,
+          "ts": "2026-11-27T09:53:48.278Z"
+        }
+      ]
+    }
+  },
+  "messaggi": {
+    "frequenzaMin": 60,
+    "inizio": 8,
+    "fine": 22,
+    "tipi": {
+      "riepilogo": {
+        "attivo": true,
+        "dati": [
+          "conteggio",
+          "titoli",
+          "genere",
+          "tipo",
+          "musica",
+          "durata",
+          "render",
+          "id",
+          "totale"
+        ]
+      },
+      "rapporto": {
+        "attivo": true,
+        "dati": [
+          "conteggi",
+          "esperimenti",
+          "salute",
+          "errori",
+          "migliori",
+          "rivedere",
+          "commento"
+        ]
+      },
+      "avvisi": {
+        "attivo": true,
+        "dati": [
+          "testo",
+          "ripetizioni",
+          "ora"
+        ]
+      }
     }
   }
 }

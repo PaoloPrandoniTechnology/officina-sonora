@@ -449,6 +449,7 @@
         <button data-s="generi" aria-pressed="false">Generi</button>
         <button data-s="guida" aria-pressed="false">Linee guida</button>
         <button data-s="note" aria-pressed="false">Note per genere</button>
+        <button data-s="messaggi" aria-pressed="false">Messaggi</button>
         <button data-s="storico" aria-pressed="false">Storico</button>
       </div>
       <div class="grid" id="cRiepilogo" style="margin-bottom:14px"></div>
@@ -457,6 +458,7 @@
       <div id="c-generi" class="cpane" hidden></div>
       <div id="c-guida" class="cpane" hidden></div>
       <div id="c-note" class="cpane" hidden></div>
+      <div id="c-messaggi" class="cpane" hidden></div>
       <div id="c-storico" class="cpane" hidden></div>
     </section>
 
@@ -823,12 +825,12 @@
   // ---------- controllo ----------
   let ctrl = null;
   let ctrlSub = 'produzione';
-  const CTRL_SEZIONI = ['produzione', 'parametri', 'generi', 'guida', 'note', 'storico'];
+  const CTRL_SEZIONI = ['produzione', 'parametri', 'generi', 'guida', 'note', 'messaggi', 'storico'];
   let noteGenere = null;
 
   function toast(testo, tipo) {
     const box = $('#toasts');
-    const t = el('div', { class: 'toast' + (tipo === 'err' ? ' err' : '') }, testo);
+    const t = Object.assign(document.createElement('div'), { className: 'toast' + (tipo === 'err' ? ' err' : ''), textContent: testo });
     box.appendChild(t);
     setTimeout(() => t.classList.add('out'), 3200);
     setTimeout(() => t.remove(), 3700);
@@ -903,6 +905,7 @@
     if (ctrlSub === 'generi') disegnaGeneri();
     if (ctrlSub === 'guida') disegnaGuida();
     if (ctrlSub === 'note') disegnaNote();
+    if (ctrlSub === 'messaggi') disegnaMessaggi();
     if (ctrlSub === 'storico') disegnaStorico();
   }
 
@@ -1007,6 +1010,42 @@
         }
       };
     });
+  }
+
+  function disegnaMessaggi() {
+    const { impostazioni: imp, definizioni, frequenze } = ctrl.messaggi;
+    const ore = (da, a, scelta) => Array.from({ length: a - da + 1 }, (_, i) => da + i)
+      .map((h) => `<option value="${h}" ${h === scelta ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('');
+    const freq = (m) => m < 60 ? m + ' minuti' : m === 60 ? '1 ora' : m / 60 + ' ore';
+    $('#c-messaggi').innerHTML = `
+      <div class="grid">
+        <div class="card c12">
+          <h2>Quando <small>ora di questo PC</small></h2>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end">
+            <label>Un riepilogo ogni<br><select class="field" id="mFreq">${frequenze.map((m) => `<option value="${m}" ${m === imp.frequenzaMin ? 'selected' : ''}>${freq(m)}</option>`).join('')}</select></label>
+            <label>Inizio invii<br><select class="field" id="mInizio">${ore(0, 23, imp.inizio)}</select></label>
+            <label>Stop invii<br><select class="field" id="mFine">${ore(1, 24, imp.fine)}</select></label>
+          </div>
+          <p class="muted" style="margin:14px 0 0">L'ultimo riepilogo parte all'ora di stop. Poi, fino all'inizio, non arriva nessun messaggio automatico. Le risposte ai tuoi comandi arrivano sempre.</p>
+        </div>
+        ${Object.entries(definizioni).map(([nome, def]) => `
+        <div class="card c4" data-tipo="${esc(nome)}">
+          <h2>${esc(def.etichetta)} <label class="switch"><input type="checkbox" data-attivo ${imp.tipi[nome].attivo ? 'checked' : ''} aria-label="attiva ${esc(def.etichetta)}"><span></span></label></h2>
+          <p class="muted" style="margin:0 0 12px">${esc(def.descrizione)}</p>
+          ${Object.entries(def.dati).map(([d, testo]) => `<label style="display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer"><input type="checkbox" value="${esc(d)}" data-dato ${imp.tipi[nome].dati.includes(d) ? 'checked' : ''}> ${esc(testo)}</label>`).join('')}
+        </div>`).join('')}
+        <div class="card c12"><button class="btn" id="mSalva">Salva le impostazioni dei messaggi</button></div>
+      </div>`;
+    $('#mSalva').onclick = async () => {
+      const tipi = {};
+      $('#c-messaggi').querySelectorAll('[data-tipo]').forEach((c) => {
+        tipi[c.dataset.tipo] = { attivo: c.querySelector('[data-attivo]').checked, dati: [...c.querySelectorAll('[data-dato]:checked')].map((x) => x.value) };
+      });
+      const corpo = { frequenzaMin: Number($('#mFreq').value), inizio: Number($('#mInizio').value), fine: Number($('#mFine').value), tipi };
+      // in caso di errore le scelte restano a video, pronte da correggere
+      try { await invia('/api/controllo/messaggi', corpo); toast('Impostazioni dei messaggi salvate', 'ok'); await caricaControllo(true); }
+      catch (e) { toast(e.message, 'err'); }
+    };
   }
 
   function disegnaGeneri() {

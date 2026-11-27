@@ -36,6 +36,6 @@ if (git diff --cached --quiet) {
   Write-Output 'nessuna modifica da pubblicare'
   exit 0
 }
-git commit -q -m "$Messaggio`n`nCo-Authored-By: Claude Haiku 5.5 <noreply@anthropic.com>"
+git commit -q -m "$Messaggio`n`nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 git push -q origin master
 git log --oneline -1
