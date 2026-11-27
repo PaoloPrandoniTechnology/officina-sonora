@@ -11,7 +11,8 @@ if (!(await engineUp())) {
 const concept = state.queue.shift();
 concept.durata_s = concept.durata_s || CFG.durDefault;
 const seed = Math.floor(Math.random() * 2147483647);
-// LoRA: la strumentale (pensata per lo score) piu' quella del genere, solo se il motore le ha davvero.
+// LoRA: la strumentale KTO piu' quella del genere, solo se il motore le ha davvero.
+// Non si usa yue2-instrumental: in produzione il motore chiudeva i brani a 30 secondi.
 // Senza elenco da /props si usa la sola KTO, per non farsi rifiutare il render.
 let presenti = [];
 try {
@@ -20,17 +21,15 @@ try {
 } catch (e) {
   log(`elenco LoRA non disponibile: ${e.message}`);
 }
-// Ripiego dopo un render fallito (LoRA sovrapposte possono rovinare lo score): al secondo tentativo senza la
-// LoRA di genere, al terzo la configurazione gia' collaudata (KTO, score di sola melodia).
-const sicuro = (concept.attempts || 0) >= 2;
 const piena = (name) => ({ name, scale: 1.0, ar_scale: 1.0, nar_scale: 0.0 });
 const delGenere = ((CFG.categories || []).find((x) => x.name === concept.categoria) || {}).lora || [];
 const mancanti = delGenere.filter((a) => !presenti.includes(a.name));
 if (presenti.length && mancanti.length) log(`LoRA assente sul motore, brano senza: ${mancanti.map((a) => a.name).join(', ')}`);
-const adapters = concept.vocale ? [] : [
-  piena(!sicuro && presenti.includes('yue2-instrumental') ? 'yue2-instrumental' : 'yue2-instrumental-kto'),
-];
-if (!concept.attempts) adapters.push(...delGenere.filter((a) => presenti.includes(a.name)));
+// Ripiego: dopo un render fallito, o al secondo ritento di un brano corto, si toglie la LoRA di genere
+// (LoRA sovrapposte possono rovinare lo score); al terzo fallimento lo score e' di sola melodia.
+const sicuro = (concept.attempts || 0) >= 2;
+const adapters = concept.vocale ? [] : [piena('yue2-instrumental-kto')];
+if (!concept.attempts && (concept.tentativi_render || 0) < 2) adapters.push(...delGenere.filter((a) => presenti.includes(a.name)));
 
 const durata = Math.min(360, Math.round(concept.durata_s * 1.2)); // 360 s: limite del motore
 // Il nostro score vale al primo tentativo; dopo un fallimento lo scrive il motore

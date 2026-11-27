@@ -188,7 +188,8 @@ sua voce dal file.
 Un brano scartato perché troppo corto viene rigenerato con uno **score nuovo** del compositore.
 
 ### LoRA
-Gli strumentali usano `yue2-instrumental` (pensata per lo score); se manca, `yue2-instrumental-kto`.
+Gli strumentali usano `yue2-instrumental-kto`. L'altra LoRA strumentale installata (`yue2-instrumental`) è
+esclusa: in produzione il motore chiudeva i brani dopo 30 secondi.
 I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una propria (campo `lora` del catalogo):
 
 | Generi | LoRA di genere |
@@ -205,8 +206,8 @@ I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una prop
 | Score cinematico | epic trailer |
 
 Se un render fallisce (per esempio perché le LoRA sovrapposte producono uno score illeggibile), il secondo
-tentativo parte senza la LoRA di genere e con lo score scritto dal motore, e il terzo con la configurazione più collaudata (`yue2-instrumental-kto`,
-score di sola melodia).
+tentativo parte senza la LoRA di genere e con lo score scritto dal motore, e il terzo con lo score di sola melodia.
+Anche il secondo ritento di un brano troppo corto parte senza LoRA di genere.
 
 Una LoRA assente dal motore viene saltata e annotata nel log. Le scale scelte sono un punto di partenza,
 da correggere con l'ascolto.

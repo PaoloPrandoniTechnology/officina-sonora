@@ -12,7 +12,7 @@ const L = new Function('require', LIB + '\nreturn { CFG, extractAbc, componiStil
 const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'];
 
 // Esegue il blocco 6 con un motore finto; ritorna il corpo inviato a /synth e lo stato
-async function invia(categoria, { props, vocale = false, attempts = 0, abc } = {}) {
+async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0 } = {}) {
   const finta = `
     CFG.comandi = {}; log = () => {}; engineUp = async () => true;
     req = async (m, url, o) => {
@@ -20,7 +20,7 @@ async function invia(categoria, { props, vocale = false, attempts = 0, abc } = {
       $env.corpo = o.body; return { ok: true, status: 200, buf: Buffer.from('{"id":"j1"}') };
     };`;
   const env = { props };
-  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts, abc };
+  const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts, abc, tentativi_render: corti };
   const input = { first: () => ({ json: { state: { job: null, queue: [concept] } } }) };
   const [r] = await new AF('require', '$input', '$env', LIB + finta + '\n' + leggi('src', 'blocks', '06-invia-render.js'))(require, input, env);
   return { corpo: env.corpo, job: r.json.state.job };
@@ -40,7 +40,7 @@ test('strumentale: score con accordi, LoRA strumentale e LoRA del genere', async
   const { corpo, job } = await invia('Score-cinematico', { props: elenco('yue2-instrumental', 'yue2-instrumental-kto', 'yue2-epic-trailer') });
   assert.equal(corpo.cot, 'full');
   assert.deepEqual(corpo.adapters, [
-    { name: 'yue2-instrumental', scale: 1, ar_scale: 1, nar_scale: 0 },
+    { name: 'yue2-instrumental-kto', scale: 1, ar_scale: 1, nar_scale: 0 },
     { name: 'yue2-epic-trailer', scale: 1, ar_scale: 0.5, nar_scale: 0.375 },
   ]);
   assert.deepEqual(job.adapters, corpo.adapters);
@@ -52,8 +52,9 @@ test('genere vocale senza parole: nessuna LoRA strumentale', async () => {
   assert.equal(corpo.adapters, undefined);
 });
 
-test('LoRA assente: il brano parte senza; manca la strumentale: KTO', async () => {
-  const { corpo } = await invia('Score-cinematico', { props: elenco('yue2-instrumental-kto') });
+// Visto in produzione: con yue2-instrumental il motore chiudeva i brani a 30 secondi
+test('LoRA assente: il brano parte senza; yue2-instrumental non viene usata', async () => {
+  const { corpo } = await invia('Score-cinematico', { props: elenco('yue2-instrumental', 'yue2-instrumental-kto') });
   assert.deepEqual(corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
 });
 
@@ -80,7 +81,7 @@ test('dopo un render fallito si riducono le LoRA, poi si torna alla configurazio
   const props = elenco('yue2-instrumental', 'yue2-instrumental-kto', 'yue2-epic-trailer');
   const secondo = await invia('Score-cinematico', { props, attempts: 1 });
   assert.equal(secondo.corpo.cot, 'full');
-  assert.deepEqual(secondo.corpo.adapters.map((a) => a.name), ['yue2-instrumental']);
+  assert.deepEqual(secondo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
   const terzo = await invia('Score-cinematico', { props, attempts: 2 });
   assert.equal(terzo.corpo.cot, 'melody');
   assert.deepEqual(terzo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
@@ -127,4 +128,12 @@ test('blocco 6: al primo tentativo invia il nostro score, dopo un fallimento lo 
   const secondo = await invia('Surf-rock-strumentale', { props, abc: 'X:1', attempts: 1 });
   assert.equal(secondo.corpo.abc, undefined);
   assert.ok(secondo.corpo.abc_sampling.max_tokens > 0);
+});
+
+test('secondo ritento di un brano corto: senza LoRA di genere', async () => {
+  const props = elenco('yue2-instrumental-kto', 'yue2-epic-trailer');
+  const primo = await invia('Score-cinematico', { props, corti: 1 });
+  assert.equal(primo.corpo.adapters.length, 2);
+  const secondo = await invia('Score-cinematico', { props, corti: 2 });
+  assert.deepEqual(secondo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
 });
