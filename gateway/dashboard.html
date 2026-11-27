@@ -890,8 +890,8 @@
     });
   }
   // invio di una modifica: intestazione X-Controllo obbligatoria lato gateway
-  async function invia(url, corpo) {
-    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Controllo': '1' }, body: JSON.stringify(corpo), cache: 'no-store' });
+  async function invia(url, corpo, signal) {
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Controllo': '1' }, body: JSON.stringify(corpo), cache: 'no-store', signal });
     const j = await r.json().catch(() => ({ ok: false, error: 'risposta non valida' }));
     if (!r.ok || !j.ok) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
@@ -1263,7 +1263,11 @@
       $('#vBrano').innerHTML = `<h3>${esc(b.titolo)}</h3><div class="sub">${esc([b.categoria, sec(b.durata_s), 'n. ' + b.numero].filter(Boolean).join(' · '))}</div>`;
       audio.src = '/audio/brano?n=' + encodeURIComponent(b.numero);
       $('#vNotaTxt').value = b.nota || '';
-    } else vt.cur = b; // stesso brano: dati aggiornati, lettore e nota scritta restano
+    } else {
+      // stesso brano: dati aggiornati, lettore fermo; la nota si aggiorna solo se non e' stata toccata
+      if ($('#vNotaTxt').value === (vt.cur.nota || '')) $('#vNotaTxt').value = b.nota || '';
+      vt.cur = b;
+    }
     abilitaVoto();
   }
 
@@ -1291,7 +1295,7 @@
 
   async function caricaVoti() {
     try {
-      const r = await leggi('/api/voti');
+      const r = await leggi('/api/voti', AbortSignal.timeout(15000));
       vt.coda = r.coda; vt.votati = r.votati; vt.caricato = true;
     } catch (e) {
       toast('Impossibile leggere i brani da votare: ' + e.message, 'err');
@@ -1311,14 +1315,14 @@
       const corpo = { numero: b.numero, voto };
       if (nota || b.nota) corpo.nota = nota; // nota vuota inviata solo per cancellarne una esistente
       try {
-        await invia('/api/controllo/voto', corpo);
-      } catch (e) { toast(e.message, 'err'); return; }
+        await invia('/api/controllo/voto', corpo, AbortSignal.timeout(15000));
+      } catch (e) { toast(e.name === 'TimeoutError' ? 'Il gateway non risponde: voto non confermato' : e.message, 'err'); return; }
       toast(`Voto ${voto} salvato: ${b.titolo}`);
       // aggiornamento locale subito, cosi' la scheda funziona anche se la rilettura fallisce
       vt.coda = vt.coda.filter((x) => x.numero !== b.numero);
       vt.votati = [{ ...b, voto, nota: corpo.nota ?? b.nota, voto_il: new Date().toISOString() }, ...vt.votati.filter((x) => x.numero !== b.numero)];
       // se nel frattempo e' stato scelto un altro brano (Salta, filtro, Votati ora) resta quello
-      const avanti = vt.cur === b;
+      const avanti = vt.cur?.numero === b.numero; // l'oggetto puo' essere stato sostituito da una rilettura
       if (avanti) vt.cur = null;
       disegnaCoda();
       disegnaVotati();
@@ -1393,8 +1397,8 @@
   window.addEventListener('hashchange', () => vai(location.hash.slice(1)));
 
   // ---------- caricamento ----------
-  async function leggi(url) {
-    const r = await fetch(url, { cache: 'no-store' });
+  async function leggi(url, signal) {
+    const r = await fetch(url, { cache: 'no-store', signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }
