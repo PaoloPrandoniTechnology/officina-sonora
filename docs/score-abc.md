@@ -28,7 +28,8 @@ Fonti: guide di composizione (motivo, frase, periodo, note dell'accordo) e MeloF
 - Ritornello in registro più alto; intro rarefatta; stop alla fine del bridge; salita verso il ritornello.
 - Armonie, scale, celle ritmiche e metro del bridge dipendono dal genere.
 - Revisore (0-100) su 30 candidati: accordo sui tempi forti 25, salti 15, ritorno del tema 20, contrasto 15,
-  posizione del climax 10, varietà 15.
+  posizione del climax 10, varietà 15. La somma pesa per l'85%; il 15% è la **novità** rispetto ai brani in memoria.
+- La memoria per genere fissa il materiale (progressioni, celle, variazioni) e i voti ne correggono i pesi.
 
 ## Da verificare
 - Quanto fedelmente YuE2 segue uno score scritto da regole, in particolare con metri diversi dal 4/4.

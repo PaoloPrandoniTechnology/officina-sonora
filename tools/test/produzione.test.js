@@ -88,14 +88,17 @@ test('dopo un render fallito si riducono le LoRA, poi si torna alla configurazio
 
 // Esegue il blocco 5d cosi' come finisce nel workflow generato
 async function componiScore(concept) {
-  require('child_process').execFileSync('node', ['build-workflow.mjs'], { cwd: RADICE, stdio: 'ignore' });
-  const wf = JSON.parse(leggi('officina-sonora-workflow.json'));
+  const uscita = path.join(RADICE, 'state', 'wf-prova-produzione.json');
+  require('child_process').execFileSync('node', ['build-workflow.mjs', uscita], { cwd: RADICE, stdio: 'ignore' });
+  const wf = JSON.parse(fs.readFileSync(uscita, 'utf8'));
+  const memoria = path.join(RADICE, 'state', 'memoria-prova-produzione.json');
   const codice = wf.nodes.find((n) => n.name === '5d Componi score').parameters.jsCode
-    .replace('// BLOCCO 5d', 'CFG.comandi = {}; log = () => {};\n// BLOCCO 5d');
+    .replace('// BLOCCO 5d', `CFG.comandi = {}; log = () => {}; CFG.memoriaFile = ${JSON.stringify(memoria)};\n// BLOCCO 5d`);
   assert.ok(wf.connections['5c Componi concept'].main[0].some((l) => l.node === '5d Componi score'));
   assert.ok(wf.connections['5d Componi score'].main[0].some((l) => l.node === '6 Invia render'));
   const input = { first: () => ({ json: { state: { job: null, queue: [concept] } } }) };
   const [r] = await new AF('require', '$input', '$env', codice)(require, input, {});
+  fs.rmSync(memoria, { force: true });
   return r.json.state.queue[0];
 }
 const conceptSurf = () => ({ titolo: 't', categoria: 'Surf-rock-strumentale', bpm: 130, tonalita: 'Mi minore', durata_s: 200, sezioni: L.CFG.strutture.arco, lyrics: 'x', vocale: false, attempts: 0 });

@@ -110,12 +110,89 @@ function adatta(cella, lunghezza) {
 }
 
 const MOSSE = [-1, -1, -1, 1, 1, 1, -2, 2, 0, 3];
-const motivo = (r, energia) => [0, 1].map(() => {
-  const ritmo = scegli(r, CELLE[energia]);
-  return { ritmo, mosse: ritmo.map(() => scegli(r, MOSSE)) };
-});
+const TRASFORMAZIONI = ['sequenza', 'inversione', 'ornamento', 'sposta'];
 
-function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }) {
+// ---- Memoria: identita' del genere (omogeneita'), preferenze dai voti, somiglianza tra brani ----
+
+function quanteProgressioni(cat, tonalita) {
+  const t = tonica(tonalita);
+  return ARMONIE[profilo(cat, t).stile][t.minore ? 'm' : 'M'].length;
+}
+
+// Peso di un elemento in base ai voti dei brani che lo hanno usato (1 = nessun voto)
+function peso(preferenze, chiave) {
+  const e = preferenze[chiave];
+  return e ? Math.max(0.25, Math.min(2, 1 + e.somma / e.n / 2)) : 1;
+}
+
+function preferenze(brani, voti) {
+  const out = {};
+  for (const b of brani) {
+    const voto = voti[b.seed];
+    if (!voto || !b.parametri) continue;
+    const chiavi = [
+      ...b.parametri.progressioni.map((x) => `prog:${x}`),
+      ...b.parametri.celle.map((x) => `cella:${x}`),
+      ...b.parametri.trasformazioni.map((x) => `trasf:${x}`),
+    ];
+    for (const k of chiavi) {
+      out[k] ||= { n: 0, somma: 0 };
+      out[k].n++;
+      out[k].somma += voto - 3;
+    }
+  }
+  return out;
+}
+
+function pesato(r, voci, pesoDi) {
+  let x = r() * voci.reduce((a, v) => a + pesoDi(v), 0);
+  for (const v of voci) { x -= pesoDi(v); if (x <= 0) return v; }
+  return voci[voci.length - 1];
+}
+
+// Il materiale che rende riconoscibile un genere: scelto una volta, poi cambia solo cio' che i voti bocciano
+function identita(cat, esistente, pref = {}, seme = 0) {
+  const r = casuale([...cat.name].reduce((a, c) => Math.imul(a, 31) + c.charCodeAt(0), seme));
+  const t = tonica((cat.tonalita || [])[0]);
+  const p = profilo(cat, t);
+  const armonie = ARMONIE[p.stile];
+  const indici = (n) => [...Array(n).keys()];
+  const estrai = (voci, quanti) => {
+    const resto = [...voci];
+    return indici(Math.min(quanti, voci.length)).map(() => resto.splice(Math.floor(r() * resto.length), 1)[0]);
+  };
+  const tutteProg = indici(Math.max(armonie.m.length, armonie.M.length));
+  if (!esistente) {
+    return {
+      progressioni: estrai(tutteProg, 3),
+      celle: Object.fromEntries(Object.entries(CELLE).map(([l, c]) => [l, estrai(indici(c.length), 4)])),
+      trasformazioni: estrai(TRASFORMAZIONI, 3),
+      metroBridge: Boolean(p.metroBridge) && r() < 0.7,
+      registro: scegli(r, [-2, 0, 2]),
+    };
+  }
+  // un elemento con almeno due voti e media 2 o meno lascia il posto a uno non ancora usato
+  const rinnova = (usati, tutti, chiave) => {
+    const liberi = tutti.filter((x) => !usati.includes(x));
+    return usati.map((x) => {
+      const e = pref[chiave(x)];
+      return e && e.n >= 2 && e.somma / e.n <= -1 && liberi.length ? liberi.splice(Math.floor(r() * liberi.length), 1)[0] : x;
+    });
+  };
+  return {
+    ...esistente,
+    progressioni: rinnova(esistente.progressioni, tutteProg, (x) => `prog:${x}`),
+    celle: Object.fromEntries(Object.entries(esistente.celle).map(([l, c]) => [l, rinnova(c, indici(CELLE[l].length), (x) => `cella:${l}:${x}`)])),
+    trasformazioni: rinnova(esistente.trasformazioni, TRASFORMAZIONI, (x) => `trasf:${x}`),
+  };
+}
+
+// 0 = brano del tutto nuovo, 1 = stesso tema, ritmi e armonie
+function somiglianza(a, b) {
+  return (a.tema === b.tema ? 0.15 : 0) + (a.mosse === b.mosse ? 0.5 : 0) + (a.ritornello === b.ritornello ? 0.15 : 0) + (a.progressioni === b.progressioni ? 0.2 : 0);
+}
+
+function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }, id, pref) {
   const t = tonica(tonalita);
   const p = profilo(cat, t);
   const nomi = sezioni.map((s) => s.replace(/[[\]]/g, ''));
@@ -127,8 +204,15 @@ function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }) {
     return { sigla: nomiAccordi[radice] + q, pcs: QUALITA[q].map((x) => (radice + x) % 12) };
   };
   const progressioni = ARMONIE[p.stile][t.minore ? 'm' : 'M'];
-  const primo = Math.floor(r() * progressioni.length);
-  const progDi = (n) => progressioni[(primo + ({ chorus: 1, bridge: 2, 'pre-chorus': 2 }[n] || 0)) % progressioni.length].split(' ').map(accordo);
+  // ordine delle progressioni del genere: le piu' votate hanno piu' possibilita' di aprire il brano
+  const resto = [...id.progressioni];
+  const ordine = id.progressioni.map(() => resto.splice(resto.indexOf(pesato(r, resto, (x) => peso(pref, `prog:${x}`))), 1)[0]);
+  const usate = { progressioni: new Set(), celle: new Set(), trasformazioni: new Set() };
+  const progDi = (n) => {
+    const indice = ordine[({ chorus: 1, bridge: 2, 'pre-chorus': 2 }[n] || 0) % ordine.length];
+    usate.progressioni.add(indice);
+    return progressioni[indice % progressioni.length].split(' ').map(accordo);
+  };
   const tonicaFinale = accordo(`0:${p.stile === 'flamenco' ? '' : t.minore ? 'm' : ''}`);
   const dominante = accordo('7:7');
 
@@ -144,13 +228,18 @@ function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }) {
 
   const livello = (n) => Math.max(1, Math.min(5, p.energia - (n === 'intro' || n === 'outro' || n === 'bridge' ? 1 : 0)));
   const temi = {};
-  const tema = (n) => (temi[n] ||= motivo(r, livello(n)));
+  const motivo = (l) => [0, 1].map(() => {
+    const i = pesato(r, id.celle[l], (x) => peso(pref, `cella:${l}:${x}`));
+    usate.celle.add(`${l}:${i}`);
+    return { ritmo: CELLE[l][i], mosse: CELLE[l][i].map(() => scegli(r, MOSSE)) };
+  });
+  const tema = (n) => (temi[n] ||= motivo(livello(n)));
   const volte = {};
-  const spostamento = (p.stile === 'drone' ? -4 : 0);
+  const spostamento = (p.stile === 'drone' ? -4 : 0) + id.registro;
 
   const scoreSezioni = nomi.map((nome, s) => {
     const volta = (volte[nome] = (volte[nome] || 0) + 1) - 1;
-    const metro = nome === 'bridge' && p.metroBridge && r() < 0.6 ? p.metroBridge : undefined;
+    const metro = nome === 'bridge' && id.metroBridge && p.metroBridge ? p.metroBridge : undefined;
     const lunghezza = Abc.unita(metro || '4/4');
     // con un metro diverso si ricalcola il numero di battute per conservare la durata
     const n = Math.max(2, 2 * Math.round((quante[s] * 32) / lunghezza / 2));
@@ -158,7 +247,8 @@ function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }) {
     const passo = p.energia <= 2 ? 2 : 1; // nei generi calmi un accordo dura due battute
     const centro = CENTRI[nome] + spostamento + (volta && nome === 'chorus' ? 2 : 0);
     const m = tema(nome);
-    const trasforma = volta ? scegli(r, ['sequenza', 'inversione', 'ornamento', 'sposta']) : 'esposizione';
+    const trasforma = volta ? pesato(r, id.trasformazioni, (x) => peso(pref, `trasf:${x}`)) : 'esposizione';
+    if (volta) usate.trasformazioni.add(trasforma);
     let ultima = vicino(centro, gradi);
 
     const battute = Array.from({ length: n }, (_, i) => {
@@ -210,11 +300,18 @@ function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }) {
     });
     return { nome, ...(metro ? { metro } : {}), battute };
   });
-  return { score: { bpm, metro: '4/4', tonalita: t.sigla, sezioni: scoreSezioni }, accordo, motivi: [temi.verse, temi.chorus].filter(Boolean).map((x) => x[0].ritmo) };
+  const principali = [temi.verse, temi.chorus].filter(Boolean);
+  const ritmi = (m) => (m ? m.map((x) => x.ritmo.join()).join('|') : '');
+  return {
+    score: { bpm, metro: '4/4', tonalita: t.sigla, sezioni: scoreSezioni },
+    motivi: principali.map((x) => x[0].ritmo),
+    parametri: Object.fromEntries(Object.entries(usate).map(([k, v]) => [k, [...v]])),
+    firma: { tema: ritmi(temi.verse), mosse: principali.flat().map((x) => x.mosse.join()).join('|'), ritornello: ritmi(temi.chorus), progressioni: ordine.join(), tonalita: t.sigla },
+  };
 }
 
 // Revisore: punteggio 0-100 sulla qualita' musicale del candidato
-function revisiona({ score, motivi }) {
+function revisiona({ score, motivi, firma }, precedenti = []) {
   const battute = score.sezioni.flatMap((s) => s.battute.map((b) => ({ ...b, sezione: s.nome, lunghezza: Abc.unita(s.metro || score.metro) })));
   const piene = battute.filter((b) => b.ins);
   const note = piene.flatMap((b) => b.ins.filter((n) => n.midi !== null));
@@ -241,20 +338,28 @@ function revisiona({ score, motivi }) {
   const varieta = Math.min(1, new Set(piene.map((b) => JSON.stringify(b.ins))).size / piene.length / 0.5);
 
   const ritornoOk = ritorno >= 0.25 && ritorno <= 0.6 ? 1 : Math.max(0, 1 - Math.min(Math.abs(ritorno - 0.25), Math.abs(ritorno - 0.6)) * 4);
-  const punteggio = accordo * 25 + Math.max(0, 1 - salti * 8) * 15 + ritornoOk * 20 + contrasto * 15 + climax * 10 + varieta * 15;
-  return { punteggio: Math.round(punteggio * 10) / 10, dettagli: { accordo: +accordo.toFixed(2), salti: +salti.toFixed(3), ritorno: +ritorno.toFixed(2), contrasto: +contrasto.toFixed(2), climax, varieta: +varieta.toFixed(2) } };
+  const novita = 1 - Math.max(0, ...precedenti.map((x) => somiglianza(firma, x)));
+  const qualita = accordo * 25 + Math.max(0, 1 - salti * 8) * 15 + ritornoOk * 20 + contrasto * 15 + climax * 10 + varieta * 15;
+  const punteggio = qualita * 0.85 + novita * 15;
+  return { punteggio: Math.round(punteggio * 10) / 10, dettagli: { accordo: +accordo.toFixed(2), salti: +salti.toFixed(3), ritorno: +ritorno.toFixed(2), contrasto: +contrasto.toFixed(2), climax, varieta: +varieta.toFixed(2), novita: +novita.toFixed(2) } };
 }
 
 // Genera i candidati, li fa valutare e restituisce il migliore gia' scritto e validato in ABC
-function componi({ candidati = 30, seed = 1, ...richiesta }) {
+// identita, precedenti (firme dei brani gia' fatti) e preferenze vengono dalla memoria del genere
+function componi({ candidati = 30, seed = 1, identita: id, precedenti = [], preferenze: pref = {}, ...richiesta }) {
+  const materiale = id || identita(richiesta.cat);
+  const gia = new Set(precedenti.map((x) => x.mosse));
   let migliore = null;
-  for (let i = 0; i < candidati; i++) {
-    const c = candidato(casuale(seed + i * 7919), richiesta);
-    const voto = revisiona(c);
-    if (!migliore || voto.punteggio > migliore.punteggio) migliore = { score: c.score, ...voto };
+  // un tema gia' usato non si ripresenta: si continua a cercare finche' ne esce uno nuovo
+  for (let i = 0; i < candidati || (!migliore && i < candidati + 200); i++) {
+    const c = candidato(casuale(seed + i * 7919), richiesta, materiale, pref);
+    if (gia.has(c.firma.mosse)) continue;
+    const voto = revisiona(c, precedenti);
+    if (!migliore || voto.punteggio > migliore.punteggio) migliore = { score: c.score, parametri: c.parametri, firma: c.firma, ...voto };
   }
+  if (!migliore) throw new Error('nessun tema nuovo disponibile');
   const { score } = migliore;
-  return { ...migliore, abc: Abc.scriviAbc(score), lyrics: Abc.lyricsDaScore(score, { forma: 'semplice' }), durata_s: Math.round(Abc.durataSecondi(score)) };
+  return { ...migliore, identita: materiale, abc: Abc.scriviAbc(score), lyrics: Abc.lyricsDaScore(score, { forma: 'semplice' }), durata_s: Math.round(Abc.durataSecondi(score)) };
 }
 
-if (typeof module !== 'undefined') module.exports = { componi, revisiona, tonica };
+if (typeof module !== 'undefined') module.exports = { componi, revisiona, tonica, identita, preferenze, peso, quanteProgressioni };

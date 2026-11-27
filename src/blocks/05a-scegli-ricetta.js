@@ -9,7 +9,9 @@ const slot = pickSlot(state, guidance);
 if (CFG.comandi.produciGenere) { log(`produzione forzata: genere ${CFG.comandi.produciGenere}`); aggiornaComandi({ produciGenere: null }); }
 const cat = slot.category;
 const variante = pickVariante(cat, libraryTracks());
-const strumenti = scegliStrumenti(cat);
+const memoria = leggiMemoria();
+const strumenti = strumentiDelGruppo(cat, gruppoMemoria(memoria, cat.name));
+salvaMemoria(memoria);
 const influenza = scegliInfluenza(cat);
 const tonalita = (cat.tonalita && cat.tonalita.length) ? cat.tonalita[Math.floor(Math.random() * cat.tonalita.length)] : '';
 const [dmin, dmax] = durRange(guidance, cat.name);

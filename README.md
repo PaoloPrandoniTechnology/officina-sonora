@@ -95,10 +95,10 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
 | Blocco | Cosa fa |
 |---|---|
-| **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, 2-4 strumenti del genere, un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
+| **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, strumenti (due fissi del genere più 1-2 che cambiano, dalla [memoria](#la-memoria-di-composizione)), un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
 | **5b Titolo** | Chiede a gemma titolo, descrizione, bpm e durata, entro i limiti del genere. Se il modello non è caricato, riprova al giro successivo. |
 | **5c Componi concept** | Compone il testo di **stile** e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
-| **5d Componi score** | Per i brani strumentali scrive 30 score candidati, li fa valutare al **revisore** e allega il migliore, con lyrics e durata coerenti. Se non riesce, lo score lo scrive il motore. |
+| **5d Componi score** | Per i brani strumentali legge la [memoria](#la-memoria-di-composizione) del genere, scrive 30 score candidati, li fa valutare al **revisore** e allega il migliore, con lyrics e durata coerenti. Se non riesce, lo score lo scrive il motore. |
 | **6 Invia render** | Sceglie le **LoRA** presenti sul motore e invia a YuE2 stile, lyrics, score, durata, seed e `cot: full`. |
 
 ### Audio e pubblicazione
@@ -107,7 +107,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 |---|---|
 | **3a Scarica audio** | Scarica l'MP3 e salva accanto lo **score** (`.abc`) che il motore ha scritto e seguito. |
 | **3b Scrivi metadati** | Scrive la scheda `.json` (numero progressivo, genere, ricetta, sezioni, lyrics, LoRA, seed, tempo di render) e chiude il job. |
-| **3c Controllo qualità** | Verifica integrità, bitrate, durata (tra 85% e 125% di quella richiesta), livello e silenzi. Gli scartati vanno in `_scartati`; se il brano è troppo corto viene rigenerato fino a 2 volte. Il clipping dà solo un avviso. |
+| **3c Controllo qualità** | Verifica integrità, bitrate, durata (tra 85% e 125% di quella richiesta), livello e silenzi. Gli scartati vanno in `_scartati`; se il brano è troppo corto viene rigenerato fino a 2 volte, con uno score nuovo. Il clipping dà solo un avviso. |
 | **3d1 Prepara caricamento** | Mette in coda i brani da caricare, esclude i duplicati audio, compone la copertina e scrive i tag ID3. |
 | **3d2 Carica** | Invia i file a iBroadcast tramite il gateway; i falliti tornano in coda (fino a 3 tentativi). |
 | **3d3 Tag e playlist** | Dopo almeno 3 minuti dal caricamento applica tag e playlist: iBroadcast li accetta solo a elaborazione finita. Ritenta fino a 30 volte. |
@@ -161,10 +161,31 @@ Per gli strumentali lo score (melodia e accordi) lo scrive il **compositore** de
 - riprese trasformate (sequenza, inversione, ornamento, spostamento ritmico);
 - **armonie, scale e ritmi del genere**; bridge in 3/4 o 7/8 dove lo stile lo regge;
 - ritornello più alto, intro rarefatta, finale sulla tonica;
-- un **revisore** dà un punteggio a 30 candidati e tiene il migliore (scritto nel log e nella scheda).
+- un **revisore** dà un punteggio (qualità e novità) a 30 candidati e tiene il migliore (scritto nel log e nella scheda).
 
 Per i generi vocali, e come ripiego, lo score lo scrive il motore. In entrambi i casi è salvato nel file `.abc`
 accanto al brano. Le regole di scrittura, con le fonti, sono in [`docs/score-abc.md`](docs/score-abc.md).
+
+### La memoria di composizione
+`state\memoria-composizione.json` tiene, per ogni genere:
+
+| Cosa | A cosa serve |
+|---|---|
+| **identità**: 3 progressioni, 4 celle ritmiche per livello di energia, 3 modi di variare il tema, registro, metro del bridge | brani dello stesso genere **riconoscibili** |
+| **strumenti fissi** (2) e ultima combinazione degli altri | stesso colore, abbinamenti che cambiano |
+| **brani composti** (ultimi 200): seed, parametri e impronta di tema, ritmi e armonie | brani **mai uguali**: un tema già usato viene escluso e il revisore premia la novità |
+| **voti** (letti dalle schede dei brani) | miglioramento continuo |
+
+Come impara dai voti:
+- progressioni, celle e variazioni dei brani votati 4-5 vengono scelte **più spesso**, quelle dei brani votati 1-2 meno;
+- un elemento con almeno due voti e media 2 o meno **esce** dall'identità del genere e ne entra uno nuovo.
+
+Vale per gli score del compositore; i generi vocali e i ripieghi con lo score del motore non vi partecipano.
+La memoria non è su Git: va inclusa nei backup insieme alla libreria. Se il file si rovina viene messo da parte
+(`.corrotta`) e si riparte da vuota. Per ridare un'identità nuova a un genere, a produzione ferma elimina la
+sua voce dal file.
+
+Un brano scartato perché troppo corto viene rigenerato con uno **score nuovo** del compositore.
 
 ### LoRA
 Gli strumentali usano `yue2-instrumental` (pensata per lo score); se manca, `yue2-instrumental-kto`.
@@ -444,10 +465,10 @@ In ordine di priorità. Il disegno completo è in
 |---|---|---|
 | 1 | **Giudicare a orecchio gli score del compositore** e correggere forme, ritmi e armonie in base ai voti | la qualità musicale non è verificabile dai test |
 | 2 | **Brani troppo corti**: controllare se con lo score nostro il problema sparisce, altrimenti agire su token e LoRA | circa un brano su tre è stato scartato finora |
-| 3 | **Compositore più ricco**: contrappunto, soli, fill, cambi di tonalità, finali, novità rispetto agli score precedenti | più varietà e dettagli |
+| 3 | **Compositore più ricco**: contrappunto, soli, fill, cambi di tonalità, finali | più varietà e dettagli |
 | 4 | **Schede artistiche per i 39 generi**: forme, progressioni, ritmi, chicche, prompt in inglese, durata 3-6 minuti | generi più distinti; oggi lo stile mescola italiano e inglese |
 | 5 | **Calibrazione delle LoRA** e forme delle lyrics (anche con tempi) | le scale attuali non sono validate a orecchio |
-| 6 | **Dashboard**: score, sezioni, punteggio del revisore e motivo dei render falliti; imparare dai voti anche su questi | rendere visibile cosa funziona |
+| 6 | **Dashboard**: score, sezioni, punteggio del revisore e motivo dei render falliti; mostrare la memoria di ogni genere | rendere visibile cosa funziona |
 | 7 | **Agente di ricerca locale** (DuckDuckGo e fonti di teoria, gemma), con approvazione in dashboard | miglioramento artistico continuo |
 | 8 | Eseguire la revisione delle linee guida quando gemma è caricato | oggi spesso fallisce durante i render |
 | 9 | Validazione più severa dello score (blocchi, ordine delle voci, nomi delle sezioni) | allinearla al validatore ufficiale |

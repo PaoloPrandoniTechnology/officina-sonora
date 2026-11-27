@@ -221,13 +221,51 @@ function pickVariante(cat, tracks) {
   return scelte[0].v;
 }
 
-// Sottoinsieme casuale di strumenti del genere (solo quelli del suo set), 2-4 per brano
-function scegliStrumenti(cat) {
-  const pool = [...(cat.strumenti || [])];
-  const n = Math.min(pool.length, 2 + Math.floor(Math.random() * 3));
-  const scelti = [];
-  while (scelti.length < n && pool.length) scelti.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-  return scelti;
+// ---- Memoria di composizione per genere (state\memoria-composizione.json) ----
+// Per ogni genere: identita' degli score, strumenti fissi e parametri dei brani gia' composti.
+CFG.memoriaFile = path.join(CFG.dir, 'state', 'memoria-composizione.json');
+function leggiMemoria() {
+  if (!fs.existsSync(CFG.memoriaFile)) return { generi: {} };
+  try {
+    const m = JSON.parse(fs.readFileSync(CFG.memoriaFile, 'utf8'));
+    if (m && m.generi) return m;
+  } catch (e) { /* gestito sotto */ }
+  // illeggibile: si mette da parte invece di sovrascriverla
+  fs.renameSync(CFG.memoriaFile, `${CFG.memoriaFile}.${Date.now()}.corrotta`);
+  log('memoria di composizione non valida: messa da parte, si riparte da vuota');
+  return { generi: {} };
+}
+function salvaMemoria(m) {
+  const tmp = CFG.memoriaFile + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(m));
+  fs.renameSync(tmp, CFG.memoriaFile);
+}
+const gruppoMemoria = (m, nome) => (m.generi[nome] ||= { brani: [] });
+
+// Voti dei brani composti da noi, per seed dello score
+function votiPerSeed(nomeCategoria) {
+  const out = {};
+  for (const t of libraryTracks()) {
+    if (t.meta.categoria === nomeCategoria && t.meta.score && votoUtente(t)) out[t.meta.score.seed] = votoUtente(t);
+  }
+  return out;
+}
+
+// Due strumenti fissi danno l'identita' al genere; gli altri (1 o 2) cambiano da un brano al successivo
+function strumentiDelGruppo(cat, g) {
+  const tutti = [...new Set(cat.strumenti || [])];
+  const caso = (v) => v.splice(Math.floor(Math.random() * v.length), 1)[0];
+  if (!g.nucleo || !g.nucleo.every((x) => tutti.includes(x))) {
+    const scorta = [...tutti];
+    g.nucleo = [];
+    while (g.nucleo.length < 2 && scorta.length) g.nucleo.push(caso(scorta));
+  }
+  const resto = tutti.filter((x) => !g.nucleo.includes(x));
+  const combinazioni = resto.flatMap((a, i) => [[a], ...resto.slice(i + 1).map((b) => [a, b])]);
+  const nuove = combinazioni.filter((c) => c.join() !== g.ultimiExtra);
+  const extra = nuove.length ? caso(nuove) : combinazioni[0] || [];
+  g.ultimiExtra = extra.join();
+  return [...g.nucleo, ...extra];
 }
 
 // Un'influenza pesata tra quelle del genere (puo' essere anche il genere stesso)

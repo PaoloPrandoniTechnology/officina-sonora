@@ -118,5 +118,6 @@ const workflow = {
   settings: { executionOrder: 'v1' },
 };
 
-writeFileSync(join(here, 'officina-sonora-workflow.json'), JSON.stringify(workflow, null, 2), 'utf8');
+const uscita = process.argv[2] || join(here, 'officina-sonora-workflow.json');
+writeFileSync(uscita, JSON.stringify(workflow, null, 2), 'utf8');
 console.log(`officina-sonora-workflow.json creato: ${workflow.nodes.length} nodi, ${links.length} collegamenti`);
