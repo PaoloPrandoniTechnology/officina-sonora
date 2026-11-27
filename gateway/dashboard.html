@@ -283,6 +283,7 @@
   .stelle-voto .btn[aria-pressed="true"] { background: rgba(251,191,36,.16); border-color: rgba(251,191,36,.45); }
   .vrow { all: unset; box-sizing: border-box; cursor: pointer; display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 4px; border-bottom: 1px solid var(--line); border-radius: 6px; }
   .vrow:hover, .vrow:focus-visible { background: rgba(148,163,184,.06); }
+  .vrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .vrow span:first-child { min-width: 0; overflow-wrap: anywhere; }
 </style>
 </head>
@@ -1241,8 +1242,15 @@
   // ---------- ascolto e voto ----------
   // Il lettore e la nota non vengono toccati dagli aggiornamenti periodici: la coda si ricarica
   // solo aprendo la scheda, dopo un voto o cambiando filtro.
-  const vt = { coda: [], votati: [], filtro: '', cur: null, idx: 0 };
+  // invio: un voto in corso (tasti doppi o tenuti premuti non votano due volte); caricato: prima lettura riuscita
+  const vt = { coda: [], votati: [], filtro: '', cur: null, idx: 0, invio: false, caricato: false };
   const vLista = () => vt.coda.filter((b) => !vt.filtro || b.categoria === vt.filtro);
+
+  function abilitaVoto() {
+    const v = vt.cur ? vt.cur.voto : null;
+    document.querySelectorAll('#vStelle button').forEach((x) => { x.setAttribute('aria-pressed', String(Number(x.dataset.v) === v)); x.disabled = !vt.cur; });
+    $('#vSalta').disabled = !vt.cur;
+  }
 
   function mostraBrano(b) {
     const audio = $('#vAudio');
@@ -1255,10 +1263,8 @@
       $('#vBrano').innerHTML = `<h3>${esc(b.titolo)}</h3><div class="sub">${esc([b.categoria, sec(b.durata_s), 'n. ' + b.numero].filter(Boolean).join(' · '))}</div>`;
       audio.src = '/audio/brano?n=' + encodeURIComponent(b.numero);
       $('#vNotaTxt').value = b.nota || '';
-    }
-    const v = vt.cur ? vt.cur.voto : null;
-    document.querySelectorAll('#vStelle button').forEach((x) => { x.setAttribute('aria-pressed', String(Number(x.dataset.v) === v)); x.disabled = !vt.cur; });
-    $('#vSalta').disabled = !vt.cur;
+    } else vt.cur = b; // stesso brano: dati aggiornati, lettore e nota scritta restano
+    abilitaVoto();
   }
 
   function disegnaVotati() {
@@ -1266,42 +1272,69 @@
       || '<div class="empty">Nessun brano votato.</div>';
   }
 
-  async function caricaVoti() {
-    try {
-      const r = await leggi('/api/voti');
-      vt.coda = r.coda; vt.votati = r.votati;
-    } catch (e) { toast('Impossibile leggere i brani da votare: ' + e.message, 'err'); return; }
+  // Filtro, titolo e brano corrente dalla coda in memoria
+  function disegnaCoda() {
     const generi = [...new Set(vt.coda.map((b) => b.categoria).filter(Boolean))].sort();
     if (vt.filtro && !generi.includes(vt.filtro)) vt.filtro = '';
     $('#vFiltro').innerHTML = '<option value="">Tutti i generi</option>' + generi.map((g) => `<option value="${esc(g)}"${g === vt.filtro ? ' selected' : ''}>${esc(g)} (${vt.coda.filter((b) => b.categoria === g).length})</option>`).join('');
     const lista = vLista();
     $('#vCodaTit').textContent = `Da votare (${lista.length})`;
-    // il brano in ascolto resta se e' ancora in coda; altrimenti quello nella stessa posizione (il successivo)
-    const resta = vt.cur ? lista.findIndex((b) => b.numero === vt.cur.numero) : -1;
-    if (resta >= 0) vt.idx = resta;
+    // il brano corrente resta se e' in coda (con il filtro) o se e' un votato in correzione;
+    // altrimenti quello nella stessa posizione (il successivo)
+    const c = vt.cur;
+    const i = c ? lista.findIndex((b) => b.numero === c.numero) : -1;
+    const correzione = c && i < 0 && (!vt.filtro || c.categoria === vt.filtro) && vt.votati.find((v) => v.numero === c.numero);
+    if (i >= 0) vt.idx = i;
     else vt.idx = Math.max(0, Math.min(vt.idx, lista.length - 1));
-    mostraBrano(resta >= 0 ? vt.cur : lista[vt.idx] || null);
+    mostraBrano(i >= 0 ? lista[i] : correzione || lista[vt.idx] || null);
+  }
+
+  async function caricaVoti() {
+    try {
+      const r = await leggi('/api/voti');
+      vt.coda = r.coda; vt.votati = r.votati; vt.caricato = true;
+    } catch (e) {
+      toast('Impossibile leggere i brani da votare: ' + e.message, 'err');
+      if (!vt.caricato) { $('#vBrano').innerHTML = `<div class="err">Impossibile leggere i brani da votare: ${esc(e.message)}</div>`; abilitaVoto(); }
+      return;
+    }
+    disegnaCoda();
     disegnaVotati();
   }
 
   async function votaBrano(voto) {
     const b = vt.cur;
-    if (!b) return;
-    const nota = $('#vNotaTxt').value.trim();
-    const corpo = { numero: b.numero, voto };
-    if (nota || b.nota) corpo.nota = nota; // nota vuota inviata solo per cancellarne una esistente
+    if (!b || vt.invio) return;
+    vt.invio = true;
     try {
-      await invia('/api/controllo/voto', corpo);
+      const nota = $('#vNotaTxt').value.trim();
+      const corpo = { numero: b.numero, voto };
+      if (nota || b.nota) corpo.nota = nota; // nota vuota inviata solo per cancellarne una esistente
+      try {
+        await invia('/api/controllo/voto', corpo);
+      } catch (e) { toast(e.message, 'err'); return; }
       toast(`Voto ${voto} salvato: ${b.titolo}`);
-    } catch (e) { toast(e.message, 'err'); return; }
-    vt.cur = null; // il brano votato esce dalla coda: si passa a quello nella stessa posizione
-    await caricaVoti();
-    if (vt.cur) $('#vAudio').play().catch(() => {});
+      // aggiornamento locale subito, cosi' la scheda funziona anche se la rilettura fallisce
+      vt.coda = vt.coda.filter((x) => x.numero !== b.numero);
+      vt.votati = [{ ...b, voto, nota: corpo.nota ?? b.nota, voto_il: new Date().toISOString() }, ...vt.votati.filter((x) => x.numero !== b.numero)];
+      // se nel frattempo e' stato scelto un altro brano (Salta, filtro, Votati ora) resta quello
+      const avanti = vt.cur === b;
+      if (avanti) vt.cur = null;
+      disegnaCoda();
+      disegnaVotati();
+      if (avanti && vt.cur) $('#vAudio').play().catch(() => {});
+      await caricaVoti();
+    } finally { vt.invio = false; }
   }
 
   $('#vStelle').addEventListener('click', (e) => {
     const x = e.target.closest('button[data-v]');
     if (x) votaBrano(Number(x.dataset.v));
+  });
+  // Invio tenuto premuto su una stella non ripete il clic
+  $('#vStelle').addEventListener('keydown', (e) => { if (e.repeat && (e.key === 'Enter' || e.key === ' ')) e.preventDefault(); });
+  $('#vAudio').addEventListener('error', (e) => {
+    if (e.target.getAttribute('src')) toast('Impossibile riprodurre il brano' + (vt.cur ? ': ' + vt.cur.titolo : ''), 'err');
   });
   $('#vSalta').addEventListener('click', () => {
     const lista = vLista();
@@ -1310,14 +1343,18 @@
     vt.idx = (i + 1) % lista.length; // da un brano gia' votato si torna alla coda
     mostraBrano(lista[vt.idx]);
   });
-  $('#vFiltro').addEventListener('change', (e) => { vt.filtro = e.target.value; vt.idx = 0; vt.cur = null; caricaVoti(); });
+  $('#vFiltro').addEventListener('change', (e) => { vt.filtro = e.target.value; vt.idx = 0; caricaVoti(); });
   $('#vVotati').addEventListener('click', (e) => {
     const x = e.target.closest('button[data-n]');
     const b = x && vt.votati.find((v) => String(v.numero) === x.dataset.n);
-    if (b) mostraBrano(b);
+    if (!b) return;
+    mostraBrano(b);
+    const audio = $('#vAudio');
+    audio.scrollIntoView({ block: 'center' });
+    audio.focus({ preventScroll: true });
   });
   document.addEventListener('keydown', (e) => {
-    if (!/^[1-5]$/.test(e.key) || e.ctrlKey || e.altKey || e.metaKey) return;
+    if (!/^[1-5]$/.test(e.key) || e.ctrlKey || e.altKey || e.metaKey || e.repeat) return;
     if (!$('#t-voti').classList.contains('on') || !$('#modal').hidden) return;
     const t = e.target;
     if (t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
