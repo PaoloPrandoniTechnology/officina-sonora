@@ -156,6 +156,36 @@ function saveState(s) {
   }
 }
 
+// Lock contro esecuzioni sovrapposte: un file con token. Scade dopo maxMs, cosi' un crash non blocca per sempre.
+const LOCK_MAX_MS = 15 * 60 * 1000;
+function lockFile(nome) {
+  return path.join(CFG.dir, 'state', nome + '.lock');
+}
+function acquireLock(nome, maxMs = LOCK_MAX_MS) {
+  const file = lockFile(nome);
+  const token = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+  for (let giro = 0; giro < 2; giro++) {
+    try {
+      fs.writeFileSync(file, JSON.stringify({ token, creato: new Date().toISOString() }), { flag: 'wx' });
+      return token;
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e;
+      let eta;
+      try { eta = Date.now() - fs.statSync(file).mtimeMs; } catch (e2) { continue; } // rilasciato nel frattempo: riprova
+      if (eta < maxMs) return null; // occupato da un'altra esecuzione
+      try { fs.unlinkSync(file); } catch (e3) { /* gia' rimosso */ }
+    }
+  }
+  return null;
+}
+function releaseLock(nome, token) {
+  const file = lockFile(nome);
+  if (token && readJsonSafe(file, {}).token === token) fs.unlinkSync(file);
+}
+function lockOccupato(nome, maxMs = LOCK_MAX_MS) {
+  try { return Date.now() - fs.statSync(lockFile(nome)).mtimeMs < maxMs; } catch (e) { return false; }
+}
+
 function readGuidance() {
   return readJsonSafe(CFG.guidanceFile, DEFAULT_GUIDANCE);
 }

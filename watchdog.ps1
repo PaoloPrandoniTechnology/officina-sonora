@@ -27,6 +27,8 @@ $Models = "$Studio\data\models\yue2-cpp"
 New-Item -ItemType Directory -Force -Path $StateDir | Out-Null
 
 function Log($msg) { Add-Content -Path $WatchLog -Value ('{0} {1}' -f (Get-Date -Format 's'), $msg) }
+# Battito di vita letto dal supervisore: se si ferma per troppo tempo, il watchdog viene riavviato
+function Battito { Set-Content -Path "$StateDir\watchdog.heartbeat" -Value (Get-Date -Format 's') }
 
 # Decifra un file DPAPI (leggibile solo dal tuo utente Windows)
 function Leggi-Segreto($file) {
@@ -74,6 +76,7 @@ function HasJob {
 
 Log 'watchdog avviato'
 while (-not (Test-Path $StopFlag)) {
+  Battito
   Avvia-Gateway
   # n8n
   if (-not (Up 'http://127.0.0.1:5678/healthz')) {
@@ -105,6 +108,6 @@ while (-not (Test-Path $StopFlag)) {
     }
   }
 
-  for ($i = 0; $i -lt 60 -and -not (Test-Path $StopFlag); $i++) { Start-Sleep -Seconds 1 }
+  for ($i = 0; $i -lt 60 -and -not (Test-Path $StopFlag); $i++) { Start-Sleep -Seconds 1; if ($i % 10 -eq 0) { Battito } }
 }
 Log 'watchdog fermato'

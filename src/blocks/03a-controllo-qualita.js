@@ -77,6 +77,23 @@ if (durataCorta) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo
 if (mp3.durata_s > target * 1.25) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo lunga rispetto a ${target}s`);
 if (mp3.bitrate_medio_kbps > 0 && mp3.bitrate_medio_kbps < 48) esito.problemi.push('bitrate troppo basso: possibile audio vuoto o degradato');
 
+// Analisi del suono (gateway): livello, silenzi e clipping. Se non disponibile, il brano passa come prima.
+let aud = null;
+try {
+  // gw() restituisce i campi della risposta al primo livello (rms_db, picco_db, ...)
+  const r = await gw('/audio/analizza', { file });
+  if (r.error || r.rms_db === undefined) throw new Error(r.error || 'risposta vuota');
+  aud = r;
+} catch (e) {
+  log(`qualita': analisi audio non disponibile (${e.message}): controllo solo strutturale`);
+}
+if (aud) {
+  if (aud.rms_db < -45) esito.problemi.push(`audio quasi silenzioso (${aud.rms_db} dB)`);
+  if (aud.frazione_silenzio > 0.5) esito.problemi.push('oltre meta\' del brano silenzioso');
+  esito.audio = { rms_db: aud.rms_db, picco_db: aud.picco_db, frazione_silenzio: +aud.frazione_silenzio.toFixed(2), frazione_clip: +aud.frazione_clip.toFixed(4) };
+  if (aud.frazione_clip > 0.01) esito.avviso_clipping = `${(aud.frazione_clip * 100).toFixed(2)}% dei campioni saturi`; // solo avviso
+}
+
 meta.qualita = { ...esito, esito: esito.problemi.length ? 'scartato' : 'ok', controllato_il: new Date().toISOString() };
 fs.writeFileSync(jsonPath, JSON.stringify(meta, null, 2));
 

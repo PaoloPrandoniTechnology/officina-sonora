@@ -39,6 +39,7 @@ const pos = (x, y) => [x, y];
 const nodes = {
   schedule: { name: 'Ogni minuto', type: 'n8n-nodes-base.scheduleTrigger', typeVersion: 1.2, parameters: { rule: { interval: [{ field: 'minutes', minutesInterval: 1 }] } }, position: pos(0, 300) },
   leggi: { name: '1 Leggi stato', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('01-') }, position: pos(250, 300) },
+  libera: { name: 'Pipeline occupata?', type: 'n8n-nodes-base.if', typeVersion: 2, parameters: ifBoolTrue('={{ $json.locked }}'), position: pos(375, 300) },
   haRender: { name: 'Render in corso?', type: 'n8n-nodes-base.if', typeVersion: 2, parameters: ifBoolTrue('={{ $json.hasJob }}'), position: pos(500, 300) },
   controlla: { name: '2 Controlla render', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('02-') }, position: pos(750, 150) },
   concluso: { name: 'Render concluso?', type: 'n8n-nodes-base.if', typeVersion: 2, parameters: ifString('={{ $json.outcome }}', 'done'), position: pos(1000, 150) },
@@ -68,7 +69,8 @@ const links = [
   ['schedule', 0, 'avvisi'],
   ['schedule', 0, 'riflessione'],
   ['schedule', 0, 'voti'], // ogni minuto controlla se e' passata la cadenza di 10 minuti // ogni minuto controlla se e' l'ora del rapporto giornaliero // in parallelo: comandi e avvisi ogni minuto
-  ['leggi', 0, 'haRender'],
+  ['leggi', 0, 'libera'],
+  ['libera', 1, 'haRender'], // false: lock ottenuto, si procede (true = occupata: nessun ramo, il giro finisce)
   ['haRender', 0, 'controlla'], // true: c'e' un render
   ['haRender', 1, 'scegli'], // false: nessun render, si passa al brano successivo
   ['controlla', 0, 'concluso'],

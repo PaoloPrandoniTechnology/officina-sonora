@@ -40,6 +40,25 @@ const erroriOggi = (() => {
 const state = readJsonSafe(CFG.stateFile, {}) || {};
 const guida = readGuidance();
 
+// Salute del sistema (sola lettura): spazio su disco, battito del watchdog, errori piu' frequenti
+const salute = (() => {
+  let liberoGb = null;
+  try { const s = fs.statfsSync('E:\\'); liberoGb = Math.round((s.bavail * s.bsize) / 1e9); } catch (e) { /* non disponibile */ }
+  let batticoMin = null;
+  try { batticoMin = Math.round((Date.now() - fs.statSync(path.join(CFG.dir, 'state', 'watchdog.heartbeat')).mtimeMs) / 60000); } catch (e) { /* assente */ }
+  const perChiave = {};
+  try {
+    fs.readFileSync(CFG.errorsFile, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l))
+      .filter((e) => Date.now() - Date.parse(e.ts) < 86400000)
+      .forEach((e) => {
+        const k = String(e.key).replace(/ a [^:]+:/, ' a <brano>:'); // stesso errore su brani diversi = un solo gruppo
+        perChiave[k] = (perChiave[k] || 0) + 1;
+      });
+  } catch (e) { /* nessun errore */ }
+  const top = Object.entries(perChiave).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return { liberoGb, batticoMin, top, coda: (state.queue || []).length, falliti: (state.failed || []).length, scartati: state.scartati || 0 };
+})();
+
 const dati = {
   brani_totali: totale,
   brani_ultime_24h: ultime24.length,
@@ -65,9 +84,12 @@ const testo = [
   `Rapporto giornaliero ${oggi}`,
   `Brani: ${totale} (ultime 24h: ${ultime24.length}) · voti: ${votiOggi} · errori 24h: ${erroriOggi}`,
   `Esperimenti attivi: ${dati.esperimenti_attivi.length ? dati.esperimenti_attivi.join(', ') : 'nessuno'}`,
+  `Salute: disco E: ${salute.liberoGb ?? '?'} GB liberi · coda ${salute.coda} · falliti ${salute.falliti} · scartati QC ${salute.scartati} · watchdog ${salute.batticoMin ?? '?'} min fa`,
+  salute.liberoGb !== null && salute.liberoGb < 20 ? 'ATTENZIONE: spazio su disco sotto 20 GB' : null,
+  salute.top.length ? `Errori principali 24h: ${salute.top.map(([k, n]) => `${k} (${n})`).join('; ')}` : 'Errori 24h: nessuno',
   `Migliori ricette: ${dati.migliori_ricette.map((c) => `${c.ricetta} (${c.punteggio.toFixed(2)})`).join('; ') || 'ancora pochi dati'}`,
   `Da rivedere: ${dati.peggiori_ricette.map((c) => `${c.ricetta} (${c.punteggio.toFixed(2)})`).join('; ') || 'nessuna'}`,
-].join('\n') + commento;
+].filter(Boolean).join('\n') + commento;
 
 try {
   await tgSend(testo);

@@ -106,6 +106,50 @@ function leggiCorpo(req) {
   });
 }
 
+// Analisi PCM di un brano della libreria: livello, silenzi e clipping. Il decoder si carica solo qui.
+const LIBRERIA = 'e:\\musica di sottofondo';
+async function analizzaAudio(file) {
+  const abs = path.resolve(String(file || ''));
+  if (!abs.toLowerCase().startsWith(LIBRERIA + path.sep)) throw new Error('file fuori dalla libreria');
+  const { MPEGDecoder } = require('mpg123-decoder');
+  const dec = new MPEGDecoder();
+  await dec.ready;
+  try {
+    const out = dec.decode(new Uint8Array(fs.readFileSync(abs)));
+    const canali = out.channelData;
+    const n = out.samplesDecoded;
+    const blocco = Math.round(out.sampleRate * 0.5); // blocchi da mezzo secondo per cercare i silenzi
+    let sommaQuadr = 0, picco = 0, clip = 0, blocchi = 0, silenziosi = 0, quadrBlocco = 0, contaBlocco = 0;
+    for (let i = 0; i < n; i++) {
+      let v = 0;
+      for (let c = 0; c < canali.length; c++) v += canali[c][i];
+      v /= canali.length;
+      const a = Math.abs(v);
+      if (a > picco) picco = a;
+      if (a >= 0.999) clip++;
+      sommaQuadr += v * v;
+      quadrBlocco += v * v;
+      contaBlocco++;
+      if (contaBlocco === blocco || i === n - 1) {
+        const db = 10 * Math.log10(quadrBlocco / contaBlocco + 1e-12);
+        blocchi++;
+        if (db < -50) silenziosi++;
+        quadrBlocco = 0; contaBlocco = 0;
+      }
+    }
+    const db = (x) => Math.round(10 * Math.log10(x + 1e-12) * 10) / 10;
+    return {
+      durata_s: Math.round(n / out.sampleRate),
+      rms_db: db(sommaQuadr / Math.max(1, n)),
+      picco_db: db(picco * picco),
+      frazione_silenzio: blocchi ? silenziosi / blocchi : 0,
+      frazione_clip: n ? clip / (n * canali.length) : 0,
+    };
+  } finally {
+    dec.free();
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   const rispondi = (code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(obj)); };
   try {
@@ -119,6 +163,10 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/ib/api') {
       const { mode, args } = JSON.parse(corpo.toString('utf8'));
       return rispondi(200, await ibApi(mode, args || {}));
+    }
+    if (req.url === '/audio/analizza') {
+      const { file } = JSON.parse(corpo.toString('utf8'));
+      return rispondi(200, await analizzaAudio(file));
     }
     if (req.url === '/ib/library') {
       return rispondi(200, await ibLibrary());

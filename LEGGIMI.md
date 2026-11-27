@@ -55,7 +55,21 @@ Il workflow "Yoga Music Factory" e' costruito da `build-workflow.mjs` a partire 
 - 9: rapporto giornaliero
 - 10: voti da iBroadcast (ogni 10 minuti)
 
+## Affidabilita'
+- **Lock di pipeline**: `state\pipeline.lock` impedisce esecuzioni sovrapposte del workflow. Scade dopo 15 minuti
+  in caso di crash. I voti (10) aspettano che il lock sia libero prima di scrivere `guidance.json`.
+- **Supervisore**: l'attivita' pianificata `YogaMusicSupervisore` gira ogni 5 minuti (`supervisore.vbs`).
+  Riavvia il watchdog se e' morto o se il suo battito (`state\watchdog.heartbeat`) e' fermo da 15 minuti.
+  Non fa nulla se esiste `state\STOP`. Log: `state\supervisore.log`.
+- **Controllo audio (3c)**: il gateway analizza il brano (livello, silenzi, clipping) con `mpg123-decoder`.
+  Scarta solo i brani quasi silenziosi (sotto -45 dB) o silenziosi per piu' della meta'. Il clipping genera
+  solo un avviso. Se l'analisi non e' disponibile il brano passa con il solo controllo strutturale.
+- **Git**: la cartella e' un repository. `.gitignore` esclude segreti e `state\`.
+- **Test**: `node --test tools/test/lib.test.js` (lock, stile, numerazione, catalogo).
+
 ## Comandi utili
 - Avvia: `avvia-automazione.vbs`
 - Ferma: `ferma-automazione.vbs`
 - Log di produzione: `state\tick.log`
+- Test: `node --test tools/test/lib.test.js`
+- Dopo modifiche ai blocchi: `node build-workflow.mjs`, poi import e publish del workflow

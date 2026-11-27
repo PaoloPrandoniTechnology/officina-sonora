@@ -9,6 +9,8 @@ const CADENZA_MS = 10 * 60 * 1000;
 const VOTI_FILE = path.join(CFG.dir, 'state', 'voti-ibroadcast.json');
 const ultimo = readJsonSafe(VOTI_FILE, { lastRun: 0 });
 if (Date.now() - ultimo.lastRun < CADENZA_MS) return [{ json: { voti: 'non ancora' } }];
+// Non scrive guidance.json mentre la pipeline e' in corso: riprova al giro successivo
+if (lockOccupato('pipeline')) return [{ json: { voti: 'pipeline occupata' } }];
 
 function decodifica(d) {
   if (!d || !d.map) return d || {};
