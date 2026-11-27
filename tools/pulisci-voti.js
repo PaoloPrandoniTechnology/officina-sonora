@@ -15,6 +15,7 @@ function pulisci(meta, oraIso) {
   if (!meta.voto_fonte) {
     meta.voto = null;
     delete meta.nota_utente;
+    delete meta.voto_ib; // altrimenti il blocco 10 non riapplicherebbe un segnale vero uguale al voto copiato
     return 'rimosso';
   }
   // voto_ib gia' presente: la scheda e' gia' a posto, la data del voto non va spostata
@@ -67,11 +68,16 @@ function main(applica) {
 
   // Tutte le copie prima della prima scrittura: se una fallisce lo script si ferma senza aver cambiato nulla
   const copia = path.join(COPIE, `voti-${ora.replace(/[:.]/g, '-')}`);
-  fs.mkdirSync(copia, { recursive: true });
-  for (const file of conCsv ? [...daFare, csv] : daFare) {
-    const dest = path.join(copia, path.relative(LIBRERIA, file)); // stesso percorso relativo: ci sono omonimi
-    fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.copyFileSync(file, dest, fs.constants.COPYFILE_EXCL);
+  try {
+    fs.mkdirSync(copia, { recursive: true });
+    for (const file of conCsv ? [...daFare, csv] : daFare) {
+      const dest = path.join(copia, path.relative(LIBRERIA, file)); // stesso percorso relativo: ci sono omonimi
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.copyFileSync(file, dest, fs.constants.COPYFILE_EXCL);
+    }
+  } catch (e) {
+    process.exitCode = 1;
+    return console.log(`Copia di sicurezza non riuscita: ${e.message} - nessuna modifica`);
   }
   console.log(`Copia di sicurezza: ${copia}`);
 

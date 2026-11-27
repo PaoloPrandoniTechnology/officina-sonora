@@ -220,6 +220,13 @@ test('pulizia: rimuove i voti copiati, segna quelli di iBroadcast', () => {
     assert.equal(pulisci(m, 't2'), null);
     assert.equal(m.voto_il, 't1');
   }
+  // copia gia' passata dal blocco 10 nuovo: si rimuove lo stesso, e il voto vero torna
+  const conIb = { voto: 5, voto_ib: 5 };
+  assert.equal(pulisci(conIb, 't1'), 'rimosso');
+  assert.deepEqual(conIb, { voto: null });
+  assert.equal(L.applicaSegnale(conIb, { voto: 5, fonte: 'valutazione iBroadcast' }, 't2'), true);
+  assert.equal(conIb.voto, 5);
+
   const conNota = { voto: 4, voto_fonte: 'valutazione iBroadcast', nota_utente: 'bella' };
   pulisci(conNota, 't1');
   assert.equal(conNota.nota_utente, 'bella');
@@ -259,7 +266,9 @@ test('pulizia: a vuoto non scrive; --applica copia, scrive e rinomina il CSV; se
   // la cartella delle copie non si puo' creare
   const ostacolo = path.join(dir, 'ostacolo');
   fs.writeFileSync(ostacolo, '');
-  assert.notEqual(esegui(ostacolo, '--applica').status, 0);
+  const fallita = esegui(ostacolo, '--applica');
+  assert.equal(fallita.status, 1);
+  assert.match(fallita.stdout, /Copia di sicurezza non riuscita: .* - nessuna modifica/);
   invariati();
 
   const fatto = esegui(copie, '--applica');
