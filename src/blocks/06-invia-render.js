@@ -17,9 +17,11 @@ const body = {
   cot: 'melody',
   // LoRA "instrumental-kto": tiene il brano davvero senza voce (il motore lo richiede per testi solo sezioni)
   ...(concept.vocale ? {} : { adapters: [{ name: 'yue2-instrumental-kto', scale: 1.0, ar_scale: 1.0, nar_scale: 0.0 }] }),
-  duration: concept.durata_s,
-  semantic_sampling: { max_tokens: concept.durata_s * 25 },
-  abc_sampling: { max_tokens: Math.max(512, concept.durata_s * 25) },
+  // Il motore tronca il brano quando finisce i token: si chiede piu' durata e piu' margine,
+  // cosi' il brano si chiude da solo e non si interrompe a meta'. Il controllo qualita' usa la durata di riferimento.
+  duration: Math.round(concept.durata_s * 1.2),
+  semantic_sampling: { max_tokens: Math.round(concept.durata_s * 1.2 * 25 * 1.2) },
+  abc_sampling: { max_tokens: Math.max(512, Math.round(concept.durata_s * 1.2 * 25 * 1.2)) },
   output_format: 'mp3',
   seed,
 };
