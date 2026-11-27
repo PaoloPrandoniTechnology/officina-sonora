@@ -1,0 +1,6 @@
+﻿# segreti e stato runtime: mai nel repository
+secrets/
+gateway/token.json
+state/
+*.dpapi
+node_modules/

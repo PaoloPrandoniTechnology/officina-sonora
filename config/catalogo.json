@@ -1,0 +1,2550 @@
+{
+  "artista": "Yoga Music Factory",
+  "categories": [
+    {
+      "name": "Meditazione",
+      "energia": 1,
+      "bpm": [
+        45,
+        62
+      ],
+      "attivita": "meditazione, mindfulness",
+      "strutture": [
+        "piatto",
+        "onda"
+      ],
+      "genere": "Drone meditativo",
+      "stile": "slow drone meditation, still and deep, no rhythm, no percussion, the sound never rushes",
+      "strumenti": [
+        "tanpura",
+        "campane tibetane",
+        "pad di sintetizzatore lungo",
+        "drone di organo"
+      ],
+      "vietati": [
+        "batteria",
+        "percussioni",
+        "basso pulsante",
+        "arpeggio veloce",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "ambient",
+          "peso": 3
+        },
+        {
+          "genere": "musica indiana",
+          "peso": 1
+        }
+      ],
+      "enfasi": "nessun picco, dinamica costante e morbida",
+      "melodia": "poche note, modo frigio, movimento lentissimo",
+      "accordi": "accordo statico o due accordi che si alternano lentamente",
+      "ritmica": "senza battito, nessuna pulsazione percepibile",
+      "tonalita": [
+        "Do minore",
+        "Re minore",
+        "La minore"
+      ],
+      "varianti": [
+        {
+          "nome": "tibetano",
+          "keywords": "tibetan singing bowls, overtones, resonant"
+        },
+        {
+          "nome": "indiano",
+          "keywords": "tanpura drone, sitar-like resonance, microtonal"
+        },
+        {
+          "nome": "spaziale",
+          "keywords": "wide reverb, cosmic pad, very slow evolution"
+        }
+      ],
+      "colori": [
+        "#1e2f4d",
+        "#4f7fa8",
+        "#e7c77a"
+      ],
+      "ambito": "yoga",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Pranayama-respiro",
+      "energia": 1,
+      "bpm": [
+        50,
+        70
+      ],
+      "attivita": "esercizi di respiro",
+      "strutture": [
+        "piatto",
+        "onda"
+      ],
+      "genere": "Ambient del respiro",
+      "stile": "breathing ambient, slow swelling pads that rise and fall like breath, soft and airy",
+      "strumenti": [
+        "pad morbido",
+        "flauto di bambu",
+        "sintetizzatore a respiro",
+        "vento sintetico"
+      ],
+      "vietati": [
+        "batteria",
+        "percussioni",
+        "chitarra distorta",
+        "basso pulsante"
+      ],
+      "influenze": [
+        {
+          "genere": "ambient",
+          "peso": 3
+        },
+        {
+          "genere": "new age",
+          "peso": 1
+        }
+      ],
+      "enfasi": "crescita e calo lenti in cicli di circa 4 battute, come un respiro",
+      "melodia": "frasi brevi di 2 o 3 note, pentatonica minore",
+      "accordi": "accordi aperti e sospesi (sus2, sus4)",
+      "ritmica": "nessun battito, il respiro fa da pulsazione lenta",
+      "tonalita": [
+        "Fa maggiore",
+        "La minore",
+        "Mi minore"
+      ],
+      "varianti": [
+        {
+          "nome": "soffio",
+          "keywords": "breath texture, airy bamboo flute, wind pad"
+        },
+        {
+          "nome": "onde",
+          "keywords": "soft swell, gentle ocean-like movement, warm pads"
+        }
+      ],
+      "colori": [
+        "#2c4a52",
+        "#8fc3b8",
+        "#f4efe1"
+      ],
+      "ambito": "yoga",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Yin-Savasana",
+      "energia": 1,
+      "bpm": [
+        40,
+        58
+      ],
+      "attivita": "posizioni passive lunghe",
+      "strutture": [
+        "piatto",
+        "onda"
+      ],
+      "genere": "Dark ambient dolce",
+      "stile": "deep dark ambient, sub bass drones, very slow and heavy but warm, no melody",
+      "strumenti": [
+        "sub bass",
+        "drone scuro",
+        "rumore di fondo naturale",
+        "corde basse"
+      ],
+      "vietati": [
+        "batteria",
+        "percussioni",
+        "melodia in primo piano",
+        "arpeggi",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "dark ambient",
+          "peso": 3
+        },
+        {
+          "genere": "drone doom",
+          "peso": 1
+        }
+      ],
+      "enfasi": "pesantezza costante, nessun crescendo",
+      "melodia": "assente, oppure una sola nota che cambia raramente",
+      "accordi": "un solo accordo grave o un intervallo di quinta",
+      "ritmica": "nessun battito",
+      "tonalita": [
+        "Mi minore",
+        "Si minore"
+      ],
+      "varianti": [
+        {
+          "nome": "profondo",
+          "keywords": "deep sub bass, warm low drone, heavy stillness"
+        },
+        {
+          "nome": "naturale",
+          "keywords": "dark nature ambience, distant low rumble"
+        }
+      ],
+      "colori": [
+        "#120f1e",
+        "#3a2d52",
+        "#8a6fb3"
+      ],
+      "ambito": "yoga",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Restorative",
+      "energia": 2,
+      "bpm": [
+        50,
+        70
+      ],
+      "attivita": "rilassamento guidato",
+      "strutture": [
+        "onda",
+        "arco"
+      ],
+      "genere": "Ambient acustico",
+      "stile": "acoustic ambient, warm harp and delayed guitar, gentle woodwinds, calm and nurturing",
+      "strumenti": [
+        "arpa",
+        "chitarra acustica con delay",
+        "flauto traverso",
+        "archi lontani"
+      ],
+      "vietati": [
+        "batteria",
+        "synth distorto",
+        "percussioni marcate",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "ambient acustico",
+          "peso": 3
+        },
+        {
+          "genere": "folk",
+          "peso": 1
+        },
+        {
+          "genere": "musica da camera",
+          "peso": 1
+        }
+      ],
+      "enfasi": "dolce e costante, picchi molto contenuti",
+      "melodia": "linea semplice con intervalli di terza e quarta, modo maggiore",
+      "accordi": "accordi maggiori e sus, movimento lento",
+      "ritmica": "pulsazione lentissima quasi impercettibile, 4/4 rilassato",
+      "tonalita": [
+        "Do maggiore",
+        "Sol maggiore",
+        "Fa maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "arpa",
+          "keywords": "harp arpeggios, soft strings, delicate"
+        },
+        {
+          "nome": "legni",
+          "keywords": "warm flute, gentle clarinet, woodwind warmth"
+        }
+      ],
+      "colori": [
+        "#4a3728",
+        "#c9a57a",
+        "#f6e7c9"
+      ],
+      "ambito": "yoga",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Sound-bath-rilassamento",
+      "energia": 2,
+      "bpm": [
+        40,
+        60
+      ],
+      "attivita": "sound bath",
+      "strutture": [
+        "piatto",
+        "crescendo"
+      ],
+      "genere": "Sound bath con gong",
+      "stile": "sound bath, gong swells, crystal bowls, long resonant sustain, hypnotic and spacious",
+      "strumenti": [
+        "gong",
+        "campane di cristallo",
+        "campane tibetane",
+        "pad di risonanza"
+      ],
+      "vietati": [
+        "batteria",
+        "percussioni ritmiche",
+        "melodia",
+        "basso pulsante",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "sound bath",
+          "peso": 3
+        },
+        {
+          "genere": "ambient",
+          "peso": 1
+        }
+      ],
+      "enfasi": "ondate di volume con lunghi decadimenti, mai secche",
+      "melodia": "nessuna melodia: solo armonici e risonanze",
+      "accordi": "cluster e intervalli di quarta e quinta",
+      "ritmica": "nessun battito, ondate di riverbero",
+      "tonalita": [
+        "Re minore",
+        "Mi minore",
+        "Do minore"
+      ],
+      "varianti": [
+        {
+          "nome": "gong",
+          "keywords": "gong waves, deep swell, long decay"
+        },
+        {
+          "nome": "cristalli",
+          "keywords": "crystal bowls, glassy overtones, shimmering"
+        }
+      ],
+      "colori": [
+        "#2a1f3d",
+        "#7d5fa3",
+        "#e9d8ff"
+      ],
+      "ambito": "yoga",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Hatha-base",
+      "energia": 3,
+      "bpm": [
+        78,
+        92
+      ],
+      "attivita": "hatha, asana basilari",
+      "strutture": [
+        "arco",
+        "onda"
+      ],
+      "genere": "Downtempo acustico",
+      "stile": "acoustic downtempo, nylon guitar and soft shaker, warm bass, gentle groove for slow movement",
+      "strumenti": [
+        "chitarra classica",
+        "shaker morbido",
+        "basso acustico",
+        "kalimba"
+      ],
+      "vietati": [
+        "batteria elettronica",
+        "synth distorto",
+        "percussioni tribali forti",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "downtempo",
+          "peso": 3
+        },
+        {
+          "genere": "bossa nova",
+          "peso": 1
+        },
+        {
+          "genere": "folk",
+          "peso": 1
+        }
+      ],
+      "enfasi": "crescita regolare e morbida, mai aggressiva",
+      "melodia": "frasi semplici di 4 battute, modo maggiore o dorico, note lunghe",
+      "accordi": "giri a quattro accordi, II-V-I morbidi, settime",
+      "ritmica": "groove leggero in 4/4, shaker sul levare",
+      "tonalita": [
+        "Sol maggiore",
+        "Re maggiore",
+        "Mi minore"
+      ],
+      "varianti": [
+        {
+          "nome": "acustico",
+          "keywords": "nylon guitar, soft shaker, gentle acoustic bass"
+        },
+        {
+          "nome": "kalimba",
+          "keywords": "kalimba, marimba, light percussion"
+        }
+      ],
+      "colori": [
+        "#3b5b3a",
+        "#a9c28a",
+        "#f5e9c4"
+      ],
+      "ambito": "yoga",
+      "famiglia": "ritmico"
+    },
+    {
+      "name": "Vinyasa-dinamico",
+      "energia": 4,
+      "bpm": [
+        96,
+        112
+      ],
+      "attivita": "vinyasa, flusso",
+      "strutture": [
+        "loop",
+        "crescendo",
+        "arco"
+      ],
+      "genere": "Organic groove",
+      "stile": "organic groove, tribal percussion, pulsing bass and plucked arpeggios, rhythmic and flowing",
+      "strumenti": [
+        "percussioni tribali",
+        "kalimba",
+        "basso pulsante",
+        "arpeggi di sintetizzatore"
+      ],
+      "vietati": [
+        "batteria rock",
+        "chitarra distorta",
+        "pad lunghi",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "organic house",
+          "peso": 3
+        },
+        {
+          "genere": "tribal",
+          "peso": 2
+        },
+        {
+          "genere": "world",
+          "peso": 1
+        }
+      ],
+      "enfasi": "costruzione a onde ripetute, crescita graduale su 8 battute",
+      "melodia": "motivo breve ripetuto con variazioni, modo dorico",
+      "accordi": "progressione minore ciclica (i-VII-VI-VII)",
+      "ritmica": "groove a 4/4 con pulsazione costante, hi-hat leggeri",
+      "tonalita": [
+        "La minore",
+        "Mi minore",
+        "Re minore"
+      ],
+      "varianti": [
+        {
+          "nome": "tribale",
+          "keywords": "tribal percussion, hand drums, djembe"
+        },
+        {
+          "nome": "organico",
+          "keywords": "kalimba, marimba, pulsing bass, flowing arpeggios"
+        }
+      ],
+      "colori": [
+        "#6b2f1d",
+        "#e08a3c",
+        "#ffd27a"
+      ],
+      "ambito": "yoga",
+      "famiglia": "ritmico"
+    },
+    {
+      "name": "Power-yoga",
+      "energia": 5,
+      "bpm": [
+        118,
+        130
+      ],
+      "attivita": "power yoga, forza",
+      "strutture": [
+        "loop",
+        "arco"
+      ],
+      "genere": "Electronic workout leggero",
+      "stile": "electronic workout, driving four-on-the-floor drum machine, pulsing synth bass, energetic but not aggressive",
+      "strumenti": [
+        "drum machine",
+        "synth pulsante",
+        "basso sintetico",
+        "claps"
+      ],
+      "vietati": [
+        "chitarra distorta",
+        "voce",
+        "pad lunghi",
+        "piano acustico"
+      ],
+      "influenze": [
+        {
+          "genere": "electronic dance",
+          "peso": 3
+        },
+        {
+          "genere": "trance leggero",
+          "peso": 2
+        }
+      ],
+      "enfasi": "crescendo a build-up e drop ogni 16 battute",
+      "melodia": "arpeggio sintetico semplice, modo minore",
+      "accordi": "accordo minore ripetuto, un cambio ogni 4 battute",
+      "ritmica": "four on the floor a 120-130 bpm",
+      "tonalita": [
+        "La minore",
+        "Mi minore",
+        "Si minore"
+      ],
+      "varianti": [
+        {
+          "nome": "pulsante",
+          "keywords": "pulsing synth bass, four on the floor, clean"
+        },
+        {
+          "nome": "build",
+          "keywords": "build-up risers, drop, energetic synth lead"
+        }
+      ],
+      "colori": [
+        "#0f2a3d",
+        "#2fb3c9",
+        "#ff5d73"
+      ],
+      "ambito": "yoga",
+      "famiglia": "ritmico"
+    },
+    {
+      "name": "Funk-groove",
+      "energia": 3,
+      "bpm": [
+        96,
+        108
+      ],
+      "attivita": "hatha dinamico, movimento a ritmo",
+      "strutture": [
+        "arco",
+        "loop"
+      ],
+      "genere": "Funk groove leggero",
+      "stile": "light funk groove, played by a band, tight rhythm section, warm and joyful, slight swing",
+      "strumenti": [
+        "basso slap",
+        "chitarra funk pulita",
+        "clavinet",
+        "batteria suonata con spazzole",
+        "ottoni morbidi"
+      ],
+      "vietati": [
+        "synth distorto",
+        "voce",
+        "drum machine rigida",
+        "pad lunghi"
+      ],
+      "influenze": [
+        {
+          "genere": "funk",
+          "peso": 3
+        },
+        {
+          "genere": "soul",
+          "peso": 1
+        },
+        {
+          "genere": "disco leggero",
+          "peso": 1
+        }
+      ],
+      "enfasi": "crescita a ondate sui ritornelli, respiro tra le sezioni",
+      "melodia": "motivo corto di 2 battute ripetuto, scala pentatonica maggiore",
+      "accordi": "accordi di settima dominante e minore, giro breve ripetuto",
+      "ritmica": "groove sincopato in 4/4, sedicesimi sul basso, ghost note sulla batteria",
+      "tonalita": [
+        "Mi minore",
+        "La maggiore",
+        "Re minore"
+      ],
+      "varianti": [
+        {
+          "nome": "pulito",
+          "keywords": "clean funk guitar, tight bass, brush drums"
+        },
+        {
+          "nome": "ottoni",
+          "keywords": "soft horn section, groove, warm organ"
+        }
+      ],
+      "colori": [
+        "#2b1a3d",
+        "#c25b8f",
+        "#ffd166"
+      ],
+      "ambito": "yoga",
+      "famiglia": "ritmico"
+    },
+    {
+      "name": "Afro-latin-groove",
+      "energia": 4,
+      "bpm": [
+        100,
+        116
+      ],
+      "attivita": "vinyasa ritmato, flusso a tempo",
+      "strutture": [
+        "loop",
+        "crescendo"
+      ],
+      "genere": "Afro-latin groove",
+      "stile": "afro-latin groove, live percussion ensemble, congas and shakers, bright and flowing, human feel",
+      "strumenti": [
+        "congas",
+        "bongos",
+        "shaker",
+        "timbales leggeri",
+        "basso acustico",
+        "chitarra nylon ritmica"
+      ],
+      "vietati": [
+        "batteria rock",
+        "synth distorto",
+        "voce",
+        "drum machine rigida"
+      ],
+      "influenze": [
+        {
+          "genere": "afro-cuban",
+          "peso": 3
+        },
+        {
+          "genere": "bossa nova",
+          "peso": 1
+        },
+        {
+          "genere": "world",
+          "peso": 1
+        }
+      ],
+      "enfasi": "costruzione per strati: prima le percussioni, poi basso e chitarra",
+      "melodia": "frase ritmica ripetuta con piccole variazioni, modo dorico",
+      "accordi": "vamp minore con cambi ogni due battute",
+      "ritmica": "clave 3-2 sottinteso, pulsazione in 4/4 con sincopi",
+      "tonalita": [
+        "Re minore",
+        "Sol minore",
+        "La minore"
+      ],
+      "varianti": [
+        {
+          "nome": "congas",
+          "keywords": "congas, bongos, live percussion, warm"
+        },
+        {
+          "nome": "chitarra",
+          "keywords": "nylon guitar montuno, shakers, bright"
+        }
+      ],
+      "colori": [
+        "#3d2a14",
+        "#e07a3f",
+        "#ffe08a"
+      ],
+      "ambito": "yoga",
+      "famiglia": "ritmico"
+    },
+    {
+      "name": "Trip-hop-dolce",
+      "energia": 3,
+      "bpm": [
+        84,
+        96
+      ],
+      "attivita": "stretching con ritmo lento, mobilita",
+      "strutture": [
+        "onda",
+        "arco"
+      ],
+      "genere": "Trip-hop dolce",
+      "stile": "soft trip-hop, dusty drums, rhodes piano, warm bass, relaxed and melancholic, played feel",
+      "strumenti": [
+        "rhodes",
+        "basso elettrico morbido",
+        "batteria con beat spezzato",
+        "vibrafono",
+        "chitarra jazz pulita"
+      ],
+      "vietati": [
+        "synth distorto",
+        "voce",
+        "drop elettronico",
+        "pad lunghi"
+      ],
+      "influenze": [
+        {
+          "genere": "trip-hop",
+          "peso": 3
+        },
+        {
+          "genere": "jazz",
+          "peso": 1
+        },
+        {
+          "genere": "lo-fi",
+          "peso": 2
+        }
+      ],
+      "enfasi": "battito spezzato che si alterna a passaggi morbidi",
+      "melodia": "linea di rhodes semplice, modo dorico, note lunghe",
+      "accordi": "accordi di nona e settima, progressione lenta ciclica",
+      "ritmica": "beat spezzato a 4/4, grancassa irregolare, rullante in ritardo",
+      "tonalita": [
+        "Fa minore",
+        "Do minore",
+        "Si bemolle maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "rhodes",
+          "keywords": "rhodes piano, warm bass, dusty drums"
+        },
+        {
+          "nome": "vibrafono",
+          "keywords": "vibraphone, soft broken beat, jazzy"
+        }
+      ],
+      "colori": [
+        "#1f2a33",
+        "#5c7a86",
+        "#e6c9a0"
+      ],
+      "ambito": "yoga",
+      "famiglia": "ritmico"
+    },
+    {
+      "name": "Reggae-dub-morbido",
+      "energia": 2,
+      "bpm": [
+        70,
+        82
+      ],
+      "attivita": "rilassamento con ritmo in levare",
+      "strutture": [
+        "piatto",
+        "onda"
+      ],
+      "genere": "Reggae dub morbido",
+      "stile": "soft reggae dub, one-drop rhythm, live bass and organ, spacious echoes, warm and loose",
+      "strumenti": [
+        "basso reggae",
+        "organo hammond",
+        "chitarra skank",
+        "rullante con eco",
+        "percussioni leggere"
+      ],
+      "vietati": [
+        "batteria rock",
+        "synth distorto",
+        "voce",
+        "arpeggi veloci"
+      ],
+      "influenze": [
+        {
+          "genere": "reggae",
+          "peso": 3
+        },
+        {
+          "genere": "dub",
+          "peso": 2
+        }
+      ],
+      "enfasi": "eco e riverberi che crescono e svaniscono, battito sempre presente ma calmo",
+      "melodia": "poche note, intervalli semplici, modo minore pentatonico",
+      "accordi": "accordi minori con settima, skank sul levare",
+      "ritmica": "one-drop in 4/4: il battere sul terzo tempo, basso sul levare",
+      "tonalita": [
+        "La minore",
+        "Mi minore",
+        "Re minore"
+      ],
+      "varianti": [
+        {
+          "nome": "dub",
+          "keywords": "dub echoes, spacious reverb, organ"
+        },
+        {
+          "nome": "roots",
+          "keywords": "roots reggae, live bass, warm guitar skank"
+        }
+      ],
+      "colori": [
+        "#1d3324",
+        "#4f9a52",
+        "#f2c94c"
+      ],
+      "ambito": "yoga",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Jazz-lounge",
+      "energia": 2,
+      "bpm": [
+        80,
+        96
+      ],
+      "attivita": "rilassamento e respiro lento con musica suonata",
+      "strutture": [
+        "arco",
+        "onda"
+      ],
+      "genere": "Jazz lounge",
+      "stile": "jazz lounge trio, played by musicians, upright bass, brushed drums, piano, relaxed and intimate",
+      "strumenti": [
+        "pianoforte",
+        "contrabbasso",
+        "batteria con spazzole",
+        "sassofono morbido",
+        "vibrafono"
+      ],
+      "vietati": [
+        "synth",
+        "drum machine",
+        "voce",
+        "distorsione"
+      ],
+      "influenze": [
+        {
+          "genere": "jazz",
+          "peso": 3
+        },
+        {
+          "genere": "bossa nova",
+          "peso": 1
+        },
+        {
+          "genere": "musica da camera",
+          "peso": 1
+        }
+      ],
+      "enfasi": "improvvisazione misurata, respiri tra le frasi, dinamica naturale",
+      "melodia": "frase jazz corta con abbellimenti, modo dorico o misolidio",
+      "accordi": "ii-V-I con settime e none, cambi lenti",
+      "ritmica": "swing leggero in 4/4, walking bass, spazzole sulla batteria",
+      "tonalita": [
+        "Do maggiore",
+        "Fa maggiore",
+        "Re minore"
+      ],
+      "varianti": [
+        {
+          "nome": "trio",
+          "keywords": "piano trio, upright bass, brushed drums"
+        },
+        {
+          "nome": "sax",
+          "keywords": "soft tenor sax, piano, walking bass"
+        }
+      ],
+      "colori": [
+        "#2a2238",
+        "#8b5e83",
+        "#f4d6a0"
+      ],
+      "ambito": "yoga",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Folk-strumming",
+      "energia": 3,
+      "bpm": [
+        90,
+        106
+      ],
+      "attivita": "hatha con ritmo accompagnato, vinyasa lento",
+      "strutture": [
+        "arco",
+        "loop"
+      ],
+      "genere": "Folk strumming",
+      "stile": "acoustic folk strumming, played guitars, banjo, light percussion, warm and honest, human feel",
+      "strumenti": [
+        "chitarra acustica strumming",
+        "banjo",
+        "armonica",
+        "basso acustico",
+        "shaker e cajon"
+      ],
+      "vietati": [
+        "synth",
+        "drum machine",
+        "voce",
+        "distorsione"
+      ],
+      "influenze": [
+        {
+          "genere": "folk",
+          "peso": 3
+        },
+        {
+          "genere": "country leggero",
+          "peso": 1
+        },
+        {
+          "genere": "americana",
+          "peso": 1
+        }
+      ],
+      "enfasi": "crescita a ripresa, ritornelli più aperti, poi ritorno intimo",
+      "melodia": "motivo semplice in do maggiore o sol maggiore, intervalli di terza",
+      "accordi": "I-IV-V-I con varianti sus, giro in quattro battute",
+      "ritmica": "strumming in ottavi in 4/4, cajon sul battere",
+      "tonalita": [
+        "Do maggiore",
+        "Sol maggiore",
+        "La minore"
+      ],
+      "varianti": [
+        {
+          "nome": "banjo",
+          "keywords": "banjo picking, acoustic strumming, bright"
+        },
+        {
+          "nome": "armonica",
+          "keywords": "harmonica, acoustic guitar strumming, warm"
+        }
+      ],
+      "colori": [
+        "#3b2f1e",
+        "#b7845a",
+        "#f7e3b5"
+      ],
+      "ambito": "yoga",
+      "famiglia": "ritmico"
+    },
+    {
+      "name": "Surf-rock-strumentale",
+      "energia": 4,
+      "bpm": [
+        126,
+        142
+      ],
+      "attivita": "sottofondo energico, movimento leggero e pedalata",
+      "strutture": [
+        "loop",
+        "arco"
+      ],
+      "genere": "Surf rock strumentale",
+      "stile": "instrumental surf rock, reverb guitar lead, driving drums, bright and playful, played by a band",
+      "strumenti": [
+        "chitarra elettrica con riverbero",
+        "batteria con piatti",
+        "basso elettrico",
+        "chitarra ritmica twang",
+        "organo leggero"
+      ],
+      "vietati": [
+        "voce",
+        "synth dominante",
+        "pad lunghi",
+        "drop elettronico"
+      ],
+      "influenze": [
+        {
+          "genere": "surf rock",
+          "peso": 3
+        },
+        {
+          "genere": "rock and roll",
+          "peso": 1
+        },
+        {
+          "genere": "rockabilly",
+          "peso": 1
+        }
+      ],
+      "enfasi": "tema di chitarra che ritorna ad ogni giro, batteria in crescendo",
+      "melodia": "tema breve di chitarra con bending, scala minore armonica",
+      "accordi": "giro di tre accordi con power chord e cambio sulla quarta",
+      "ritmica": "beat di batteria dritto in 4/4 con rullate, basso in ottavi",
+      "tonalita": [
+        "Mi minore",
+        "La minore",
+        "Re minore"
+      ],
+      "varianti": [
+        {
+          "nome": "reverb",
+          "keywords": "reverb guitar lead, twangy rhythm, driving drums"
+        },
+        {
+          "nome": "organo",
+          "keywords": "surf guitar with organ, bright cymbals, energetic"
+        }
+      ],
+      "colori": [
+        "#0b3b4f",
+        "#1fa3b8",
+        "#ffb84d"
+      ],
+      "ambito": "musica",
+      "famiglia": "rock"
+    },
+    {
+      "name": "Post-rock-strumentale",
+      "energia": 4,
+      "bpm": [
+        100,
+        120
+      ],
+      "attivita": "sottofondo ampio e dinamico, lavoro e concentrazione attiva",
+      "strutture": [
+        "arco",
+        "crescendo"
+      ],
+      "genere": "Post-rock strumentale",
+      "stile": "instrumental post-rock, layered clean and delayed guitars, building drums, cinematic and expansive, played by a band",
+      "strumenti": [
+        "chitarra elettrica con delay",
+        "chitarra clean arpeggiata",
+        "batteria con crescendo",
+        "basso profondo",
+        "glockenspiel"
+      ],
+      "vietati": [
+        "voce",
+        "synth dominante",
+        "drum machine rigida",
+        "drop elettronico"
+      ],
+      "influenze": [
+        {
+          "genere": "post-rock",
+          "peso": 3
+        },
+        {
+          "genere": "shoegaze",
+          "peso": 1
+        },
+        {
+          "genere": "ambient rock",
+          "peso": 1
+        }
+      ],
+      "enfasi": "costruzione a strati, picco sul terzo crescendo, ritorno morbido",
+      "melodia": "motivo di chitarra ripetuto con variazioni, modo eolio",
+      "accordi": "accordi maggiori e minori alternati, cambi ogni 4 battute",
+      "ritmica": "batteria che passa da pulsazione leggera a battere pieno, 4/4",
+      "tonalita": [
+        "Sol minore",
+        "Re minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "delay",
+          "keywords": "delayed guitars, building drums, cinematic"
+        },
+        {
+          "nome": "arpeggi",
+          "keywords": "clean arpeggio guitars, glockenspiel, expansive"
+        }
+      ],
+      "colori": [
+        "#1b2631",
+        "#4a6fa5",
+        "#e8d5b5"
+      ],
+      "ambito": "musica",
+      "famiglia": "rock"
+    },
+    {
+      "name": "Blues-shuffle-strumentale",
+      "energia": 3,
+      "bpm": [
+        100,
+        116
+      ],
+      "attivita": "sottofondo con groove, pedalata e lavoro a ritmo",
+      "strutture": [
+        "arco",
+        "loop"
+      ],
+      "genere": "Blues shuffle strumentale",
+      "stile": "instrumental blues shuffle, slide guitar, drums with swing shuffle, warm organ, played by a band, lively",
+      "strumenti": [
+        "chitarra slide",
+        "batteria con shuffle",
+        "basso walking",
+        "organo hammond",
+        "chitarra ritmica elettrica"
+      ],
+      "vietati": [
+        "voce",
+        "synth",
+        "drum machine rigida",
+        "pad lunghi"
+      ],
+      "influenze": [
+        {
+          "genere": "blues",
+          "peso": 3
+        },
+        {
+          "genere": "rock",
+          "peso": 1
+        },
+        {
+          "genere": "boogie",
+          "peso": 1
+        }
+      ],
+      "enfasi": "assoli brevi che si alternano al groove, crescita sul ritornello",
+      "melodia": "frase blues di slide con bending, pentatonica minore con blue note",
+      "accordi": "dodici battute blues, dominanti di settima",
+      "ritmica": "shuffle in 12/8 sentito in 4/4, rullante sul due e sul quattro",
+      "tonalita": [
+        "Mi minore",
+        "La minore",
+        "Mi maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "slide",
+          "keywords": "slide guitar blues, shuffle drums, walking bass"
+        },
+        {
+          "nome": "hammond",
+          "keywords": "hammond organ blues, shuffle drums, warm guitar"
+        }
+      ],
+      "colori": [
+        "#3a1f0f",
+        "#b5651d",
+        "#f5d27a"
+      ],
+      "ambito": "musica",
+      "famiglia": "rock"
+    },
+    {
+      "name": "Indie-rock-strumentale",
+      "energia": 4,
+      "bpm": [
+        116,
+        130
+      ],
+      "attivita": "sottofondo positivo e movimentato, studio e attivita leggere",
+      "strutture": [
+        "loop",
+        "crescendo"
+      ],
+      "genere": "Indie rock strumentale",
+      "stile": "instrumental indie rock, jangly guitars, driving drums, bright and energetic, played by a band",
+      "strumenti": [
+        "chitarra elettrica jangle",
+        "batteria rock",
+        "basso elettrico",
+        "chitarra ritmica con power chord",
+        "tastiera vintage"
+      ],
+      "vietati": [
+        "voce",
+        "synth dominante",
+        "pad lunghi",
+        "drop elettronico"
+      ],
+      "influenze": [
+        {
+          "genere": "indie rock",
+          "peso": 3
+        },
+        {
+          "genere": "power pop",
+          "peso": 1
+        },
+        {
+          "genere": "new wave",
+          "peso": 1
+        }
+      ],
+      "enfasi": "ritornelli di chitarra che si aprono, batteria che accelera nel finale",
+      "melodia": "riff breve e orecchiabile, modo maggiore con passaggi minori",
+      "accordi": "progressione I-V-vi-IV con power chord e arpeggi",
+      "ritmica": "batteria in 4/4 con colpo sul levare, basso sugli ottavi",
+      "tonalita": [
+        "Sol maggiore",
+        "Re maggiore",
+        "Mi minore"
+      ],
+      "varianti": [
+        {
+          "nome": "jangle",
+          "keywords": "jangly guitars, driving drums, bright"
+        },
+        {
+          "nome": "tastiera",
+          "keywords": "vintage keyboard, rock drums, energetic guitars"
+        }
+      ],
+      "colori": [
+        "#1e2f3a",
+        "#3a9ad9",
+        "#ffd166"
+      ],
+      "ambito": "musica",
+      "famiglia": "rock"
+    },
+    {
+      "name": "Rockabilly-strumentale",
+      "energia": 5,
+      "bpm": [
+        132,
+        146
+      ],
+      "attivita": "sottofondo molto movimentato, cardio e ritmo alto",
+      "strutture": [
+        "loop",
+        "arco"
+      ],
+      "genere": "Rockabilly strumentale",
+      "stile": "instrumental rockabilly, fast slap bass, twangy electric guitar, swinging drums, lively and joyful, played by a band",
+      "strumenti": [
+        "contrabbasso slap",
+        "chitarra elettrica twang",
+        "batteria rockabilly",
+        "chitarra solista con bending",
+        "claps"
+      ],
+      "vietati": [
+        "voce",
+        "synth",
+        "drum machine rigida",
+        "pad lunghi"
+      ],
+      "influenze": [
+        {
+          "genere": "rockabilly",
+          "peso": 3
+        },
+        {
+          "genere": "rock and roll",
+          "peso": 2
+        },
+        {
+          "genere": "country",
+          "peso": 1
+        }
+      ],
+      "enfasi": "assolo di chitarra che sale, ritorno al tema con batteria piena",
+      "melodia": "tema veloce di chitarra con bending, modo misolidio",
+      "accordi": "giro rock and roll I-IV-V con dominanti",
+      "ritmica": "shuffle veloce in 4/4, contrabbasso slap sul battere",
+      "tonalita": [
+        "Mi maggiore",
+        "La maggiore",
+        "Re maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "contrabbasso",
+          "keywords": "slap upright bass, twangy guitar, swinging drums"
+        },
+        {
+          "nome": "claps",
+          "keywords": "rockabilly guitar, claps, fast drums, lively"
+        }
+      ],
+      "colori": [
+        "#4a1d2b",
+        "#e04b5a",
+        "#ffe066"
+      ],
+      "ambito": "musica",
+      "famiglia": "rock"
+    },
+    {
+      "name": "Techno-minimale",
+      "energia": 4,
+      "bpm": [
+        122,
+        130
+      ],
+      "attivita": "sottofondo ipnotico, ritmo costante per attivita leggere",
+      "strutture": [
+        "loop",
+        "crescendo"
+      ],
+      "genere": "Techno minimale",
+      "stile": "minimal techno, hypnotic four-on-the-floor kick, sparse hi-hats, filtered bass, clean and precise, electronic production",
+      "strumenti": [
+        "drum machine kick",
+        "hi-hat sintetico",
+        "basso filtrato",
+        "stab di sintetizzatore",
+        "rumore percussivo"
+      ],
+      "vietati": [
+        "voce",
+        "chitarra",
+        "archi",
+        "pianoforte acustico"
+      ],
+      "influenze": [
+        {
+          "genere": "minimal techno",
+          "peso": 3
+        },
+        {
+          "genere": "deep house",
+          "peso": 1
+        },
+        {
+          "genere": "dub techno",
+          "peso": 1
+        }
+      ],
+      "enfasi": "costruzione lenta per sottrazione e aggiunta di elementi, filtro che si apre",
+      "melodia": "poche note di sintetizzatore ripetute, modo minore",
+      "accordi": "accordo minore statico con cambi rari",
+      "ritmica": "kick in 4/4 costante, hi-hat sull'offbeat",
+      "tonalita": [
+        "La minore",
+        "Do minore",
+        "Fa diesis minore"
+      ],
+      "varianti": [
+        {
+          "nome": "filtro",
+          "keywords": "filtered bass, hypnotic kick, sparse hats"
+        },
+        {
+          "nome": "dub",
+          "keywords": "dub techno chords, echoes, minimal kick"
+        }
+      ],
+      "colori": [
+        "#0a0f14",
+        "#2b4c5e",
+        "#7ae7ff"
+      ],
+      "ambito": "musica",
+      "famiglia": "elettronico"
+    },
+    {
+      "name": "Piano-minimalista",
+      "energia": 1,
+      "bpm": [
+        60,
+        78
+      ],
+      "attivita": "concentrazione e pausa, musica di fondo molto calma",
+      "strutture": [
+        "piatto",
+        "onda"
+      ],
+      "genere": "Piano minimalista",
+      "stile": "minimalist piano, repeating short patterns, gentle and precise, played by a pianist, quiet dynamics",
+      "strumenti": [
+        "pianoforte acustico",
+        "pianoforte preparato leggero",
+        "violoncello lontano",
+        "celesta"
+      ],
+      "vietati": [
+        "batteria",
+        "synth",
+        "voce",
+        "distorsione"
+      ],
+      "influenze": [
+        {
+          "genere": "minimalismo",
+          "peso": 3
+        },
+        {
+          "genere": "musica da camera",
+          "peso": 1
+        },
+        {
+          "genere": "neoclassica",
+          "peso": 1
+        }
+      ],
+      "enfasi": "cellule ripetute che si sovrappongono lentamente, nessun picco",
+      "melodia": "cellula di 3-4 note ripetuta con variazioni, modo lidio",
+      "accordi": "accordi maggiori e aggiunte, cambi lenti",
+      "ritmica": "pulsazione regolare e quieta in 4/4, nessun accento forte",
+      "tonalita": [
+        "Do maggiore",
+        "Re maggiore",
+        "La maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "solo",
+          "keywords": "solo piano, repeating patterns, gentle"
+        },
+        {
+          "nome": "celesta",
+          "keywords": "celesta and piano, minimal patterns, delicate"
+        }
+      ],
+      "colori": [
+        "#1a1a24",
+        "#5d6b8a",
+        "#f0e6d2"
+      ],
+      "ambito": "musica",
+      "famiglia": "meditativo"
+    },
+    {
+      "name": "Score-cinematico",
+      "energia": 3,
+      "bpm": [
+        84,
+        104
+      ],
+      "attivita": "sottofondo narrativo, lettura e lavoro creativo",
+      "strutture": [
+        "arco",
+        "crescendo"
+      ],
+      "genere": "Score cinematico",
+      "stile": "cinematic orchestral score, strings and horns, timpani and soft brass, sweeping and emotional, played by an orchestra",
+      "strumenti": [
+        "archi sinfonici",
+        "corni",
+        "timpani",
+        "arpa",
+        "ottoni morbidi"
+      ],
+      "vietati": [
+        "batteria rock",
+        "synth",
+        "voce",
+        "chitarra elettrica"
+      ],
+      "influenze": [
+        {
+          "genere": "colonna sonora",
+          "peso": 3
+        },
+        {
+          "genere": "musica sinfonica",
+          "peso": 2
+        },
+        {
+          "genere": "epic",
+          "peso": 1
+        }
+      ],
+      "enfasi": "crescendo orchestrale verso un picco di ottoni e timpani, poi ritorno intimo",
+      "melodia": "tema lirico per archi, intervalli ampi, modo minore",
+      "accordi": "progressione sinfonica con sospensioni e dominanti",
+      "ritmica": "respiro lento in 4/4, timpani sui punti di tensione",
+      "tonalita": [
+        "Re minore",
+        "Sol minore",
+        "Mi bemolle maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "archi",
+          "keywords": "sweeping strings, emotional, cinematic score"
+        },
+        {
+          "nome": "corni",
+          "keywords": "french horns, timpani, orchestral crescendo"
+        }
+      ],
+      "colori": [
+        "#241b2f",
+        "#7c4d6b",
+        "#f2c57c"
+      ],
+      "ambito": "musica",
+      "famiglia": "orchestrale"
+    },
+    {
+      "name": "Folk-balcanico",
+      "energia": 5,
+      "bpm": [
+        132,
+        146
+      ],
+      "attivita": "sottofondo vivace e festoso, movimento energico",
+      "strutture": [
+        "loop",
+        "arco"
+      ],
+      "genere": "Folk balcanico strumentale",
+      "stile": "balkan instrumental folk, accordion and clarinet, fast drums, lively and festive, played by a folk ensemble",
+      "strumenti": [
+        "fisarmonica",
+        "clarinetto",
+        "tamburo a cornice",
+        "violino",
+        "basso acustico"
+      ],
+      "vietati": [
+        "synth",
+        "voce",
+        "drum machine rigida",
+        "pad lunghi"
+      ],
+      "influenze": [
+        {
+          "genere": "musica balcanica",
+          "peso": 3
+        },
+        {
+          "genere": "klezmer",
+          "peso": 1
+        },
+        {
+          "genere": "folk",
+          "peso": 1
+        }
+      ],
+      "enfasi": "ballo che accelera a ondate, ritorno al tema con tutto l'ensemble",
+      "melodia": "tema veloce di clarinetto, scala balcanica con intervalli aumentati",
+      "accordi": "giro minore con bordone di fisarmonica",
+      "ritmica": "tempo dispari in ritmo di danza, tamburo a cornice sui battere",
+      "tonalita": [
+        "Mi minore",
+        "La minore",
+        "Re minore"
+      ],
+      "varianti": [
+        {
+          "nome": "fisarmonica",
+          "keywords": "accordion dance, fast clarinet, frame drum"
+        },
+        {
+          "nome": "violino",
+          "keywords": "fiddle dance, balkan rhythm, lively ensemble"
+        }
+      ],
+      "colori": [
+        "#3a1f14",
+        "#c0503a",
+        "#f6d37a"
+      ],
+      "ambito": "musica",
+      "famiglia": "world"
+    },
+    {
+      "name": "Beat-hip-hop",
+      "energia": 3,
+      "bpm": [
+        84,
+        96
+      ],
+      "attivita": "sottofondo rilassato con groove, studio e pause attive",
+      "strutture": [
+        "loop",
+        "onda"
+      ],
+      "genere": "Beat hip-hop strumentale",
+      "stile": "instrumental hip-hop beat, boom-bap drums, vinyl crackle, warm sampled keys, head-nodding groove",
+      "strumenti": [
+        "batteria boom-bap",
+        "campione di piano",
+        "basso sub",
+        "giradischi con crackle",
+        "vibrafono campionato"
+      ],
+      "vietati": [
+        "voce",
+        "chitarra distorta",
+        "archi lunghi",
+        "drop elettronico"
+      ],
+      "influenze": [
+        {
+          "genere": "boom-bap",
+          "peso": 3
+        },
+        {
+          "genere": "jazz hop",
+          "peso": 2
+        },
+        {
+          "genere": "lo-fi",
+          "peso": 1
+        }
+      ],
+      "enfasi": "loop che evolve lentamente, un elemento in piu ad ogni giro",
+      "melodia": "campione di piano o vibrafono in loop, poche note",
+      "accordi": "giro di accordi minori di nona, cambio ogni due battute",
+      "ritmica": "boom-bap in 4/4, grancassa sul uno e tre, rullante sul due e quattro",
+      "tonalita": [
+        "Fa minore",
+        "Si bemolle minore",
+        "Do minore"
+      ],
+      "varianti": [
+        {
+          "nome": "boom-bap",
+          "keywords": "boom-bap drums, sampled piano, vinyl crackle"
+        },
+        {
+          "nome": "jazz",
+          "keywords": "jazz hop, vibraphone sample, warm sub bass"
+        }
+      ],
+      "colori": [
+        "#1c1c1c",
+        "#6d4c41",
+        "#d7c49e"
+      ],
+      "ambito": "musica",
+      "famiglia": "elettronico"
+    },
+    {
+      "name": "Manouche-swing",
+      "energia": 4,
+      "bpm": [
+        132,
+        146
+      ],
+      "attivita": "sottofondo allegro e virtuosistico, energia positiva",
+      "strutture": [
+        "arco",
+        "loop"
+      ],
+      "genere": "Manouche swing strumentale",
+      "stile": "gypsy jazz manouche swing, rhythm guitars, lead violin and guitar, fast and joyful, played by a quintet",
+      "strumenti": [
+        "chitarra manouche ritmica",
+        "chitarra solista",
+        "violino jazz",
+        "contrabbasso",
+        "chitarra acustica pizzicata"
+      ],
+      "vietati": [
+        "batteria elettronica",
+        "synth",
+        "voce",
+        "distorsione"
+      ],
+      "influenze": [
+        {
+          "genere": "gypsy jazz",
+          "peso": 3
+        },
+        {
+          "genere": "swing",
+          "peso": 2
+        },
+        {
+          "genere": "musette",
+          "peso": 1
+        }
+      ],
+      "enfasi": "assoli che si passano tra violino e chitarra, ritorno al tema corale",
+      "melodia": "tema veloce e cantabile, modo maggiore con cromatismi",
+      "accordi": "giro di dominanti e diminuite, ritmo di chitarra a pulsazione",
+      "ritmica": "swing in 4/4 con chitarra ritmica pulsante e contrabbasso sui quarti",
+      "tonalita": [
+        "Sol maggiore",
+        "Re maggiore",
+        "La maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "quintetto",
+          "keywords": "gypsy jazz quintet, lead violin, rhythm guitar"
+        },
+        {
+          "nome": "chitarra",
+          "keywords": "manouche guitar, swing rhythm, joyful"
+        }
+      ],
+      "colori": [
+        "#2d2412",
+        "#a77a3c",
+        "#ffe9b0"
+      ],
+      "ambito": "musica",
+      "famiglia": "jazz"
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "loop",
+        "arco"
+      ],
+      "vietati": [
+        "voce",
+        "chitarra acustica",
+        "archi"
+      ],
+      "influenze": [
+        {
+          "genere": "Synthwave strumentale",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "instrumental synthwave, retro analog synths, gated reverb drums, arpeggiated bass, nostalgic and bright"
+        },
+        {
+          "nome": "variante",
+          "keywords": "instrumental synthwave, retro analog synths, gated reverb drums, arpeggiated bass, nostalgic and bright"
+        }
+      ],
+      "name": "Synthwave",
+      "famiglia": "elettronico",
+      "energia": 3,
+      "bpm": [
+        100,
+        118
+      ],
+      "attivita": "studio e lavoro, sottofondo retro",
+      "genere": "Synthwave strumentale",
+      "stile": "instrumental synthwave, retro analog synths, gated reverb drums, arpeggiated bass, nostalgic and bright",
+      "strumenti": [
+        "synth analogico",
+        "arpeggiatore",
+        "batteria elettronica con reverb",
+        "basso sintetico",
+        "pad analogico"
+      ],
+      "colori": [
+        "#1a0b2e",
+        "#ff2e88",
+        "#00e5ff"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "loop",
+        "crescendo"
+      ],
+      "vietati": [
+        "voce",
+        "synth",
+        "batteria elettronica"
+      ],
+      "influenze": [
+        {
+          "genere": "Flamenco chitarra",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "instrumental flamenco guitar, rasgueado and palmas, passionate and rhythmic, played by a guitarist"
+        },
+        {
+          "nome": "variante",
+          "keywords": "instrumental flamenco guitar, rasgueado and palmas, passionate and rhythmic, played by a guitarist"
+        }
+      ],
+      "name": "Flamenco-chitarra",
+      "famiglia": "world",
+      "energia": 4,
+      "bpm": [
+        110,
+        130
+      ],
+      "attivita": "sottofondo vivo e ritmato",
+      "genere": "Flamenco chitarra",
+      "stile": "instrumental flamenco guitar, rasgueado and palmas, passionate and rhythmic, played by a guitarist",
+      "strumenti": [
+        "chitarra flamenca",
+        "palmas",
+        "cajon",
+        "basso acustico"
+      ],
+      "colori": [
+        "#3d0c02",
+        "#c62828",
+        "#ffd54f"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "arco",
+        "onda"
+      ],
+      "vietati": [
+        "voce",
+        "synth",
+        "batteria rock"
+      ],
+      "influenze": [
+        {
+          "genere": "Celtic arpa e whistle",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "instrumental celtic folk, harp arpeggios, tin whistle melody, soft bodhran, gentle and storytelling"
+        },
+        {
+          "nome": "variante",
+          "keywords": "instrumental celtic folk, harp arpeggios, tin whistle melody, soft bodhran, gentle and storytelling"
+        }
+      ],
+      "name": "Celtic-arpa-whistle",
+      "famiglia": "world",
+      "energia": 2,
+      "bpm": [
+        80,
+        100
+      ],
+      "attivita": "lettura e pausa narrativa",
+      "genere": "Celtic arpa e whistle",
+      "stile": "instrumental celtic folk, harp arpeggios, tin whistle melody, soft bodhran, gentle and storytelling",
+      "strumenti": [
+        "arpa celtica",
+        "tin whistle",
+        "bodhran leggero",
+        "violino celtico"
+      ],
+      "colori": [
+        "#1f3d2b",
+        "#5fa776",
+        "#e9f5c9"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "loop",
+        "crescendo"
+      ],
+      "vietati": [
+        "voce",
+        "chitarra distorta",
+        "pianoforte"
+      ],
+      "influenze": [
+        {
+          "genere": "Drum and bass morbido",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "soft drum and bass, fast breakbeat, deep sub bass, airy pads, energetic but smooth"
+        },
+        {
+          "nome": "variante",
+          "keywords": "soft drum and bass, fast breakbeat, deep sub bass, airy pads, energetic but smooth"
+        }
+      ],
+      "name": "Drum-and-bass-soft",
+      "famiglia": "elettronico",
+      "energia": 5,
+      "bpm": [
+        160,
+        172
+      ],
+      "attivita": "sottofondo intenso per sessioni brevi",
+      "genere": "Drum and bass morbido",
+      "stile": "soft drum and bass, fast breakbeat, deep sub bass, airy pads, energetic but smooth",
+      "strumenti": [
+        "breakbeat",
+        "basso sub",
+        "pad aereo",
+        "hi-hat veloci",
+        "stab di sintetizzatore"
+      ],
+      "colori": [
+        "#0d1b2a",
+        "#1b98e0",
+        "#f1faee"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "piatto",
+        "onda"
+      ],
+      "vietati": [
+        "batteria",
+        "synth",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "Gamelan ambient",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "gamelan ambient, interlocking metallophones, shimmering textures, slow and cyclical"
+        },
+        {
+          "nome": "variante",
+          "keywords": "gamelan ambient, interlocking metallophones, shimmering textures, slow and cyclical"
+        }
+      ],
+      "name": "Gamelan-ambient",
+      "famiglia": "world",
+      "energia": 1,
+      "bpm": [
+        60,
+        75
+      ],
+      "attivita": "meditazione e concentrazione",
+      "genere": "Gamelan ambient",
+      "stile": "gamelan ambient, interlocking metallophones, shimmering textures, slow and cyclical",
+      "strumenti": [
+        "metallofoni gamelan",
+        "gong sospeso",
+        "bambu",
+        "drone leggero"
+      ],
+      "colori": [
+        "#2e1a05",
+        "#b8860b",
+        "#fff1c1"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "arco",
+        "onda"
+      ],
+      "vietati": [
+        "batteria rock",
+        "synth",
+        "voce"
+      ],
+      "influenze": [
+        {
+          "genere": "Bossa nova chitarra",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "instrumental bossa nova, nylon guitar, soft bass, light percussion, warm and airy"
+        },
+        {
+          "nome": "variante",
+          "keywords": "instrumental bossa nova, nylon guitar, soft bass, light percussion, warm and airy"
+        }
+      ],
+      "name": "Bossa-nova-chitarra",
+      "famiglia": "jazz",
+      "energia": 2,
+      "bpm": [
+        90,
+        110
+      ],
+      "attivita": "pranzo, lettura, sottofondo rilassato",
+      "genere": "Bossa nova chitarra",
+      "stile": "instrumental bossa nova, nylon guitar, soft bass, light percussion, warm and airy",
+      "strumenti": [
+        "chitarra classica",
+        "basso acustico",
+        "shaker",
+        "flauto morbido"
+      ],
+      "colori": [
+        "#2b3a2e",
+        "#9ec5a0",
+        "#fdf6e3"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "piatto",
+        "onda"
+      ],
+      "vietati": [
+        "batteria",
+        "parole",
+        "testo cantato"
+      ],
+      "influenze": [
+        {
+          "genere": "Vocalise coro",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "wordless choral vocalise, ah and oh vowels, soft choir, no lyrics, no words, sacred and calm"
+        },
+        {
+          "nome": "variante",
+          "keywords": "wordless choral vocalise, ah and oh vowels, soft choir, no lyrics, no words, sacred and calm"
+        }
+      ],
+      "name": "Vocalise-coro",
+      "famiglia": "meditativo",
+      "energia": 1,
+      "bpm": [
+        60,
+        75
+      ],
+      "attivita": "meditazione con voci",
+      "genere": "Vocalise coro",
+      "stile": "wordless choral vocalise, ah and oh vowels, soft choir, no lyrics, no words, sacred and calm",
+      "strumenti": [
+        "coro di voci su vocali",
+        "pad morbido",
+        "campane leggere"
+      ],
+      "colori": [
+        "#2c2140",
+        "#8e7cc3",
+        "#f4ecff"
+      ],
+      "vocale_senza_parole": true
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "piatto"
+      ],
+      "vietati": [
+        "batteria",
+        "parole",
+        "synth"
+      ],
+      "influenze": [
+        {
+          "genere": "Canto armonico overtone",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "overtone singing, harmonic voice, hypnotic and deep, no words, sustained tones"
+        },
+        {
+          "nome": "variante",
+          "keywords": "overtone singing, harmonic voice, hypnotic and deep, no words, sustained tones"
+        }
+      ],
+      "name": "Overtone-canto",
+      "famiglia": "meditativo",
+      "energia": 1,
+      "bpm": [
+        50,
+        65
+      ],
+      "attivita": "meditazione profonda",
+      "genere": "Canto armonico overtone",
+      "stile": "overtone singing, harmonic voice, hypnotic and deep, no words, sustained tones",
+      "strumenti": [
+        "voce armonica",
+        "drone di tanpura",
+        "campane"
+      ],
+      "colori": [
+        "#101418",
+        "#4a6670",
+        "#d6e6e8"
+      ],
+      "vocale_senza_parole": true
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "piatto",
+        "arco"
+      ],
+      "vietati": [
+        "batteria",
+        "parole",
+        "synth ritmico"
+      ],
+      "influenze": [
+        {
+          "genere": "Canto monodico moderno",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "modern monodic chant, male and female voices on vowels, church bells and soft pads, no words, reverent"
+        },
+        {
+          "nome": "variante",
+          "keywords": "modern monodic chant, male and female voices on vowels, church bells and soft pads, no words, reverent"
+        }
+      ],
+      "name": "Canto-gregoriano-moderno",
+      "famiglia": "meditativo",
+      "energia": 1,
+      "bpm": [
+        60,
+        72
+      ],
+      "attivita": "raccoglimento e silenzio",
+      "genere": "Canto monodico moderno",
+      "stile": "modern monodic chant, male and female voices on vowels, church bells and soft pads, no words, reverent",
+      "strumenti": [
+        "voci monodiche su vocali",
+        "campane",
+        "organo",
+        "pad"
+      ],
+      "colori": [
+        "#1e1b16",
+        "#7a6a4f",
+        "#f5ecd6"
+      ],
+      "vocale_senza_parole": true
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "loop",
+        "arco"
+      ],
+      "vietati": [
+        "parole",
+        "testo cantato",
+        "drop elettronico"
+      ],
+      "influenze": [
+        {
+          "genere": "Soul vocalise",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "soul vocalise, improvised wordless vocals on vowels, warm bass and drums, groove, no lyrics"
+        },
+        {
+          "nome": "variante",
+          "keywords": "soul vocalise, improvised wordless vocals on vowels, warm bass and drums, groove, no lyrics"
+        }
+      ],
+      "name": "Soul-vocalise",
+      "famiglia": "ritmico",
+      "energia": 3,
+      "bpm": [
+        85,
+        100
+      ],
+      "attivita": "sottofondo caldo con groove",
+      "genere": "Soul vocalise",
+      "stile": "soul vocalise, improvised wordless vocals on vowels, warm bass and drums, groove, no lyrics",
+      "strumenti": [
+        "voce soul su vocali",
+        "basso groove",
+        "batteria soul",
+        "rhodes",
+        "fiati leggeri"
+      ],
+      "colori": [
+        "#3b1d2a",
+        "#d1607a",
+        "#ffd6a5"
+      ],
+      "vocale_senza_parole": true
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "loop",
+        "crescendo"
+      ],
+      "vietati": [
+        "voce",
+        "pad morbidi",
+        "archi"
+      ],
+      "influenze": [
+        {
+          "genere": "Metal strumentale",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "instrumental heavy metal, distorted guitars, double bass drums, aggressive riffs, played by a band"
+        },
+        {
+          "nome": "variante",
+          "keywords": "instrumental heavy metal, distorted guitars, double bass drums, aggressive riffs, played by a band"
+        }
+      ],
+      "name": "Metal-strumentale",
+      "famiglia": "rock",
+      "energia": 5,
+      "bpm": [
+        130,
+        150
+      ],
+      "attivita": "sessioni intense di allenamento",
+      "genere": "Metal strumentale",
+      "stile": "instrumental heavy metal, distorted guitars, double bass drums, aggressive riffs, played by a band",
+      "strumenti": [
+        "chitarra distorta",
+        "batteria a doppio pedale",
+        "basso distorto",
+        "chitarra solista",
+        "tastiera di sfondo"
+      ],
+      "colori": [
+        "#050505",
+        "#a4161a",
+        "#e5e5e5"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "loop",
+        "crescendo"
+      ],
+      "vietati": [
+        "voce",
+        "chitarra acustica",
+        "pad caldi"
+      ],
+      "influenze": [
+        {
+          "genere": "Industrial techno",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "industrial techno, heavy kick, metallic percussion, distorted synths, dark and driving"
+        },
+        {
+          "nome": "variante",
+          "keywords": "industrial techno, heavy kick, metallic percussion, distorted synths, dark and driving"
+        }
+      ],
+      "name": "Industrial-techno",
+      "famiglia": "elettronico",
+      "energia": 5,
+      "bpm": [
+        132,
+        145
+      ],
+      "attivita": "concentrazione intensa e ritmo forte",
+      "genere": "Industrial techno",
+      "stile": "industrial techno, heavy kick, metallic percussion, distorted synths, dark and driving",
+      "strumenti": [
+        "kick potente",
+        "percussione metallica",
+        "synth distorto",
+        "basso industriale",
+        "rumore"
+      ],
+      "colori": [
+        "#0b0b0b",
+        "#5b5b5b",
+        "#c0ff3e"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "loop",
+        "arco"
+      ],
+      "vietati": [
+        "voce",
+        "chitarra acustica",
+        "archi"
+      ],
+      "influenze": [
+        {
+          "genere": "Trap strumentale",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "instrumental trap beat, rolling hi-hats, booming 808 bass, dark melodies, modern and punchy"
+        },
+        {
+          "nome": "variante",
+          "keywords": "instrumental trap beat, rolling hi-hats, booming 808 bass, dark melodies, modern and punchy"
+        }
+      ],
+      "name": "Trap-strumentale",
+      "famiglia": "elettronico",
+      "energia": 4,
+      "bpm": [
+        136,
+        150
+      ],
+      "attivita": "sottofondo ritmico e moderno",
+      "genere": "Trap strumentale",
+      "stile": "instrumental trap beat, rolling hi-hats, booming 808 bass, dark melodies, modern and punchy",
+      "strumenti": [
+        "808",
+        "hi-hat rapidi",
+        "kick",
+        "campana melodica",
+        "pad scuro"
+      ],
+      "colori": [
+        "#121212",
+        "#7b2cbf",
+        "#f72585"
+      ]
+    },
+    {
+      "ambito": "musica",
+      "strutture": [
+        "arco",
+        "loop"
+      ],
+      "vietati": [
+        "voce",
+        "synth",
+        "pad lunghi"
+      ],
+      "influenze": [
+        {
+          "genere": "Hard rock strumentale",
+          "peso": 3
+        }
+      ],
+      "enfasi": "costruzione graduale e ritorno al tema",
+      "melodia": "tema semplice ripetuto",
+      "accordi": "progressione ciclica",
+      "tonalita": [
+        "La minore",
+        "Do maggiore"
+      ],
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "instrumental hard rock, overdriven guitars, powerful drums, big riffs and solos, played by a band"
+        },
+        {
+          "nome": "variante",
+          "keywords": "instrumental hard rock, overdriven guitars, powerful drums, big riffs and solos, played by a band"
+        }
+      ],
+      "name": "Hard-rock-strumentale",
+      "famiglia": "rock",
+      "energia": 5,
+      "bpm": [
+        120,
+        138
+      ],
+      "attivita": "energia alta e sottofondo grintoso",
+      "genere": "Hard rock strumentale",
+      "stile": "instrumental hard rock, overdriven guitars, powerful drums, big riffs and solos, played by a band",
+      "strumenti": [
+        "chitarra overdrive",
+        "batteria potente",
+        "basso rock",
+        "chitarra solista",
+        "organo"
+      ],
+      "colori": [
+        "#2a0a0a",
+        "#d62828",
+        "#f7b267"
+      ]
+    }
+  ],
+  "tipi": [
+    {
+      "name": "ambient-pad",
+      "palette": "pad lunghi e morbidi"
+    },
+    {
+      "name": "ambient-profondo",
+      "palette": "texture scure e spaziose"
+    },
+    {
+      "name": "melodico-dolce",
+      "palette": "melodia semplice e ricorrente"
+    },
+    {
+      "name": "drone-spaziale",
+      "palette": "drone e riverberi ampi"
+    },
+    {
+      "name": "ritmico-leggero",
+      "palette": "pulsazione leggera e costante"
+    },
+    {
+      "name": "ritmico-energico",
+      "palette": "pulsazione marcata e incalzante"
+    }
+  ],
+  "strutture": {
+    "piatto": [
+      "[Intro]",
+      "[Main]",
+      "[Outro]"
+    ],
+    "onda": [
+      "[Intro]",
+      "[Main]",
+      "[Release]",
+      "[Main]",
+      "[Outro]"
+    ],
+    "arco": [
+      "[Intro]",
+      "[Build]",
+      "[Peak]",
+      "[Release]",
+      "[Outro]"
+    ],
+    "crescendo": [
+      "[Intro]",
+      "[Build]",
+      "[Build]",
+      "[Main]",
+      "[Peak]",
+      "[Release]",
+      "[Outro]"
+    ],
+    "loop": [
+      "[Intro]",
+      "[Main]",
+      "[Main]",
+      "[Peak]",
+      "[Main]",
+      "[Outro]"
+    ]
+  },
+  "tag_extra": {},
+  "tassonomia": {
+    "voto": {
+      "preferito": "preferit|fav|like|top|\\bok\\b|mi.?piace|da.?sottofondo|bello|perfetto",
+      "scartato": "scart|skip|brutt|\\bno\\b|delete|noios|non.?mi.?piace"
+    },
+    "tempo": {
+      "piu-veloce": "piu.?veloce|più.?veloce|veloce|ritmo.?alto",
+      "piu-lento": "piu.?lento|più.?lento|lento|rilassat"
+    },
+    "passoBpm": 6,
+    "limiteBpm": 15,
+    "nota": "Per un nuovo genere basta aggiungerlo a config/catalogo.json con ambito, famiglia, colori e varianti: tag, playlist, voti e tempo funzionano da soli."
+  }
+}
