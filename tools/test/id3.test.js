@@ -9,7 +9,7 @@ const leggi = (f) => fs.readFileSync(path.join(src, f), 'utf8');
 
 const AF = Object.getPrototypeOf(async function () {}).constructor;
 const carica = () => new AF('require', 'console', ['lib.js', 'lib-apprendimento.js', 'lib-ibroadcast.js', 'cover.js'].map(leggi).join('\n')
-  + '\nreturn { tagFile, copertinaPer, chiaveId3, fnvAudio, CFG, setGw: (f) => { gw = f; } };')(require, console);
+  + '\nreturn { tagFile, copertinaPer, chiaveId3, fnvAudio, audioIntegro: typeof audioIntegro === "function" ? audioIntegro : undefined, CFG, setGw: (f) => { gw = f; } };')(require, console);
 
 function frames(buf) {
   const size = ((buf[6] & 0x7f) << 21) | ((buf[7] & 0x7f) << 14) | ((buf[8] & 0x7f) << 7) | (buf[9] & 0x7f);
@@ -114,4 +114,24 @@ test('copertina: JPEG dal gateway, ripiego se il gateway non risponde o non ha s
     assert.equal(r.mime, 'image/png');
     assert.equal(r.dati.readUInt32BE(0), 0x89504e47);
   }
+});
+
+test('scrittura interrotta: il file originale resta intatto', async () => {
+  const lib = await carica();
+  const f = file();
+  const vera = fs.renameSync;
+  fs.renameSync = () => { throw new Error('interrotto'); };
+  try { assert.throws(() => lib.tagFile(f, meta), /interrotto/); } finally { fs.renameSync = vera; }
+  assert.deepEqual(fs.readFileSync(f), audio);
+});
+
+test('audioIntegro: riconosce un file troncato rispetto all impronta salvata', async () => {
+  const lib = await carica();
+  const f = file();
+  const impronta = lib.fnvAudio(audio);
+  lib.tagFile(f, meta);
+  assert.equal(lib.audioIntegro(fs.readFileSync(f), impronta), true);
+  assert.equal(lib.audioIntegro(fs.readFileSync(f), impronta.split('-')[0] + '-999'), true, 'formato vecchio dell impronta');
+  assert.equal(lib.audioIntegro(fs.readFileSync(f).subarray(0, 900), impronta), false);
+  assert.equal(lib.audioIntegro(audio, undefined), true, 'senza impronta non si puo giudicare');
 });

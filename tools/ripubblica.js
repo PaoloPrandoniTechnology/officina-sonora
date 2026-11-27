@@ -41,8 +41,38 @@ function segnali(lib, id) {
   };
 }
 
+// --tutti solo dopo che il trasferimento delle stelle (API non ufficiale) ha funzionato fino in fondo
+const provaSuperata = (mappa) => Object.values(mappa).some((r) => r.cestinato && r.voto_trasferito);
+
+// Brano che non si puo' preparare: si salta senza fermare gli altri (nulla e' stato inviato)
+class Saltato extends Error {}
+async function perOgnuno(elementi, fn, saltati) {
+  for (const x of elementi) {
+    if (saltati.has(x)) continue;
+    try { await fn(x); } catch (e) {
+      if (!(e instanceof Saltato)) throw e;
+      saltati.add(x);
+      console.log('saltato: ' + e.message);
+    }
+  }
+}
+
 // Passi dopo l'organizzazione: voto, playlist e tag, cestino. Ogni passo si salva subito.
 async function dopoOrganizzato(r, io) {
+  if (!r.playlist_ok) {
+    // tra caricamento e cestino passano ore: vale quello che l'utente ha fatto fino ad adesso
+    const lib = await io.libreria();
+    const prima = segnali(lib, r.vecchio);
+    const gia = segnali(lib, r.nuovo);
+    if (!r.voto_ok) {
+      r.rating = prima.rating;
+      // stelle diverse date sulla copia nuova: sono la scelta piu' recente e restano
+      if (gia.rating > 0 && gia.rating !== prima.rating) r.voto_ok = true;
+    }
+    r.playlists = prima.playlists.filter((p) => !gia.playlists.includes(p));
+    r.tags = prima.tags.filter((t) => !gia.tags.includes(t));
+    io.salva();
+  }
   for (let passo = prossimoPasso(r); passo !== 'fatto'; passo = prossimoPasso(r)) {
     const nuovo = Number(r.nuovo);
     if (passo === 'voto') {
@@ -58,6 +88,7 @@ async function dopoOrganizzato(r, io) {
       meta.voto_ib = r.rating;
       io.scriviScheda(meta);
       r.voto_ok = true;
+      r.voto_trasferito = true;
     } else if (passo === 'playlist') {
       for (const p of r.playlists || []) await io.api('appendplaylist', { playlist: p, tracks: [nuovo] });
       for (const t of r.tags || []) await io.api('tagtracks', { tagid: t, tracks: [nuovo], untag: false });
@@ -77,7 +108,7 @@ async function motore() {
   const src = (f) => fs.readFileSync(path.join(DIR, 'src', f), 'utf8');
   const AF = Object.getPrototypeOf(async function () {}).constructor;
   const lib = src('lib.js') + '\n' + src('lib-apprendimento.js') + '\n' + src('lib-messaggi.js') + '\n' + src('lib-ibroadcast.js') + '\n' + src('cover.js');
-  const m = await new AF('require', lib + '\nreturn { CFG, gw, ibApi, libraryTracks, copertinaPer, acquireLock, releaseLock, loadState, saveState, readJsonSafe, aggiornaScheda, scriviScheda };')(require);
+  const m = await new AF('require', lib + '\nreturn { CFG, gw, ibApi, libraryTracks, copertinaPer, acquireLock, releaseLock, loadState, saveState, readJsonSafe, aggiornaScheda, scriviScheda, audioIntegro };')(require);
   m.blocco = async (nome, json) => (await new AF('require', '$input', '$env', lib + '\n' + src(path.join('blocks', nome)))(require, { first: () => ({ json }) }, {}))[0].json;
   return m;
 }
@@ -90,6 +121,7 @@ async function main() {
   const m = await motore();
   const mappa = m.readJsonSafe(MAPPA, {});
   const salva = () => { fs.writeFileSync(MAPPA + '.tmp', JSON.stringify(mappa, null, 2)); fs.renameSync(MAPPA + '.tmp', MAPPA); };
+  if (modo === '--tutti' && !provaSuperata(mappa)) throw new Error('prima serve una --prova completata che includa un brano con stelle');
   let brani = daRipubblicare(m.libraryTracks(), mappa);
   if (modo === '--prova') {
     const scelti = file.map((f) => path.resolve(f).toLowerCase());
@@ -112,6 +144,7 @@ async function main() {
 
   const carica = async (b) => {
     const meta = m.readJsonSafe(b.jsonPath, null);
+    if (!meta || !meta.ibroadcast) throw new Saltato(`${path.basename(b.jsonPath)}: scheda illeggibile`);
     let r = mappa[b.jsonPath];
     if (!r || r.cestinato) {
       const id = String(meta.ibroadcast.track_id);
@@ -122,13 +155,15 @@ async function main() {
     if (String(meta.ibroadcast.track_id) !== r.vecchio) { r.nuovo = String(meta.ibroadcast.track_id); return salva(); }
     const sfondi = path.join(DIR, 'assets', 'sfondi', meta.categoria);
     const quanti = fs.existsSync(sfondi) ? fs.readdirSync(sfondi).filter((f) => /^\d+\.jpg$/.test(f)).length : 0;
-    if (quanti < 8) throw new Error(`${meta.categoria}: solo ${quanti} sfondi su 8 (node tools/genera-sfondi.js --genere ${meta.categoria})`);
+    if (quanti < 8) throw new Saltato(`${meta.categoria}: solo ${quanti} sfondi su 8 (node tools/genera-sfondi.js --genere ${meta.categoria})`);
     if (!(await m.copertinaPer(meta)).definitiva) throw new Error('il gateway non compone le copertine: riavviarlo');
     const audio = b.jsonPath.replace(/\.json$/, '.mp3');
+    if (!fs.existsSync(audio)) throw new Saltato(`${meta.titolo}: file audio mancante`);
+    if (!m.audioIntegro(fs.readFileSync(audio), meta.hash_audio)) throw new Saltato(`${meta.titolo}: l'audio non corrisponde all'impronta salvata, non caricato`);
     const stato = { ...m.loadState(), uploadQueue: [audio], ibroadcastScanned: true, retagScanned: true, uploadTries: {} };
     const pronto = await m.blocco('03d1-prepara-caricamento.js', { state: stato });
-    if (!pronto.daCaricare.length) throw new Error(`${meta.titolo}: non preparato (duplicato o file mancante), vedere state\\tick.log`);
-    if (m.readJsonSafe(b.jsonPath, {}).copertina !== 'ai') throw new Error(`${meta.titolo}: copertina provvisoria, non caricato`);
+    if (!pronto.daCaricare.length) throw new Saltato(`${meta.titolo}: non preparato (duplicato o file mancante), vedere state\\tick.log`);
+    if (m.readJsonSafe(b.jsonPath, {}).copertina !== 'ai') throw new Saltato(`${meta.titolo}: copertina provvisoria, non caricato`);
     // il blocco 3d4 non si usa: manderebbe un messaggio Telegram per ogni brano
     const esito = await m.blocco('03d2-carica-ibroadcast.js', pronto);
     const c = esito.caricati[0];
@@ -143,10 +178,10 @@ async function main() {
 
   let ultimoAvanzamento = Date.now();
   let restano = brani;
+  const saltati = new Set();
   while (restano.length) {
     let organizzare = false;
-    for (const b of restano) {
-      await conLock(async () => {
+    await perOgnuno(restano, (b) => conLock(async () => {
         let r = mappa[b.jsonPath];
         if (!r || r.cestinato || !r.nuovo) { await carica(b); r = mappa[b.jsonPath]; ultimoAvanzamento = Date.now(); }
         if (!r.organizzato) r.organizzato = !!m.readJsonSafe(b.jsonPath, {}).ibroadcast.organizzato;
@@ -158,9 +193,8 @@ async function main() {
         });
         ultimoAvanzamento = Date.now();
         console.log(`fatto: ${b.meta.titolo}`);
-      });
-    }
-    restano = restano.filter((b) => !(mappa[b.jsonPath] || {}).cestinato);
+    }), saltati);
+    restano = restano.filter((b) => !saltati.has(b) && !(mappa[b.jsonPath] || {}).cestinato);
     if (!restano.length) break;
     if (Date.now() - ultimoAvanzamento > 45 * 60000) throw new Error(`fermo da 45 minuti, restano ${restano.length} brani: rilanciare piu tardi`);
     if (organizzare) {
@@ -171,8 +205,8 @@ async function main() {
       });
     }
   }
-  console.log('ripubblicazione completata');
+  console.log(saltati.size ? `finito: ${saltati.size} brani saltati (motivi sopra), rilanciare dopo averli sistemati` : 'ripubblicazione completata');
 }
 
-module.exports = { daRipubblicare, prossimoPasso, segnali, dopoOrganizzato };
+module.exports = { daRipubblicare, prossimoPasso, segnali, dopoOrganizzato, provaSuperata, perOgnuno, Saltato };
 if (require.main === module) main().catch((e) => { console.error('ERR', e.message); process.exit(1); });

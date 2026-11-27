@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { mancanti, conPausa } = require(path.join(__dirname, '..', 'genera-sfondi.js'));
+const { mancanti, conPausa, emergenza } = require(path.join(__dirname, '..', 'genera-sfondi.js'));
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'sf-'));
 const leggi = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
@@ -47,4 +47,14 @@ test('conPausa: se la produzione viene ripresa dalla dashboard, inPausa lo segna
     fs.writeFileSync(f, '{}');
     assert.equal(inPausa(), false);
   }, f);
+});
+
+test('chiusura della finestra: la pausa torna com era anche senza attendere il lavoro', async () => {
+  const f = path.join(tmp(), 'comandi.json');
+  fs.writeFileSync(f, JSON.stringify({ svuotaCoda: true }));
+  await conPausa(async () => {
+    emergenza();
+    assert.deepEqual(leggi(f), { svuotaCoda: true });
+  }, f);
+  assert.deepEqual(leggi(f), { svuotaCoda: true });
 });

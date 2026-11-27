@@ -33,20 +33,29 @@ function scrivi(file, dati) {
   fs.renameSync(file + '.tmp', file);
 }
 
+// Pulizie da eseguire subito se la finestra viene chiusa (Windows concede pochi secondi)
+const pulizie = new Set();
+const emergenza = () => [...pulizie].reverse().forEach((f) => f());
+
 // Esegue fn con la produzione in pausa; lo stato precedente torna anche in caso di errore.
 async function conPausa(fn, file = COMANDI) {
   const esisteva = fs.existsSync(file);
   const prima = leggi(file, {});
   if (!prima.pausa) scrivi(file, { ...prima, pausa: true });
-  try {
-    return await fn(() => !!leggi(file, {}).pausa);
-  } finally {
+  const ripristina = () => {
     if (!prima.pausa) {
       const ora = leggi(file, {});
       delete ora.pausa;
       if (!esisteva && !Object.keys(ora).length) fs.rmSync(file, { force: true });
       else scrivi(file, ora);
     }
+  };
+  pulizie.add(ripristina);
+  try {
+    return await fn(() => !!leggi(file, {}).pausa);
+  } finally {
+    pulizie.delete(ripristina);
+    ripristina();
   }
 }
 
@@ -77,6 +86,7 @@ async function avviaWebui(interrotto) {
   const log = fs.openSync(path.join(DIR, 'state', 'webui-sfondi.log'), 'w');
   const p = spawn('cmd.exe', ['/d', '/c', `call .\\environment.bat && cd webui && python launch.py --api --lowvram --port ${PORTA}`], { cwd: WEBUI, stdio: ['ignore', log, log] });
   const chiudi = () => { try { execFileSync('taskkill', ['/PID', String(p.pid), '/T', '/F'], { stdio: 'ignore' }); } catch (e) { /* gia' chiusa */ } };
+  pulizie.add(chiudi);
   const fine = Date.now() + 10 * 60000;
   while (Date.now() < fine && p.exitCode === null && !interrotto()) {
     if (await pronta()) return chiudi;
@@ -129,7 +139,9 @@ async function main() {
   console.log(`sfondi da generare: ${lavori.length}`);
 
   let stop = false;
-  for (const s of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(s, () => { stop = true; console.log('interruzione richiesta: chiudo dopo la fase in corso'); });
+  for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { stop = true; console.log('interruzione richiesta: chiudo dopo la fase in corso'); });
+  for (const s of ['SIGHUP', 'SIGBREAK']) process.on(s, () => { emergenza(); process.exit(1); });
+  console.log('la produzione resta in pausa finche questo programma lavora');
 
   await conPausa(async (inPausa) => {
     const interrotto = () => stop || !inPausa();
@@ -166,5 +178,5 @@ async function main() {
   console.log('finito; produzione nello stato precedente');
 }
 
-module.exports = { mancanti, conPausa };
+module.exports = { mancanti, conPausa, emergenza };
 if (require.main === module) main().catch((e) => { console.error('ERR', e.message); process.exit(1); });

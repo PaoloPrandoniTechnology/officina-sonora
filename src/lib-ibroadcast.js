@@ -11,6 +11,11 @@ function fnvAudio(raw) {
   return h.toString(16) + '-' + (raw.length - i);
 }
 
+// L'audio e' ancora quello dell'impronta salvata? (si confronta l'hash: la lunghezza ha avuto due formati)
+function audioIntegro(raw, impronta) {
+  return !impronta || fnvAudio(raw).split('-')[0] === String(impronta).split('-')[0];
+}
+
 // ---- Tag ID3v2.3 completi, scritti nel file prima del caricamento ----
 function syncsafe(n) {
   return Buffer.from([(n >> 21) & 0x7f, (n >> 14) & 0x7f, (n >> 7) & 0x7f, n & 0x7f]);
@@ -110,7 +115,9 @@ function tagFile(file, meta, cop = copertinaProvvisoria(meta)) {
   ].filter(Boolean);
   const body = Buffer.concat(frames);
   const header = Buffer.concat([Buffer.from('ID3'), Buffer.from([0x03, 0x00, 0x00]), syncsafe(body.length)]);
-  fs.writeFileSync(file, Buffer.concat([header, body, audio]));
+  // scrittura atomica: un'interruzione non deve mai lasciare il brano troncato
+  fs.writeFileSync(file + '.tmp', Buffer.concat([header, body, audio]));
+  fs.renameSync(file + '.tmp', file);
   return frames.length;
 }
 
