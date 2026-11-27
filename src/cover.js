@@ -87,14 +87,14 @@ function coverPng(categoria, seme) {
   });
 }
 
-// Frame APIC (ID3v2.3): copertina anteriore in PNG
-function apicFrame(png) {
+// Frame APIC (ID3v2.3): copertina anteriore
+function apicFrame(dati, mime = 'image/png') {
   const payload = Buffer.concat([
     Buffer.from([0x00]), // testo ISO-8859-1
-    Buffer.from('image/png', 'ascii'), Buffer.from([0x00]),
+    Buffer.from(mime, 'ascii'), Buffer.from([0x00]),
     Buffer.from([0x03]), // copertina anteriore
     Buffer.from([0x00]), // descrizione vuota
-    png,
+    dati,
   ]);
   return frame('APIC', payload);
 }

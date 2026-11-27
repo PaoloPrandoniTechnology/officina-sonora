@@ -56,7 +56,11 @@ for (const file of pending) {
       continue;
     }
     meta.hash_audio = hashAudio;
-    const nTags = tagFile(file, meta);
+    const cop = await copertinaPer(meta);
+    const nTags = tagFile(file, meta, cop);
+    meta.id3_versione = 2;
+    meta.copertina = cop.definitiva ? 'ai' : 'provvisoria';
+    fs.writeFileSync(jsonPath, JSON.stringify(meta, null, 2));
     daCaricare.push({ file, jsonPath, nTags, titolo: meta.titolo, tentativi: state.uploadTries ? (state.uploadTries[file] || 0) : 0 });
   } catch (e) {
     log(`iBroadcast: preparazione di ${path.basename(file)} non riuscita: ${e.message}`);

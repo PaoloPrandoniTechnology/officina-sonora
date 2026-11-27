@@ -17,7 +17,7 @@ const TOKEN_FILE = path.join(__dirname, 'token.json');
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const IB_CLIENT = process.env.IBROADCAST_CLIENT_ID || '';
 const TG_METODI = new Set(['sendMessage', 'getUpdates', 'answerCallbackQuery']);
-const IB_MODI = new Set(['createtag', 'tagtracks', 'createplaylist', 'appendplaylist', 'trash']);
+const IB_MODI = new Set(['createtag', 'tagtracks', 'createplaylist', 'appendplaylist', 'trash', 'ratetrack']);
 
 let cache = { access: null, scadenza: 0 };
 
@@ -202,6 +202,10 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/audio/analizza') {
       const { file } = JSON.parse(corpo.toString('utf8'));
       return rispondi(200, await analizzaAudio(file));
+    }
+    if (req.url === '/copertina') {
+      const r = await require('./copertina').componi(JSON.parse(corpo.toString('utf8')));
+      return rispondi(200, r ? { ok: true, jpeg: r.jpeg.toString('base64') } : { ok: false, error: 'nessuno sfondo per il genere' });
     }
     if (req.url === '/ib/library') {
       return rispondi(200, await ibLibrary());
