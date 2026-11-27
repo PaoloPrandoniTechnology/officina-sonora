@@ -11,7 +11,7 @@ const controllo = require('./controllo');
 const voti = require('./voti');
 const { ammessa } = require('./protezione');
 
-const PORT = 5790;
+const PORT = process.env.YMF_PORTA || 5790;
 const TOKEN_FILE = path.join(__dirname, 'token.json');
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const IB_CLIENT = process.env.IBROADCAST_CLIENT_ID || '';

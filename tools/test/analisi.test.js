@@ -16,6 +16,13 @@ test('analisi: forma dei dati e coerenza dei totali', () => {
   assert.equal(d.libreria.timeline.length, 14, 'la timeline copre 14 giorni');
 });
 
+test('analisi: ogni punto della timeline ha ore e voti numerici', () => {
+  for (const p of datiAnalisi().libreria.timeline) {
+    assert.ok(Number.isFinite(p.ore) && p.ore >= 0, `${p.giorno}: ore`);
+    assert.ok(Number.isInteger(p.voti) && p.voti >= 0, `${p.giorno}: voti`);
+  }
+});
+
 test('analisi: ogni genere ha le specifiche per la scheda', () => {
   const d = datiAnalisi();
   assert.equal(d.generi.length, 39, 'il catalogo ha 39 generi');

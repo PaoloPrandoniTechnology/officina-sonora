@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = 'E:\\Musica di sottofondo';
+const ROOT = process.env.YMF_LIBRERIA || 'E:\\Musica di sottofondo';
 const STATE = 'E:\\n8n\\yoga\\state';
 const CATALOGO = path.join(__dirname, '..', 'config', 'catalogo.json');
 const GUIDA = path.join(__dirname, '..', 'config', 'guidance.json');
@@ -91,6 +91,7 @@ function calcola() {
       generato_il: meta.generato_il || null,
       numero: typeof meta.numero_traccia === 'number' ? meta.numero_traccia : null,
       voto: typeof meta.voto === 'number' ? meta.voto : null,
+      voto_il: typeof meta.voto_il === 'string' ? meta.voto_il : null,
       ascolti: (meta.ibroadcast && meta.ibroadcast.ascolti) || meta.ascolti || 0,
       caricato: !!(meta.ibroadcast && meta.ibroadcast.track_id),
       esito: (meta.qualita && meta.qualita.esito) || null,
@@ -141,13 +142,20 @@ function calcola() {
   // Libreria
   const durataTot = tracce.reduce((a, t) => a + (t.durata_s || 0), 0);
   const giorni = {};
+  const secondi = {};
+  const votiGiorno = {};
   for (const t of tracce) {
-    if (t.generato_il) giorni[t.generato_il.slice(0, 10)] = (giorni[t.generato_il.slice(0, 10)] || 0) + 1;
+    if (t.generato_il) {
+      const g = t.generato_il.slice(0, 10);
+      giorni[g] = (giorni[g] || 0) + 1;
+      secondi[g] = (secondi[g] || 0) + (t.durata_s || 0);
+    }
+    if (t.voto !== null && t.voto_il) votiGiorno[t.voto_il.slice(0, 10)] = (votiGiorno[t.voto_il.slice(0, 10)] || 0) + 1;
   }
   const timeline = [];
   for (let i = 13; i >= 0; i--) {
     const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-    timeline.push({ giorno: d, brani: giorni[d] || 0 });
+    timeline.push({ giorno: d, brani: giorni[d] || 0, ore: Math.round(((secondi[d] || 0) / 3600) * 10) / 10, voti: votiGiorno[d] || 0 });
   }
   const bpmBins = {};
   for (const t of tracce) {
