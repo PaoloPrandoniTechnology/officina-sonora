@@ -170,6 +170,28 @@ Puoi anche scrivere in italiano cosa vuoi cambiare, per esempio: *"Vinyasa più 
 
 ---
 
+### Schermate della dashboard
+
+| Panoramica | Controllo: produzione |
+|---|---|
+| ![Panoramica](docs/screenshots/01-panoramica.png) | ![Produzione](docs/screenshots/07-controllo-produzione.png) |
+| ![Generi](docs/screenshots/03-generi.png) | ![Note per genere](docs/screenshots/11-controllo-note.png) |
+
+Tutte le schermate sono in [`docs/screenshots`](docs/screenshots). Si rigenerano con `tools\screenshot.ps1`.
+
+### Controllo della produzione
+
+La sezione **Controllo** della dashboard permette di intervenire senza toccare i file:
+
+- **Produzione**: metti in pausa o riprendi; svuota la coda; produci subito un genere scelto.
+- **Parametri**: durata, esplorazione, peso dei tuoi voti, soglie del controllo qualità. Ogni valore ha limiti precisi.
+- **Generi**: attiva o sospendi un genere, e regola il suo peso di frequenza (0 = mai, 5 = cinque volte più spesso).
+- **Linee guida**: stile da aggiungere o evitare, note, fasce di bpm per genere.
+- **Note per genere**: scrivi in italiano cosa vuoi sentire (per esempio *fai più assoli* o *usa il flauto di pan*). Il sistema la traduce in inglese e la aggiunge allo stile dei brani di quel genere.
+- **Storico**: ogni modifica è registrata con il valore precedente.
+
+Le modifiche valgono dal prossimo brano.
+
 ## 6. Come votare i brani
 
 Vota direttamente dall'app iBroadcast, con le stesse regole per tutti i generi:

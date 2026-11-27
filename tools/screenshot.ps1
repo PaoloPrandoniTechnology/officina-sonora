@@ -33,6 +33,8 @@ $pagine = @(
 )
 
 $profilo = Join-Path $env:TEMP 'ymf-screenshot-profile'
+# Chrome scrive avvisi sul registro di errore: non devono fermare lo script
+$ErrorActionPreference = 'Continue'
 foreach ($p in $pagine) {
   $file = Join-Path $cartella ($p.n + '.png')
   $url = 'http://127.0.0.1:5790/dashboard#' + $p.h
