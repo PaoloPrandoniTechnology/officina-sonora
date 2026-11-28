@@ -13,7 +13,7 @@ function libraryTracks() {
   const walk = (dir) => {
     for (const name of fs.readdirSync(dir)) {
       const full = path.join(dir, name);
-      if (name === '_scartati') continue; // brani scartati dal controllo qualita': non fanno parte della libreria
+      if (name === '_scartati') continue; // brani scartati dal controllo qualità: non fanno parte della libreria
       if (fs.statSync(full).isDirectory()) walk(full);
       else if (name.endsWith('.json') && name !== 'feedback.json') {
         const meta = readJsonSafe(full, null);
@@ -27,13 +27,11 @@ function libraryTracks() {
 
 // Scrittura atomica di una scheda: chi legge non la trova mai a meta'
 function scriviScheda(jsonPath, meta) {
-  const tmp = jsonPath + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(meta, null, 2));
-  fs.renameSync(tmp, jsonPath);
+  scriviAtomico(jsonPath, JSON.stringify(meta, null, 2));
 }
 
 // Aggiorna solo alcuni campi di una scheda, rileggendola: un voto scritto nel frattempo resta.
-// Se la scheda manca o e' illeggibile lancia un errore, senza ricrearla con i soli campi.
+// Se la scheda manca o è illeggibile lancia un errore, senza ricrearla con i soli campi.
 function aggiornaScheda(jsonPath, campi) {
   const meta = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
   scriviScheda(jsonPath, Object.assign(meta, campi));
@@ -43,9 +41,10 @@ function aggiornaScheda(jsonPath, campi) {
 // Il contatore vive in state/contatore.json e si incrementa a ogni brano salvato.
 CFG.contatoreFile = path.join(CFG.dir, 'state', 'contatore.json');
 function numeroProgressivo() {
-  const c = readJsonSafe(CFG.contatoreFile, { prossimo: 1 });
-  const numero = c.prossimo;
-  fs.writeFileSync(CFG.contatoreFile, JSON.stringify({ prossimo: numero + 1, aggiornato: new Date().toISOString() }, null, 2));
+  let numero = readJsonSafe(CFG.contatoreFile, {}).prossimo;
+  // contatore perso o illeggibile: si riparte dal numero più alto in libreria, mai da 1
+  if (!Number.isInteger(numero)) numero = libraryTracks().reduce((m, t) => Math.max(m, t.meta.numero_traccia || 0), 0) + 1;
+  scriviAtomico(CFG.contatoreFile, JSON.stringify({ prossimo: numero + 1, aggiornato: new Date().toISOString() }, null, 2));
   return numero;
 }
 
@@ -67,14 +66,14 @@ function bandRange(range, band) {
   return [Math.round(lo + step * band), Math.round(lo + step * (band + 1))];
 }
 
-// Voto utente di un brano: unica fonte e' il campo voto del suo json
+// Voto utente di un brano: unica fonte è il campo voto del suo json
 function votoUtente(track) {
   const v = track.meta.voto;
   return v >= 1 && v <= 5 ? v : null;
 }
 
-// Segnale di iBroadcast ({voto, fonte} o null): conta solo quando cambia, cosi' vince l'ultimo voto dato.
-// Ritorna true se meta.voto e' cambiato.
+// Segnale di iBroadcast ({voto, fonte} o null): conta solo quando cambia, così vince l'ultimo voto dato.
+// Ritorna true se meta.voto è cambiato.
 function applicaSegnale(meta, segnale, oraIso) {
   const nuovo = segnale?.voto ?? null;
   if (nuovo === (meta.voto_ib ?? null)) return false;
@@ -86,7 +85,7 @@ function applicaSegnale(meta, segnale, oraIso) {
   return true;
 }
 
-// Impronta dei voti ("quanti|data dell'ultimo"): cambia anche correggendo un voto gia' dato
+// Impronta dei voti ("quanti|data dell'ultimo"): cambia anche correggendo un voto già dato
 function firmaVoti(tracks) {
   const votati = tracks.filter((t) => votoUtente(t));
   const ultimo = votati.map((t) => t.meta.voto_il || '').sort().pop() || '';
@@ -152,8 +151,8 @@ function pickSlot(state, guidance) {
   const altre = candidati.filter((c) => !ultime.includes(c.cat.name));
   let pool = altre.length ? altre : candidati;
   if (CFG.comandi && CFG.comandi.produciGenere) pool = candidati; // "produci ora" ignora la varieta' recente
-  // Rotazione tra i generi: prima si sceglie il genere, con peso piu' alto per quelli meno rappresentati
-  // in libreria (i generi senza brani pesano di piu'). Poi si applica la logica di ricetta solo a quel genere.
+  // Rotazione tra i generi: prima si sceglie il genere, con peso più alto per quelli meno rappresentati
+  // in libreria (i generi senza brani pesano di più). Poi si applica la logica di ricetta solo a quel genere.
   const conta = {};
   for (const t of tracks) conta[t.meta.categoria] = (conta[t.meta.categoria] || 0) + 1;
   // Peso e stato (attivo/sospeso) per genere da config\parametri.json; "produci ora" forza un genere
@@ -169,7 +168,7 @@ function pickSlot(state, guidance) {
   pool = pool.filter((c) => c.cat.name === sceltaCat);
   candidati.splice(0, candidati.length, ...pool);
 
-  // Prima le ricette affidabili con punteggio migliore; le non affidabili solo se c'e' posto negli esperimenti
+  // Prima le ricette affidabili con punteggio migliore; le non affidabili solo se c'è posto negli esperimenti
   const affidabili = candidati.filter((c) => c.affidabile).sort((a, b) => b.score - a.score);
   const nuove = candidati.filter((c) => !c.affidabile).sort((a, b) => b.score - a.score);
   let scelto = null;
@@ -227,7 +226,7 @@ function pickVariante(cat, tracks) {
 }
 
 // ---- Memoria di composizione per genere (state\memoria-composizione.json) ----
-// Per ogni genere: identita' degli score, strumenti fissi e parametri dei brani gia' composti.
+// Per ogni genere: identita' degli score, strumenti fissi e parametri dei brani già composti.
 CFG.memoriaFile = path.join(CFG.dir, 'state', 'memoria-composizione.json');
 function leggiMemoria() {
   if (!fs.existsSync(CFG.memoriaFile)) return { generi: {} };
@@ -241,9 +240,7 @@ function leggiMemoria() {
   return { generi: {} };
 }
 function salvaMemoria(m) {
-  const tmp = CFG.memoriaFile + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(m));
-  fs.renameSync(tmp, CFG.memoriaFile);
+  scriviAtomico(CFG.memoriaFile, JSON.stringify(m));
 }
 const gruppoMemoria = (m, nome) => (m.generi[nome] ||= { brani: [] });
 
@@ -273,7 +270,7 @@ function strumentiDelGruppo(cat, g) {
   return [...g.nucleo, ...extra];
 }
 
-// Un'influenza pesata tra quelle del genere (puo' essere anche il genere stesso)
+// Un'influenza pesata tra quelle del genere (può essere anche il genere stesso)
 function scegliInfluenza(cat) {
   const lista = cat.influenze || [];
   if (!lista.length) return null;
@@ -293,15 +290,15 @@ function tonalitaInglese(nome) {
 }
 
 // ---- Blocchi di stile (usati anche dal gateway per la pagina Linee guida: funzioni senza effetti) ----
-// Perche' un termine non puo' essere un blocco di stile; stringa vuota se va bene
+// Perche' un termine non può essere un blocco di stile; stringa vuota se va bene
 function erroreBlocco(testo, { strumentale = false } = {}) {
   const t = String(testo ?? '').trim();
   if (t.length < 2 || t.length > 60) return 'tra 2 e 60 caratteri';
   if (/[,<>]/.test(t)) return 'senza virgole, < o >';
   if (/^no\s/i.test(t)) return 'niente negazioni: escludi il termine';
-  if (/\bbpm\b/i.test(t) || /\b[a-g](#|b)?\s+(major|minor)\b/i.test(t)) return 'bpm e tonalita\' li mette il sistema';
-  if (/^(instrumental|wordless vocals)$/i.test(t)) return 'e\' un blocco fisso';
-  // "singing bowls" e' uno strumento
+  if (/\bbpm\b/i.test(t) || /\b[a-g](#|b)?\s+(major|minor)\b/i.test(t)) return 'bpm e tonalità li mette il sistema';
+  if (/^(instrumental|wordless vocals)$/i.test(t)) return 'è un blocco fisso';
+  // "singing bowls" è uno strumento
   if (strumentale && /\b(vocals?|vocalist|vocalise|voice|choir|singer|female|male|child|soprano|lyrics|rap|rapping)\b|\bsinging\b(?!\s+bowl)/i.test(t)) return 'le voci non vanno in un genere strumentale';
   return '';
 }

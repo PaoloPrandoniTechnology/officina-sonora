@@ -1,11 +1,12 @@
 // Plancia di controllo: lettura e scrittura dei parametri della produzione.
-// Ogni modifica e' validata entro limiti precisi, scritta in modo atomico e registrata nello storico.
+// Ogni modifica è validata entro limiti precisi, scritta in modo atomico e registrata nello storico.
 // Le scritture sono accettate solo con l'intestazione X-Controllo: 1 (il browser non la invia da altri siti).
 const fs = require('fs');
 const path = require('path');
 const { datiAnalisi } = require('./analisi');
 const voti = require('./voti');
 const sfondi = require('./sfondi');
+const { scriviAtomico } = require('./disco');
 
 const DIR = path.join(__dirname, '..');
 const PARAMETRI = path.join(DIR, 'config', 'parametri.json');
@@ -40,30 +41,33 @@ const BLOCCO_FISSO = /^(instrumental|wordless vocals|no vocals|no lyrics)$/i;
 // Catalogo dei parametri: etichetta, gruppo, valore di default, limiti e spiegazione
 const PARAMETRI_DEF = [
   { chiave: 'durDefault', gruppo: 'Durata', etichetta: 'Durata di riferimento', unita: 's', def: 180, min: 60, max: 600, passo: 5, descrizione: 'Durata usata quando un brano non ne dichiara una.' },
-  { chiave: 'durMin', gruppo: 'Durata', etichetta: 'Durata minima', unita: 's', def: 120, min: 60, max: 240, passo: 5, descrizione: 'Nessun brano verra\' richiesto piu\' corto di questo.' },
-  { chiave: 'durMax', gruppo: 'Durata', etichetta: 'Durata massima', unita: 's', def: 270, min: 120, max: 600, passo: 5, descrizione: 'Nessun brano verra\' richiesto piu\' lungo di questo.' },
+  { chiave: 'durMin', gruppo: 'Durata', etichetta: 'Durata minima', unita: 's', def: 120, min: 60, max: 240, passo: 5, descrizione: 'Nessun brano verrà richiesto più corto di questo.' },
+  { chiave: 'durMax', gruppo: 'Durata', etichetta: 'Durata massima', unita: 's', def: 270, min: 120, max: 600, passo: 5, descrizione: 'Nessun brano verrà richiesto più lungo di questo.' },
   { chiave: 'maxAttempts', gruppo: 'Render', etichetta: 'Tentativi per render', unita: '', def: 3, min: 1, max: 10, passo: 1, descrizione: 'Quante volte si riprova un render fallito prima di rinunciare.' },
   { chiave: 'reviewEvery', gruppo: 'Apprendimento', etichetta: 'Revisione linee guida ogni', unita: 'brani', def: 5, min: 1, max: 50, passo: 1, descrizione: 'Ogni quanti brani il sistema rivede le linee guida.' },
   { chiave: 'pesoVoto', gruppo: 'Apprendimento', etichetta: 'Peso dei tuoi voti', unita: '', def: 100, min: 0, max: 1000, passo: 10, descrizione: 'Quanto pesa un tuo voto rispetto ai dati automatici (che valgono 1).' },
-  { chiave: 'minVotiAffidabili', gruppo: 'Apprendimento', etichetta: 'Voti per fidarsi di una ricetta', unita: 'voti', def: 3, min: 1, max: 20, passo: 1, descrizione: 'Quanti voti servono perche\' una ricetta sia considerata affidabile.' },
+  { chiave: 'minVotiAffidabili', gruppo: 'Apprendimento', etichetta: 'Voti per fidarsi di una ricetta', unita: 'voti', def: 3, min: 1, max: 20, passo: 1, descrizione: 'Quanti voti servono perché una ricetta sia considerata affidabile.' },
   { chiave: 'maxEsperimenti', gruppo: 'Apprendimento', etichetta: 'Esperimenti in parallelo', unita: '', def: 2, min: 0, max: 10, passo: 1, descrizione: 'Quante ricette nuove si provano contemporaneamente.' },
   { chiave: 'esplorazione', gruppo: 'Apprendimento', etichetta: 'Esplorazione', unita: '', def: 0.3, min: 0, max: 2, passo: 0.05, descrizione: 'Quanto il sistema prova cose nuove invece di ripetere le migliori.' },
   { chiave: 'durataEsperimentoBrani', gruppo: 'Apprendimento', etichetta: 'Durata di un esperimento', unita: 'brani', def: 10, min: 1, max: 100, passo: 1, descrizione: 'Dopo quanti brani un esperimento viene chiuso.' },
-  { chiave: 'qcSilenzioDb', gruppo: 'Qualita\' audio', etichetta: 'Soglia di silenzio', unita: 'dB', def: -45, min: -80, max: -20, passo: 1, descrizione: 'Sotto questo livello medio il brano e\' considerato quasi silenzioso e viene scartato.' },
-  { chiave: 'qcSilenzioFrazione', gruppo: 'Qualita\' audio', etichetta: 'Quota di silenzio ammessa', unita: '', def: 0.5, min: 0.1, max: 1, passo: 0.05, descrizione: 'Quota del brano che puo\' essere silenziosa prima dello scarto.' },
-  { chiave: 'qcDurataMin', gruppo: 'Qualita\' audio', etichetta: 'Durata minima accettata', unita: '', def: 0.85, min: 0.5, max: 1, passo: 0.01, descrizione: 'Frazione della durata richiesta sotto cui il brano viene rigenerato.' },
-  { chiave: 'qcDurataMax', gruppo: 'Qualita\' audio', etichetta: 'Durata massima accettata', unita: '', def: 1.25, min: 1, max: 2, passo: 0.01, descrizione: 'Frazione della durata richiesta sopra cui il brano viene scartato.' },
+  { chiave: 'qcSilenzioDb', gruppo: 'Qualità audio', etichetta: 'Soglia di silenzio', unita: 'dB', def: -45, min: -80, max: -20, passo: 1, descrizione: 'Sotto questo livello medio il brano è considerato quasi silenzioso e viene scartato.' },
+  { chiave: 'qcSilenzioFrazione', gruppo: 'Qualità audio', etichetta: 'Quota di silenzio ammessa', unita: '', def: 0.5, min: 0.1, max: 1, passo: 0.05, descrizione: 'Quota del brano che può essere silenziosa prima dello scarto.' },
+  { chiave: 'qcDurataMin', gruppo: 'Qualità audio', etichetta: 'Durata minima accettata', unita: '', def: 0.85, min: 0.5, max: 1, passo: 0.01, descrizione: 'Frazione della durata richiesta sotto cui il brano viene rigenerato.' },
+  { chiave: 'qcDurataMax', gruppo: 'Qualità audio', etichetta: 'Durata massima accettata', unita: '', def: 1.25, min: 1, max: 2, passo: 0.01, descrizione: 'Frazione della durata richiesta sopra cui il brano viene scartato.' },
 ];
 
 function leggiJson(file, fallback) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
 }
 
-// Scrittura atomica: prima un file temporaneo, poi il nome definitivo
 function scriviJson(file, dati) {
-  const tmp = file + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(dati, null, 2));
-  fs.renameSync(tmp, file);
+  scriviAtomico(file, JSON.stringify(dati, null, 2));
+}
+
+// Prima di una modifica: un file presente ma illeggibile non si riscrive con il solo campo cambiato
+function daModificare(file) {
+  if (!fs.existsSync(file)) return {};
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { throw new Error(`${path.basename(file)} non leggibile: nessuna modifica salvata`); }
 }
 
 function registra(sezione, chiave, prima, dopo) {
@@ -130,7 +134,7 @@ function impostaParametro({ chiave, valore }) {
   if (!def) throw new Error(`parametro sconosciuto: ${chiave}`);
   if (typeof valore !== 'number' || Number.isNaN(valore)) throw new Error(`${def.etichetta}: valore non numerico`);
   if (valore < def.min || valore > def.max) throw new Error(`${def.etichetta}: il valore deve stare tra ${def.min} e ${def.max}`);
-  const salvati = leggiJson(PARAMETRI, {});
+  const salvati = daModificare(PARAMETRI);
   const prima = typeof salvati[chiave] === 'number' ? salvati[chiave] : def.def;
   salvati[chiave] = Math.round(valore * 1000) / 1000;
   scriviJson(PARAMETRI, salvati);
@@ -149,7 +153,7 @@ function impostaMessaggi({ frequenzaMin, inizio, fine, tipi }) {
     if (t.attivo && !t.dati.length) throw new Error(`${def.etichetta}: scegli almeno un dato oppure disattiva il messaggio`);
     puliti[nome] = { attivo: t.attivo, dati: t.dati };
   }
-  const salvati = leggiJson(PARAMETRI, {});
+  const salvati = daModificare(PARAMETRI);
   const prima = M.impostazioniMessaggi(salvati.messaggi);
   salvati.messaggi = { frequenzaMin, inizio, fine, tipi: puliti };
   scriviJson(PARAMETRI, salvati);
@@ -159,7 +163,7 @@ function impostaMessaggi({ frequenzaMin, inizio, fine, tipi }) {
 
 function impostaGenere({ nome, peso, attivo }) {
   if (!catalogoNomi().includes(nome)) throw new Error(`genere sconosciuto: ${nome}`);
-  const salvati = leggiJson(PARAMETRI, {});
+  const salvati = daModificare(PARAMETRI);
   salvati.generi = salvati.generi || {};
   const corrente = salvati.generi[nome] || { peso: 1, attivo: true };
   const nuovo = { ...corrente, peso: corrente.peso, attivo: corrente.attivo }; // conserva le note del genere
@@ -183,7 +187,7 @@ function comando({ azione, genere }) {
     registra('comandi', azione, {}, {});
     return { ok: true, sfondi: sfondi.stato() };
   }
-  const cur = leggiJson(COMANDI, {});
+  const cur = daModificare(COMANDI);
   let patch;
   if (azione === 'pausa') patch = { pausa: true };
   else if (azione === 'riprendi') patch = { pausa: null };
@@ -222,10 +226,10 @@ function salvaBlocchi(salvata, { ambito, aggiunti, esclusi, azzera }) {
   };
   // le aggiunte generali valgono anche per i generi strumentali
   const piu = azzera ? [] : pulisci(aggiunti, 'aggiunti', 8, (v) => STILE.erroreBlocco(v, { strumentale: !(cat && cat.vocale_senza_parole) }));
-  const meno = azzera ? [] : pulisci(esclusi, 'esclusi', 40, (v) => (BLOCCO_FISSO.test(v) ? 'e\' un blocco fisso'
+  const meno = azzera ? [] : pulisci(esclusi, 'esclusi', 40, (v) => (BLOCCO_FISSO.test(v) ? 'è un blocco fisso'
     : v.length < 2 || v.length > 120 || /[,<>]/.test(v) ? 'blocco non valido' : ''));
   const doppio = piu.find((v) => meno.includes(v));
-  if (doppio) throw new Error(`"${doppio}": non puo' essere insieme aggiunto ed escluso`);
+  if (doppio) throw new Error(`"${doppio}": non può essere insieme aggiunto ed escluso`);
   if (generale) {
     salvata.style_extra = piu;
     salvata.style_avoid = meno;
@@ -256,12 +260,12 @@ function stile(genere, indiceVariante) {
   const avvisi = [];
   const escluso = (testo) => blocchi.some((b) => b.escluso && b.testo.toLowerCase() === String(testo).toLowerCase());
   const en = cat.en || {};
-  if (en.genre && en.genre.split(',').some((g) => escluso(g.trim()))) avvisi.push('Il termine del genere e\' escluso: il brano potrebbe uscire di un altro stile.');
+  if (en.genre && en.genre.split(',').some((g) => escluso(g.trim()))) avvisi.push('Il termine del genere è escluso: il brano potrebbe uscire di un altro stile.');
   const famiglia = leggiJson(VOCABOLARIO, { famiglie: {} }).famiglie.strumenti || [];
   const suoi = Object.values(en.instruments || {});
   if (suoi.length && suoi.every(escluso) && !esempio.some((b) => b.origine !== 'catalogo' && famiglia.includes(b.testo))) avvisi.push('Nessuno strumento rimasto nello stile.');
   if (esempio.length > 25) avvisi.push(`${esempio.length} blocchi: oltre 25 il motore pesa poco ogni termine.`);
-  for (const b of blocchi) if (b.escluso && b.origine === 'tuo') avvisi.push(`"${b.testo}" e' tra i tuoi blocchi ma escluso a livello generale.`);
+  for (const b of blocchi) if (b.escluso && b.origine === 'tuo') avvisi.push(`"${b.testo}" è tra i tuoi blocchi ma escluso a livello generale.`);
   return {
     genere, variante: variante ? variante.nome : '', varianti: varianti.map((v) => v.nome), vocale: !!cat.vocale_senza_parole,
     blocchi, esempio: esempio.map((b) => b.testo).join(', '), conteggio: esempio.length, avvisi, bpm: `${min}-${max}`,
@@ -269,7 +273,7 @@ function stile(genere, indiceVariante) {
 }
 
 function guida({ campo, valori, categoria, valore, ...blocchi }) {
-  const salvata = leggiJson(GUIDA, {});
+  const salvata = daModificare(GUIDA);
   if (campo === 'blocchi') {
     salvaBlocchi(salvata, blocchi);
   } else if (campo === 'note') {
@@ -320,7 +324,7 @@ function voto(dati) {
 
 // ---- note per genere ----
 // Ogni nota viene scritta in italiano e tradotta in inglese (il motore YuE2 risponde meglio all'inglese).
-// La traduzione usa il modello di LM Studio; se non risponde, la nota resta in italiano e viene usata cosi'.
+// La traduzione usa il modello di LM Studio; se non risponde, la nota resta in italiano e viene usata così.
 const http = require('http');
 const LLM = { hostname: '127.0.0.1', port: 1234, model: 'google/gemma-4-e4b' };
 
@@ -358,12 +362,13 @@ async function aggiungiNota({ nome, testo }) {
   const t = String(testo || '').trim();
   if (t.length < 3 || t.length > 300) throw new Error('nota: tra 3 e 300 caratteri');
   if (/[<>]/.test(t)) throw new Error('nota: non usare i caratteri < o >');
-  const salvati = leggiJson(PARAMETRI, {});
+  if ((((leggiJson(PARAMETRI, {}).generi || {})[nome] || {}).note || []).length >= 20) throw new Error('nota: massimo 20 note per genere');
+  const inglese = await traduci(t);
+  // lettura dopo la traduzione: nei secondi di attesa i parametri possono essere cambiati
+  const salvati = daModificare(PARAMETRI);
   salvati.generi = salvati.generi || {};
   const corrente = salvati.generi[nome] || { peso: 1, attivo: true };
   const note = corrente.note || [];
-  if (note.length >= 20) throw new Error('nota: massimo 20 note per genere');
-  const inglese = await traduci(t);
   const nuova = { testo: t, inglese, ts: new Date().toISOString() };
   salvati.generi[nome] = { ...corrente, note: [...note, nuova] };
   scriviJson(PARAMETRI, salvati);
@@ -384,8 +389,8 @@ async function ritraduciPendenti() {
     if (t) risultati.push({ ...p, inglese: t });
   }
   if (!risultati.length) return;
-  // rilettura prima della scrittura: nel frattempo l'utente puo' aver aggiunto o tolto note
-  const salvati = leggiJson(PARAMETRI, {});
+  // rilettura prima della scrittura: nel frattempo l'utente può aver aggiunto o tolto note
+  const salvati = daModificare(PARAMETRI);
   let cambiate = 0;
   for (const r of risultati) {
     const nota = ((salvati.generi || {})[r.nome]?.note || []).find((n) => n.ts === r.ts && !n.inglese);
@@ -396,7 +401,7 @@ async function ritraduciPendenti() {
 setInterval(() => { ritraduciPendenti().catch(() => {}); }, 10 * 60 * 1000).unref();
 
 function togliNota({ nome, indice }) {
-  const salvati = leggiJson(PARAMETRI, {});
+  const salvati = daModificare(PARAMETRI);
   const corrente = (salvati.generi || {})[nome];
   if (!corrente || !Array.isArray(corrente.note) || !corrente.note[indice]) throw new Error('nota non trovata');
   const rimossa = corrente.note[indice];

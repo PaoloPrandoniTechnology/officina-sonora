@@ -62,3 +62,88 @@
 {"ts":"2026-11-27T17:02:59.973Z","sezione":"generi","chiave":"Industrial-techno","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
 {"ts":"2026-11-27T17:02:59.977Z","sezione":"generi","chiave":"Trap-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
 {"ts":"2026-11-27T17:02:59.982Z","sezione":"generi","chiave":"Hard-rock-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-27T20:47:38.532Z","sezione":"comandi","chiave":"sfondi_avvia","prima":{},"dopo":{}}
+{"ts":"2026-11-27T21:15:24.052Z","sezione":"comandi","chiave":"produci","prima":{"pausa":true},"dopo":{"pausa":true,"produciGenere":"Jazz-lounge"}}
+{"ts":"2026-11-27T21:15:37.090Z","sezione":"comandi","chiave":"sfondi_avvia","prima":{},"dopo":{}}
+{"ts":"2026-11-28T00:02:48.131Z","sezione":"comandi","chiave":"riprendi","prima":{"pausa":true,"produciGenere":"Jazz-lounge"},"dopo":{"produciGenere":"Jazz-lounge"}}
+{"ts":"2026-11-28T07:01:03.639Z","sezione":"generi","chiave":"Meditazione","prima":{"peso":1,"attivo":true,"note":[]},"dopo":{"peso":1,"attivo":false,"note":[]}}
+{"ts":"2026-11-28T07:01:04.248Z","sezione":"generi","chiave":"Pranayama-respiro","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:05.128Z","sezione":"generi","chiave":"Restorative","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:05.951Z","sezione":"generi","chiave":"Sound-bath-rilassamento","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:06.789Z","sezione":"generi","chiave":"Hatha-base","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:07.555Z","sezione":"generi","chiave":"Power-yoga","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:08.687Z","sezione":"generi","chiave":"Reggae-dub-morbido","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:09.606Z","sezione":"generi","chiave":"Surf-rock-strumentale","prima":{"peso":1,"attivo":true,"note":[{"testo":"voglio piu assoli di chitarra elettrica","inglese":"Add more electric guitar solos and riffs throughout the track.","ts":"2026-11-27T09:53:48.278Z"}]},"dopo":{"peso":1,"attivo":false,"note":[{"testo":"voglio piu assoli di chitarra elettrica","inglese":"Add more electric guitar solos and riffs throughout the track.","ts":"2026-11-27T09:53:48.278Z"}]}}
+{"ts":"2026-11-28T07:01:10.384Z","sezione":"generi","chiave":"Post-rock-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:12.825Z","sezione":"generi","chiave":"Blues-shuffle-strumentale","prima":{"peso":1,"attivo":true},"dopo":{"peso":1,"attivo":false}}
+{"ts":"2026-11-28T07:01:18.922Z","sezione":"generi","chiave":"Meditazione","prima":{"peso":1,"attivo":false,"note":[]},"dopo":{"peso":1,"attivo":true,"note":[]}}
+{"ts":"2026-11-28T07:01:31.553Z","sezione":"generi","chiave":"Pranayama-respiro","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.562Z","sezione":"generi","chiave":"Yin-Savasana","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.571Z","sezione":"generi","chiave":"Restorative","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.580Z","sezione":"generi","chiave":"Sound-bath-rilassamento","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.589Z","sezione":"generi","chiave":"Hatha-base","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.599Z","sezione":"generi","chiave":"Vinyasa-dinamico","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.611Z","sezione":"generi","chiave":"Power-yoga","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.648Z","sezione":"generi","chiave":"Funk-groove","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.657Z","sezione":"generi","chiave":"Afro-latin-groove","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.665Z","sezione":"generi","chiave":"Trip-hop-dolce","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.674Z","sezione":"generi","chiave":"Reggae-dub-morbido","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.681Z","sezione":"generi","chiave":"Jazz-lounge","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.689Z","sezione":"generi","chiave":"Folk-strumming","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.700Z","sezione":"generi","chiave":"Surf-rock-strumentale","prima":{"peso":1,"attivo":false,"note":[{"testo":"voglio piu assoli di chitarra elettrica","inglese":"Add more electric guitar solos and riffs throughout the track.","ts":"2026-11-27T09:53:48.278Z"}]},"dopo":{"peso":1,"attivo":true,"note":[{"testo":"voglio piu assoli di chitarra elettrica","inglese":"Add more electric guitar solos and riffs throughout the track.","ts":"2026-11-27T09:53:48.278Z"}]}}
+{"ts":"2026-11-28T07:01:31.708Z","sezione":"generi","chiave":"Post-rock-strumentale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.717Z","sezione":"generi","chiave":"Blues-shuffle-strumentale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.728Z","sezione":"generi","chiave":"Indie-rock-strumentale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.737Z","sezione":"generi","chiave":"Rockabilly-strumentale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.744Z","sezione":"generi","chiave":"Techno-minimale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.755Z","sezione":"generi","chiave":"Piano-minimalista","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.763Z","sezione":"generi","chiave":"Score-cinematico","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.772Z","sezione":"generi","chiave":"Folk-balcanico","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.782Z","sezione":"generi","chiave":"Beat-hip-hop","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.790Z","sezione":"generi","chiave":"Manouche-swing","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.799Z","sezione":"generi","chiave":"Synthwave","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.836Z","sezione":"generi","chiave":"Flamenco-chitarra","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.845Z","sezione":"generi","chiave":"Celtic-arpa-whistle","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.853Z","sezione":"generi","chiave":"Drum-and-bass-soft","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.861Z","sezione":"generi","chiave":"Gamelan-ambient","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.869Z","sezione":"generi","chiave":"Bossa-nova-chitarra","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.879Z","sezione":"generi","chiave":"Vocalise-coro","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.888Z","sezione":"generi","chiave":"Overtone-canto","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.897Z","sezione":"generi","chiave":"Canto-gregoriano-moderno","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.904Z","sezione":"generi","chiave":"Soul-vocalise","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.915Z","sezione":"generi","chiave":"Metal-strumentale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.923Z","sezione":"generi","chiave":"Industrial-techno","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.932Z","sezione":"generi","chiave":"Trap-strumentale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T07:01:31.942Z","sezione":"generi","chiave":"Hard-rock-strumentale","prima":{"peso":1,"attivo":false},"dopo":{"peso":1,"attivo":true}}
+{"ts":"2026-11-28T08:15:50.324Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{},"dopo":{"aggiunti":[],"esclusi":["slide guitar lead"]}}
+{"ts":"2026-11-28T08:15:52.324Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{"aggiunti":[],"esclusi":["slide guitar lead"]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:15:54.326Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{},"dopo":{"aggiunti":["celtic harp arpeggios"],"esclusi":[]}}
+{"ts":"2026-11-28T08:15:56.326Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{"aggiunti":["celtic harp arpeggios"],"esclusi":[]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:28:49.298Z","sezione":"linee guida","chiave":"blocchi generale","prima":{"aggiunti":[],"esclusi":[]},"dopo":{"aggiunti":["indian classical"],"esclusi":[]}}
+{"ts":"2026-11-28T08:29:07.867Z","sezione":"linee guida","chiave":"blocchi generale","prima":{"aggiunti":["indian classical"],"esclusi":[]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:35:40.560Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{},"dopo":{"aggiunti":[],"esclusi":["shuffle drums"]}}
+{"ts":"2026-11-28T08:35:42.559Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{"aggiunti":[],"esclusi":["shuffle drums"]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:35:44.565Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{},"dopo":{"aggiunti":["zydeco squeeze"],"esclusi":[]}}
+{"ts":"2026-11-28T08:35:46.566Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{"aggiunti":["zydeco squeeze"],"esclusi":[]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:36:10.697Z","sezione":"linee guida","chiave":"blocchi Meditazione","prima":{"revisione":["drone","minimalist","resonant","ambient pad","ethereal"]},"dopo":{"aggiunti":["zydeco squeeze"],"esclusi":[]}}
+{"ts":"2026-11-28T08:36:12.700Z","sezione":"linee guida","chiave":"blocchi Meditazione","prima":{"aggiunti":["zydeco squeeze"],"esclusi":[],"revisione":["drone","minimalist","resonant","ambient pad","ethereal"]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:55:46.501Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{},"dopo":{"aggiunti":["808 bass"],"esclusi":[]}}
+{"ts":"2026-11-28T08:55:48.360Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{"aggiunti":["808 bass"],"esclusi":[]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:55:50.159Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{},"dopo":{"aggiunti":[],"esclusi":["808 bass"]}}
+{"ts":"2026-11-28T08:55:51.968Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{"aggiunti":[],"esclusi":["808 bass"]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T08:55:55.077Z","sezione":"linee guida","chiave":"bpm Trap-strumentale","prima":null,"dopo":"70-80"}
+{"ts":"2026-11-28T08:55:56.580Z","sezione":"linee guida","chiave":"bpm Trap-strumentale","prima":"70-80","dopo":null}
+{"ts":"2026-11-28T08:55:58.083Z","sezione":"linee guida","chiave":"durata Trap-strumentale","prima":null,"dopo":"150-200"}
+{"ts":"2026-11-28T08:55:59.584Z","sezione":"linee guida","chiave":"durata Trap-strumentale","prima":"150-200","dopo":null}
+{"ts":"2026-11-28T08:56:01.088Z","sezione":"linee guida","chiave":"strutture Trap-strumentale","prima":null,"dopo":["arco"]}
+{"ts":"2026-11-28T08:56:02.591Z","sezione":"linee guida","chiave":"strutture Trap-strumentale","prima":["arco"],"dopo":null}
+{"ts":"2026-11-28T09:14:55.070Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{},"dopo":{"aggiunti":[],"esclusi":["electricguitar"]}}
+{"ts":"2026-11-28T09:14:57.271Z","sezione":"linee guida","chiave":"blocchi Blues-shuffle-strumentale","prima":{"aggiunti":[],"esclusi":["electricguitar"]},"dopo":{"aggiunti":[],"esclusi":[]}}
+{"ts":"2026-11-28T09:56:47.086Z","sezione":"comandi","chiave":"produci","prima":{},"dopo":{"produciGenere":"Manouche-swing"}}
+{"ts":"2026-11-28T10:29:59.793Z","sezione":"linee guida","chiave":"strutture Post-rock-strumentale","prima":["arco","crescendo"],"dopo":["crescendo"]}
+{"ts":"2026-11-28T10:30:00.940Z","sezione":"linee guida","chiave":"strutture Post-rock-strumentale","prima":["crescendo"],"dopo":null}
+{"ts":"2026-11-28T10:30:01.981Z","sezione":"linee guida","chiave":"strutture Post-rock-strumentale","prima":null,"dopo":["crescendo"]}
+{"ts":"2026-11-28T10:30:02.761Z","sezione":"linee guida","chiave":"strutture Post-rock-strumentale","prima":["crescendo"],"dopo":null}
+{"ts":"2026-11-28T10:30:03.451Z","sezione":"linee guida","chiave":"strutture Post-rock-strumentale","prima":null,"dopo":["crescendo"]}
+{"ts":"2026-11-28T10:30:04.064Z","sezione":"linee guida","chiave":"strutture Post-rock-strumentale","prima":["crescendo"],"dopo":null}
+{"ts":"2026-11-28T10:30:04.966Z","sezione":"linee guida","chiave":"strutture Post-rock-strumentale","prima":null,"dopo":["crescendo"]}

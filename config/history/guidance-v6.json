@@ -1,0 +1,94 @@
+{
+  "versione": 6,
+  "bpm_range": {
+    "Power-yoga": "103-125",
+    "Meditazione": "35-65",
+    "Pranayama-respiro": "50-75",
+    "Hatha-base": "75-105",
+    "Yin-Savasana": "40-60",
+    "Restorative": "50-80",
+    "Sound-bath-rilassamento": "35-55",
+    "Post-rock-strumentale": "95-110"
+  },
+  "struttura_pref": {
+    "Sound-bath-rilassamento": [
+      "piatto"
+    ],
+    "Yin-Savasana": [
+      "piatto",
+      "onda"
+    ],
+    "Meditazione": [
+      "piatto",
+      "onda"
+    ],
+    "Restorative": [
+      "onda"
+    ],
+    "Post-rock-strumentale": [
+      "arco",
+      "crescendo"
+    ]
+  },
+  "style_extra": [],
+  "stile_generi": {
+    "Meditazione": [
+      "deep swell"
+    ],
+    "Pranayama-respiro": [
+      "breath texture",
+      "swelling pads",
+      "gentle flow",
+      "sustained notes",
+      "airy soundscape"
+    ],
+    "Hatha-base": [
+      "gentle slow pulse"
+    ],
+    "Power-yoga": [
+      "breath texture"
+    ],
+    "Sound-bath-rilassamento": [
+      "gong waves",
+      "crystal bowls",
+      "long decays",
+      "meditative"
+    ],
+    "Restorative": [
+      "acoustic arpeggios",
+      "gentle woodwinds",
+      "warm tones",
+      "delicate texture",
+      "soft ambiance"
+    ],
+    "Post-rock-strumentale": [
+      "atmospheric",
+      "cinematic score",
+      "sweeping strings",
+      "delayed guitars",
+      "build-up risers"
+    ],
+    "Reggae-dub-morbido": [
+      "one drop groove",
+      "relaxed bossa groove",
+      "dub echoes",
+      "sparse hats",
+      "warm low drone"
+    ]
+  },
+  "style_avoid": [],
+  "blocchi_generi": {},
+  "durata_hint": {
+    "Meditazione": "240-270",
+    "Pranayama-respiro": "180-270",
+    "Hatha-base": "180-240",
+    "Vinyasa-dinamico": "150-210",
+    "Power-yoga": "120-200",
+    "Yin-Savasana": "240-270",
+    "Restorative": "240-270",
+    "Sound-bath-rilassamento": "240-270",
+    "Post-rock-strumentale": "240-270"
+  },
+  "note": "Ho aggiornato le linee guida rafforzando i termini stilistici per le categorie che hanno ricevuto voti alti (Post-rock, Meditazione, Hatha), rendendo più espliciti gli elementi 'cinematici' e 'ambientali'. Ho inoltre regolato leggermente la durata media di alcune categorie in base ai brani performan",
+  "aggiornato": "2026-11-28T09:14:57.272Z"
+}

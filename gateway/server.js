@@ -11,6 +11,16 @@ const controllo = require('./controllo');
 const voti = require('./voti');
 const andamento = require('./andamento');
 const { ammessa } = require('./protezione');
+const { scriviAtomico } = require('./disco');
+const { copertinaDi } = require('./id3');
+
+// Un errore imprevisto resta scritto (il gateway parte senza finestra); il watchdog lo riavvia
+process.on('uncaughtException', (e) => {
+  try { fs.appendFileSync(path.join(__dirname, '..', 'state', 'gateway-errori.log'), `${new Date().toISOString()} ${e.stack}\n`); } catch (x) { /* nulla da fare */ }
+  process.exit(1);
+});
+const STATICI = { '/dashboard': ['dashboard.html', 'text/html'], '/dashboard.css': ['dashboard.css', 'text/css'], '/dashboard.js': ['dashboard.js', 'text/javascript'] };
+const MAX_CORPO = 300 * 1024 * 1024;
 
 const PORT = process.env.OFS_PORTA || 5790;
 const TOKEN_FILE = path.join(__dirname, 'token.json');
@@ -25,9 +35,7 @@ function leggiRefresh() {
   try { return JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8')).refresh; } catch (e) { return process.env.IBROADCAST_REFRESH || ''; }
 }
 function salvaRefresh(refresh) {
-  const tmp = TOKEN_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify({ refresh, aggiornato: new Date().toISOString() }));
-  fs.renameSync(tmp, TOKEN_FILE);
+  scriviAtomico(TOKEN_FILE, JSON.stringify({ refresh, aggiornato: new Date().toISOString() }));
 }
 
 // Richiesta HTTPS generica: ritorna {status, json, buf}
@@ -105,10 +113,15 @@ async function telegram(method, body) {
 }
 
 function leggiCorpo(req) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on('data', (c) => chunks.push(c));
+    let n = 0;
+    req.on('data', (c) => {
+      n += c.length;
+      if (n > MAX_CORPO) { reject(new Error('richiesta troppo grande')); req.destroy(); } else chunks.push(c);
+    });
     req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
   });
 }
 
@@ -178,10 +191,13 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.socket.remoteAddress !== '127.0.0.1' && req.socket.remoteAddress !== '::ffff:127.0.0.1') return rispondi(403, { ok: false });
     if (!ammessa(req.method, req.headers)) return rispondi(403, { ok: false });
-    // Dashboard di sola lettura (solo da questo PC)
-    if (req.method === 'GET' && req.url === '/dashboard') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
-      return res.end(fs.readFileSync(path.join(__dirname, 'dashboard.html')));
+    // Dashboard (solo da questo PC)
+    const pagina = req.url.split('?')[0];
+    if (req.method === 'GET' && Object.hasOwn(STATICI, pagina)) {
+      const [nome, tipo] = STATICI[pagina];
+      const testo = fs.readFileSync(path.join(__dirname, nome));
+      res.writeHead(200, { 'Content-Type': `${tipo}; charset=utf-8`, 'Cache-Control': 'no-store' });
+      return res.end(testo);
     }
     if (req.method === 'GET' && req.url === '/api/stato') return rispondi(200, await leggiStato());
     if (req.method === 'GET' && req.url === '/api/dati') return rispondi(200, datiAnalisi());
@@ -192,10 +208,20 @@ const server = http.createServer(async (req, res) => {
       catch (e) { return rispondi(400, { error: e.message }); }
     }
     if (req.method === 'GET' && req.url === '/api/voti') return rispondi(200, voti.elenco(Date.now()));
-    if (req.method === 'GET' && req.url.startsWith('/audio/brano?')) {
-      const n = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('n');
+    if (req.method === 'GET' && /^\/(audio\/brano|api\/brano|api\/copertina)\?/.test(req.url)) {
+      const q = new URLSearchParams(req.url.slice(req.url.indexOf('?')));
+      const n = q.get('n');
       if (!/^\d{1,9}$/.test(n || '')) return rispondi(400, { ok: false, error: 'numero di brano non valido' });
-      return voti.inviaAudio(req, res, Number(n));
+      if (req.url.startsWith('/audio/')) return voti.inviaAudio(req, res, Number(n), q.has('scarica'));
+      if (req.url.startsWith('/api/brano')) {
+        const b = voti.scheda(Number(n));
+        return b ? rispondi(200, b) : rispondi(404, { ok: false, error: 'brano non trovato' });
+      }
+      const file = voti.audioDi(voti.trova(Number(n)));
+      const img = file && /\.mp3$/.test(file) ? copertinaDi(file) : null;
+      if (!img) return rispondi(404, { ok: false, error: 'copertina assente' });
+      res.writeHead(200, { 'Content-Type': img.mime, 'Cache-Control': 'private, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
+      return res.end(img.dati);
     }
     if (req.method === 'GET' && (req.url === '/api/andamento' || req.url.startsWith('/api/andamento?'))) {
       const q = new URLSearchParams(req.url.slice('/api/andamento'.length));
@@ -252,4 +278,6 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+// porta occupata: c'è già un gateway attivo, questo si chiude senza segnalare nulla
+server.on('error', (e) => { if (e.code !== 'EADDRINUSE') throw e; process.exit(0); });
 server.listen(PORT, '127.0.0.1', () => console.log(`gateway in ascolto su 127.0.0.1:${PORT}`));

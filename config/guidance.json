@@ -1,13 +1,14 @@
 {
-  "versione": 5,
+  "versione": 7,
   "bpm_range": {
-    "Power-yoga": "103-125",
-    "Meditazione": "40-65",
+    "Power-yoga": "103-130",
+    "Meditazione": "30-70",
     "Pranayama-respiro": "50-75",
-    "Hatha-base": "75-105",
+    "Hatha-base": "70-107",
     "Yin-Savasana": "40-60",
     "Restorative": "50-80",
-    "Sound-bath-rilassamento": "35-55"
+    "Sound-bath-rilassamento": "35-55",
+    "Post-rock-strumentale": "95-110"
   },
   "struttura_pref": {
     "Sound-bath-rilassamento": [
@@ -23,65 +24,80 @@
     ],
     "Restorative": [
       "onda"
+    ],
+    "Post-rock-strumentale": [
+      "crescendo"
     ]
   },
   "style_extra": [],
   "stile_generi": {
     "Meditazione": [
-      "drone",
-      "minimalist",
-      "resonant",
-      "ambient pad",
-      "ethereal"
+      "deep swell",
+      "sustained tones",
+      "spiritual",
+      "very slow evolution",
+      "resonant"
     ],
     "Pranayama-respiro": [
-      "breath texture",
-      "swelling pads",
-      "gentle flow",
-      "sustained notes",
-      "airy soundscape"
+      "breath texture"
     ],
     "Hatha-base": [
-      "acoustic arpeggios",
-      "warm tones",
-      "fingerpicking",
-      "delicate sustain",
-      "rhythmic groove"
+      "gentle slow pulse",
+      "relaxed bossa groove",
+      "acoustic guitar strumming",
+      "light relaxed groove"
     ],
     "Power-yoga": [
-      "uplifting pads",
-      "pulsing resonance",
-      "sweeping synth",
-      "moderate rhythm",
-      "atmospheric soundscape"
+      "breath texture",
+      "uplifting",
+      "cinematic score",
+      "pulsing synth bass"
     ],
     "Sound-bath-rilassamento": [
-      "gong swells",
+      "gong waves",
       "crystal bowls",
-      "deep decay",
-      "harmonic wash",
-      "resonant sustain"
+      "long decays",
+      "meditative",
+      "deep swell"
     ],
     "Restorative": [
-      "acoustic arpeggios",
-      "gentle woodwinds",
-      "warm tones",
-      "delicate texture",
-      "soft ambiance"
+      "nurturing"
+    ],
+    "Post-rock-strumentale": [
+      "atmospheric",
+      "cinematic score",
+      "sweeping strings",
+      "delayed guitars",
+      "build-up risers"
+    ],
+    "Reggae-dub-morbido": [
+      "one drop groove",
+      "relaxed bossa groove",
+      "dub echoes",
+      "sparse hats",
+      "warm low drone"
+    ],
+    "Yin-Savasana": [
+      "deep swell",
+      "sustained tones",
+      "heavy stillness",
+      "warm low drone",
+      "very slow evolution"
     ]
   },
   "style_avoid": [],
+  "blocchi_generi": {},
   "durata_hint": {
     "Meditazione": "240-270",
     "Pranayama-respiro": "180-270",
-    "Hatha-base": "180-240",
+    "Hatha-base": "180-250",
     "Vinyasa-dinamico": "150-210",
     "Power-yoga": "120-200",
     "Yin-Savasana": "240-270",
     "Restorative": "240-270",
-    "Sound-bath-rilassamento": "240-270"
+    "Sound-bath-rilassamento": "240-270",
+    "Post-rock-strumentale": "240-270"
   },
-  "note": "Linee guida a blocchi: elenco generale da evitare svuotato.",
-  "aggiornato": "2026-11-28T08:15:56.326Z",
-  "blocchi_generi": {}
+  "note": "Ho rafforzato i termini stilistici per enfatizzare il senso di quiete profonda e risonanza (Meditazione, Sound-bath) o l'aspetto emotivo/elevante (Power-yoga, Restorative), basandomi sui voti alti. Ho leggermente ampliato le durate massime per accogliere la natura spesso estesa del 'drone' e dei pro",
+  "aggiornato": "2026-11-28T10:30:04.967Z"
 }

@@ -17,6 +17,7 @@ const FERMA = path.join(DIR, 'state', 'sfondi.stop'); // richiesta di stop dalla
 const LIBRERIA = 'E:\\Musica di sottofondo';
 const FFMPEG = 'E:\\MusicAI\\ffmpeg\\bin\\ffmpeg.exe';
 const WEBUI = 'E:\\StableDiffusion\\webui';
+const { scriviAtomico } = require('../gateway/disco');
 const PORTA = 7861;
 const NEGATIVO = 'text, letters, watermark, signature, logo, frame, border, face, deformed hands, extra fingers, lowres, blurry, jpeg artifacts';
 
@@ -31,8 +32,7 @@ function mancanti(categorie, cartella = SFONDI, n = 8) {
 
 function scrivi(file, dati) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file + '.tmp', JSON.stringify(dati, null, 2));
-  fs.renameSync(file + '.tmp', file);
+  scriviAtomico(file, JSON.stringify(dati, null, 2));
 }
 
 // Pulizie da eseguire subito se la finestra viene chiusa (Windows concede pochi secondi)

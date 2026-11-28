@@ -22,7 +22,7 @@
     },
     "Yin-Savasana": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Restorative": {
       "peso": 1,
@@ -38,7 +38,7 @@
     },
     "Vinyasa-dinamico": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Power-yoga": {
       "peso": 1,
@@ -46,15 +46,15 @@
     },
     "Funk-groove": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Afro-latin-groove": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Trip-hop-dolce": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Reggae-dub-morbido": {
       "peso": 1,
@@ -62,11 +62,11 @@
     },
     "Jazz-lounge": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Folk-strumming": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Post-rock-strumentale": {
       "peso": 1,
@@ -78,91 +78,91 @@
     },
     "Indie-rock-strumentale": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Rockabilly-strumentale": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Techno-minimale": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Piano-minimalista": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Score-cinematico": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Folk-balcanico": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Beat-hip-hop": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Manouche-swing": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Synthwave": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Flamenco-chitarra": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Celtic-arpa-whistle": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Drum-and-bass-soft": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Gamelan-ambient": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Bossa-nova-chitarra": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Vocalise-coro": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Overtone-canto": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Canto-gregoriano-moderno": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Soul-vocalise": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Metal-strumentale": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Industrial-techno": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Trap-strumentale": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     },
     "Hard-rock-strumentale": {
       "peso": 1,
-      "attivo": false
+      "attivo": true
     }
   },
   "messaggi": {

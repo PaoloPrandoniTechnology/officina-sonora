@@ -3,6 +3,7 @@
 // non pesa sull'aggiornamento della dashboard (che legge lo stato ogni 5 secondi).
 const fs = require('fs');
 const path = require('path');
+const libreria = require('./libreria');
 
 const ROOT = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
 const STATE = 'E:\\n8n\\officina-sonora\\state';
@@ -30,20 +31,6 @@ function codaTesto(file, bytes = 400000) {
   } catch (e) { return ''; }
 }
 
-// Tutti i file .json della libreria (anche _scartati)
-function trovaJson(dir, out = []) {
-  let nomi = [];
-  try { nomi = fs.readdirSync(dir); } catch (e) { return out; }
-  for (const n of nomi) {
-    const p = path.join(dir, n);
-    let st;
-    try { st = fs.statSync(p); } catch (e) { continue; }
-    if (st.isDirectory()) trovaJson(p, out);
-    else if (n.endsWith('.json') && n !== 'feedback.json') out.push(p);
-  }
-  return out;
-}
-
 function media(valori) {
   const v = valori.filter((x) => typeof x === 'number' && !Number.isNaN(x));
   return v.length ? Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100) / 100 : null;
@@ -64,17 +51,20 @@ function motivoNormalizzato(p) {
   return String(p).replace(/\d+(\.\d+)?/g, '#').slice(0, 90);
 }
 
+// Giorno nell'ora di questo PC (AAAA-MM-GG); null se la data manca
+function giornoLocale(x) {
+  const d = new Date(x || NaN);
+  return Number.isNaN(d.getTime()) ? null : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function calcola() {
   const catalogo = leggiJson(CATALOGO, { categories: [], tipi: [] });
   const guida = leggiJson(GUIDA, {});
   const tracce = [];
   const scartati = [];
 
-  for (const f of trovaJson(ROOT)) {
-    const meta = leggiJson(f, null);
-    if (!meta || !meta.titolo) continue;
+  for (const { file: f, meta, scartato: fuori } of libreria.schede(ROOT)) {
     const parti = path.relative(ROOT, f).split(path.sep);
-    const fuori = parti[0] === '_scartati';
     const rec = {
       titolo: meta.titolo,
       ambito: fuori ? null : parti[0],
@@ -147,16 +137,19 @@ function calcola() {
   const secondi = {};
   const votiGiorno = {};
   for (const t of tracce) {
-    if (t.generato_il) {
-      const g = t.generato_il.slice(0, 10);
+    const g = giornoLocale(t.generato_il);
+    if (g) {
       giorni[g] = (giorni[g] || 0) + 1;
       secondi[g] = (secondi[g] || 0) + (t.durata_s || 0);
     }
-    if (t.voto !== null && t.voto_il) votiGiorno[t.voto_il.slice(0, 10)] = (votiGiorno[t.voto_il.slice(0, 10)] || 0) + 1;
+    const v = t.voto !== null && giornoLocale(t.voto_il);
+    if (v) votiGiorno[v] = (votiGiorno[v] || 0) + 1;
   }
   const timeline = [];
   for (let i = 13; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    const quando = new Date();
+    quando.setDate(quando.getDate() - i);
+    const d = giornoLocale(quando);
     timeline.push({ giorno: d, brani: giorni[d] || 0, ore: Math.round(((secondi[d] || 0) / 3600) * 10) / 10, voti: votiGiorno[d] || 0 });
   }
   const bpmBins = {};
@@ -213,7 +206,8 @@ function calcola() {
   }
   const erroriTop = Object.entries(erroriPerChiave).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([errore, n]) => ({ errore, n }));
 
-  const recenti = [...tracce].sort((a, b) => (b.generato_il || '').localeCompare(a.generato_il || '')).slice(0, 2000); // la pagina Libreria cerca e filtra su tutti
+  const recenti = [...tracce].sort((a, b) => (b.generato_il || '').localeCompare(a.generato_il || '')); // la pagina Libreria cerca e filtra su tutti
+  // shortcut: l'elenco viaggia intero ogni 30 s; oltre circa 20.000 brani servirà la ricerca nel gateway
 
   return {
     aggiornato: new Date().toISOString(),

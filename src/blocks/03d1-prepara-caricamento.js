@@ -5,9 +5,9 @@ const state = inp.state;
 state.uploadQueue = state.uploadQueue || [];
 if (inp.outcome === 'saved' && inp.file) state.uploadQueue.push(inp.file);
 
-// Una sola scansione: i brani senza il campo ibroadcast e quelli senza tag ID3 completi entrano in coda
+// Ogni ora si ripescano i brani senza il campo ibroadcast (caricamento fallito); una volta sola quelli senza tag completi
 const accoda = (full) => { if (!state.uploadQueue.includes(full)) state.uploadQueue.push(full); };
-if (!state.ibroadcastScanned) {
+if (!(Date.now() - state.ibroadcastScanned < 3600000)) {
   const walkLib = (dir) => {
     for (const name of fs.readdirSync(dir)) {
       const full = path.join(dir, name);
@@ -15,12 +15,15 @@ if (!state.ibroadcastScanned) {
       if (fs.statSync(full).isDirectory()) walkLib(full);
       else if (/\.(mp3|flac|wav|ogg)$/.test(name)) {
         const meta = readJsonSafe(full.replace(/\.[^.]+$/, '.json'), null);
-        if (meta && !meta.ibroadcast) accoda(full);
+        if (meta && !meta.ibroadcast && !meta.duplicato_di) {
+          if (state.uploadTries) delete state.uploadTries[full]; // altri tre tentativi
+          accoda(full);
+        }
       }
     }
   };
   if (fs.existsSync(CFG.root)) walkLib(CFG.root);
-  state.ibroadcastScanned = true;
+  state.ibroadcastScanned = Date.now();
 }
 if (!state.retagScanned) {
   const walkRetag = (dir) => {

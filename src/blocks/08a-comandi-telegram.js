@@ -1,6 +1,6 @@
 // BLOCCO 8 - Telegram: comandi, feedback interpretati con conferma, avvisi per errori ripetuti.
 // Ogni modifica richiesta viene riscritta in chiaro e applicata solo dopo il pulsante "Conferma".
-// Stato proprio in state/telegram.json, cosi' non interferisce con la produzione dei brani.
+// Stato proprio in state/telegram.json, così non interferisce con la produzione dei brani.
 // il token Telegram sta nel gateway locale: qui non c'e'
 const CHAT = Number((readJsonSafe(CFG.telegramFile, {}) || {}).chat_id);
 const TG_FILE = path.join(CFG.dir, 'state', 'telegram.json');
@@ -16,7 +16,7 @@ async function tgRequest(method, body) {
 
 async function say(text, buttons) {
   const body = { chat_id: CHAT, text: String(text).slice(0, 3900) };
-  // buttons: una riga di bottoni, oppure gia' un elenco di righe
+  // buttons: una riga di bottoni, oppure già un elenco di righe
   if (buttons) body.reply_markup = { inline_keyboard: Array.isArray(buttons[0]) ? buttons : [buttons] };
   return tgRequest('sendMessage', body);
 }
@@ -24,11 +24,13 @@ async function say(text, buttons) {
 const AIUTO = [
   'Officina Sonora - comandi:',
   '/stato - a che punto siamo (brani, coda, errori)',
+  '/pausa - ferma la produzione dopo il brano in corso',
+  '/riprendi - riavvia la produzione',
   '/annulla - scarta le modifiche in attesa',
   '/aiuto - questo elenco',
   '',
   'Oppure scrivi in italiano cosa vuoi cambiare, per esempio:',
-  '- "Vinyasa piu ritmato, bpm tra 100 e 120"',
+  '- "Vinyasa più ritmato, bpm tra 100 e 120"',
   '- "Aggiungi la categoria Batfit: energia 4, strutture loop e crescendo"',
   '- "Aggiungi una struttura breve con solo intro, verse e outro"',
   'Ti mostro sempre il riepilogo e applico solo dopo il tuo Conferma.',
@@ -37,18 +39,19 @@ const AIUTO = [
 function statoTesto() {
   const s = readJsonSafe(CFG.stateFile, {}) || {};
   const g = readGuidance();
-  const cats = (CFG.categories || []).map((c) => c.name).join(', ');
+  const attivi = (CFG.categories || []).filter((c) => (CFG.generiOverride[c.name] || {}).attivo !== false).length;
   return [
+    `Produzione: ${CFG.comandi.pausa ? 'in pausa (/riprendi per ripartire)' : 'attiva'}`,
     `Brani salvati: ${s.done || 0}`,
     `In coda: ${(s.queue || []).length}`,
     `Render in corso: ${s.job ? s.job.concept.titolo : 'nessuno'}`,
     `Scartati: ${(s.failed || []).length}`,
     `Linee guida: v${g.versione}`,
-    `Categorie: ${cats}`,
+    `Generi attivi: ${attivi} di ${(CFG.categories || []).length}`,
   ].join('\n');
 }
 
-// Interpreta il messaggio in un'azione strutturata; se non e' chiaro, restituisce una domanda.
+// Interpreta il messaggio in un'azione strutturata; se non è chiaro, restituisce una domanda.
 async function interpreta(testo, contesto) {
   const sistema = 'Sei l\'assistente di configurazione di un generatore di musica di sottofondo. Rispondi solo con JSON valido.';
   const utente = `${contesto ? `Contesto: ${contesto}\n` : ''}Messaggio dell'utente: "${testo}"
@@ -67,7 +70,7 @@ Rispondi con un oggetto JSON con i campi:
   * nuova_struttura: nome (senza spazi), sezioni (array di sezioni valide, minimo 3)
   * tag_extra: categoria (esistente), tag (max 3 parole)
 - "testo": solo per azione "domanda": la domanda da fare all'utente in italiano
-Se non e' chiaro, usa "domanda" e chiedi cosa intende.`;
+Se non è chiaro, usa "domanda" e chiedi cosa intende.`;
   return llmJson(sistema, utente, 1200);
 }
 
@@ -83,7 +86,7 @@ function valida(p) {
       return Object.keys(d).length > 0 ? null : 'nessuna modifica indicata';
     case 'nuova_categoria':
       if (!isName(d.name)) return 'nome categoria non valido';
-      if (catNames.includes(d.name)) return 'la categoria esiste gia\'';
+      if (catNames.includes(d.name)) return 'la categoria esiste già';
       if (!(d.energia >= 1 && d.energia <= 5)) return 'energia deve essere tra 1 e 5';
       if (!bpmOk(d.bpm)) return 'bpm non validi';
       if (!Array.isArray(d.strutture) || !d.strutture.length || !d.strutture.every((s) => strutNames.includes(s))) return 'strutture non riconosciute';
@@ -96,7 +99,7 @@ function valida(p) {
       return null;
     case 'nuova_struttura':
       if (!isName(d.nome)) return 'nome struttura non valido';
-      if (strutNames.includes(d.nome)) return 'la struttura esiste gia\'';
+      if (strutNames.includes(d.nome)) return 'la struttura esiste già';
       if (!Array.isArray(d.sezioni) || d.sezioni.length < 3 || !d.sezioni.every((s) => CFG.sections.includes(s))) return 'sezioni non valide';
       return null;
     case 'tag_extra':
@@ -107,6 +110,9 @@ function valida(p) {
       return 'azione non riconosciuta';
   }
 }
+
+// Il modello a volte scrive un elenco come testo: il catalogo vuole sempre un elenco
+const elenco = (v) => (Array.isArray(v) ? v : String(v || '').split(',')).map((s) => String(s).trim()).filter(Boolean);
 
 // Applica la modifica confermata
 function applica(p) {
@@ -121,32 +127,33 @@ function applica(p) {
     if (d.bpm_range) next.bpm_range = { ...(cur.bpm_range || {}), ...d.bpm_range };
     if (d.struttura_pref) next.struttura_pref = { ...(cur.struttura_pref || {}), ...d.struttura_pref };
     if (d.note) next.note = String(d.note).slice(0, 300);
-    fs.mkdirSync(CFG.historyDir, { recursive: true });
-    fs.writeFileSync(path.join(CFG.historyDir, `guidance-v${cur.versione}.json`), JSON.stringify(cur, null, 2));
-    fs.writeFileSync(CFG.guidanceFile, JSON.stringify(next, null, 2));
+    scriviGuida(next, cur);
     return `linee guida aggiornate a v${next.versione}`;
   }
   // Tutte le altre modifiche riguardano il catalogo
   const cat = readJsonSafe(CFG.catalogoFile, {});
   if (p.azione === 'nuova_categoria') {
     cat.categories.push({ name: d.name, energia: d.energia, bpm: d.bpm, attivita: d.attivita || d.name, strutture: d.strutture,
-      genere: d.genere || d.name, strumenti: d.strumenti || '', stile_base: d.stile_base || '' });
+      genere: d.genere || d.name, ambito: 'musica', famiglia: 'generale', strumenti: elenco(d.strumenti), stile: String(d.stile_base || d.genere || d.name) });
   } else if (p.azione === 'modifica_categoria') {
     const c = cat.categories.find((x) => x.name === d.name);
-    Object.assign(c, d.campi || {});
+    // solo i campi previsti: nome e specifiche del catalogo non si toccano
+    for (const k of ['energia', 'bpm', 'attivita', 'strutture']) if ((d.campi || {})[k] !== undefined) c[k] = d.campi[k];
   } else if (p.azione === 'nuova_struttura') {
     cat.strutture[d.nome] = d.sezioni;
   } else if (p.azione === 'tag_extra') {
     cat.tag_extra = cat.tag_extra || {};
     cat.tag_extra[d.categoria] = d.tag;
   }
-  fs.writeFileSync(CFG.catalogoFile, JSON.stringify(cat, null, 2));
+  if (!Array.isArray(cat.categories)) throw new Error('catalogo non leggibile');
+  scriviAtomico(CFG.catalogoFile, JSON.stringify(cat, null, 2));
   return 'catalogo aggiornato';
 }
 
 // ---- Menu guidato: bottoni per navigare, con percorsi passo-passo ----
 const MENU_BUTTONS = [
   [{ text: '📊 Stato', callback_data: 'm:stato' }, { text: '⭐ Vota un brano', callback_data: 'm:vota' }],
+  [{ text: '⏸ Pausa', callback_data: 'm:pausa' }, { text: '▶ Riprendi', callback_data: 'm:riprendi' }],
   [{ text: '🧘 Categorie', callback_data: 'm:cat' }, { text: '🧩 Strutture', callback_data: 'm:strut' }],
   [{ text: '🏷 Tag', callback_data: 'm:tag' }, { text: '🎚 Linee guida', callback_data: 'm:linee' }],
   [{ text: '❓ Aiuto', callback_data: 'm:aiuto' }, { text: '✖ Annulla', callback_data: 'm:annulla' }],
@@ -167,7 +174,14 @@ function chiediTesto(contesto, domanda) {
   return say(domanda + '\n\n(scrivi la risposta; /annulla per uscire)');
 }
 
+async function pausa(attiva) {
+  aggiornaComandi({ pausa: attiva });
+  log(`telegram: produzione ${attiva ? 'in pausa' : 'ripresa'}`);
+  return menu(attiva ? 'Produzione in pausa: il brano in corso finisce, poi il sistema aspetta.' : 'Produzione ripresa.');
+}
+
 async function sezione(nome) {
+  if (nome === 'pausa' || nome === 'riprendi') return pausa(nome === 'pausa');
   if (nome === 'stato') return say(statoTesto()).then(() => menu());
   if (nome === 'aiuto') return say(AIUTO).then(() => menu());
   if (nome === 'annulla') { tgs.flow = null; tgs.pending = {}; return menu('Annullato.'); }
@@ -202,7 +216,7 @@ async function sezione(nome) {
   return menu();
 }
 
-// Gestisce i pulsanti del menu. Ritorna true se il pulsante e' stato gestito qui.
+// Gestisce i pulsanti del menu. Ritorna true se il pulsante è stato gestito qui.
 async function menuPulsante(data) {
   const [tipo, ...resto] = String(data).split(':');
   const valore = resto.join(':');
@@ -236,13 +250,13 @@ async function menuPulsante(data) {
   if (tipo === 't') return chiediTesto(`tag extra per la categoria ${valore}`, `Quali tag extra vuoi per ${valore}? (max 3, separati da virgola)`).then(() => true);
   if (tipo === 'n') {
     if (valore === 'cat') return chiediTesto('nuova categoria', 'Descrivi la nuova categoria: nome, energia (1-5), bpm, attivita e strutture.').then(() => true);
-    if (valore === 'strut') return chiediTesto('nuova struttura', 'Descrivi la nuova struttura: nome e sezioni (Intro, Build, Main, Peak, Release, Outro).').then(() => true);
+    if (valore === 'strut') return chiediTesto('nuova struttura', `Descrivi la nuova struttura: nome e sezioni (${CFG.sections.join(' ')}).`).then(() => true);
     if (valore === 'linee') return chiediTesto('linee guida', 'Scrivi la modifica alle linee guida (stile, cose da evitare, bpm, durate).').then(() => true);
   }
   return false;
 }
 
-const PULSANTE_VECCHIO = 'Questo pulsante non e\' piu\' valido. Riapri "Vota un brano" dal /menu.';
+const PULSANTE_VECCHIO = 'Questo pulsante non è più valido. Riapri "Vota un brano" dal /menu.';
 
 // Voto e nota passano dal gateway, che li scrive nella scheda del brano
 async function salvaVoto(dati) {
@@ -257,6 +271,7 @@ async function gestisciTesto(msg) {
   const testo = (msg.text || '').trim();
   if (/^\/(start|aiuto|menu)/.test(testo)) return menu('Benvenuto in Officina Sonora. Scegli una voce oppure scrivi direttamente la modifica.');
   if (/^\/stato/.test(testo)) return say(statoTesto());
+  if (/^\/(pausa|riprendi)\b/.test(testo)) return pausa(testo.startsWith('/pausa'));
   if (/^\/annulla/.test(testo)) { tgs.pending = {}; tgs.flow = null; return say('Annullato.').then(() => menu()); }
   if (!testo) return;
   // Nota a un voto appena dato: si salva direttamente
@@ -264,9 +279,9 @@ async function gestisciTesto(msg) {
     const { numero } = tgs.flow;
     // attesa di una nota rimasta dal formato precedente (nome del file)
     if (!numero) { tgs.flow = null; return say(PULSANTE_VECCHIO); }
-    // solo la nota: il voto nella scheda puo' essere cambiato nel frattempo e non va riscritto
+    // solo la nota: il voto nella scheda può essere cambiato nel frattempo e non va riscritto
     const r = await salvaVoto({ numero, nota: testo });
-    // in caso di errore si resta in attesa, cosi' la nota si puo' riscrivere
+    // in caso di errore si resta in attesa, così la nota si può riscrivere
     if (!r.ok) return say(`Non ho salvato la nota: ${r.error}\nRiscrivi la nota oppure /annulla.`);
     tgs.flow = null;
     return say('Nota salvata.').then(() => menu());
@@ -286,7 +301,7 @@ async function gestisciTesto(msg) {
   const id = String(tgs.seq);
   tgs.pending[id] = p;
   const dettagli = JSON.stringify(p.dati, null, 1).slice(0, 1200);
-  return say(`Ho capito cosi':\n${p.riassunto}\n\nDettagli:\n${dettagli}\n\nApplico?`, [
+  return say(`Ho capito così:\n${p.riassunto}\n\nDettagli:\n${dettagli}\n\nApplico?`, [
     { text: 'Conferma', callback_data: `ok:${id}` },
     { text: 'Annulla', callback_data: `no:${id}` },
   ]);
@@ -301,7 +316,7 @@ async function gestisciPulsante(cb) {
   const [esito, id] = String(cb.data || '').split(':');
   const p = tgs.pending[id];
   await tgRequest('answerCallbackQuery', { callback_query_id: cb.id });
-  if (!p) return say('Questa modifica non e\' piu\' in attesa.');
+  if (!p) return say('Questa modifica non è più in attesa.');
   delete tgs.pending[id];
   if (esito === 'no') return say('Modifica annullata.');
   try {

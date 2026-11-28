@@ -3,6 +3,7 @@
 // storico del controllo, linee guida).
 const fs = require('fs');
 const path = require('path');
+const libreria = require('./libreria');
 
 const LIBRERIA = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
 const STATE = 'E:\\n8n\\officina-sonora\\state';
@@ -151,34 +152,25 @@ const righe = (file) => { try { return fs.readFileSync(file, 'utf8').split('\n')
 const righeJson = (file) => righe(file).map((r) => { try { return JSON.parse(r); } catch (e) { return null; } }).filter(Boolean);
 const numero = (x) => (typeof x === 'number' ? x : null);
 
-function schede(dir, scartato, out) {
-  let voci = [];
-  try { voci = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return out; }
-  for (const v of voci) {
-    const file = path.join(dir, v.name);
-    if (v.isDirectory()) schede(file, scartato || (dir === LIBRERIA && v.name === '_scartati'), out);
-    else if (v.name.endsWith('.json') && v.name !== 'feedback.json') {
-      const m = leggiJson(file);
-      if (!m || !m.titolo) continue;
-      const ib = m.ibroadcast || {};
-      out.push({
-        generato_il: m.generato_il || null,
-        scartato,
-        categoria: m.categoria || null,
-        tipo: typeof m.tipo === 'string' ? m.tipo : null,
-        struttura: m.struttura || null,
-        voto: Number.isInteger(m.voto) && m.voto >= 1 && m.voto <= 5 ? m.voto : null,
-        durata_s: (m.qualita && m.qualita.durata_reale_s) || m.durata_s || null,
-        richiesta_s: m.qualita && m.qualita.durata_reale_s ? numero(m.durata_s) : null,
-        render_s: numero(m.render_s),
-        tentativi: numero(m.tentativi_render),
-        problemi: (m.qualita && m.qualita.problemi) || [],
-        caricato: !!ib.track_id,
-        ascolti: numero(ib.ascolti) ?? numero(m.ascolti),
-      });
-    }
-  }
-  return out;
+function schede() {
+  return libreria.schede(LIBRERIA).map(({ meta: m, scartato }) => {
+    const ib = m.ibroadcast || {};
+    return {
+      generato_il: m.generato_il || null,
+      scartato,
+      categoria: m.categoria || null,
+      tipo: typeof m.tipo === 'string' ? m.tipo : null,
+      struttura: m.struttura || null,
+      voto: Number.isInteger(m.voto) && m.voto >= 1 && m.voto <= 5 ? m.voto : null,
+      durata_s: (m.qualita && m.qualita.durata_reale_s) || m.durata_s || null,
+      richiesta_s: m.qualita && m.qualita.durata_reale_s ? numero(m.durata_s) : null,
+      render_s: numero(m.render_s),
+      tentativi: numero(m.tentativi_render),
+      problemi: (m.qualita && m.qualita.problemi) || [],
+      caricato: !!ib.track_id,
+      ascolti: numero(ib.ascolti) ?? numero(m.ascolti),
+    };
+  });
 }
 
 // Versioni delle linee guida (attuale e archiviate): ogni data di aggiornamento e' una modifica,
@@ -197,7 +189,7 @@ function aggiungiGuide(modifiche, guide) {
 function leggi(query) {
   const catalogo = (leggiJson(path.join(CONFIG, 'catalogo.json')) || {}).categories || [];
   const perNome = new Map(catalogo.map((c) => [c.name, c]));
-  const brani = schede(LIBRERIA, false, []).map((b) => {
+  const brani = schede().map((b) => {
     const c = perNome.get(b.categoria) || {};
     return { ...b, ambito: c.ambito || null, famiglia: c.famiglia || null };
   });

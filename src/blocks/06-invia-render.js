@@ -42,7 +42,12 @@ const body = piano ? corpoPiano(concept, seed)
   : corpoRender(concept, adapters, seed, nostro ? concept.abc : null, nostro ? concept.durata_s : 0);
 const id = await inviaSynth(body);
 if (!id) {
-  state.queue.unshift(concept);
+  // un rifiuto della richiesta (4xx) si ripete identico: dopo 5 volte il brano si abbandona
+  if (inviaSynth.ultimoStato >= 400 && inviaSynth.ultimoStato < 500) concept.rifiuti = (concept.rifiuti || 0) + 1;
+  if (concept.rifiuti >= 5) {
+    state.failed.push({ titolo: concept.titolo, categoria: concept.categoria, tipo: concept.tipo, motivo: `rifiutato dal motore (HTTP ${inviaSynth.ultimoStato})`, at: new Date().toISOString() });
+    log(`scartato "${concept.titolo}": il motore rifiuta la richiesta (HTTP ${inviaSynth.ultimoStato})`);
+  } else state.queue.unshift(concept);
   return [{ json: { state } }];
 }
 state.job = { id, seed, submittedAt: Date.now(), concept, adapters, abcNostro: nostro, ...(piano ? { fase: 'piano', pianoN: 1 } : {}) };

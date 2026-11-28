@@ -60,15 +60,17 @@ Niente nomi di artisti o marchi.`;
   const carico = await gw('/llm/carica'); // dopo un render gemma puo' non essere ancora in memoria
   if (!carico.ok) throw new Error(`gemma non caricato: ${carico.error || carico.status}`);
   const j = await llmJson(system, user, 1500);
+  // la risposta arriva dopo minuti: si riparte dalle linee guida di adesso, o le tue modifiche andrebbero perse
+  const base = readGuidance();
 
   const names = CFG.categories.map((c) => c.name);
-  const hint = { ...current.durata_hint };
+  const hint = { ...base.durata_hint };
   for (const [cat, range] of Object.entries(j.durata_hint || {})) {
     const m = /^(\d+)\s*-\s*(\d+)$/.exec(String(range));
     if (names.includes(cat) && m) hint[cat] = `${clampDur(m[1])}-${clampDur(m[2])}`;
   }
   // bpm_range: solo intervalli validi e dentro la fascia di energia della categoria (+/- 15)
-  const bpmRange = { ...(current.bpm_range || {}) };
+  const bpmRange = { ...(base.bpm_range || {}) };
   for (const [cat, range] of Object.entries(j.bpm_range || {})) {
     const c = CFG.categories.find((x) => x.name === cat);
     const m = /^(\d+)\s*-\s*(\d+)$/.exec(String(range));
@@ -80,7 +82,7 @@ Niente nomi di artisti o marchi.`;
     }
   }
   // struttura_pref: solo strutture gia' previste per la categoria
-  const strutturaPref = { ...(current.struttura_pref || {}) };
+  const strutturaPref = { ...(base.struttura_pref || {}) };
   for (const [cat, list] of Object.entries(j.struttura_pref || {})) {
     const c = CFG.categories.find((x) => x.name === cat);
     if (c && Array.isArray(list)) {
@@ -89,28 +91,26 @@ Niente nomi di artisti o marchi.`;
     }
   }
   // parole di stile per genere: solo per i generi con brani votati; gli altri conservano le loro
-  const stileGeneri = { ...(current.stile_generi || {}) };
+  const stileGeneri = { ...(base.stile_generi || {}) };
   for (const [cat, list] of Object.entries(j.stile_generi || {})) {
     if (!names.includes(cat) || !voted.some((t) => t.categoria === cat) || !Array.isArray(list)) continue;
-    const mio = (current.blocchi_generi || {})[cat] || {};
-    const esclusi = new Set([...(current.style_avoid || []), ...(mio.esclusi || [])]);
+    const mio = (base.blocchi_generi || {})[cat] || {};
+    const esclusi = new Set([...(base.style_avoid || []), ...(mio.esclusi || [])]);
     stileGeneri[cat] = [...new Set(list.map((s) => String(s).trim().toLowerCase()))].filter((s) => ammessi.has(s) && !esclusi.has(s)).slice(0, 5);
   }
   const next = {
-    versione: current.versione + 1,
+    versione: (base.versione || 1) + 1,
     bpm_range: bpmRange,
     struttura_pref: strutturaPref,
-    style_extra: current.style_extra || [], // generali: li cambi solo tu
+    style_extra: base.style_extra || [], // generali: li cambi solo tu
     stile_generi: stileGeneri,
-    style_avoid: current.style_avoid || [],
-    blocchi_generi: current.blocchi_generi || {},
+    style_avoid: base.style_avoid || [],
+    blocchi_generi: base.blocchi_generi || {},
     durata_hint: hint,
     note: String(j.note || '').slice(0, 300),
     aggiornato: new Date().toISOString(),
   };
-  fs.mkdirSync(CFG.historyDir, { recursive: true });
-  fs.writeFileSync(path.join(CFG.historyDir, `guidance-v${current.versione}.json`), JSON.stringify(current, null, 2));
-  fs.writeFileSync(CFG.guidanceFile, JSON.stringify(next, null, 2));
+  scriviGuida(next, base);
   log(`linee guida aggiornate a v${next.versione}: ${next.note}`);
 } catch (e) {
   log(`revisione non riuscita (linee guida invariate): ${e.message}`);

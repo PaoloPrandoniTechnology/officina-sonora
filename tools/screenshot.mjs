@@ -15,16 +15,17 @@ const mostraTip = (selettore) => `document.querySelector('${selettore}')?.dispat
 // pagina: percorso; dopo: JavaScript eseguito prima dello scatto; fissa: altezza imposta (solo cio' che si vede)
 const PAGINE = [
   { nome: '01-panoramica', pagina: 'panoramica' },
-  { nome: '02-render', pagina: 'render' },
   { nome: '03-generi', pagina: 'generi' },
   { nome: '04-voti', pagina: 'voti' },
   { nome: '14-andamento', pagina: 'andamento' },
   { nome: '05-qualita', pagina: 'qualita' },
   { nome: '06-libreria', pagina: 'libreria' },
-  { nome: '18-lettore', pagina: 'libreria', dopo: clic('#recenti .ascolta'), fissa: 900 },
+  { nome: '18-lettore', pagina: 'libreria', dopo: clic('#recenti [data-ascolta]'), fissa: 900 },
+  { nome: '22-scheda', pagina: 'libreria', dopo: clic('#recenti [data-info]'), fissa: 900 },
+  { nome: '23-tema-scuro', pagina: 'panoramica', fissa: 900, scuro: true },
   { nome: '07-controllo-produzione', pagina: 'controllo/produzione' },
   { nome: '08-controllo-parametri', pagina: 'controllo/parametri' },
-  { nome: '09-controllo-generi', pagina: 'controllo/generi' },
+  { nome: '09-generi-pesi', pagina: 'generi/pesi' },
   { nome: '10-controllo-guida', pagina: 'controllo/guida' },
   { nome: '15-controllo-guida-genere', pagina: 'controllo/guida/Blues-shuffle-strumentale' },
   { nome: '19-tooltip', pagina: 'controllo/guida/Blues-shuffle-strumentale', dopo: mostraTip('#gPrompt [data-fai]'), fissa: 760 },
@@ -75,6 +76,7 @@ try {
   for (const p of PAGINE.filter((x) => !scelte.length || scelte.includes(x.nome))) {
     const larghezza = p.larghezza || 1440;
     await misura(larghezza, p.fissa || 1000);
+    await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }, { name: 'prefers-color-scheme', value: p.scuro ? 'dark' : 'light' }] });
     await cdp('Page.navigate', { url: 'about:blank' });
     await cdp('Page.navigate', { url: BASE + p.pagina });
     await attesa(6000);

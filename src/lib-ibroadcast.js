@@ -174,10 +174,3 @@ async function organizza(access, meta, trackId, state) {
   await ibApi(access, 'appendplaylist', { playlist: pid, tracks: [tid] });
 }
 
-async function upload(access, file) {
-  const r = await gwUpload(path.basename(file), fs.readFileSync(file));
-  const j = r.json || {};
-  if (j.result === false) throw new Error('upload non accettato (HTTP ' + r.status + '): ' + (j.message || ''));
-  const match = /\((.*)\) uploaded successfully/.exec(j.message || '');
-  return match ? match[1] : 'ok';
-}

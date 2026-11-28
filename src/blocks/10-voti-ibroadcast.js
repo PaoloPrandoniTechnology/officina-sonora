@@ -108,9 +108,7 @@ for (const b of nostri) {
       const hi = Math.max(minimo, Math.min(massimo, attuale[1] + dir * TASS.passoBpm));
       if (lo < hi) {
         const prossima = { ...g, versione: g.versione + 1, aggiornato: new Date().toISOString(), bpm_range: { ...(g.bpm_range || {}), [c.name]: `${lo}-${hi}` }, note: `bpm di ${c.name} ${dir > 0 ? 'alzato' : 'abbassato'} da un tag di tempo` };
-        fs.mkdirSync(CFG.historyDir, { recursive: true });
-        fs.writeFileSync(path.join(CFG.historyDir, `guidance-v${g.versione}.json`), JSON.stringify(g, null, 2));
-        fs.writeFileSync(CFG.guidanceFile, JSON.stringify(prossima, null, 2));
+        scriviGuida(prossima, g);
         log(`voti iBroadcast: tempo di ${c.name} ${dir > 0 ? 'alzato' : 'abbassato'} a ${lo}-${hi} bpm (versione ${prossima.versione})`);
       }
     }

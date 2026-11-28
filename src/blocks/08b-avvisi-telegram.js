@@ -14,7 +14,7 @@ async function avvisi() {
   const conta = {};
   for (const r of righe) if (Date.parse(r.ts) >= dopo) conta[r.key] = (conta[r.key] || 0) + 1;
   // Solo i casi che richiedono un tuo intervento: il resto (ritardi, riprove, attese) resta nel log
-  const GRAVE = /refresh (token )?non valido|invalid_grant|login iBroadcast non riuscito|credenzial|gateway non configurato|scrittura fuori|lettura bloccata|spazio|disco pieno|motore YuE2 non attivo.*(riavvio fallito)|token Telegram/i;
+  const GRAVE = /refresh (token )?non valido|invalid_grant|login iBroadcast non riuscito|credenzial|gateway non configurato|scrittura fuori|lettura bloccata|spazio|disco pieno|ENOSPC|state\.json non leggibile|motore YuE2 non attivo.*(riavvio fallito)|token Telegram/i;
   for (const [key, n] of Object.entries(conta)) {
     if (!GRAVE.test(key)) continue;
     if (n < 3) continue;

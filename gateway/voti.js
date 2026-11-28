@@ -2,27 +2,15 @@
 const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream');
+const { scriviAtomico } = require('./disco');
+const libreria = require('./libreria');
 
 const LIBRERIA = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
 const ATTESA_MS = 15 * 60 * 1000; // i brani appena generati sono ancora in lavorazione nei blocchi
 const TIPI_AUDIO = { mp3: 'audio/mpeg', flac: 'audio/flac', wav: 'audio/wav', ogg: 'audio/ogg' };
 
 // Schede con titolo e numero di traccia, esclusi i brani scartati
-function schede(dir = LIBRERIA, out = []) {
-  let voci = [];
-  try { voci = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return out; }
-  for (const v of voci) {
-    const file = path.join(dir, v.name);
-    if (v.name === '_scartati') continue;
-    if (v.isDirectory()) schede(file, out);
-    else if (v.name.endsWith('.json') && v.name !== 'feedback.json') {
-      let meta;
-      try { meta = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { continue; }
-      if (meta && meta.titolo && Number.isInteger(meta.numero_traccia)) out.push({ file, meta });
-    }
-  }
-  return out;
-}
+const schede = () => libreria.schede(LIBRERIA).filter((s) => !s.scartato && Number.isInteger(s.meta.numero_traccia));
 
 const trova = (numero) => schede().find((s) => s.meta.numero_traccia === numero);
 const votoValido = (v) => Number.isInteger(v) && v >= 1 && v <= 5;
@@ -48,9 +36,7 @@ function vota({ numero, voto, nota, fonte }) {
     meta.voto_il = new Date().toISOString();
   }
   if (conNota) meta.nota_utente = nota.trim();
-  const tmp = s.file + '.voto.tmp'; // suffisso diverso da quello dei blocchi (.tmp)
-  fs.writeFileSync(tmp, JSON.stringify(meta, null, 2));
-  fs.renameSync(tmp, s.file);
+  scriviAtomico(s.file, JSON.stringify(meta, null, 2), '.voto.tmp'); // suffisso diverso da quello dei blocchi (.tmp)
   return { ok: true, numero, titolo: meta.titolo, prima, dopo: { voto: meta.voto, nota: meta.nota_utente ?? null } };
 }
 
@@ -90,10 +76,33 @@ function intervallo(range, size) {
   return start < size ? { start, end: Math.min(end, size - 1) } : false;
 }
 
-// Il file si ricava solo dal numero di traccia: nessun percorso arriva dalla richiesta.
-function inviaAudio(req, res, numero) {
+const audioDi = (s) => s && Object.keys(TIPI_AUDIO).map((e) => s.file.replace(/json$/, e)).find((f) => fs.existsSync(f));
+
+// Tutto cio' che la pagina mostra di un brano
+function scheda(numero) {
   const s = Number.isInteger(numero) ? trova(numero) : null;
-  const file = s && Object.keys(TIPI_AUDIO).map((e) => s.file.replace(/json$/, e)).find((f) => fs.existsSync(f));
+  if (!s) return null;
+  const m = s.meta;
+  const ib = m.ibroadcast || {};
+  const file = audioDi(s);
+  return {
+    numero, titolo: m.titolo, descrizione: m.descrizione || '', categoria: m.categoria || null, genere: m.genere || null,
+    variante: m.variante || null, tipo: m.tipo || null, struttura: m.struttura || null, sezioni: m.sezioni || [],
+    strumenti: [].concat(m.strumenti || []), influenza: m.influenza || null, bpm: m.bpm ?? null, tonalita: m.tonalita || null,
+    energia: m.energia ?? null, attivita: m.attivita || '', durata_s: (m.qualita && m.qualita.durata_reale_s) || m.durata_s || null,
+    richiesta_s: m.durata_s ?? null, render_s: m.render_s ?? null, generato_il: m.generato_il || null, stile: m.style || '',
+    score_fonte: m.score_fonte || null, lora: (m.lora || []).map((l) => (typeof l === 'string' ? l : l.name)),
+    qualita: m.qualita ? { esito: m.qualita.esito, problemi: m.qualita.problemi || [], bitrate: m.qualita.bitrate_medio_kbps ?? null, audio: m.qualita.audio || null } : null,
+    voto: votoValido(m.voto) ? m.voto : null, nota: m.nota_utente ?? null, voto_fonte: m.voto_fonte || null,
+    caricato: !!ib.track_id, ascolti: ib.ascolti ?? m.ascolti ?? 0,
+    file: file ? path.relative(LIBRERIA, file) : null,
+  };
+}
+
+// Il file si ricava solo dal numero di traccia: nessun percorso arriva dalla richiesta.
+function inviaAudio(req, res, numero, scarica) {
+  const s = Number.isInteger(numero) ? trova(numero) : null;
+  const file = audioDi(s);
   if (!file) {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ ok: false, error: 'brano non trovato' }));
@@ -105,10 +114,11 @@ function inviaAudio(req, res, numero) {
     return res.end();
   }
   const testa = { 'Content-Type': TIPI_AUDIO[path.extname(file).slice(1)], 'Accept-Ranges': 'bytes', 'Content-Length': r ? r.end - r.start + 1 : size };
+  if (scarica) testa['Content-Disposition'] = `attachment; filename*=UTF-8''${encodeURIComponent(path.basename(file))}`;
   if (r) testa['Content-Range'] = `bytes ${r.start}-${r.end}/${size}`;
   res.writeHead(r ? 206 : 200, testa);
   // pipeline chiude il file se il lettore interrompe; un errore di lettura chiude solo questa risposta
   pipeline(fs.createReadStream(file, r || {}), res, () => {});
 }
 
-module.exports = { vota, elenco, inviaAudio };
+module.exports = { vota, elenco, inviaAudio, scheda, trova, audioDi };

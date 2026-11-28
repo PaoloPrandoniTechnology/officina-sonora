@@ -220,7 +220,7 @@ test('blocco 8a: voto e nota passano dal gateway col numero di traccia', () => c
   for (const vecchio of ['v:eco.mp3', 'vv:5:eco.mp3']) {
     const r = await premi(vecchio);
     assert.deepEqual(r.voti, []);
-    assert.match(r.detti[0].text, /non e' piu' valido/);
+    assert.match(r.detti[0].text, /non è più valido/);
   }
 
   assert.deepEqual((await premi('vv:5:9')).voti, [{ numero: 9, voto: 5, fonte: 'telegram' }]);

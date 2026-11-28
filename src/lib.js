@@ -121,6 +121,20 @@ const LIMITI_PARAMETRI = {
   CFG.comandi = readJsonSafe(path.join(CFG.dir, 'state', 'comandi.json'), {});
 })();
 
+// Scrittura atomica: file temporaneo e rinomina. Su Windows la rinomina fallisce per un istante se il file
+// è aperto da un altro processo (antivirus, dashboard): si riprova.
+function scriviAtomico(file, testo) {
+  const tmp = file + '.tmp';
+  fs.writeFileSync(tmp, testo);
+  for (let i = 0; ; i++) {
+    try { return fs.renameSync(tmp, file); } catch (e) {
+      if (i >= 40 || !['EPERM', 'EACCES', 'EBUSY'].includes(e.code)) throw e;
+      const fine = Date.now() + 25;
+      while (Date.now() < fine); // i blocchi sono sincroni: attesa breve
+    }
+  }
+}
+
 // Aggiorna state\comandi.json: null/false/undefined rimuovono la chiave. Scrittura atomica.
 function aggiornaComandi(patch) {
   const file = path.join(CFG.dir, 'state', 'comandi.json');
@@ -129,9 +143,7 @@ function aggiornaComandi(patch) {
     if (v === null || v === undefined || v === false) delete cur[k];
     else cur[k] = v;
   }
-  const tmp = file + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(cur, null, 2));
-  fs.renameSync(tmp, file);
+  scriviAtomico(file, JSON.stringify(cur, null, 2));
   CFG.comandi = cur;
 }
 
@@ -184,19 +196,19 @@ function readJsonSafe(file, fallback) {
 }
 
 function loadState() {
-  const s = readJsonSafe(CFG.stateFile, null) || {};
+  let s = readJsonSafe(CFG.stateFile, null);
+  if (!s && fs.existsSync(CFG.stateFile)) {
+    // illeggibile: se ne tiene una copia invece di sovrascriverlo con uno stato vuoto
+    fs.copyFileSync(CFG.stateFile, `${CFG.stateFile}.${Date.now()}.corrotto`);
+    log('errore: state.json non leggibile, copia messa da parte e stato ricreato');
+  }
+  s = s || {};
   return { cursor: 0, queue: [], job: null, done: 0, failed: [], recent: [], lastReview: 0, ...s };
 }
 
 function saveState(s) {
   fs.mkdirSync(path.dirname(CFG.stateFile), { recursive: true });
-  const tmp = CFG.stateFile + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(s, null, 2));
-  try {
-    fs.renameSync(tmp, CFG.stateFile);
-  } catch (e) {
-    fs.writeFileSync(CFG.stateFile, JSON.stringify(s, null, 2)); // Windows: rename puo' fallire se il file e' aperto
-  }
+  scriviAtomico(CFG.stateFile, JSON.stringify(s, null, 2));
 }
 
 // Lock contro esecuzioni sovrapposte: un file con token. Scade dopo maxMs, cosi' un crash non blocca per sempre.
@@ -231,6 +243,12 @@ function lockOccupato(nome, maxMs = LOCK_MAX_MS) {
 
 function readGuidance() {
   return readJsonSafe(CFG.guidanceFile, DEFAULT_GUIDANCE);
+}
+// Nuove linee guida: la versione precedente va nello storico, poi scrittura atomica
+function scriviGuida(prossima, precedente) {
+  fs.mkdirSync(CFG.historyDir, { recursive: true });
+  fs.writeFileSync(path.join(CFG.historyDir, `guidance-v${precedente.versione}.json`), JSON.stringify(precedente, null, 2));
+  scriviAtomico(CFG.guidanceFile, JSON.stringify(prossima, null, 2));
 }
 
 // Richiesta HTTP con modulo 'http' (la sandbox di n8n non ha fetch/URL).
@@ -426,6 +444,7 @@ function corpoRender(concept, adapters, seed, abc, secondi) {
 // Invia una richiesta al motore; ritorna l'id del job, o null se rifiutata
 async function inviaSynth(body) {
   const r = await req('POST', `${CFG.yue}/synth`, { body, ms: 20000 });
+  inviaSynth.ultimoStato = r.status;
   if (!r.ok) { log(`/synth rifiutato (HTTP ${r.status}): riprovo al prossimo giro`); return null; }
   return JSON.parse(r.buf.toString('utf8')).id;
 }

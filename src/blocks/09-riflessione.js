@@ -41,7 +41,7 @@ const erroriOggi = (() => {
 const state = readJsonSafe(CFG.stateFile, {}) || {};
 const guida = readGuidance();
 
-// Salute del sistema (sola lettura): spazio su disco, battito del watchdog, errori piu' frequenti
+// Salute del sistema (sola lettura): spazio su disco, battito del watchdog, errori più frequenti
 const salute = (() => {
   let liberoGb = null;
   try { const s = fs.statfsSync('E:\\'); liberoGb = Math.round((s.bavail * s.bsize) / 1e9); } catch (e) { /* non disponibile */ }

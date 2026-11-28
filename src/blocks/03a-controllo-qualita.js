@@ -1,4 +1,4 @@
-// BLOCCO 3a - Controllo qualita': verifica il brano appena salvato prima del caricamento.
+// BLOCCO 3a - Controllo qualità: verifica il brano appena salvato prima del caricamento.
 // Lettore MP3 in JavaScript puro (nessun programma esterno): legge i frame, calcola durata reale,
 // bitrate medio e integrita' del file. Un brano non superato va in _scartati e non viene caricato.
 const inp = $input.first().json;
@@ -85,21 +85,21 @@ try {
   if (r.error || r.rms_db === undefined) throw new Error(r.error || 'risposta vuota');
   aud = r;
 } catch (e) {
-  log(`qualita': analisi audio non disponibile (${e.message}): controllo solo strutturale`);
+  log(`qualità: analisi audio non disponibile (${e.message}): controllo solo strutturale`);
 }
 if (aud) {
   if (aud.rms_db < (CFG.qcSilenzioDb ?? -45)) esito.problemi.push(`audio quasi silenzioso (${aud.rms_db} dB)`);
-  if (aud.frazione_silenzio > (CFG.qcSilenzioFrazione ?? 0.5)) esito.problemi.push('oltre meta\' del brano silenzioso');
+  if (aud.frazione_silenzio > (CFG.qcSilenzioFrazione ?? 0.5)) esito.problemi.push('oltre metà del brano silenzioso');
   esito.audio = { rms_db: aud.rms_db, picco_db: aud.picco_db, frazione_silenzio: +aud.frazione_silenzio.toFixed(2), frazione_clip: +aud.frazione_clip.toFixed(4) };
   if (aud.frazione_clip > 0.01) esito.avviso_clipping = `${(aud.frazione_clip * 100).toFixed(2)}% dei campioni saturi`; // solo avviso
 }
 
 meta.qualita = { ...esito, esito: esito.problemi.length ? 'scartato' : 'ok', controllato_il: new Date().toISOString() };
-// Durante l'analisi puo' essere arrivato un voto: si aggiunge solo l'esito
+// Durante l'analisi può essere arrivato un voto: si aggiunge solo l'esito
 try {
   aggiornaScheda(jsonPath, { qualita: meta.qualita });
 } catch (e) {
-  log(`qualita': scheda di ${path.basename(file)} non aggiornata: ${e.message}`);
+  log(`qualità: scheda di ${path.basename(file)} non aggiornata: ${e.message}`);
 }
 
 if (esito.problemi.length) {
@@ -117,15 +117,16 @@ if (esito.problemi.length) {
       titolo: meta.titolo, descrizione: meta.descrizione, bpm: meta.bpm, tonalita: meta.tonalita, durata_s: meta.durata_s,
       energia: meta.energia, attivita: meta.attivita, struttura: meta.struttura, style: meta.style, avoid: meta.avoid,
       sezioni: meta.sezioni, lyrics: (meta.sezioni || []).join('\n\n'), categoria: meta.categoria, tipo: meta.tipo,
-      genere: meta.genere, variante: meta.variante, strumenti: meta.strumenti, influenza: meta.influenza, tonalita: meta.tonalita, guida_versione: meta.guida_versione, ricetta: meta.ricetta, esperimento: meta.esperimento,
+      genere: meta.genere, variante: meta.variante, strumenti: meta.strumenti, influenza: meta.influenza, guida_versione: meta.guida_versione, ricetta: meta.ricetta, esperimento: meta.esperimento,
       // senza score: il blocco 5d ne compone uno nuovo (uno score del motore troppo corto non si ripete)
       attempts: 0, tentativi_render: tentativi,
+      vocale: !!((CFG.categories || []).find((x) => x.name === meta.categoria) || {}).vocale_senza_parole,
     });
-    log(`qualita': "${meta.titolo}" troppo corto, rigenero (tentativo ${tentativi}): ${esito.problemi.join('; ')}`);
+    log(`qualità: "${meta.titolo}" troppo corto, rigenero (tentativo ${tentativi}): ${esito.problemi.join('; ')}`);
   } else {
-    log(`qualita': scartato ${path.basename(file)}: ${esito.problemi.join('; ')}`);
+    log(`qualità: scartato ${path.basename(file)}: ${esito.problemi.join('; ')}`);
   }
   return [{ json: { state, outcome: 'scartato', file: null } }];
 }
-log(`qualita' ok: ${path.basename(file)} (durata ${esito.durata_reale_s}s, ${esito.bitrate_medio_kbps} kbps)`);
+log(`qualità ok: ${path.basename(file)} (durata ${esito.durata_reale_s}s, ${esito.bitrate_medio_kbps} kbps)`);
 return [{ json: { state, outcome: 'saved', file } }];

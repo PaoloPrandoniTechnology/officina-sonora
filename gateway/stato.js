@@ -30,13 +30,18 @@ function getJson(url, ms = 2000) {
   });
 }
 
-// Modelli caricati in LM Studio (stesso comando che usa il watchdog)
+// Modelli caricati in LM Studio (stesso comando che usa il watchdog). La pagina chiede lo stato ogni 5 s:
+// il comando si esegue al massimo ogni 20.
+let psCache = { t: 0, esito: Promise.resolve('') };
 function lmsPs() {
-  return new Promise((resolve) => {
-    execFile(LMS, ['ps'], { timeout: 8000, windowsHide: true }, (err, stdout, stderr) => {
-      resolve(String(stdout || '') + String(stderr || ''));
-    });
-  });
+  if (Date.now() - psCache.t > 20000) {
+    psCache = { t: Date.now(), esito: new Promise((resolve) => {
+      execFile(LMS, ['ps'], { timeout: 8000, windowsHide: true }, (err, stdout, stderr) => {
+        resolve(String(stdout || '') + String(stderr || ''));
+      });
+    }) };
+  }
+  return psCache.esito;
 }
 
 function leggiJson(file, fallback) {
@@ -102,6 +107,7 @@ async function leggiStato() {
       trascorsi_s: Math.round((Date.now() - job.submittedAt) / 1000),
       renderMedio_s: renderMedio(),
       statoMotore: statoYue.status || 'sconosciuto',
+      fase: job.fase === 'piano' ? 'spartito' : 'audio',
     };
   }
   const lockFile = path.join(STATE, 'pipeline.lock');
@@ -123,9 +129,13 @@ async function leggiStato() {
       occupata: lockEta !== null && lockEta < 900,
       etaLock_s: lockEta,
       coda: (state.queue || []).length,
+      prossimi: (state.queue || []).slice(0, 5).map((c) => ({ titolo: c.titolo, categoria: c.categoria, durata_s: c.durata_s })),
+      abbandonati: (state.failed || []).slice(-5).reverse().map((f) => ({ titolo: f.titolo, motivo: f.motivo, at: f.at })),
+      daCaricare: (state.uploadQueue || []).length,
       brani: state.done || 0,
       scartati: state.scartati || 0,
     },
+    comandi: leggiJson(path.join(STATE, 'comandi.json'), {}),
     watchdog: { battito_s: eta(path.join(STATE, 'watchdog.heartbeat')) },
     supervisore: { ultimeRighe: supervisoreLog, ultimoRun_s: eta(path.join(STATE, 'supervisore.log')) },
     sistema: { disco_E_liberoGb: liberoGb },

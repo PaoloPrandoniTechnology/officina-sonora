@@ -7,8 +7,9 @@ const caricati = [];
 for (const item of inp.daCaricare || []) {
   try {
     const r = await gwUpload(path.basename(item.file), fs.readFileSync(item.file));
-    const j = r.json || {};
-    if (j.result === false) throw new Error('upload non accettato (HTTP ' + r.status + '): ' + (j.message || ''));
+    const j = r.json;
+    // senza risposta di iBroadcast (token scaduto, gateway in errore) il brano non è caricato
+    if (r.status !== 200 || !j || j.result === false) throw new Error('upload non accettato (HTTP ' + r.status + '): ' + (r.error || (j && j.message) || ''));
     const match = /\((.*)\) uploaded successfully/.exec(j.message || '');
     const trackId = match ? match[1] : 'ok';
     caricati.push({ file: item.file, jsonPath: item.jsonPath, nTags: item.nTags, trackId });

@@ -5,7 +5,7 @@ New-Item -ItemType File -Force -Path 'E:\n8n\officina-sonora\state\STOP' | Out-N
 
 # Finestre cmd/powershell rimaste da avvii precedenti
 Get-CimInstance Win32_Process -Filter "Name='cmd.exe' OR Name='powershell.exe'" |
-  Where-Object { $_.CommandLine -match 'n8n|watchdog' -and $_.ProcessId -ne $PID } |
+  Where-Object { $_.CommandLine -match 'watchdog\.ps1|node_modules\\n8n\\bin\\n8n' -and $_.ProcessId -ne $PID } |
   ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 
 foreach ($port in 5678, 18087, 5790) {
@@ -14,5 +14,4 @@ foreach ($port in 5678, 18087, 5790) {
   }
 }
 Get-Process yue-server -ErrorAction SilentlyContinue | Stop-Process -Force
-Start-Sleep -Seconds 2
-Remove-Item -Force 'E:\n8n\officina-sonora\state\STOP' -ErrorAction SilentlyContinue
+# Il file STOP resta: finché c'è, il supervisore non riavvia nulla. Lo cancella avvia-automazione.vbs.
