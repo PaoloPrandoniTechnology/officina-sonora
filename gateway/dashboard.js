@@ -541,7 +541,8 @@
     const pendenti = [];
     if (ctrl.comandi.svuotaCoda) pendenti.push('svuotamento della coda');
     if (ctrl.comandi.produciGenere) pendenti.push('genere forzato: ' + nm(ctrl.comandi.produciGenere));
-    const sf = ctrl.sfondi || { fatti: 0, totale: 0 };
+    const sf = ctrl.sfondi || { fatti: 0, totale: 0, brani: 0, conCopertina: 0, daFare: 0 };
+    const nienteDaFare = !sf.daFare && sf.fatti >= sf.totale;
     const scelto = $('#selGen') && $('#selGen').value;
     const inCoda = ((statoUltimo && statoUltimo.pipeline.prossimi) || []).map((c) => `<div class="srv"><span>${esc(c.titolo)}</span><span class="muted">${esc(nm(c.categoria))}</span></div>`).join('');
     const opzioni = perFamiglia(ctrl.generi).map(([titolo, lista]) => `<optgroup label="${esc(titolo)}">${lista.map((g) => `<option value="${esc(g.nome)}">${esc(g.etichetta)}${g.attivo ? '' : ' (sospeso)'}</option>`).join('')}</optgroup>`).join('');
@@ -565,14 +566,15 @@
           <p style="margin:12px 0 0"><button class="btn danger" id="bCoda" ${inCoda ? '' : 'disabled'}>Svuota la coda</button></p>
         </div>
         <div class="card c12">
-          <h2>Sfondi delle copertine <small>${n0(sf.fatti)} su ${n0(sf.totale)} pronti</small></h2>
+          <h2>Copertine <small>${n0(sf.conCopertina)} brani su ${n0(sf.brani)} hanno la propria</small></h2>
           <p class="muted" style="margin:0 0 14px">${sf.inCorso
             ? (sf.inChiusura ? 'Mi fermo dopo l’immagine in lavorazione, poi la produzione torna com’era.' : 'Generazione in corso: la produzione è in pausa.')
-            : 'La generazione mette in pausa la produzione, aspetta il brano in lavorazione e alla fine la ripristina. Puoi fermarla quando vuoi: riparte da dove era arrivata.'}</p>
+            : nienteDaFare ? 'Ogni brano ha già la sua copertina. Il pulsante si riaccende quando ne arrivano di nuovi.'
+              : 'Ogni lotto (fino a 40 immagini, circa mezz’ora) crea per ogni brano un’immagine diversa, ispirata a titolo e musica. La produzione va in pausa, aspetta il brano in lavorazione e alla fine riparte. Puoi fermare il lotto quando vuoi.'}</p>
           ${sf.ultima ? `<p class="muted" style="margin:0 0 14px;font-size:12px" aria-live="polite">${esc(sf.ultima)}</p>` : ''}
           ${sf.inCorso
             ? `<button class="btn" id="bSfondiStop" ${sf.inChiusura ? 'disabled' : ''}>Ferma la generazione</button>`
-            : `<button class="btn warn" id="bSfondi" ${sf.fatti >= sf.totale ? 'disabled' : ''}>Metti in pausa e genera gli sfondi</button>`}
+            : `<button class="btn warn" id="bSfondi" ${nienteDaFare ? 'disabled' : ''}>Metti in pausa e genera un lotto</button>`}
         </div>
         <div class="card c12">
           <h2>Produci ora un genere <small>ha la precedenza sulla rotazione, una sola volta</small></h2>
@@ -592,8 +594,8 @@
     };
     if (scelto) $('#selGen').value = scelto;
     if ($('#bSfondi')) $('#bSfondi').onclick = async () => {
-      if (await chiedi('Generare gli sfondi?', 'La produzione va in pausa finché la generazione non finisce o la fermi.', 'Genera')) {
-        esegui(() => invia('/api/controllo/comando', { azione: 'sfondi_avvia' }), 'Generazione degli sfondi avviata');
+      if (await chiedi('Generare un lotto di copertine?', 'La produzione va in pausa finché il lotto non finisce o lo fermi.', 'Genera')) {
+        esegui(() => invia('/api/controllo/comando', { azione: 'sfondi_avvia' }), 'Generazione delle copertine avviata');
       }
     };
     if ($('#bSfondiStop')) $('#bSfondiStop').onclick = () => esegui(() => invia('/api/controllo/comando', { azione: 'sfondi_ferma' }), 'Fermo la generazione');
@@ -1877,7 +1879,7 @@
   aggiornaStato();
   aggiornaDati();
   setInterval(aggiornaStato, 5000);
-  // avanzamento degli sfondi mentre si generano
+  // avanzamento delle copertine mentre si generano
   setInterval(() => { if (ctrl && ctrl.sfondi && ctrl.sfondi.inCorso && ctrlSub === 'produzione' && $('#bSfondiStop')) caricaControllo(true); }, 10000);
   setInterval(aggiornaDati, 30000);
 })();

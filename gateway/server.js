@@ -213,7 +213,11 @@ const server = http.createServer(async (req, res) => {
       const file = voti.audioDi(voti.trova(Number(n)));
       const img = file && /\.mp3$/.test(file) ? copertinaDi(file) : null;
       if (!img) return rispondi(404, { ok: false, error: 'copertina assente' });
-      res.writeHead(200, { 'Content-Type': img.mime, 'Cache-Control': 'private, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
+      // la copertina di un brano può cambiare: il browser la tiene ma chiede ogni volta se è ancora quella
+      const etag = '"' + Math.round(fs.statSync(file).mtimeMs) + '"';
+      const intestazioni = { 'Content-Type': img.mime, 'Cache-Control': 'private, no-cache', ETag: etag, 'X-Content-Type-Options': 'nosniff' };
+      if (req.headers['if-none-match'] === etag) { res.writeHead(304, intestazioni); return res.end(); }
+      res.writeHead(200, intestazioni);
       return res.end(img.dati);
     }
     if (req.method === 'GET' && pagina === '/abc.js') {

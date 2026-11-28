@@ -1,7 +1,9 @@
-// Copertine: sfondo pre-generato del genere + etichetta, titolo e artista composti in SVG -> JPEG 1000x1000.
+// Copertine: immagine propria del brano (o, finché manca, uno sfondo del genere) + etichetta, titolo e artista
+// composti in SVG -> JPEG 1000x1000.
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const crypto = require('crypto');
 
 const DIR = path.join(__dirname, '..');
 const CATALOGO = path.join(DIR, 'config', 'catalogo.json');
@@ -66,19 +68,36 @@ function resvg() {
   return motore;
 }
 
-// null se il genere non ha ancora sfondi
-async function componi({ categoria, titolo, numero }, cartella = SFONDI) {
-  if (!/^[\p{L}\p{N} _-]+$/u.test(String(categoria || ''))) throw new Error('categoria non valida');
-  const dir = path.join(cartella, categoria);
-  const file = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^\d+\.jpg$/.test(f)).sort() : [];
-  if (!file.length) return null;
-  const sfondo = file[(Math.abs(Math.trunc(Number(numero))) || 0) % file.length];
-  const stile = stileCopertina(categoria);
-  const { R, fonts } = await resvg();
-  const svg = svgCopertina({ titolo: String(titolo || '').trim() || stile.etichetta, stile, sfondo: fs.readFileSync(path.join(dir, sfondo)) });
-  const png = new R.Resvg(svg, { font: { fontBuffers: fonts, defaultFontFamily: 'Georgia' } }).render().asPng();
-  const jpeg = execFileSync(FFMPEG, ['-loglevel', 'error', '-f', 'png_pipe', '-i', 'pipe:0', '-f', 'mjpeg', '-q:v', '3', 'pipe:1'], { input: Buffer.from(png), maxBuffer: 16 * 1024 * 1024, timeout: 60000 });
-  return { jpeg, sfondo };
+// Un brano non ancora prodotto non ha numero: la sua immagine si riconosce da genere e titolo.
+const chiaveInAttesa = (categoria, titolo) => 'c-' + crypto.createHash('sha1').update(categoria + '|' + titolo).digest('hex').slice(0, 16);
+
+// L'immagine propria del brano. Quella preparata prima della produzione passa al numero al primo uso,
+// così un secondo brano con lo stesso titolo non la riprende.
+function immaginePropria({ categoria, titolo, numero }, cartella) {
+  const n = Math.trunc(Number(numero));
+  if (!(n > 0)) return null;
+  const file = path.join(cartella, n + '.jpg');
+  const attesa = path.join(cartella, chiaveInAttesa(categoria, titolo) + '.jpg');
+  if (!fs.existsSync(file) && fs.existsSync(attesa)) fs.renameSync(attesa, file);
+  return fs.existsSync(file) ? file : null;
 }
 
-module.exports = { stileCopertina, svgCopertina, componi };
+// null se il brano non ha un'immagine propria e il genere non ha ancora sfondi
+async function componi({ categoria, titolo, numero }, cartella = SFONDI, proprie = path.join(cartella, '..', 'copertine')) {
+  if (!/^[\p{L}\p{N} _-]+$/u.test(String(categoria || ''))) throw new Error('categoria non valida');
+  let immagine = immaginePropria({ categoria, titolo, numero }, proprie);
+  if (!immagine) {
+    const dir = path.join(cartella, categoria);
+    const file = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^\d+\.jpg$/.test(f)).sort() : [];
+    if (!file.length) return null;
+    immagine = path.join(dir, file[(Math.abs(Math.trunc(Number(numero))) || 0) % file.length]);
+  }
+  const stile = stileCopertina(categoria);
+  const { R, fonts } = await resvg();
+  const svg = svgCopertina({ titolo: String(titolo || '').trim() || stile.etichetta, stile, sfondo: fs.readFileSync(immagine) });
+  const png = new R.Resvg(svg, { font: { fontBuffers: fonts, defaultFontFamily: 'Georgia' } }).render().asPng();
+  const jpeg = execFileSync(FFMPEG, ['-loglevel', 'error', '-f', 'png_pipe', '-i', 'pipe:0', '-f', 'mjpeg', '-q:v', '3', 'pipe:1'], { input: Buffer.from(png), maxBuffer: 16 * 1024 * 1024, timeout: 60000 });
+  return { jpeg, sfondo: path.basename(immagine) };
+}
+
+module.exports = { stileCopertina, svgCopertina, componi, chiaveInAttesa };

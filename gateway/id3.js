@@ -1,6 +1,7 @@
 // Copertina incorporata in un MP3 (frame APIC di un tag ID3v2.3, quello scritto dal blocco 3d1).
 // Si legge solo il tag in testa al file, non l'audio.
 const fs = require('fs');
+const { scriviAtomico } = require('./disco');
 
 const MAX_TAG = 8 * 1024 * 1024;
 const MIME = new Set(['image/jpeg', 'image/png']);
@@ -43,4 +44,33 @@ function copertinaDi(file) {
   }
 }
 
-module.exports = { copertinaDi };
+// Cambia solo l'immagine del tag ID3v2.3: gli altri campi e l'audio restano identici.
+// false se il file non ha un tag di quel tipo, o se il tag è rovinato (non si tocca).
+function sostituisciCopertina(file, jpeg) {
+  const raw = fs.readFileSync(file);
+  if (raw.length < 10 || raw.toString('latin1', 0, 3) !== 'ID3' || raw[3] !== 3 || raw[5] !== 0) return false;
+  const n = ((raw[6] & 0x7f) << 21) | ((raw[7] & 0x7f) << 14) | ((raw[8] & 0x7f) << 7) | (raw[9] & 0x7f);
+  if (10 + n > raw.length) return false;
+  const tag = raw.subarray(10, 10 + n);
+  const tieni = [];
+  for (let i = 0; i + 10 <= tag.length;) {
+    const id = tag.toString('latin1', i, i + 4);
+    const l = tag.readUInt32BE(i + 4);
+    if (!/^[A-Z0-9]{4}$/.test(id)) break; // riempimento in coda
+    if (!l || i + 10 + l > tag.length) return false;
+    if (id !== 'APIC') tieni.push(tag.subarray(i, i + 10 + l));
+    i += 10 + l;
+  }
+  // codifica latin1, tipo, copertina anteriore, descrizione vuota
+  const apicNuovo = Buffer.concat([Buffer.from('\0image/jpeg\0\x03\0', 'latin1'), jpeg]);
+  const testa = Buffer.alloc(10);
+  testa.write('APIC', 0, 'latin1');
+  testa.writeUInt32BE(apicNuovo.length, 4);
+  const corpo = Buffer.concat([...tieni, testa, apicNuovo]);
+  const s = corpo.length;
+  const header = Buffer.from([0x49, 0x44, 0x33, 3, 0, 0, (s >> 21) & 0x7f, (s >> 14) & 0x7f, (s >> 7) & 0x7f, s & 0x7f]);
+  scriviAtomico(file, Buffer.concat([header, corpo, raw.subarray(10 + n)]), '.cop.tmp');
+  return true;
+}
+
+module.exports = { copertinaDi, sostituisciCopertina };

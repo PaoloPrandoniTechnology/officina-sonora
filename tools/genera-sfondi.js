@@ -1,15 +1,23 @@
-// Genera in anticipo gli sfondi delle copertine: 8 per genere in assets/sfondi/<categoria>/NN.jpg.
-// Uso: node tools/genera-sfondi.js [--genere NOME] [--max N]
+// Genera un lotto di copertine: gli sfondi mancanti dei generi (8 in assets/sfondi/<categoria>/NN.jpg) e
+// un'immagine propria per ogni brano che non l'ha (assets/copertine/<numero>.jpg), anche per quelli in coda.
+// La scena di ogni brano la scrivono i modelli di testo e resta nel registro, per non ripetersi.
+// Uso: node tools/genera-sfondi.js [--genere NOME] [--max N]   (N = immagini del lotto, 40 se non indicato)
 // Mette in pausa la produzione, aspetta il render in corso, usa la WebUI e ripristina tutto alla fine.
-// Riprendibile: crea solo i file mancanti (per rifare un'immagine, cancellarla e rilanciare).
+// Riprendibile: per rifare la copertina di un brano togliere copertina_propria dalla scheda e cancellare l'immagine.
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
 const { spawn, execFileSync } = require('child_process');
-const { stileCopertina } = require('../gateway/copertina');
+const { stileCopertina, componi } = require('../gateway/copertina');
+const { sostituisciCopertina } = require('../gateway/id3');
+const { daFare } = require('../gateway/sfondi');
 
 const DIR = path.join(__dirname, '..');
 const SFONDI = path.join(DIR, 'assets', 'sfondi');
+const COPERTINE = path.join(DIR, 'assets', 'copertine');
+const REGISTRO = path.join(COPERTINE, 'registro.json');
+const LOTTO = 40; // circa mezz'ora di produzione ferma
+const GATEWAY = Number(process.env.OFS_PORTA) || 5790;
 const COMANDI = path.join(DIR, 'state', 'comandi.json');
 const STATO = path.join(DIR, 'state', 'state.json');
 const PID = path.join(DIR, 'state', 'sfondi.pid'); // letto dalla dashboard (gateway/sfondi.js)
@@ -62,10 +70,10 @@ async function conPausa(fn, file = COMANDI) {
 }
 
 // node:http senza il limite di 300 s di fetch: in --lowvram un'immagine puo' superarlo
-function webui(rotta, corpo, ms = 20 * 60000) {
+function webui(rotta, corpo, ms = 20 * 60000, porta = PORTA) {
   return new Promise((resolve, reject) => {
     const data = corpo ? Buffer.from(JSON.stringify(corpo)) : null;
-    const r = http.request({ hostname: '127.0.0.1', port: PORTA, path: rotta, method: data ? 'POST' : 'GET', timeout: ms,
+    const r = http.request({ hostname: '127.0.0.1', port: porta, path: rotta, method: data ? 'POST' : 'GET', timeout: ms,
       headers: data ? { 'Content-Type': 'application/json', 'Content-Length': data.length } : {} }, (res) => {
       const ch = [];
       res.on('data', (c) => ch.push(c));
@@ -116,10 +124,72 @@ function foglio(dir) {
   execFileSync(FFMPEG, ['-y', '-loglevel', 'error', ...file.flatMap((f) => ['-i', path.join(dir, f)]), '-filter_complex', filtro, '-frames:v', '1', '-q:v', '3', path.join(dir, '_foglio.jpg')]);
 }
 
+// Una tecnica diversa a ogni richiesta: senza, i modelli tendono a proporre sempre la stessa fotografia
+const TECNICHE = ['fine art photography', 'oil painting', 'gouache illustration', 'screen print poster', 'watercolor',
+  'linocut print', 'cinematic matte painting', 'paper cut collage', 'long exposure photography', 'ink wash painting',
+  'risograph print', 'aerial photography', 'pastel drawing', 'macro photography', 'art nouveau lithograph', 'low poly 3d render'];
+
+const parole = (s) => new Set(String(s).toLowerCase().match(/\p{L}{4,}/gu) || []);
+// Quota di parole in comune tra due scene (0 nessuna, 1 identiche)
+function somiglianza(a, b) {
+  const x = parole(a), y = parole(b);
+  const comuni = [...x].filter((p) => y.has(p)).length;
+  return comuni / (x.size + y.size - comuni || 1);
+}
+
+function richiestaScena(meta, tecnica, usate) {
+  return {
+    system: 'You are the art director of a record label. Reply ONLY with JSON: {"scena":"..."}. '
+      + 'scena is the cover image of ONE specific track, in English, 20 to 45 words, for a text-to-image model: '
+      + 'a concrete main subject that evokes the meaning of the track title and description, its setting, light and colors, '
+      + 'coherent with genre, instruments and energy, rendered in the requested technique. '
+      + 'No text, letters, logos or human faces. It must differ in subject and composition from every scene in "already_used".',
+    user: JSON.stringify({
+      title: meta.titolo, description: meta.descrizione, category: meta.categoria, genre: meta.genere, variant: meta.variante,
+      instruments: meta.strumenti, activity: meta.attivita, energy_1_to_5: meta.energia, structure: meta.struttura,
+      bpm: meta.bpm, key: meta.tonalita, music_style: meta.style, technique: tecnica, already_used: usate,
+    }),
+    maxTokens: 300,
+  };
+}
+
+// Scena nuova per un brano: fino a tre richieste se il modello ripropone qualcosa di già usato.
+async function scenaPer(meta, registro, chiedi) {
+  const voci = Object.values(registro);
+  const usate = [...voci.filter((v) => v.categoria === meta.categoria).slice(-12), ...voci.slice(-8)].map((v) => v.scena);
+  for (let i = 0; i < 3; i++) {
+    const tecnica = TECNICHE[Math.floor(Math.random() * TECNICHE.length)];
+    const r = await chiedi(richiestaScena(meta, tecnica, usate));
+    const scena = String((r && r.scena) || '').replace(/\s+/g, ' ').trim().slice(0, 400);
+    // shortcut: confronto a parole, non di significato; passare agli embedding se si vedono scene troppo simili
+    if (scena.length >= 20 && voci.every((v) => somiglianza(scena, v.scena) < 0.5)) return { scena, tecnica };
+    usate.push(scena);
+  }
+  throw new Error('il modello di testo ripete scene già usate o non risponde come richiesto');
+}
+
+async function gateway(rotta, corpo) {
+  const r = await webui(rotta, corpo, 11 * 60000, GATEWAY);
+  if (r.ok === false) throw new Error(r.error || 'il gateway rifiuta la richiesta');
+  return r;
+}
+const chiediModello = async (richiesta) => (await gateway('/llm/chat', richiesta)).dati;
+
+// La copertina entra nell'MP3 solo dei brani che la produzione ha finito: agli altri la mette il blocco 3d1.
+async function applica(lavoro, cartella = COPERTINE, componiFn = componi) {
+  const m = lavoro.meta;
+  if (!lavoro.file || !m.ibroadcast || !m.id3_frames) return false;
+  const r = await componiFn({ categoria: m.categoria, titolo: m.titolo, numero: m.numero_traccia }, SFONDI, cartella);
+  if (!r || !sostituisciCopertina(lavoro.file.replace(/json$/, 'mp3'), r.jpeg)) return false;
+  // rilettura subito prima di scrivere: nel frattempo può essere arrivato un voto
+  const scheda = JSON.parse(fs.readFileSync(lavoro.file, 'utf8'));
+  scriviAtomico(lavoro.file, JSON.stringify({ ...scheda, copertina_propria: new Date().toISOString() }, null, 2), '.cop.tmp');
+  return true;
+}
+
 async function genera(lavoro) {
-  const stile = stileCopertina(lavoro.categoria);
   const r = await webui('/sdapi/v1/txt2img', {
-    prompt: stile.prompt + ', masterpiece, detailed', negative_prompt: NEGATIVO, width: 768, height: 768, steps: 28, cfg_scale: 7,
+    prompt: (lavoro.prompt || stileCopertina(lavoro.categoria).prompt) + ', masterpiece, detailed', negative_prompt: NEGATIVO, width: 768, height: 768, steps: 28, cfg_scale: 7,
     sampler_name: 'DPM++ 2M', scheduler: 'Karras', seed: lavoro.seed, override_settings: { sd_model_checkpoint: 'Deliberate_v6' },
   });
   if (!r.images || !r.images[0]) throw new Error('nessuna immagine nella risposta');
@@ -134,11 +204,13 @@ async function main() {
   const cat = require('../config/catalogo.json').categories.map((c) => c.name);
   const genere = arg('--genere');
   if (genere && !cat.includes(genere)) throw new Error('genere sconosciuto: ' + genere);
-  const presenti = conBrani();
-  const scelte = genere ? [genere] : [...cat].sort((a, b) => Number(presenti.has(b)) - Number(presenti.has(a)));
-  const lavori = mancanti(scelte).slice(0, Number(arg('--max')) || undefined);
-  if (!lavori.length) return console.log('nessuno sfondo da generare');
-  console.log(`sfondi da generare: ${lavori.length}`);
+  const quante = Number(arg('--max')) || LOTTO;
+  const sfondiMancanti = () => {
+    const presenti = conBrani();
+    return mancanti(genere ? [genere] : [...cat].sort((a, b) => Number(presenti.has(b)) - Number(presenti.has(a))));
+  };
+  const braniSenza = () => daFare().lavori.filter((x) => cat.includes(x.meta.categoria) && (!genere || x.meta.categoria === genere));
+  if (!sfondiMancanti().length && !braniSenza().length) return console.log('tutti i brani hanno già la loro copertina');
 
   let stop = false;
   for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => { stop = true; console.log('interruzione richiesta: chiudo dopo la fase in corso'); });
@@ -157,32 +229,73 @@ async function main() {
       console.log('attendo la fine del render in corso...');
       await attendi(30000);
     }
-    const chiudi = await avviaWebui(interrotto);
+    // l'elenco si fa adesso, così comprende anche il brano appena finito
+    const sfondi = sfondiMancanti().slice(0, quante);
+    const immagine = (b) => path.join(COPERTINE, b.chiave + '.jpg');
+    const tutti = braniSenza();
+    // chi ha già l'immagine va solo applicato e non occupa posti nel lotto
+    const brani = [...tutti.filter((b) => fs.existsSync(immagine(b))),
+      ...tutti.filter((b) => !fs.existsSync(immagine(b))).slice(0, quante - sfondi.length)];
+    const registro = leggi(REGISTRO, {});
+    const scritta = (b) => (registro[b.chiave] && registro[b.chiave].titolo === b.meta.titolo ? registro[b.chiave] : null);
     let errori = 0;
+    const fallito = (cosa, e) => {
+      console.error(cosa + ' non riuscito: ' + e.message);
+      if (++errori >= 3) throw new Error('tre errori di fila: mi fermo');
+    };
+
+    // 1. tutte le scene prima delle immagini: il modello locale e Stable Diffusion non stanno insieme in 6 GB
+    const nuovi = brani.filter((b) => !fs.existsSync(immagine(b)) && !scritta(b)); // le scene di un lotto interrotto restano
+    for (let i = 0; i < nuovi.length && !interrotto(); i++) {
+      const b = nuovi[i];
+      try {
+        const { scena, tecnica } = await scenaPer(b.meta, registro, chiediModello);
+        const usati = new Set(Object.values(registro).map((v) => v.seed));
+        let seed;
+        do seed = Math.floor(Math.random() * 2 ** 31); while (usati.has(seed));
+        delete registro[b.chiave]; // in fondo all'elenco: è la più recente
+        registro[b.chiave] = { titolo: b.meta.titolo, categoria: b.meta.categoria, scena, tecnica, seed, il: new Date().toISOString() };
+        scrivi(REGISTRO, registro);
+        errori = 0;
+        console.log('scena ' + (i + 1) + '/' + nuovi.length + ': ' + b.meta.titolo);
+      } catch (e) { fallito('scena di ' + b.meta.titolo, e); }
+    }
+    errori = 0;
+
+    // 2. le immagini
+    const lavori = [
+      ...sfondi.map((l) => ({ ...l, nome: l.categoria + '/' + path.basename(l.file) })),
+      ...brani.filter((b) => fs.existsSync(immagine(b)) || scritta(b)).map((b) => ({
+        brano: b, file: immagine(b), nome: b.meta.titolo, prompt: (scritta(b) || {}).scena, seed: (scritta(b) || {}).seed,
+      })),
+    ];
+    console.log('immagini del lotto: ' + lavori.length);
+    let chiudi = null;
     try {
       for (let i = 0; i < lavori.length && !interrotto(); i++) {
         const l = lavori[i];
         const t = Date.now();
+        const nuova = !fs.existsSync(l.file);
+        if (nuova && !chiudi) {
+          await gateway('/llm/scarica', {}).catch((e) => console.log('modello locale non scaricato: ' + e.message));
+          chiudi = await avviaWebui(interrotto); // se non parte, inutile continuare
+        }
         try {
-          await genera(l);
+          if (nuova) await genera(l);
+          if (l.brano) await applica(l.brano);
           errori = 0;
-          console.log(`${i + 1}/${lavori.length} ${l.categoria}/${path.basename(l.file)} (${Math.round((Date.now() - t) / 1000)} s)`);
-        } catch (e) {
-          console.error(`${l.categoria}/${path.basename(l.file)} non riuscito: ${e.message}`);
-          if (++errori >= 3) throw new Error('tre errori di fila: mi fermo');
-        }
-        if (!lavori[i + 1] || lavori[i + 1].categoria !== l.categoria) {
-          if (fs.existsSync(path.dirname(l.file))) foglio(path.dirname(l.file));
-        }
+          console.log((i + 1) + '/' + lavori.length + ' ' + l.nome + ' (' + Math.round((Date.now() - t) / 1000) + ' s)');
+        } catch (e) { fallito(l.nome, e); }
+        if (!l.brano && (!lavori[i + 1] || lavori[i + 1].categoria !== l.categoria) && fs.existsSync(path.dirname(l.file))) foglio(path.dirname(l.file));
       }
       if (!inPausa()) console.log('produzione ripresa dalla dashboard: mi fermo');
       else if (fs.existsSync(FERMA)) console.log('generazione fermata dalla dashboard');
     } finally {
-      chiudi();
+      if (chiudi) chiudi();
     }
   });
-  console.log('finito; produzione nello stato precedente');
+  console.log('finito; produzione nello stato precedente; brani ancora senza copertina propria: ' + braniSenza().length);
 }
 
-module.exports = { mancanti, conPausa, emergenza };
+module.exports = { mancanti, conPausa, emergenza, somiglianza, scenaPer, applica };
 if (require.main === module) main().catch((e) => { console.error('ERR', e.message); process.exit(1); });

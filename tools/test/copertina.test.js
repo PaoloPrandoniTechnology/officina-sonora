@@ -64,3 +64,13 @@ test('componi: null senza sfondi, JPEG 1000x1000 con rotazione per numero', asyn
 test('componi: una categoria con percorso malevolo viene rifiutata', async () => {
   await assert.rejects(() => componi({ categoria: '../../secrets', titolo: 'x', numero: 1 }, tmp()), /categoria/);
 });
+
+test('componi: l immagine del brano vince sullo sfondo e quella in attesa passa al numero una volta sola', async () => {
+  const { chiaveInAttesa } = require(path.join(base, 'gateway', 'copertina.js'));
+  const sfondiDir = tmp(), proprie = tmp();
+  const dati = { categoria: 'Meditazione', titolo: 'Brano in attesa', numero: 12 };
+  fs.writeFileSync(path.join(proprie, chiaveInAttesa(dati.categoria, dati.titolo) + '.jpg'), png());
+  assert.equal((await componi(dati, sfondiDir, proprie)).sfondo, '12.jpg');
+  assert.deepEqual(fs.readdirSync(proprie), ['12.jpg']);
+  assert.equal(await componi({ ...dati, numero: 13 }, sfondiDir, proprie), null, 'un omonimo non riprende l immagine');
+});

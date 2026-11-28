@@ -606,7 +606,7 @@ Qui **cambi il comportamento** del sistema. Le modifiche valgono **dal brano suc
 
 | Sezione | In parole semplici |
 |---|---|
-| [Produzione](#produzione) | pausa, coda, sfondi delle copertine, genere da produrre |
+| [Produzione](#produzione) | pausa, coda, copertine, genere da produrre |
 | [Linee guida](#linee-guida) | come deve suonare la musica |
 | [Note per genere](#note-per-genere) | richieste scritte in italiano |
 | [Parametri](#parametri) | regole generali, con dei cursori |
@@ -616,11 +616,12 @@ Qui **cambi il comportamento** del sistema. Le modifiche valgono **dal brano suc
 
 #### Produzione
 
-![Produzione: pausa, coda, sfondi delle copertine, genere da produrre e comandi in attesa](docs/screenshots/07-controllo-produzione.png)
+![Produzione: pausa, coda, copertine, genere da produrre e comandi in attesa](docs/screenshots/07-controllo-produzione.png)
 
 - **Metti in pausa / Riprendi**: il brano in corso finisce, poi il sistema aspetta.
 - **Coda**: elenco dei brani in attesa e *Svuota la coda*.
-- **Sfondi delle copertine**: crea le immagini; mette in pausa la produzione e poi la riprende.
+- **Copertine**: genera un lotto di immagini, una diversa per ogni brano che non ha ancora la sua; mette in
+  pausa la produzione e poi la riprende. Dettagli in [iBroadcast, copertine e metadati](#8-ibroadcast-copertine-e-metadati).
 - **Produci ora un genere**: scegli dall'elenco e conferma.
 
 #### Parametri
@@ -909,12 +910,26 @@ energia, struttura, tipo) e playlist `Yoga - <categoria>` o `Musica - <categoria
 
 Gli MP3 hanno tag ID3 completi (anche bpm, tonalità, mood, strumenti, variante e seed come campi aggiuntivi).
 
-La **copertina** è uno sfondo del genere generato con Stable Diffusion, con titolo, genere e artista:
+La **copertina** è un'immagine generata con Stable Diffusion, con titolo, genere e artista. Ogni brano ha la
+sua; finché manca si usa uno degli 8 sfondi del genere, che quindi si ripetono.
 
-1. *Controllo → Produzione*: **Metti in pausa e genera gli sfondi** (8 per genere; si può interrompere e riprendere).
-   Per rifarne uno cancella il file in `assets\sfondi\<categoria>` (`_foglio.jpg` li mostra tutti).
-2. Il prompt di ogni genere è nel campo `copertina` del catalogo.
-3. Per aggiornare i brani già online: prima `node tools\ripubblica.js --prova <a.json> <b.json> <c.json>`
+1. *Controllo → Produzione*: **Metti in pausa e genera un lotto**. La produzione si ferma (il brano in corso
+   finisce), poi:
+   - i modelli di testo ([Chiavi](#chiavi), con ripiego su gemma) descrivono per ogni brano una scena a partire
+     da titolo, descrizione, genere, strumenti, energia e stile, in una tecnica pittorica o fotografica scelta a caso;
+   - una scena troppo simile a una già usata viene rifiutata e richiesta di nuovo (confronto sulle parole);
+   - Stable Diffusion crea l'immagine, con un seme mai usato prima;
+   - nei brani già finiti la nuova copertina sostituisce quella nell'MP3 sul PC (dashboard e lettore); gli altri
+     la ricevono prima del caricamento su iBroadcast.
+2. Un lotto arriva a 40 immagini (circa mezz'ora): prima i brani in coda di produzione, poi i più recenti. Ogni
+   pressione continua con i successivi; si può fermare e riprendere. Lotti più grandi:
+   `node tools\genera-sfondi.js --max 200` (con `--genere NOME` per un solo genere).
+3. Le immagini sono in `assets\copertine` e le scene in `assets\copertine\registro.json`. Per rifarne una togli
+   `copertina_propria` dalla scheda del brano e cancella `assets\copertine\<numero>.jpg` e la sua voce nel registro.
+4. Gli sfondi di genere (compresi quelli di un genere nuovo, creati nello stesso lotto) sono in
+   `assets\sfondi\<categoria>` (`_foglio.jpg` li mostra tutti); il loro prompt è nel campo `copertina` del catalogo.
+5. **Su iBroadcast la copertina di un brano già online non cambia da sola.** Per aggiornare i brani online con
+   copertina provvisoria: prima `node tools\ripubblica.js --prova <a.json> <b.json> <c.json>`
    (almeno uno con le stelle), controlla nell'app, poi `node tools\ripubblica.js --tutti`. La vecchia copia si
    cestina solo dopo che la nuova ha tag, playlist e voti; il conteggio degli ascolti riparte da zero.
 
@@ -1067,3 +1082,4 @@ In ordine di priorità. Il disegno completo è in
 | 7 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |
 | 8 | **Servizi di testo dalla dashboard**: accendere, spegnere e ordinare (le chiavi si inseriscono già); aggiungere Cloudflare Workers AI | oggi si modifica `config\servizi.json` |
 | 9 | **Prova di un motore musicale in rete** (ACE-Step su Hugging Face, pochi brani al giorno) | valutata e non attivata: vedi [analisi](docs/superpowers/specs/2026-11-28-motori-cloud-design.md) |
+| 10 | **Copertine online**: portare su iBroadcast, a richiesta, le immagini proprie dei brani già caricati; confrontare le scene per significato | oggi `ripubblica.js` considera solo copertine provvisorie e tag vecchi, e il confronto è sulle parole |

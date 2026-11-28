@@ -58,3 +58,45 @@ test('chiusura della finestra: la pausa torna com era anche senza attendere il l
   }, f);
   assert.deepEqual(leggi(f), { svuotaCoda: true });
 });
+
+const { somiglianza, scenaPer, applica } = require(path.join(__dirname, '..', 'genera-sfondi.js'));
+
+test('somiglianza: 1 per la stessa scena, 0 per scene senza parole in comune', () => {
+  assert.equal(somiglianza('bronze bowl on stone', 'Bronze bowl on stone.'), 1);
+  assert.equal(somiglianza('bronze bowl on stone', 'neon highway under rain'), 0);
+});
+
+test('scenaPer: scarta una scena già usata e chiede di nuovo; dopo tre ripetizioni rinuncia', async () => {
+  const usata = 'single bronze singing bowl resting on a flat stone beside a misty lake';
+  const nuova = 'paper lanterns drifting over a dark river between tall reeds at night';
+  const registro = { 1: { categoria: 'Meditazione', scena: usata } };
+  const risposte = [usata, nuova];
+  const richieste = [];
+  const r = await scenaPer({ titolo: 'Fiume', categoria: 'Meditazione' }, registro, async (x) => { richieste.push(x); return { scena: risposte.shift() }; });
+  assert.equal(r.scena, nuova);
+  assert.equal(richieste.length, 2);
+  assert.ok(richieste[0].user.includes(usata) && richieste[0].user.includes('Fiume'));
+  await assert.rejects(() => scenaPer({ titolo: 'x' }, registro, async () => ({ scena: usata })), /ripete/);
+  await assert.rejects(() => scenaPer({ titolo: 'x' }, {}, async () => ({})), /non risponde/);
+});
+
+test('applica: scrive la copertina nell MP3 solo dei brani finiti e annota la scheda', async () => {
+  const d = tmp();
+  const scheda = path.join(d, 'b.json');
+  const mp3 = path.join(d, 'b.mp3');
+  const tag = Buffer.concat([Buffer.from('TIT2'), Buffer.from([0, 0, 0, 3, 0, 0, 0]), Buffer.from('ab')]);
+  const audio = Buffer.from([0xff, 0xfb, 1, 2, 3]);
+  fs.writeFileSync(mp3, Buffer.concat([Buffer.from([0x49, 0x44, 0x33, 3, 0, 0, 0, 0, 0, tag.length]), tag, audio]));
+  const meta = { titolo: 'B', categoria: 'Meditazione', numero_traccia: 5 };
+  fs.writeFileSync(scheda, JSON.stringify(meta));
+  const componiFn = async () => ({ jpeg: Buffer.from([0xff, 0xd8, 9]) });
+  assert.equal(await applica({ file: scheda, meta }, d, componiFn), false, 'brano ancora in lavorazione');
+  fs.writeFileSync(scheda, JSON.stringify({ ...meta, voto: 4 }));
+  assert.equal(await applica({ file: scheda, meta: { ...meta, ibroadcast: {}, id3_frames: 1 } }, d, componiFn), true);
+  assert.equal(leggi(scheda).voto, 4, 'il voto arrivato nel frattempo resta');
+  assert.ok(leggi(scheda).copertina_propria);
+  const dopo = fs.readFileSync(mp3);
+  assert.ok(dopo.includes(Buffer.from('TIT2')) && dopo.includes(Buffer.from('APIC')));
+  assert.deepEqual(dopo.subarray(-audio.length), audio);
+  assert.deepEqual(require(path.join(__dirname, '..', '..', 'gateway', 'id3.js')).copertinaDi(mp3).dati, Buffer.from([0xff, 0xd8, 9]));
+});
