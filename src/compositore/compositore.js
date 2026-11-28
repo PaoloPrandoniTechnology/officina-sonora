@@ -134,6 +134,8 @@ function preferenze(brani, voti) {
       ...b.parametri.progressioni.map((x) => `prog:${x}`),
       ...b.parametri.celle.map((x) => `cella:${x}`),
       ...b.parametri.trasformazioni.map((x) => `trasf:${x}`),
+      ...(b.parametri.forma ? [`forma:${b.parametri.forma}`] : []), // compositore estro
+      ...(b.parametri.cameo ? [`cameo:${b.parametri.cameo}`] : []),
     ];
     for (const k of chiavi) {
       out[k] ||= { n: 0, somma: 0 };
@@ -362,4 +364,4 @@ function componi({ candidati = 30, seed = 1, identita: id, precedenti = [], pref
   return { ...migliore, identita: materiale, abc: Abc.scriviAbc(score), lyrics: Abc.lyricsDaScore(score, { forma: 'semplice' }), durata_s: Math.round(Abc.durataSecondi(score)) };
 }
 
-if (typeof module !== 'undefined') module.exports = { componi, revisiona, tonica, identita, preferenze, peso, quanteProgressioni };
+if (typeof module !== 'undefined') module.exports = { componi, revisiona, tonica, identita, preferenze, peso, quanteProgressioni, profilo, casuale, adatta, somiglianza, pesato, SCALE, QUALITA, DIESIS, BEMOLLI };

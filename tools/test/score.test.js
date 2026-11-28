@@ -69,6 +69,12 @@ test('impostazioni: predefiniti, poi generali, poi genere; i valori sbagliati si
   assert.deepEqual([a.fonte, a.tentativi, a.temperature], ['motore', 2, 0.7]);
   assert.equal(A.impostazioni(conf, 'B').fonte, 'compositore');
   const base = A.impostazioni(null, 'A');
+  // "auto" si risolve col genere
+  const r = (cat, extra) => { const x = A.risolvi({ ...base, ...extra }, cat); return [x.livello, x.fonte]; };
+  assert.deepEqual(r({ ambito: 'yoga', estro: 0 }), [0, 'modello']);
+  assert.deepEqual(r({ ambito: 'musica' }), [2, 'compositore']);
+  assert.deepEqual(r({ estro: 1 }), [1, 'compositore']);
+  assert.deepEqual(r({ estro: 2 }, { estro: 'quiete', fonte: 'motore' }), [0, 'motore']);
   assert.deepEqual(A.campionamento(base), { abc_sampling: { max_tokens: 6000 } });
   assert.deepEqual(A.campionamento({ ...base, temperature: 0.9, armonia: 6 }), { abc_sampling: { max_tokens: 6000, temperature: 0.9 }, harmony: { strength: 6 } });
 });
@@ -139,7 +145,7 @@ test('blocco 2: uno score troncato del modello si recupera; senza recupero si ri
 
 test('blocco 6: una richiesta inutilizzabile risulta consumata e il brano parte lo stesso', async () => {
   const archivio = { richieste: [{ id: 'r9', categoria: 'Surf-rock-strumentale', abc: 'rotto' }] };
-  const { state, env } = await blocco('06-invia-render.js', { job: null, queue: [concept()] }, { archivio });
+  const { state, env } = await blocco('06-invia-render.js', { job: null, queue: [concept()] }, { archivio, conf: { generale: { fonte: 'modello' } } });
   fs.rmSync(env.dir, { recursive: true, force: true });
   assert.match(state.scoreUsati.r9.errore, /non valido/);
   assert.equal(state.job.fase, 'piano');

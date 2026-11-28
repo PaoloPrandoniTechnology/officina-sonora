@@ -38,6 +38,19 @@ Fonti: guide di composizione (motivo, frase, periodo, note dell'accordo) e MeloF
   posizione del climax 10, varietà 15. La somma pesa per l'85%; il 15% è la **novità** rispetto ai brani in memoria.
 - La memoria per genere fissa il materiale (progressioni, celle, variazioni) e i voti ne correggono i pesi.
 
+## Compositore estro (generi creativi)
+`src/compositore/estro.js`, usato quando il genere ha `estro` 1 o 2. Aggiornato il 28/11/2026.
+
+- Perché: negli score del modello la ripetizione mediana era 0,87-0,9, spesso con un solo interlude di oltre
+  cento battute e 1-3 accordi.
+- Forma per ruoli (gancio, strofa, pre, ritornello, assolo, duello, rottura, ponte, finale), un giro armonico per
+  ruolo, motivi trasformati a ogni ripresa, chiusure di frase, modulazioni (`K:` di sezione), ponte in 3/4 o 7/8.
+- Richiami di pubblico dominio trascritti a memoria in forma ridotta (4/4, 2-4 battute): sono allusioni, non edizioni.
+- Revisore: accordo sui tempi forti 20, varietà 25, ritmi 15, gancio che torna 15, contrasto 10, salti 10, climax 5;
+  85% qualità e 15% novità. Forma e richiamo si scelgono prima, escludendo i recenti.
+- Misure su 208 brani di prova: ripetizione mediana 0,11 (massimo 0,28), 104 cambi di accordo mediani,
+  durata entro il 3%.
+
 ## Da verificare
 - Quanto fedelmente YuE2 segue uno score scritto da regole, in particolare con metri diversi dal 4/4.
 - La documentazione non dice cosa rifiuti il motore: l'unico controllo documentato è il validatore.

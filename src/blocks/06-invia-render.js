@@ -19,7 +19,7 @@ if (scelto) {
   catch (e) { consumato(scelto.id, { titolo: concept.titolo, errore: e.message }); log(`score scelto a mano non usato per "${concept.titolo}": ${e.message}`); }
 }
 const manuale = Boolean(concept.scoreManuale);
-const imp = ScoreAbc.impostazioni(confScore(), concept.categoria);
+const imp = ScoreAbc.risolvi(ScoreAbc.impostazioni(confScore(), concept.categoria), (CFG.categories || []).find((x) => x.name === concept.categoria));
 const seed = nuovoSeed();
 // LoRA: la strumentale KTO piu' quella del genere, solo se il motore le ha davvero.
 // Non si usa yue2-instrumental: in produzione il motore chiudeva i brani a 30 secondi.
@@ -48,9 +48,10 @@ if (!concept.attempts && (concept.tentativi_render || 0) < 2) adapters.push(...d
 try { await gw('/llm/scarica'); } catch (e) { log(`gemma non scaricato: ${e.message}`); }
 
 // Strumentale al primo tentativo: prima il solo score, poi il blocco 2 avvia il render.
-// Altrimenti render in un passo, con lo score del compositore (ripiego) o scritto dal motore.
+// Altrimenti render in un passo, con lo score del compositore o scritto dal motore.
 const piano = !manuale && imp.fonte === 'modello' && !concept.vocale && !concept.attempts && !concept.pianoFallito;
-const nostro = !piano && Boolean(concept.abc) && (manuale || (!concept.attempts && imp.fonte !== 'motore'));
+// nei generi creativi il nostro score resta anche al primo ritento: quello del motore è molto più monotono
+const nostro = !piano && Boolean(concept.abc) && (manuale || ((concept.attempts || 0) <= (imp.livello ? 1 : 0) && imp.fonte !== 'motore'));
 const body = piano ? corpoPiano(concept, seed, ScoreAbc.campionamento(imp))
   : corpoRender(concept, adapters, seed, nostro ? concept.abc : null, nostro ? concept.durata_s : 0);
 const id = await inviaSynth(body);

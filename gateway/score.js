@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const Abc = require('../src/compositore/abc.js');
 const Compositore = require('../src/compositore/compositore.js');
+const Estro = require('../src/compositore/estro.js');
 const libreria = require('./libreria');
 const { scriviAtomico } = require('./disco');
 
@@ -99,7 +100,7 @@ function lettura(base = BASE) {
   return {
     definizioni: Abc.IMPOSTAZIONI,
     impostazioni: { generale: conf.generale || {}, generi: conf.generi || {} },
-    generi: catalogo(p).map((c) => ({ nome: c.name, etichetta: c.genere || c.name, bpm: c.bpm, tonalita: c.tonalita || [], vocale: !!c.vocale_senza_parole, strutture: c.strutture || [] })),
+    generi: catalogo(p).map((c) => ({ nome: c.name, etichetta: c.genere || c.name, bpm: c.bpm, estro: c.estro, ambito: c.ambito, tonalita: c.tonalita || [], vocale: !!c.vocale_senza_parole, strutture: c.strutture || [] })),
     bozze: (archivio.bozze || []).slice().reverse(),
     richieste: (archivio.richieste || []).map((r) => ({ ...r, usata: usati[r.id] || null })).reverse(),
     inArrivo: [
@@ -151,10 +152,11 @@ function componi(p, r) {
   const sezioni = Array.isArray(r.sezioni) && r.sezioni.length >= 1 && r.sezioni.length <= 16 && r.sezioni.every((s) => Abc.TAG.includes(s))
     ? r.sezioni : ['intro', 'verse', 'chorus', 'verse', 'chorus', 'outro'];
   const seed = Number.isInteger(r.seed) ? r.seed : crypto.randomInt(2147483647);
-  const imp = Abc.impostazioni(facoltativo(p.conf, {}), cat.name);
+  const imp = Abc.risolvi(Abc.impostazioni(facoltativo(p.conf, {}), cat.name), cat);
   const g = (facoltativo(p.memoria, { generi: {} }).generi || {})[cat.name] || {};
-  const identita = Compositore.identita(cat, g.identita, {}, seed);
-  const c = Compositore.componi({ cat, bpm, tonalita: String(r.tonalita || (cat.tonalita || [])[0] || ''), durata_s: durata, sezioni, seed, identita, precedenti: (g.brani || []).map((b) => b.firma), candidati: imp.candidati, metri: imp.metri });
+  const richiesta = { cat, bpm, tonalita: String(r.tonalita || (cat.tonalita || [])[0] || ''), durata_s: durata, sezioni, seed, precedenti: (g.brani || []).map((b) => b.firma), candidati: imp.candidati, metri: imp.metri };
+  const c = imp.livello ? Estro.componi({ ...richiesta, estro: imp.livello })
+    : Compositore.componi({ ...richiesta, identita: Compositore.identita(cat, g.identita, {}, seed) });
   return { abc: c.abc, punteggio: c.punteggio, seed };
 }
 

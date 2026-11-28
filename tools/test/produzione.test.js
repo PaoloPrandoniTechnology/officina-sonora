@@ -108,8 +108,19 @@ async function componiScore(concept) {
 }
 const conceptSurf = () => ({ titolo: 't', categoria: 'Surf-rock-strumentale', bpm: 130, tonalita: 'Mi minore', durata_s: 200, sezioni: L.CFG.strutture.arco, lyrics: 'x', vocale: false, attempts: 0 });
 
+const conceptQuiete = () => ({ ...conceptSurf(), categoria: 'Hatha-base', bpm: 84 });
+
+test('blocco 5d: genere creativo, forma e suoni li decide il compositore estro', async () => {
+  const c = await componiScore({ ...conceptSurf(), style: 'Instrumental, surf rock, 130 BPM, E minor, no vocals', descrizione: 'd' });
+  assert.match(c.abc, /^X:1\n/);
+  assert.ok(c.score.parametri.forma && c.score.parametri.trovate.includes('solo'));
+  assert.deepEqual(c.sezioni, c.lyrics.split('\n\n'));
+  assert.match(c.style, /^Instrumental, surf rock, .+, 130 BPM, E minor, no vocals$/);
+  assert.equal(/Richiamo nascosto/.test(c.descrizione), Boolean(c.score.parametri.cameo));
+});
+
 test('blocco 5d: scrive score, lyrics e durata del brano strumentale', async () => {
-  const c = await componiScore(conceptSurf());
+  const c = await componiScore(conceptQuiete());
   assert.match(c.abc, /^X:1\n/);
   assert.ok(c.score.punteggio > 60 && Math.abs(c.durata_s - 200) <= 16);
   assert.equal(c.lyrics.split('\n\n').length, L.CFG.strutture.arco.length);
@@ -117,24 +128,28 @@ test('blocco 5d: scrive score, lyrics e durata del brano strumentale', async () 
 
 test('blocco 5d: voci e richieste non componibili restano al motore', async () => {
   assert.equal((await componiScore({ ...conceptSurf(), vocale: true })).abc, undefined);
-  const rotto = await componiScore({ ...conceptSurf(), sezioni: ['[Main]'] });
+  const rotto = await componiScore({ ...conceptQuiete(), sezioni: ['[Main]'] });
   assert.equal(rotto.abc, undefined);
   assert.equal(rotto.lyrics, 'x');
 });
 
 test('blocco 6: prima il solo score; col ripiego il nostro; dopo un fallimento lo scrive il motore', async () => {
   const props = elenco('yue2-instrumental-kto');
-  const primo = await invia('Surf-rock-strumentale', { props, abc: 'X:1', pianoFallito: false });
+  // un genere creativo parte subito col nostro score, senza chiedere quello del modello
+  assert.equal((await invia('Surf-rock-strumentale', { props, abc: 'X:1', pianoFallito: false })).corpo.abc, 'X:1');
+  assert.equal((await invia('Surf-rock-strumentale', { props, abc: 'X:1', attempts: 1 })).corpo.abc, 'X:1');
+  assert.equal((await invia('Surf-rock-strumentale', { props, abc: 'X:1', attempts: 2 })).corpo.abc, undefined);
+  const primo = await invia('Hatha-base', { props, abc: 'X:1', pianoFallito: false });
   assert.equal(primo.corpo.duration, 1);
   assert.equal(primo.corpo.abc, undefined);
   assert.equal(primo.job.fase, 'piano');
   assert.equal(primo.corpo.adapters, undefined, 'lo score si chiede senza LoRA');
   assert.ok(primo.job.adapters.length, 'le LoRA restano per il render');
-  const ripiego = await invia('Surf-rock-strumentale', { props, abc: 'X:1', pianoFallito: true });
+  const ripiego = await invia('Hatha-base', { props, abc: 'X:1', pianoFallito: true });
   assert.equal(ripiego.corpo.abc, 'X:1');
   assert.equal(ripiego.corpo.semantic_sampling.min_tokens, 6750);
   assert.equal(ripiego.job.abcNostro, true);
-  const secondo = await invia('Surf-rock-strumentale', { props, abc: 'X:1', attempts: 1 });
+  const secondo = await invia('Hatha-base', { props, abc: 'X:1', attempts: 1 });
   assert.equal(secondo.corpo.abc, undefined);
   assert.equal(secondo.corpo.output_format, 'mp3');
   assert.ok(secondo.corpo.abc_sampling.max_tokens > 0);

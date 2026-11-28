@@ -72,6 +72,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 | **Dare un voto** | stelle nel [lettore](#il-lettore), pagina [Voti](#voti), `/menu` su Telegram o stelle in iBroadcast |
 | **Vedere, ascoltare e modificare uno score** | pagina [Score](#score) |
 | **Decidere come nascono gli score** nuovi | [Score → Come nascono](#come-nascono) |
+| Brani **più ricchi di variazioni** o, al contrario, più calmi | [Score → Come nascono](#come-nascono), voce *Estro* (vedi [Quiete o estro](#quiete-o-estro)) |
 | **Scaricare** un brano o vedere come è stato fatto | clic sul titolo: [scheda del brano](#la-scheda-del-brano) |
 | Avere **subito** un certo genere | [Generi](#generi): *Produci ora* |
 | **Sospendere** un genere o farlo uscire di più | [Generi](#generi): interruttore sulla scheda, peso in *Attivazione e frequenza* |
@@ -89,7 +90,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 
 1. il sistema **sceglie** genere, strumenti e forma, dando precedenza a ciò che hai votato bene;
 2. un **servizio di testo** in rete (o, se non risponde, **gemma**) inventa titolo e descrizione;
-3. si prepara lo **spartito** e **YuE2** crea l'audio (la parte più lunga);
+3. si prepara lo **spartito** (calmo e ripetuto per yoga e meditazione, [ricco di variazioni](#quiete-o-estro) per gli altri generi) e **YuE2** crea l'audio (la parte più lunga);
 4. il volume viene reso uniforme e il brano **controllato**: se non va bene viene rifatto;
 5. se è buono, viene salvato, **caricato** su iBroadcast e compare nella dashboard;
 6. i tuoi **voti** guidano le scelte successive.
@@ -142,10 +143,10 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | Blocco | Cosa fa |
 |---|---|
 | **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, strumenti (due fissi del genere più 1-2 che cambiano, dalla [memoria](#la-memoria-di-composizione)), un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
-| **5b Titolo** | Chiede ai [servizi di testo](#servizi-di-testo) titolo, descrizione, bpm e durata, entro i limiti del genere. Gli indica le prime parole dei titoli recenti da non ripetere. Se nessun modello risponde, riprova al giro successivo. |
+| **5b Titolo** | Chiede ai [servizi di testo](#servizi-di-testo) titolo, descrizione, bpm e durata, entro i limiti del genere; nei [generi creativi](#quiete-o-estro) chiede anche una *trovata* sonora per quel brano. Gli indica le prime parole dei titoli recenti da non ripetere. Se nessun modello risponde, riprova al giro successivo. |
 | **5c Componi concept** | Compone il testo di **stile** in inglese e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
-| **5d Componi score** | Prepara lo score di **ripiego** del compositore (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere): di norma si usa solo se il modello non ne scrive uno valido; nelle [impostazioni degli score](#come-nascono) può diventare la prima scelta. |
-| **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali) oppure direttamente l'audio (voci, ripieghi e [score scelti da te](#da-produrre)). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
+| **5d Componi score** | Compone lo score (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere). Nei [generi creativi](#quiete-o-estro) è lo score del brano, con forma, assoli e richiami decisi dal compositore *estro*, che aggiunge anche i suoni allo stile. Nei generi di quiete è il **ripiego**, usato solo se il modello non ne scrive uno valido. |
+| **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali di quiete) oppure direttamente l'audio (generi creativi, voci, ripieghi e [score scelti da te](#da-produrre)). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
 
 ### Audio e pubblicazione
 
@@ -240,6 +241,32 @@ log (nella scheda: *ricostruito dal log*); di questi non si conoscono tempo di r
 
 ## 4. Come nasce la musica
 
+### Quiete o estro
+Ogni genere ha un livello di **estro** (campo `estro` del catalogo, modificabile in [Come nascono](#come-nascono)):
+
+| Livello | Generi | Come suonano |
+|---|---|---|
+| **Quiete** (0) | meditazione, pranayama, yin, restorative, sound bath, Hatha, Vinyasa, Power yoga, Gamelan, voci meditative | la ripetizione è voluta: lo score lo scrive il modello YuE2 |
+| **Vivo** (1) | Funk, Afro-latin, Trip-hop, Reggae dub, Jazz lounge, Folk strumming, Bossa nova, Celtic, Piano minimalista, Soul vocalise | variazioni, chiusure di frase, un assolo; qualche richiamo; niente strappi |
+| **Pieno** (2) | rock, metal, blues, elettronica, hip-hop, trap, swing, balcanico, flamenco, orchestrale | tutto: assoli, botta e risposta, rotture, cambi di metro e di tonalità, richiami frequenti |
+
+Nei livelli 1 e 2 lo score è del compositore **estro** (`src\compositore\estro.js`), perché gli score del modello
+ripetono in media 87 battute su 100 con due o tre accordi; i suoi ne ripetono circa 11 su 100.
+
+| Ingrediente | Cosa fa |
+|---|---|
+| **Forme** | 4 per il livello vivo e 5 per il pieno (*arena, corsa, suite, jam, montagne*); non si ripete la forma dei due brani precedenti del genere |
+| **Armonie** | un giro diverso per strofa, ritornello, ponte e assolo; sostituzioni nelle riprese |
+| **Fraseggi** | il gancio del ritornello torna riconoscibile, tutto il resto si trasforma a ogni ripresa |
+| **Chiusure** | corse, colpi con silenzio, spinte sincopate alla fine delle frasi |
+| **Assoli, duelli, rotture** | assolo che sale e cita il gancio; domanda e risposta tra registri; la banda si ferma e riparte |
+| **Metro e tonalità** (pieno) | ponte in 3/4 o 7/8 o in un'altra tonalità; ultimo ritornello più in alto |
+| **Richiami** | 2-4 battute di un tema di **pubblico dominio** (Bach, Beethoven, Mozart, Grieg, Rossini, Bizet, Offenbach, canti tradizionali) adatto al genere, mai uno degli ultimi quattro. La descrizione del brano dice quale: *Richiamo nascosto: …* |
+| **Suoni** | 3-5 timbri e trovate diversi a ogni brano aggiunti allo stile (per esempio *theremin lead*, *talk box lead*), più la trovata proposta dal modello di testo |
+
+I richiami sono limitati al pubblico dominio: citare canzoni recenti esporrebbe a rivendicazioni di copyright.
+Quanto fedelmente YuE2 renda ogni dettaglio dello score e dello stile va giudicato **ascoltando**.
+
 ### Stile (prompt)
 È in **inglese**, fatto di soli descrittori e sempre nello stesso ordine: `Instrumental`, genere, strumenti con
 timbro e tecnica, variante, ritmo, atmosfera, influenza, note del produttore, linee guida, spazio e mix,
@@ -262,6 +289,7 @@ Anche nei brani strumentali il campo è sempre compilato, con i soli tag che la 
 | `loop` | intro, verse, chorus, verse, bridge, verse, chorus, chorus, outro |
 
 ### Score ABC
+Quanto segue vale per i generi di **quiete**; per gli altri vedi [Quiete o estro](#quiete-o-estro).
 Per gli strumentali segue la procedura ufficiale di YuE, in due passi:
 
 1. il **modello** scrive lo score (richiesta da un secondo di audio, senza LoRA);
@@ -300,7 +328,8 @@ Come impara dai voti:
 - progressioni, celle e variazioni dei brani votati 4-5 vengono scelte **più spesso**, quelle dei brani votati 1-2 meno;
 - un elemento con almeno due voti e media 2 o meno **esce** dall'identità del genere e ne entra uno nuovo.
 
-Vale per gli score del compositore, oggi usati come ripiego; gli score del modello e i generi vocali non vi partecipano.
+Questo vale per il compositore di quiete (ripiego); nei [generi creativi](#quiete-o-estro) la memoria evita temi,
+forme e richiami appena usati e i voti pesano su forme e richiami. Gli score del modello e i generi vocali non vi partecipano.
 La memoria non è su Git: va inclusa nei backup insieme alla libreria. Se il file si rovina viene messo da parte
 (`.corrotta`) e si riparte da vuota. Per ridare un'identità nuova a un genere, a produzione ferma elimina la
 sua voce dal file.
@@ -328,7 +357,8 @@ I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una prop
 Lo score si chiede senza LoRA: agiscono solo sul render.
 
 Se un render fallisce (per esempio perché le LoRA sovrapposte producono uno score illeggibile), il secondo
-tentativo parte senza la LoRA di genere e con lo score scritto dal motore, e il terzo con lo score di sola melodia.
+tentativo parte senza la LoRA di genere e con lo score scritto dal motore (nei generi creativi resta ancora il nostro),
+e il terzo con lo score di sola melodia.
 Anche il secondo ritento di un brano troppo corto parte senza LoRA di genere.
 
 Una LoRA assente dal motore viene saltata e annotata nel log. Le scale scelte sono un punto di partenza,
@@ -777,7 +807,8 @@ modifiche nello [Storico](#storico) e si applicano ai brani successivi.
 
 | Impostazione | Predefinito | Effetto |
 |---|---|---|
-| Chi scrive lo score | modello, poi compositore | oppure subito il compositore, o il motore durante il render |
+| Chi scrive lo score | automatico | compositore per i generi creativi; modello (poi compositore) per quelli di quiete. Si può forzare modello, compositore o motore |
+| Estro | automatico dal genere | quiete, vivo o pieno: vedi [Quiete o estro](#quiete-o-estro) |
 | Tentativi del modello | 3 | ognuno costa circa 2 minuti |
 | Recupera gli score troncati o troppo lunghi | sì | meno tentativi buttati |
 | Durata minima accettata | 75% | |
@@ -1029,7 +1060,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 |---|---|
 | `src\blocks\` | i blocchi del workflow |
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
-| `src\compositore\` | compositore, revisore, scrittura e validazione dello score ABC |
+| `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js`), scrittura e validazione dello score ABC (`abc.js`) |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
 | `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
@@ -1076,6 +1107,7 @@ In ordine di priorità. Il disegno completo è in
 
 | # | Miglioramento | Perché |
 |---|---|---|
+| 0 | **Ascoltare i brani creativi** e votarli: correggere forme, richiami e suoni che non convincono; valutare LoRA anche per i generi che non ne hanno | l'effetto sull'audio non è misurabile dai test; i voti pesano già su forme e richiami |
 | 1 | **Selezione sull'audio**: 2-3 versioni per brano e pubblicazione della migliore, giudicata da un modello (per esempio Meta Audiobox Aesthetics o SongEval) | richiede di scaricare pacchetto e pesi, e di verificarli sugli strumentali |
 | 2 | **Ascoltare e votare** i brani del nuovo percorso, poi correggere i descrittori `en` e le soglie dello score | la qualità musicale non è verificabile dai test |
 | 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |

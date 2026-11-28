@@ -439,7 +439,8 @@ const lyricsDi = (score) => lyricsDaScore({ ...score, sezioni: score.sezioni.map
 
 // ---- Impostazioni: come nascono gli score dei brani nuovi (config\score.json) ----
 const IMPOSTAZIONI = [
-  { chiave: 'fonte', gruppo: 'Chi scrive', etichetta: 'Chi scrive lo score', scelte: [['modello', 'Modello YuE2, compositore di riserva'], ['compositore', 'Compositore del progetto'], ['motore', 'Motore durante il render']], def: 'modello', descrizione: 'Vale per i brani strumentali. I generi con voci usano sempre il motore.' },
+  { chiave: 'fonte', gruppo: 'Chi scrive', etichetta: 'Chi scrive lo score', scelte: [['auto', 'Automatico, secondo l’estro'], ['modello', 'Modello YuE2, compositore di riserva'], ['compositore', 'Compositore del progetto'], ['motore', 'Motore durante il render']], def: 'auto', descrizione: 'Vale per i brani strumentali. I generi con voci usano sempre il motore.' },
+  { chiave: 'estro', gruppo: 'Chi scrive', etichetta: 'Estro', scelte: [['auto', 'Automatico dal genere'], ['quiete', 'Quiete: ripetizione voluta'], ['vivo', 'Vivo: variazioni e un assolo'], ['pieno', 'Pieno: assoli, rotture, cambi, richiami']], def: 'auto', descrizione: 'Quanto il brano cambia mentre suona. Quiete per meditazione e yoga, pieno per la musica da ascolto.' },
   { chiave: 'tentativi', gruppo: 'Modello YuE2', etichetta: 'Tentativi del modello', min: 1, max: 5, passo: 1, def: 3, descrizione: 'Quanti score si chiedono prima di passare al compositore. Ogni tentativo costa circa due minuti.' },
   { chiave: 'ripara', gruppo: 'Modello YuE2', etichetta: 'Recupera gli score troncati o troppo lunghi', si: true, def: true, descrizione: 'Taglia lo score a un confine di sezione vicino alla durata richiesta invece di buttarlo.' },
   { chiave: 'durataMinima', gruppo: 'Modello YuE2', etichetta: 'Durata minima accettata', min: 0.5, max: 1, passo: 0.05, def: 0.75, descrizione: 'Frazione della durata richiesta sotto cui lo score si rifiuta.' },
@@ -469,6 +470,13 @@ function impostazioni(conf, categoria) {
     for (const s of strati) if (s && valoreValido(d, s[d.chiave])) v = s[d.chiave];
     return [d.chiave, v];
   }));
+}
+
+// "auto" si risolve col genere: livello 0 quiete, 1 vivo, 2 pieno (campo estro del catalogo)
+function risolvi(imp, cat) {
+  const c = cat || {};
+  const livello = { quiete: 0, vivo: 1, pieno: 2 }[imp.estro] ?? c.estro ?? (c.ambito === 'musica' ? 2 : 0);
+  return { ...imp, livello, fonte: imp.fonte === 'auto' ? (livello ? 'compositore' : 'modello') : imp.fonte };
 }
 
 // Parte della richiesta al motore che riguarda la scrittura dello score
@@ -504,4 +512,4 @@ function applica(concept, richiesta) {
   return out;
 }
 
-module.exports = { strumentale, scriviAbc, leggiAbc, durataSecondi, lyricsDaScore, unita, TAG, SEZIONI, noteAccordo, trasponi, sistemaLegature, analizza, ripara, lyricsDi, IMPOSTAZIONI, valoreValido, impostazioni, campionamento, SECONDI_MANUALE, nomeTonalita, richiestaPer, applica };
+module.exports = { strumentale, scriviAbc, leggiAbc, durataSecondi, lyricsDaScore, unita, TAG, SEZIONI, noteAccordo, trasponi, sistemaLegature, analizza, ripara, lyricsDi, IMPOSTAZIONI, valoreValido, impostazioni, risolvi, campionamento, SECONDI_MANUALE, nomeTonalita, richiestaPer, applica };

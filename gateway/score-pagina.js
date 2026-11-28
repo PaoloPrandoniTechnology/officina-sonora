@@ -532,7 +532,8 @@ window.PaginaScore = function (app) {
       if (c.fonte) return c.fonte === 'modello' && c.dove === 'spartito' ? 'Il modello lo sta scrivendo' : 'Score: ' + fonte(c.fonte);
       if (c.manuale) return 'Score scelto a mano';
       if (c.vocale) return 'Genere con voci: lo scrive il motore';
-      const g = quadro.impostazioni.generi[c.categoria] || {}, f = g.fonte || quadro.impostazioni.generale.fonte || 'modello';
+      const genere = quadro.generi.find((x) => x.nome === c.categoria) || {};
+      const f = A.risolvi(A.impostazioni({ generale: quadro.impostazioni.generale, generi: quadro.impostazioni.generi }, c.categoria), genere).fonte;
       return f === 'modello' ? 'Lo scriverà il modello; il compositore è pronto di riserva' : f === 'compositore' ? 'Userà lo score del compositore' : 'Lo scriverà il motore durante il render';
     };
     imposta(radice, `<div class="grid">
@@ -571,8 +572,8 @@ window.PaginaScore = function (app) {
         <span class="muted">Un campo vuoto eredita il valore indicato. Le modifiche valgono dai prossimi brani.</span></div>
       <div class="card sc-flusso"><h2>Come nasce lo score di un brano nuovo</h2><ol>
         <li><b>Score scelto da te</b>, se c'è: ha la precedenza su tutto.</li>
-        <li><b>Modello YuE2</b>: scrive lo score; il sistema lo controlla, passa la melodia agli strumenti e, se è troncato o troppo lungo, lo recupera.</li>
-        <li><b>Compositore del progetto</b>: pronto di riserva quando il modello non riesce.</li>
+        <li><b>Generi creativi</b> (estro vivo o pieno): lo compone il compositore del progetto, con assoli, variazioni e richiami diversi a ogni brano.</li>
+        <li><b>Generi di quiete</b> (yoga e meditazione): lo scrive il modello YuE2; il sistema lo controlla, passa la melodia agli strumenti e, se è troncato o troppo lungo, lo recupera. Il compositore è di riserva.</li>
         <li><b>Motore durante il render</b>: ultima risorsa, e unica strada per i generi con voci.</li></ol></div>
       ${Object.entries(gruppi).map(([nome, lista]) => `<div class="card cgroup"><h3>${esc(nome)}</h3>${lista.map((d) => `<div class="prow"><div><div class="nm">${esc(d.etichetta)}${d.chiave in miei ? '<span class="badge">modificato</span>' : ''}</div><div class="ds">${esc(d.descrizione)}${d.min !== undefined ? ` Da ${String(d.min).replace('.', ',')} a ${String(d.max).replace('.', ',')}.` : ''}</div></div><div class="ctl">${controllo(d)}</div><div></div></div>`).join('')}</div>`).join('')}
       <div class="sc-salva"><button type="button" class="btn" data-sc="regole" disabled>Salva</button><button type="button" class="btn ghost" data-sc="predefiniti" ${Object.keys(miei).length ? '' : 'disabled'}>Torna ${ambito === 'generale' ? 'ai predefiniti' : 'al generale'}</button></div>`;
