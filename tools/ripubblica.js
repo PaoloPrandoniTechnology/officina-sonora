@@ -21,7 +21,8 @@ function prossimoPasso(r) {
 
 function daRipubblicare(brani, mappa) {
   return brani.filter(({ jsonPath, meta }) => {
-    if (!meta.ibroadcast || !meta.ibroadcast.track_id) return false;
+    // "rimosso": eliminato per spazio, ricaricarlo vanificherebbe la rotazione
+    if (!meta.ibroadcast || !meta.ibroadcast.track_id || meta.ibroadcast.rimosso) return false;
     const r = mappa[jsonPath];
     if (r && !r.cestinato) return true;
     return (meta.id3_versione || 0) < 2 || meta.copertina === 'provvisoria' || meta.copertina_online === false;

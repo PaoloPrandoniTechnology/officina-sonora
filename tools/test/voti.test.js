@@ -343,3 +343,43 @@ test('pulizia: a vuoto non scrive; --applica copia, scrive e rinomina il CSV; se
   assert.equal(fs.readFileSync(csv, 'utf8'), 'nuovo');
   assert.equal(fs.readFileSync(csv + '.vecchio', 'utf8'), originali[2]);
 }));
+
+test('spazio iBroadcast: sotto soglia nulla; sopra, prima il cestino, poi voto peggiore e piu vecchi, mai i 5', () => {
+  const daRimuovere = vm.runInContext('daRimuovere', ctx);
+  const brano = (id, voto, giorno) => ({ id, meta: { voto, generato_il: `2026-11-${giorno}` } });
+  const nostri = [brano('1', null, '01'), brano('2', 4, '01'), brano('3', 1, '20'), brano('4', 5, '01'), brano('5', 3, '02'), brano('6', 2, '25')];
+  const tracce = Object.fromEntries(['1', '2', '3', '4', '5', '6', '7', '8'].map((id) => [id, { size: 10, trashed: id === '7' }]));
+  assert.deepEqual([...daRimuovere(tracce, nostri, 90, 70)], []);
+  // 80 usati: il cestino (7) e poi 3 (voto 1), 6 (voto 2), 1 e 5 (senza voto o 3, per età), 2 (voto 4); 8 non è nostro
+  assert.deepEqual([...daRimuovere(tracce, nostri, 80, 50)], ['7', '3', '6']);
+  assert.deepEqual([...daRimuovere(tracce, nostri, 80, 0)], ['7', '3', '6', '1', '5', '2']);
+});
+
+test('blocco 10: oltre la soglia elimina, segna la scheda e non scambia la rimozione per un voto', () => conLibreria(async (dir, lib) => {
+  const a = path.join(lib, 'a.json');
+  const b = path.join(lib, 'b.json');
+  fs.writeFileSync(a, JSON.stringify({ titolo: 'A', voto: null, generato_il: '2026-11-01', ibroadcast: { track_id: '1' } }));
+  fs.writeFileSync(b, JSON.stringify({ titolo: 'B', voto: null, generato_il: '2026-11-02', ibroadcast: { track_id: '2' } }));
+  const tracks = { 1: { size: 10 }, 2: { size: 10 } };
+  const chiamate = [];
+  const cfg = { spazioIb: { soglia: 20, obiettivo: 10 } };
+  const gw = (ok) => async (rotta, corpo) => {
+    if (rotta === '/ib/library') return { json: { library: { tracks, playlists: {}, tags: {} } } };
+    chiamate.push([corpo.mode, [...corpo.args.tracks]]);
+    return { status: 200, json: { result: ok } };
+  };
+  // rifiuto del cestino: la scheda non resta segnata
+  await eseguiBlocco('10-voti-ibroadcast.js', { gw: gw(false), cfg }, dir);
+  assert.equal(leggi(a).ibroadcast.rimosso, undefined);
+  fs.rmSync(path.join(dir, 'state', 'voti-ibroadcast.json'));
+  chiamate.length = 0;
+  await eseguiBlocco('10-voti-ibroadcast.js', { gw: gw(true), cfg }, dir);
+  assert.deepEqual(chiamate, [['trash', [1]], ['empty_trash', [1]]]);
+  assert.ok(leggi(a).ibroadcast.rimosso);
+  assert.equal(leggi(b).ibroadcast.rimosso, undefined);
+  // cestino non ancora svuotato: il brano rimosso non diventa voto 1
+  fs.rmSync(path.join(dir, 'state', 'voti-ibroadcast.json'));
+  tracks[1].trashed = true;
+  await eseguiBlocco('10-voti-ibroadcast.js', { gw: gw(true), cfg: { spazioIb: { soglia: 1000, obiettivo: 900 } } }, dir);
+  assert.equal(leggi(a).voto, null);
+}));

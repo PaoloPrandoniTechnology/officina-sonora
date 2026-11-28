@@ -1,5 +1,5 @@
-// BLOCCO 10 - Voti da iBroadcast: legge la libreria (sola lettura, via gateway) ogni 10 minuti e converte
-// i segnali che tu gia' dai nell'app in voti:
+// BLOCCO 10 - Voti da iBroadcast: legge la libreria (via gateway) ogni 10 minuti, libera spazio quando
+// si avvicina ai 5 GB e converte i segnali che tu gia' dai nell'app in voti:
 //  - valutazione a stelle (rating 1-5)  -> voto diretto
 //  - tag utente (preferito, scarta, voto-N) -> voto
 //  - playlist utente (preferiti, scartati) -> voto
@@ -93,7 +93,7 @@ for (const b of nostri) {
   let voto = null, fonte = null;
   if (Number(t.rating) >= 1) { voto = Math.min(5, Math.round(Number(t.rating))); fonte = 'valutazione iBroadcast'; }
   else if (fonteVoto[b.id]) { voto = fonteVoto[b.id].voto; fonte = fonteVoto[b.id].fonte; }
-  else if (t.trashed) { voto = 1; fonte = 'cestino iBroadcast'; }
+  else if (t.trashed && !b.meta.ibroadcast.rimosso) { voto = 1; fonte = 'cestino iBroadcast'; }
 
   // Tag di tempo: sposta il bpm del genere di un passo, una sola volta per brano, entro i limiti
   const dir = tempoPerTraccia[b.id];
@@ -129,6 +129,41 @@ for (const b of nostri) {
     log(`voti iBroadcast: scheda di ${meta.titolo} non aggiornata: ${e.message}`);
   }
 }
-fs.writeFileSync(VOTI_FILE, JSON.stringify({ lastRun: Date.now(), tempoApplicati: ultimo.tempoApplicati || [], ultimoEsito: { aggiornati, ascoltiTot } }, null, 2));
+// Spazio: dopo aver registrato i voti si eliminano da iBroadcast i brani di troppo. I file sul PC restano.
+// Il segno "rimosso" si scrive prima di cestinare: così il brano non diventa un voto 1 né viene ricaricato.
+const via = daRimuovere(tracce, nostri.map((b) => ({ id: b.id, meta: readJsonSafe(b.json, b.meta) })), CFG.spazioIb.soglia, CFG.spazioIb.obiettivo);
+if (via.length) {
+  const segnati = [];
+  const chiedi = async (mode, ids) => {
+    const r = await gw('/ib/api', { mode, args: { tracks: ids.map(Number) } });
+    if (r.status !== 200 || !r.json || r.json.result === false) throw new Error(`${mode} non accettato (HTTP ${r.status}) ${r.error || (r.json && r.json.message) || ''}`);
+  };
+  try {
+    for (const b of nostri.filter((x) => via.includes(x.id))) {
+      const meta = readJsonSafe(b.json, null);
+      if (!meta || !meta.ibroadcast || meta.ibroadcast.rimosso) continue;
+      meta.ibroadcast.rimosso = new Date().toISOString();
+      scriviScheda(b.json, meta);
+      segnati.push(b);
+    }
+    const daCestinare = via.filter((id) => !tracce[id].trashed);
+    if (daCestinare.length) {
+      try { await chiedi('trash', daCestinare); } catch (e) {
+        for (const b of segnati.filter((x) => daCestinare.includes(x.id))) {
+          const meta = readJsonSafe(b.json, null);
+          delete meta.ibroadcast.rimosso;
+          scriviScheda(b.json, meta);
+        }
+        throw e;
+      }
+    }
+    // se lo svuotamento fallisce i brani restano nel cestino e al giro successivo sono i primi della lista
+    await chiedi('empty_trash', via);
+    log(`spazio iBroadcast: eliminati ${via.length} brani (restano sul PC). Per liberare del tutto la quota controlla "Unavailable Files" nel Track Dashboard`);
+  } catch (e) {
+    log('spazio iBroadcast: eliminazione non riuscita: ' + e.message);
+  }
+}
+fs.writeFileSync(VOTI_FILE,JSON.stringify({ lastRun: Date.now(), tempoApplicati: ultimo.tempoApplicati || [], ultimoEsito: { aggiornati, ascoltiTot } }, null, 2));
 if (aggiornati) log(`voti iBroadcast: ${aggiornati} brani aggiornati dai segnali dell'app`);
 return [{ json: { voti: 'ok', aggiornati, ascoltiTot } }];

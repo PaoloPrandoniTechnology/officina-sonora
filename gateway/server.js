@@ -32,7 +32,7 @@ const TOKEN_FILE = path.join(__dirname, 'token.json');
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const IB_CLIENT = process.env.IBROADCAST_CLIENT_ID || '';
 const TG_METODI = new Set(['sendMessage', 'getUpdates', 'answerCallbackQuery']);
-const IB_MODI = new Set(['createtag', 'tagtracks', 'createplaylist', 'appendplaylist', 'trash', 'ratetrack']);
+const IB_MODI = new Set(['createtag', 'tagtracks', 'createplaylist', 'appendplaylist', 'trash', 'empty_trash', 'ratetrack']);
 
 let cache = { access: null, scadenza: 0 };
 

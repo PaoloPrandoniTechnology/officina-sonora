@@ -85,6 +85,29 @@ function applicaSegnale(meta, segnale, oraIso) {
   return true;
 }
 
+// Spazio gratuito di iBroadcast (5 GB): oltre la soglia si libera fino all'obiettivo
+CFG.spazioIb = { soglia: 4.7e9, obiettivo: 4.5e9 };
+
+// Id da eliminare da iBroadcast. Prima tutto il cestino (occupa spazio); poi i brani del sistema: voto 1, voto 2,
+// senza voto o 3, voto 4, a parità i più vecchi. I voti 5 e i brani caricati a mano non si toccano.
+function daRimuovere(tracce, nostri, soglia, obiettivo) {
+  const peso = (id) => Number(tracce[id].size) || 0;
+  const ids = Object.keys(tracce).filter((id) => id !== 'map');
+  let usato = ids.reduce((s, id) => s + peso(id), 0);
+  if (usato < soglia) return [];
+  const via = ids.filter((id) => tracce[id].trashed);
+  usato -= via.reduce((s, id) => s + peso(id), 0);
+  const classe = (v) => ({ 1: 0, 2: 1, 4: 3 })[v] ?? 2;
+  const candidati = nostri.filter((b) => tracce[b.id] && !tracce[b.id].trashed && b.meta.voto !== 5)
+    .sort((a, b) => classe(a.meta.voto) - classe(b.meta.voto) || String(a.meta.generato_il || '').localeCompare(String(b.meta.generato_il || '')));
+  for (const b of candidati) {
+    if (usato <= obiettivo) break;
+    via.push(b.id);
+    usato -= peso(b.id);
+  }
+  return via;
+}
+
 // Impronta dei voti ("quanti|data dell'ultimo"): cambia anche correggendo un voto già dato
 function firmaVoti(tracks) {
   const votati = tracks.filter((t) => votoUtente(t));

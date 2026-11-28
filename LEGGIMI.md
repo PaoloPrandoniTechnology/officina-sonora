@@ -47,6 +47,9 @@ Dall'app iBroadcast, con le stesse regole per ogni genere:
 - tag `piu-veloce` / `piu-lento`: spostano il bpm del genere di 6, entro 15 dalla fascia base.
 Le playlist e i tag di sistema non contano come voti.
 
+Spazio: oltre 4,7 GB il sistema elimina da iBroadcast (definitivamente; i file sul PC restano) prima il cestino, poi
+i brani con voto peggiore e i piu' vecchi, fino a 4,5 GB. I brani con voto 5 non vengono toccati.
+
 ## Andamento (scheda della dashboard)
 Voto medio, brani scartati %, secondi di render per secondo di musica buona ed errori, per ora o per giorno, con
 filtro per genere (non applicato agli errori) e linee verticali sulle modifiche. Il voto e' collocato alla data di

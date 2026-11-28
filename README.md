@@ -70,6 +70,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 | **Ascoltare** di seguito, in ordine o a caso | *Riproduci* o *Casuale* in [Libreria](#libreria) e [Playlist](#playlist); vedi [Il lettore](#il-lettore) |
 | **Preparare la musica per una lezione** | una [playlist](#playlist), con [dissolvenza e timer di spegnimento](#timer-dissolvenza-e-scorciatoie) |
 | **Dare un voto** | stelle nel [lettore](#il-lettore), pagina [Voti](#voti), `/menu` su Telegram o stelle in iBroadcast |
+| **Non superare i 5 GB** di iBroadcast | è automatico: vedi [rotazione](#spazio-la-rotazione-dei-brani); dai voto 5 ai brani da conservare |
 | **Vedere, ascoltare e modificare uno score** | pagina [Score](#score) |
 | **Decidere come nascono gli score** nuovi | [Score → Come nascono](#come-nascono) |
 | Brani **più ricchi di variazioni** o, al contrario, più calmi | [Score → Come nascono](#come-nascono), voce *Estro* (vedi [Quiete o estro](#quiete-o-estro)) |
@@ -168,7 +169,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | **8a Comandi Telegram** | Risponde ai comandi, raccoglie voti e interpreta richieste in italiano, applicandole solo dopo il tuo **Conferma**. |
 | **8b Avvisi** | Un errore ripetuto 3 volte in un'ora genera un avviso (al massimo uno ogni 30 minuti per tipo). |
 | **9 Rapporto giornaliero** | Una volta al giorno: brani, voti, errori, salute del sistema, ricette migliori e peggiori, commento del modello di testo. |
-| **10 Voti da iBroadcast** | Ogni 10 minuti legge stelle, tag, playlist e cestino e li trasforma in voti; applica anche `piu-veloce` / `piu-lento`. |
+| **10 Voti da iBroadcast** | Ogni 10 minuti legge stelle, tag, playlist e cestino e li trasforma in voti; applica anche `piu-veloce` / `piu-lento`. Vicino ai 5 GB elimina da iBroadcast i brani peggiori e più vecchi ([rotazione](#spazio-la-rotazione-dei-brani)). |
 | **11 Riepilogo** | Alla frequenza scelta, nella fascia oraria, un messaggio con i brani caricati. |
 
 ### Servizi di supporto
@@ -980,6 +981,20 @@ sua; finché manca si usa uno degli 8 sfondi del genere, che quindi si ripetono.
    La vecchia copia si cestina solo dopo che la nuova ha tag, playlist e voti; il conteggio degli ascolti
    riparte da zero.
 
+### Spazio: la rotazione dei brani
+
+Il piano gratuito di iBroadcast ha 5 GB. Il blocco 10, dopo aver letto i voti, somma lo spazio di tutti i brani
+(cestino compreso): oltre **4,7 GB** elimina fino a scendere a **4,5 GB** (a gruppi, non uno per ogni brano nuovo).
+I valori sono `CFG.spazioIb` in `src\lib-apprendimento.js`. Ordine di eliminazione:
+
+1. tutto ciò che è nel cestino;
+2. voto 1, poi voto 2, poi senza voto o 3, poi voto 4; a parità, i più vecchi.
+
+I brani con **voto 5** e quelli che hai caricato a mano (se non nel cestino) non vengono toccati. L'eliminazione da
+iBroadcast è **definitiva** (cestino e svuotamento); MP3, scheda e voto **restano sul PC** e il brano non viene
+ricaricato (`ibroadcast.rimosso` nella scheda). Secondo iBroadcast i file svuotati dal cestino possono restare in
+*Unavailable Files* nel Track Dashboard: se lo spazio non si libera, cancellali da lì.
+
 ---
 
 ## 9. Generi e libreria
@@ -1126,6 +1141,7 @@ In ordine di priorità. Il disegno completo è in
 | 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |
 | 4 | **Score**: pentagramma oltre al piano roll, e confronto fra due versioni | il piano roll non è una partitura |
 | 5 | **Lettore**: equalizzatore, playlist inviate a iBroadcast, cronologia comune a più browser | oggi restano su questo PC e nel browser |
+| 6 | **Rotazione**: verificare dopo la prima eliminazione che la quota di iBroadcast scenda davvero | l'API di svuotamento non è documentata e i file potrebbero restare in *Unavailable Files* |
 | 6 | **Schede artistiche** più ricche per i generi attivi: forme e varianti vere al posto di quelle segnaposto | generi più distinti |
 | 7 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |
 | 8 | **Servizi di testo dalla dashboard**: accendere, spegnere e ordinare (le chiavi si inseriscono già); aggiungere Cloudflare Workers AI | oggi si modifica `config\servizi.json` |

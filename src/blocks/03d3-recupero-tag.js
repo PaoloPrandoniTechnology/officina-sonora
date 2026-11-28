@@ -13,7 +13,7 @@ const walkOrg = (dir) => {
     else if (name.endsWith('.json') && name !== 'feedback.json') {
       const meta = readJsonSafe(full, null);
       const ib = meta && meta.ibroadcast;
-      if (!ib || !ib.track_id || ib.organizzato) continue;
+      if (!ib || !ib.track_id || ib.organizzato || ib.rimosso) continue;
       const ultimo = ib.tag_ultimo_tentativo ? Date.parse(ib.tag_ultimo_tentativo) : 0;
       if ((ib.tag_tentativi || 0) >= 30 || Date.now() - ultimo < 5 * 60000) continue;
       if (Date.now() - Date.parse(ib.caricato_il || 0) < 3 * 60000) continue;
