@@ -114,12 +114,45 @@ test('lettura: stili con i generi che li usano, e la pagina è collegata', () =>
   assert.ok(server.includes("'/composizione-pagina.js'") && server.includes('/api/composizione/'));
 });
 
-test('pagina: l’editor a pulsanti riscrive ogni accordo di serie con lo stesso significato', () => {
-  const js = fs.readFileSync(path.join(RADICE, 'gateway', 'composizione-pagina.js'), 'utf8');
-  const parte = js.slice(js.indexOf('const GRADI_ROM'), js.indexOf('// riquadro:'));
-  const { smonta, monta } = new Function(parte + 'return { smonta, monta };')();
-  const { grado } = require('../../src/compositore/armonia.js');
-  const accordi = M.unisci({}).filter((v) => v.tipo === 'armonia' || v.tipo === 'richiamo').flatMap((v) => (v.tipo === 'armonia' ? v.testo : v.accordi).split(/[|\s]+/).filter(Boolean));
-  assert.ok(accordi.length > 1000);
-  for (const a of accordi) assert.deepEqual(grado(monta(smonta(a))), grado(a), a);
+// ---- editor a pulsanti: il suo modello deve rileggere ogni voce senza alterarla ----
+const Ed = require('../../gateway/composizione-editor.js');
+
+test('editor: ogni voce di serie, letta e riscritta, resta identica per il compositore', () => {
+  for (const v of M.unisci({})) {
+    const campi = Ed.campiDi(Ed.modelloDi(v));
+    const dopo = M.controlla({ ...v, ...campi });
+    const prima = M.controlla(v);
+    if (v.tipo === 'armonia') assert.deepEqual(M.periodoDi(dopo.testo, v.ruolo === 'pre' ? 4 : 8), M.periodoDi(prima.testo, v.ruolo === 'pre' ? 4 : 8), v.id);
+    else if (v.tipo === 'richiamo') {
+      assert.deepEqual(M.noteDi(dopo.note), M.noteDi(prima.note), v.id);
+      assert.deepEqual(M.periodoDi(dopo.accordi, M.noteDi(dopo.note).length), M.periodoDi(prima.accordi, M.noteDi(prima.note).length), v.id);
+    } else assert.deepEqual(dopo, prima, v.id);
+  }
+});
+
+test('editor: qualsiasi sequenza di pulsanti lascia battute complete e voci valide', () => {
+  let seme = 7;
+  const caso = (n) => { seme = (seme * 48271) % 2147483647; return seme % n; };
+  for (const tipo of ['motivo', 'assolo', 'richiamo']) {
+    const base = M.unisci({}).find((v) => v.tipo === tipo);
+    const m = Ed.modelloDi(base);
+    for (let passo = 0; passo < 600; passo++) {
+      const bar = m.figure[caso(m.figure.length)], i = caso(bar.length), azione = caso(6);
+      if (azione === 0) Ed.cambiaDurata(bar, i, 1 + caso(32));
+      else if (azione === 1) Ed.dividi(bar, i);
+      else if (azione === 2) Ed.unisci(bar, i);
+      else if (azione === 3) { bar[i].pausa = !bar[i].pausa; if (tipo === 'richiamo') bar[i].midi = bar[i].pausa ? null : Ed.MIN + caso(37); Ed.sistema(bar); }
+      else if (azione === 4 && !bar[i].pausa) { bar[i].app = !bar[i].app; Ed.sistema(bar); }
+      else if (azione === 5 && !bar[i].pausa) { bar[i].ant = !bar[i].ant; Ed.sistema(bar); }
+      for (const b of m.figure) assert.equal(b.reduce((a, f) => a + f.d, 0), 32, `${tipo} ${passo}`);
+      assert.doesNotThrow(() => M.controlla({ ...base, ...Ed.campiDi(m) }), `${tipo} passo ${passo}: ${JSON.stringify(Ed.campiDi(m))}`);
+    }
+  }
+});
+
+test('editor: allungare mangia le figure dopo, accorciare lascia una pausa', () => {
+  const [bar] = Ed.leggiRitmo('8 8 8 8');
+  assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 0, 20)]), '20 4 8');
+  assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 0, 4)]), '4 -16 4 8');
+  assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 3, 32)]), '4 -16 4 8', 'oltre la fine della battuta non si va');
 });
