@@ -337,10 +337,10 @@
   .termini-famiglie { display: flex; flex-direction: column; gap: 2px; }
   .termini-famiglie .gvoce { padding: 6px 9px; font-size: 12.5px; }
   .termini-famiglie .gvoce small { color: var(--faint); font-weight: 400; }
-  .termini-elenco { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 0 18px; max-height: 330px; overflow: auto; align-content: start; }
+  .termini-elenco { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 0 18px; align-content: start; }
   .termine { display: flex; align-items: center; gap: 4px; padding: 3px 4px; border-bottom: 1px solid var(--line); font-size: 12.5px; min-width: 0; }
   .termine:hover { background: rgba(255,255,255,.03); }
-  .termine > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .termine > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .termine.piu > span { color: var(--accent); } .termine.meno > span { color: var(--muted); text-decoration: line-through; }
   .segno { all: unset; cursor: pointer; width: 22px; height: 22px; display: inline-grid; place-items: center; border-radius: 6px; border: 1px solid var(--line2); color: var(--muted); font-size: 14px; line-height: 1; flex: none; }
   .segno:hover { color: var(--text); border-color: var(--accent); }
@@ -1400,13 +1400,12 @@
       const fonte = cerca ? famiglie.flatMap((f) => ctrl.vocabolario[f] || []) : (ctrl.vocabolario[guidaFam] || []);
       const trovati = fonte.filter((t) => t.includes(cerca));
       if (cerca.length > 1 && !noti.has(cerca)) trovati.unshift(cerca);
-      $('#gVocab').innerHTML = trovati.slice(0, 240).map((t) => {
+      $('#gVocab').innerHTML = trovati.map((t) => {
         const piu = aggiunti.includes(t), meno = esclusi.includes(t), nuovo = !noti.has(t);
         return `<div class="termine${piu ? ' piu' : meno ? ' meno' : ''}"><span title="${esc(t)}">${esc(t)}${nuovo ? ' <small class="muted">(nuovo)</small>' : ''}</span>
           <button type="button" class="segno piu" data-piu="${esc(t)}" aria-pressed="${piu}" aria-label="aggiungi ${esc(t)}" title="${voceVietata(t) ? 'le voci non vanno nei brani strumentali' : 'aggiungi allo stile'}" ${voceVietata(t) && !piu ? 'disabled' : ''}>+</button>
           <button type="button" class="segno meno" data-meno="${esc(t)}" aria-pressed="${meno}" aria-label="evita ${esc(t)}" title="da evitare">−</button></div>`;
-      }).join('') + (trovati.length > 240 ? `<div class="termine muted">altri ${n0(trovati.length - 240)}: usa la ricerca</div>` : '')
-        || '<div class="termine muted">Nessun termine trovato.</div>';
+      }).join('') || '<div class="termine muted">Nessun termine trovato.</div>';
       clic('[data-piu]', (b) => aggiungi(b.dataset.piu));
       clic('[data-meno]', (b) => evita(b.dataset.meno));
     };
