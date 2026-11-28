@@ -11,6 +11,7 @@ const controllo = require('./controllo');
 const voti = require('./voti');
 const playlist = require('./playlist');
 const score = require('./score');
+const composizione = require('./composizione');
 const andamento = require('./andamento');
 const { crea: creaTesti, lms } = require('./testi');
 const { ammessa } = require('./protezione');
@@ -24,7 +25,7 @@ process.on('uncaughtException', (e) => {
 });
 const STATICI = { '/dashboard': ['dashboard.html', 'text/html'], '/dashboard.css': ['dashboard.css', 'text/css'], '/dashboard.js': ['dashboard.js', 'text/javascript'],
   '/coda.js': ['coda.js', 'text/javascript'], '/lettore.js': ['lettore.js', 'text/javascript'], '/lettore.css': ['lettore.css', 'text/css'],
-  '/score-pagina.js': ['score-pagina.js', 'text/javascript'], '/score.css': ['score.css', 'text/css'] };
+  '/score-pagina.js': ['score-pagina.js', 'text/javascript'], '/composizione-pagina.js': ['composizione-pagina.js', 'text/javascript'], '/score.css': ['score.css', 'text/css'] };
 const MAX_CORPO = 300 * 1024 * 1024;
 
 const PORT = process.env.OFS_PORTA || 5790;
@@ -231,6 +232,7 @@ const server = http.createServer(async (req, res) => {
       const d = pagina.endsWith('brano') ? score.brano(Number(q.get('n'))) : score.scartato(q.get('id'));
       return d ? rispondi(200, d) : rispondi(404, { ok: false, error: 'score non trovato' });
     }
+    if (req.method === 'GET' && req.url === '/api/composizione') return rispondi(200, composizione.lettura());
     if (req.method === 'GET' && req.url === '/api/playlist') return rispondi(200, playlist.leggi());
     if (req.method === 'GET' && req.url.startsWith('/api/playlist/m3u?')) {
       const id = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('id');
@@ -257,7 +259,7 @@ const server = http.createServer(async (req, res) => {
       return rispondi(r.codice, r.corpo);
     }
     const archivio = req.url.startsWith('/api/playlist/') ? [playlist, '/api/playlist/'] : req.url.startsWith('/api/score/') ? [score, '/api/score/']
-      : req.url.startsWith('/api/testi/') ? [testi, '/api/testi/'] : null;
+      : req.url.startsWith('/api/composizione/') ? [composizione, '/api/composizione/'] : req.url.startsWith('/api/testi/') ? [testi, '/api/testi/'] : null;
     if (archivio) {
       if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
       try { return rispondi(200, await archivio[0].gestisci(req.url.slice(archivio[1].length), JSON.parse(corpo.toString('utf8') || '{}'))); }

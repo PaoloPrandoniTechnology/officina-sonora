@@ -55,3 +55,32 @@
 .sc-salva { position: sticky; bottom: 0; display: flex; gap: 8px; padding: 12px 0; background: var(--bg); }
 body.suona .sc-salva { bottom: 86px; }
 @media (max-width: 880px) { .sc-zoom { margin-left: 0; } }
+
+/* Pagina Composizione: schede del materiale musicale */
+.cm-aiuto { margin-bottom: 14px; }
+.cm-aiuto p { margin: 0 0 6px; font-size: 13px; max-width: 90ch; }
+.cm-elenco { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); }
+.cm-voce { display: flex; flex-direction: column; gap: 8px; }
+.cm-voce.spenta pre, .cm-voce.spenta h3 { opacity: .55; }
+.cm-voce h3 { margin: 0; font-size: 13.5px; }
+.cm-voce p { margin: 0; font-size: 12.5px; }
+.cm-voce pre { margin: 0; flex: 1; padding: 8px 10px; background: var(--panel-2); border-radius: 4px; font: 12.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.cm-tasti { display: flex; flex-wrap: wrap; gap: 6px; }
+.cm-form .cm-testo { width: 100%; font: 13px/1.6 var(--mono); resize: vertical; }
+.cm-form > p { max-width: 60ch; font-size: 12.5px; }
+.cm-spunte { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 4px 10px; border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; }
+.cm-spunte label { display: flex; align-items: center; gap: 6px; }
+#finestra:has(.cm-giro) { width: min(94vw, 680px); max-width: 94vw; }
+.cm-terna { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.cm-battute { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.cm-battuta { display: flex; gap: 3px; position: relative; padding-top: 14px; min-width: 0; }
+.cm-battuta small { position: absolute; top: 0; left: 2px; font-size: 11px; color: var(--faint); }
+.cm-accordo { flex: 1; min-width: 0; display: grid; gap: 1px; padding: 6px 2px; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line-2); border-radius: 4px; overflow: hidden; }
+.cm-accordo b { font: 600 13px var(--mono); overflow-wrap: anywhere; }
+.cm-accordo span { font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
+.cm-form .cm-scelta { margin: 10px 0 4px; font-size: 12.5px; }
+.cm-form .cm-riga { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 8px; max-width: none; }
+.cm-riga > span { width: 52px; font-size: 12px; color: var(--muted); }
+.cm-tasto { min-width: 34px; height: 28px; padding: 0 7px; font-size: 12.5px; background: var(--panel); color: var(--ink); border: 1px solid var(--line-2); border-radius: 4px; }
+.cm-accordo[aria-pressed="true"], .cm-tasto[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.cm-accordo[aria-pressed="true"] span { color: var(--accent-text); }

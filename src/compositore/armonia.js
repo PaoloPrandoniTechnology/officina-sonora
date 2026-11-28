@@ -152,4 +152,4 @@ const ARMONIA = Object.fromEntries(Object.entries(G).map(([stile, modi]) => [sti
   [modo, Object.fromEntries(Object.entries(ruoli).map(([ruolo, voci]) => [ruolo, voci.map(periodo)]))]))]));
 ARMONIA.drone = ARMONIA.cine;
 
-if (typeof module !== 'undefined') module.exports = { ARMONIA, grado };
+if (typeof module !== 'undefined') module.exports = { TESTI: G, ARMONIA, grado };

@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const Abc = require('../src/compositore/abc.js');
 const Compositore = require('../src/compositore/compositore.js');
 const Estro = require('../src/compositore/estro.js');
+const Materiale = require('../src/compositore/materiale.js');
 const libreria = require('./libreria');
 const { scriviAtomico } = require('./disco');
 
@@ -18,6 +19,7 @@ const percorsi = (base) => ({
   scartati: path.join(base, 'state', 'score-scartati'),
   catalogo: path.join(base, 'config', 'catalogo.json'),
   memoria: path.join(base, 'state', 'memoria-composizione.json'),
+  composizione: process.env.OFS_COMPOSIZIONE || path.join(base, 'config', 'composizione.json'),
   storico: process.env.OFS_STORICO || path.join(base, 'config', 'history', 'controllo.jsonl'), // lo stesso Storico del Controllo
 });
 const MAX_BOZZE = 200;
@@ -155,7 +157,8 @@ function componi(p, r) {
   const imp = Abc.risolvi(Abc.impostazioni(facoltativo(p.conf, {}), cat.name), cat);
   const g = (facoltativo(p.memoria, { generi: {} }).generi || {})[cat.name] || {};
   const richiesta = { cat, bpm, tonalita: String(r.tonalita || (cat.tonalita || [])[0] || ''), durata_s: durata, sezioni, seed, precedenti: (g.brani || []).map((b) => b.firma), candidati: imp.candidati, metri: imp.metri };
-  const c = imp.livello ? Estro.componi({ ...richiesta, estro: imp.livello })
+  const materiale = Materiale.pronto(facoltativo(p.composizione, {}));
+  const c = imp.livello ? Estro.componi({ ...richiesta, estro: imp.livello, materiale })
     : Compositore.componi({ ...richiesta, identita: Compositore.identita(cat, g.identita, {}, seed) });
   return { abc: c.abc, punteggio: c.punteggio, seed };
 }

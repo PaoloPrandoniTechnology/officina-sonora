@@ -43,6 +43,7 @@ Usato quando il genere ha `estro` 1 o 2. Terza versione, 28/11/2026: dettagli e 
 [composizione-design](superpowers/specs/2026-11-28-composizione-design.md).
 
 - `armonia.js`: periodi in gradi romani (`i | bVII/II | iv7 V7`) per stile, modo e ruolo.
+- `materiale.js`: unisce i valori di serie alle modifiche della pagina Composizione (`config\composizione.json`).
 - `melodia.js`: scheletro di note dell'accordo (programmazione dinamica, costo dei salti, percorso ad arco);
   motivi di due battute con gesti; scala piegata sull'accordo quando esce dalla tonalità; appoggiature e
   anticipi (legatura sulla stessa altezza oltre la stanghetta); frasi d'assolo di una battuta.

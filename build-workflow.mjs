@@ -23,7 +23,7 @@ const codeIb = (prefix) => lib + '\n' + libIb + '\n' + coverJs + '\n' + blockFil
 // moduli CommonJS di src/compositore, ciascuno chiuso in una funzione
 const modulo = (nome, file) => `const ${nome} = (() => { const module = { exports: {} };\n${readFileSync(join(here, 'src', 'compositore', file), 'utf8')}\nreturn module.exports; })();`;
 const abcJs = modulo('ScoreAbc', 'abc.js');
-const compositoreJs = abcJs + '\n' + modulo('Compositore', 'compositore.js') + '\n' + modulo('Armonia', 'armonia.js') + '\n' + modulo('Melodia', 'melodia.js') + '\n' + modulo('Estro', 'estro.js');
+const compositoreJs = abcJs + '\n' + modulo('Compositore', 'compositore.js') + '\n' + modulo('Armonia', 'armonia.js') + '\n' + modulo('Melodia', 'melodia.js') + '\n' + modulo('Materiale', 'materiale.js') + '\n' + modulo('Estro', 'estro.js');
 const ifString = (left, right) => ({
   conditions: {
     options: { caseSensitive: true, leftValue: '', typeValidation: 'strict', version: 1 },

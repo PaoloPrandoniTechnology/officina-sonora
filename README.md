@@ -72,6 +72,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 | **Dare un voto** | stelle nel [lettore](#il-lettore), pagina [Voti](#voti), `/menu` su Telegram o stelle in iBroadcast |
 | **Non superare i 5 GB** di iBroadcast | è automatico: vedi [rotazione](#spazio-la-rotazione-dei-brani); dai voto 5 ai brani da conservare |
 | **Vedere, ascoltare e modificare uno score** | pagina [Score](#score) |
+| **Vedere, cambiare o aggiungere** accordi, motivi, assoli, richiami e forme | [Composizione](#composizione) |
 | **Decidere come nascono gli score** nuovi | [Score → Come nascono](#come-nascono) |
 | Brani **più ricchi di variazioni** o, al contrario, più calmi | [Score → Come nascono](#come-nascono), voce *Estro* (vedi [Quiete o estro](#quiete-o-estro)) |
 | **Scaricare** un brano o vedere come è stato fatto | clic sul titolo: [scheda del brano](#la-scheda-del-brano) |
@@ -253,11 +254,12 @@ Ogni genere ha un livello di **estro** (campo `estro` del catalogo, modificabile
 
 Nei livelli 1 e 2 lo score è del compositore **estro**, perché gli score del modello ripetono in media 87
 battute su 100 con due o tre accordi; i suoi ne ripetono circa 39 su 100. Lavora in tre strati, come un
-arrangiatore ([analisi e fonti](docs/superpowers/specs/2026-11-28-composizione-design.md)):
+arrangiatore ([analisi e fonti](docs/superpowers/specs/2026-11-28-composizione-design.md)). Tutto il materiale si vede e si
+modifica nella pagina [Composizione](#composizione):
 
 | Strato | Cosa fa | File in `src\compositore\` |
 |---|---|---|
-| **Armonia** | 184 periodi scritti a mano per genere (8 battute, 4 per il pre-ritornello) con cadenze, due accordi per battuta dove serve, rivolti, dominanti secondarie e accordi presi in prestito. La strofa resta aperta, il ritornello chiude, il ponte parte lontano; al ritorno il ritornello si arricchisce di una dominante | `armonia.js` |
+| **Armonia** | 165 periodi scritti a mano per genere (8 battute, 4 per il pre-ritornello) con cadenze, due accordi per battuta dove serve, rivolti, dominanti secondarie e accordi presi in prestito. La strofa resta aperta, il ritornello chiude, il ponte parte lontano; al ritorno il ritornello si arricchisce di una dominante | `armonia.js` |
 | **Scheletro** | sceglie una nota dell'accordo per ogni mezza battuta lungo un percorso che sale verso un apice e ridiscende, con movimenti piccoli | `melodia.js` |
 | **Superficie** | motivi di due battute con ritmo del genere: note di passaggio e di volta, arpeggi, appoggiature che risolvono, anticipi legati oltre la stanghetta | `melodia.js` |
 
@@ -415,6 +417,7 @@ Non devi premere nulla per aggiornarla: lo stato si rinfresca ogni 5 secondi, i 
 | Ascolto | [Voti](#voti) | Mi piace questo brano? |
 | Produzione | [Generi](#generi) | Che tipi di musica produrre? |
 | Produzione | [Score](#score) | Che musica scritta c'è dietro un brano, e come la voglio? |
+| Produzione | [Composizione](#composizione) | Quali accordi, motivi e assoli usa il compositore? Come aggiungo i miei? |
 | Produzione | [Controllo](#controllo) | Come cambio il comportamento? |
 | Analisi | [Andamento](#andamento) | Il sistema sta migliorando? |
 | Analisi | [Qualità e tempi](#qualità-e-tempi) | Cosa è andato storto? Quanto ci mette? |
@@ -840,6 +843,57 @@ I generi **con voci** usano sempre lo score del motore (resta possibile affidarg
 
 ---
 
+### Composizione
+
+Il materiale con cui il compositore scrive i brani dei [generi creativi](#quiete-o-estro): lo consulti, lo ascolti,
+lo modifichi e ne crei di nuovo. Le modifiche valgono **dal brano successivo**.
+
+![La pagina Composizione: i giri di accordi](docs/screenshots/37-composizione-accordi.png)
+
+| Scheda | Cosa contiene | Come si scrive |
+|---|---|---|
+| **Accordi** | 165 giri per stile, modo e parte del brano | [coi pulsanti](#accordi-coi-pulsanti), senza scrivere (8 battute, 4 il pre-ritornello) |
+| **Motivi** | 30 ritmi di due battute per andamento | durate in trentaduesimi: `-4 4 4 4 6 6 4~ \| 8 4 4 -8 8` |
+| **Chiusure** | 5 ritmi con cui si chiude una frase | come i motivi |
+| **Assoli** | 12 frasi di una battuta | ritmo e una lettera per figura (`x` arrivo, `p` passaggio, `n` volta, `a` arpeggio, `s` salto, `c` cromatica, `r` ribattuta) |
+| **Richiami** | 15 temi di pubblico dominio | accordi coi pulsanti; note in Do (`Sol4:8`, pausa `-:8`) |
+| **Forme** | 4 strutture di brano | `ruolo:battute:priorità`, per esempio `gancio:4:0 strofa:8:0 rit:8:0 solo:8:1 finale:4:0` |
+
+Ogni scheda spiega in alto la sua scrittura.
+
+| Pulsante | Cosa fa |
+|---|---|
+| **Ascolta** | un sintetizzatore semplice suona la voce: per i motivi e gli assoli su un giro di prova, per le forme un brano intero. Serve a giudicare note e ritmo, **non** il suono finale |
+| **Modifica** | apre l'editor; si salva solo se il controllo passa, con il motivo scritto in chiaro |
+| **Duplica** | parte da una copia per crearne una tua |
+| **Spegni / Accendi** | il compositore non la usa più, senza cancellarla. Se un gruppo resta tutto spento, usa le voci di serie |
+| **Ripristina** | toglie la tua modifica a una voce di serie |
+| **Elimina** | solo per le voci create da te |
+
+![I richiami a temi celebri](docs/screenshots/38-composizione-richiami.png)
+
+#### Accordi coi pulsanti
+
+![L'editor degli accordi: le battute e i pulsanti di grado, tipo e basso](docs/screenshots/39-composizione-modifica.png)
+
+| Passo | Cosa fai |
+|---|---|
+| 1 | scegli **stile**, **modo** e **parte del brano** |
+| 2 | premi una **battuta** (sotto ogni sigla c'è il nome dell'accordo in La minore o Do maggiore) |
+| 3 | premi **grado**, **tipo** (maggiore, minore, 7, maj7, sus, diminuito…) e, se vuoi, **basso** |
+| 4 | *Aggiungi un secondo accordo* divide la battuta a metà; *Copia nella successiva* la ripete |
+| 5 | **Ascolta**, poi **Salva** |
+
+Nei richiami, dove la lunghezza è libera, ci sono anche *+ battuta* e *Togli la battuta* (il loro numero deve
+corrispondere alle battute di note).
+
+I filtri (stile, modo, parte, andamento, *solo le tue*) e la ricerca restringono l'elenco; scegliendo uno stile
+leggi quali generi lo usano. Le tue modifiche stanno in `config\composizione.json` (le voci di serie restano nel
+codice) e sono registrate nello [Storico](#storico). Il compositore dei generi di quiete e gli strumenti dei generi
+non passano da questa pagina.
+
+---
+
 ### Andamento
 
 Risponde alla domanda **«sta migliorando?»**.
@@ -1093,9 +1147,9 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 |---|---|
 | `src\blocks\` | i blocchi del workflow |
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
-| `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js` forma, `armonia.js` accordi, `melodia.js` fraseggio), scrittura e validazione dello score ABC (`abc.js`) |
+| `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js` forma, `armonia.js` accordi, `melodia.js` fraseggio, `materiale.js` richiami, forme, controlli e unione con le tue modifiche), scrittura e validazione dello score ABC (`abc.js`) |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
-| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
+| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `composizione.js` e `composizione-pagina.js` pagina Composizione, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `docs\ricerche\` · `docs\report\` | [ricerca sulla composizione](docs/ricerche/2026-11-28-composizione.md) · [report sui brani creativi](docs/report/2026-11-28-brani-creativi.md) |

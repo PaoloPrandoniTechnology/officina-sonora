@@ -45,6 +45,7 @@
   <symbol id="i-schermo" viewBox="0 0 16 16"><path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/></symbol>
   <symbol id="i-trascina" viewBox="0 0 16 16"><path d="M6 4h.01M10 4h.01M6 8h.01M10 8h.01M6 12h.01M10 12h.01" stroke-width="2.4"/></symbol>
   <symbol id="i-score" viewBox="0 0 16 16"><path d="M2 3h12M2 6.5h5M2 10h4M2 13.5h12M11.5 11V5l2.5 1.5"/><circle cx="10" cy="11" r="1.6"/></symbol>
+  <symbol id="i-composizione" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11zM6 2.5v7M10 2.5v7M2.5 9.5h11M8 9.5v4"/></symbol>
   <symbol id="i-menu" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11zM6 2.5v11M11.5 6 9.5 8l2 2"/></symbol>
   <symbol id="i-tema" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.500"/><path d="M8 2.500a5.500 5.500 0 0 1 0 11z" fill="currentColor"/></symbol>
 </svg>
@@ -61,6 +62,7 @@
       <p>Produzione</p>
       <button data-tab="generi"><svg class="ic"><use href="#i-generi"/></svg>Generi</button>
       <button data-tab="score"><svg class="ic"><use href="#i-score"/></svg>Score</button>
+      <button data-tab="composizione"><svg class="ic"><use href="#i-composizione"/></svg>Composizione</button>
       <button data-tab="controllo"><svg class="ic"><use href="#i-controllo"/></svg>Controllo</button>
       <p>Analisi</p>
       <button data-tab="andamento"><svg class="ic"><use href="#i-andamento"/></svg>Andamento</button>
@@ -210,6 +212,19 @@
       <div id="scPagina"></div>
     </section>
 
+    <!-- COMPOSIZIONE: disegnata da composizione-pagina.js -->
+    <section class="tab" id="t-composizione">
+      <div class="sub-nav" id="cmSub" role="group" aria-label="Materiale musicale">
+        <button data-scheda="armonia" aria-pressed="true">Accordi</button>
+        <button data-scheda="motivo" aria-pressed="false">Motivi</button>
+        <button data-scheda="cadenza" aria-pressed="false">Chiusure</button>
+        <button data-scheda="assolo" aria-pressed="false">Assoli</button>
+        <button data-scheda="richiamo" aria-pressed="false">Richiami</button>
+        <button data-scheda="forma" aria-pressed="false">Forme</button>
+      </div>
+      <div id="cmPagina"></div>
+    </section>
+
     <!-- ANDAMENTO -->
     <section class="tab" id="t-andamento">
       <div class="toolbar an-filtri">
@@ -348,6 +363,7 @@
 <script src="/lettore.js"></script>
 <script src="/abc.js"></script>
 <script src="/score-pagina.js"></script>
+<script src="/composizione-pagina.js"></script>
 <script src="/dashboard.js"></script>
 </body>
 </html>

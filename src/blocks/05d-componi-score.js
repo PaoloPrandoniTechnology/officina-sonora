@@ -19,7 +19,9 @@ try {
   let r;
   if (imp.livello) {
     // generi creativi: forma, assolo e richiami li decide il compositore estro, brano per brano
-    r = Estro.componi({ ...richiesta, estro: imp.livello });
+    // accordi, motivi, assoli, richiami e forme con le modifiche fatte dalla dashboard
+    const materiale = Materiale.pronto(readJsonSafe(path.join(CFG.dir, 'config', 'composizione.json'), {}));
+    r = Estro.componi({ ...richiesta, estro: imp.livello, materiale });
     if (r.cameo) c.descrizione = `${String(c.descrizione || '').replace(/ Richiamo nascosto: .*$/, '')} Richiamo nascosto: ${r.cameo.nome}.`.trim();
     c.sezioni = r.lyrics.split('\n\n');
   } else {

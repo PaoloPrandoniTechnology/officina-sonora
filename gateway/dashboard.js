@@ -1436,6 +1436,9 @@
     $, esc, ic, imposta, nm, toast, chiedi, invia, leggi, data, n0, stelle, vai,
     popover: lettore.popover, pausaLettore: () => { lettore.pausa(); $('#vAudio').pause(); },
   });
+  // ---------- composizione (composizione-pagina.js) ----------
+  const composizione = window.PaginaComposizione({ $, esc, imposta, toast, chiedi, invia, leggi, pausaLettore: () => { lettore.pausa(); $('#vAudio').pause(); } });
+  $('#cmSub').addEventListener('click', (e) => { const b = e.target.closest('[data-scheda]'); if (b) vai(b.dataset.scheda === 'armonia' ? 'composizione' : 'composizione/' + b.dataset.scheda); });
   $('#scSub').addEventListener('click', (e) => { const b = e.target.closest('[data-vista]'); if (b) vai(b.dataset.vista === 'archivio' ? 'score' : 'score/' + b.dataset.vista); });
   // voto dal lettore o dalla scheda
   async function votaDa(b, voto) {
@@ -1732,7 +1735,7 @@
   setInterval(() => { if ($('#t-andamento').classList.contains('on')) caricaAndamento(); }, 30000);
 
   // ---------- navigazione ----------
-  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', playlist: 'Playlist', score: 'Score', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
+  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', playlist: 'Playlist', score: 'Score', composizione: 'Composizione', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
   function vai(indirizzo) {
     const parti = String(indirizzo || '').split('/');
     let tab = parti[0];
@@ -1749,7 +1752,7 @@
     const corrente = document.querySelector('#nav button[aria-current="page"]');
     const nav = $('#nav');
     if (corrente && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = corrente.offsetLeft - nav.clientWidth / 2;
-    const hash = tab === 'controllo' ? (ctrlSub === 'guida' ? indirizzoGuida() : '#controllo/' + ctrlSub) : tab === 'generi' && parti[1] === 'pesi' ? '#generi/pesi' : (tab === 'playlist' || tab === 'score') && parti[1] ? '#' + tab + '/' + parti[1] : '#' + tab;
+    const hash = tab === 'controllo' ? (ctrlSub === 'guida' ? indirizzoGuida() : '#controllo/' + ctrlSub) : tab === 'generi' && parti[1] === 'pesi' ? '#generi/pesi' : (tab === 'playlist' || tab === 'score' || tab === 'composizione') && parti[1] ? '#' + tab + '/' + parti[1] : '#' + tab;
     if (location.hash !== hash) history.replaceState(null, '', hash);
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (tab === 'controllo') caricaControllo();
@@ -1758,6 +1761,7 @@
     if (tab === 'andamento') caricaAndamento();
     if (tab === 'playlist') lettore.pagina(parti[1]);
     if (tab === 'score') score.pagina(parti[1]); else score.ferma();
+    if (tab === 'composizione') composizione.pagina(parti[1]); else composizione.ferma();
     lettore.navigato();
   }
   document.getElementById('nav').addEventListener('click', (e) => {
