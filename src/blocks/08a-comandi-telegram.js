@@ -53,7 +53,7 @@ function statoTesto() {
 
 // Interpreta il messaggio in un'azione strutturata; se non è chiaro, restituisce una domanda.
 async function interpreta(testo, contesto) {
-  const sistema = 'Sei l\'assistente di configurazione di un generatore di musica di sottofondo. Rispondi solo con JSON valido.';
+  const sistema = 'Sei l\'assistente di configurazione di un generatore di musica. Rispondi solo con JSON valido.';
   const utente = `${contesto ? `Contesto: ${contesto}\n` : ''}Messaggio dell'utente: "${testo}"
 
 Categorie attuali: ${(CFG.categories || []).map((c) => `${c.name} (energia ${c.energia}, bpm ${c.bpm.join('-')}, strutture ${c.strutture.join('/')})`).join('; ')}
@@ -134,7 +134,8 @@ function applica(p) {
   const cat = readJsonSafe(CFG.catalogoFile, {});
   if (p.azione === 'nuova_categoria') {
     cat.categories.push({ name: d.name, energia: d.energia, bpm: d.bpm, attivita: d.attivita || d.name, strutture: d.strutture,
-      genere: d.genere || d.name, ambito: 'musica', famiglia: 'generale', strumenti: elenco(d.strumenti), stile: String(d.stile_base || d.genere || d.name) });
+      genere: d.genere || d.name, raccolta: 'Sottofondo', famiglia: 'generale', voce: 'strumentale', carattere: 'cine', estro: d.energia <= 2 ? 0 : d.energia === 3 ? 1 : 2,
+      strumenti: elenco(d.strumenti), stile: String(d.stile_base || d.genere || d.name) });
   } else if (p.azione === 'modifica_categoria') {
     const c = cat.categories.find((x) => x.name === d.name);
     // solo i campi previsti: nome e specifiche del catalogo non si toccano
@@ -154,7 +155,7 @@ function applica(p) {
 const MENU_BUTTONS = [
   [{ text: '📊 Stato', callback_data: 'm:stato' }, { text: '⭐ Vota un brano', callback_data: 'm:vota' }],
   [{ text: '⏸ Pausa', callback_data: 'm:pausa' }, { text: '▶ Riprendi', callback_data: 'm:riprendi' }],
-  [{ text: '🧘 Categorie', callback_data: 'm:cat' }, { text: '🧩 Strutture', callback_data: 'm:strut' }],
+  [{ text: '🎼 Generi', callback_data: 'm:cat' }, { text: '🧩 Strutture', callback_data: 'm:strut' }],
   [{ text: '🏷 Tag', callback_data: 'm:tag' }, { text: '🎚 Linee guida', callback_data: 'm:linee' }],
   [{ text: '❓ Aiuto', callback_data: 'm:aiuto' }, { text: '✖ Annulla', callback_data: 'm:annulla' }],
 ];

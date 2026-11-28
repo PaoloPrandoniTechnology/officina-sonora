@@ -25,7 +25,7 @@ test('analisi: ogni punto della timeline ha ore e voti numerici', () => {
 
 test('analisi: ogni genere ha le specifiche per la scheda', () => {
   const d = datiAnalisi();
-  assert.equal(d.generi.length, 39, 'il catalogo ha 39 generi');
+  assert.equal(d.generi.length, 41, 'il catalogo ha 41 generi');
   for (const g of d.generi) {
     assert.ok(g.nome, 'nome mancante');
     assert.ok(Array.isArray(g.bpm) && g.bpm.length === 2, `${g.nome}: bpm`);

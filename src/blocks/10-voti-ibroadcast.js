@@ -39,7 +39,7 @@ const playlist = Object.values(decodifica(lib.playlists));
 const tag = Object.values(decodifica(lib.tags));
 
 // Valori dai tag e dalle playlist dell'utente (non quelli creati dal sistema)
-const mai = (nome) => /^(yoga|musica|famiglia-|categoria-|energia-|struttura-|tipo-|Yoga - |Musica - |Recently|Most Recent)/i.test(nome || '');
+const mai = (nome) => nostroNome(nome) || /^(Recently|Most Recent)/i.test(nome || '');
 // Parole di voto e di tempo: dalla tassonomia del catalogo, valide per ogni genere
 const TASS = CFG.tassonomia || { voto: { preferito: 'preferit|fav|like|top|ok', scartato: 'scart|skip|brutt|no$|delete' }, tempo: { 'piu-veloce': 'piu.?veloce', 'piu-lento': 'piu.?lento' }, passoBpm: 6, limiteBpm: 15 };
 const PREF = new RegExp(TASS.voto.preferito, 'i');

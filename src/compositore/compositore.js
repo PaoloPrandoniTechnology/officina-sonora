@@ -40,16 +40,10 @@ const ARMONIE = {
   flamenco: { m: ['5:m 3: 1: 0:', '0: 1: 0: 10:m', '8:7 7: 1:maj7 0:'], M: ['0: 1: 0: 1:', '5:m 3: 1: 0:'] },
 };
 
+// Il carattere (progressioni e andamento) e' scritto nel genere; senza, lo suggerisce la famiglia
+const DA_FAMIGLIA = { rock: 'rock', elettronico: 'elettro', ritmico: 'elettro', meditativo: 'drone', jazz: 'jazz', blues: 'blues' };
 function profilo(cat, t) {
-  const n = cat.name;
-  const stile = {
-    'Jazz-lounge': 'jazz', 'Bossa-nova-chitarra': 'jazz', 'Manouche-swing': 'jazz',
-    'Blues-shuffle-strumentale': 'blues', 'Rockabilly-strumentale': 'blues',
-    'Post-rock-strumentale': 'cine', 'Piano-minimalista': 'cine', 'Score-cinematico': 'cine',
-    'Reggae-dub-morbido': 'funk', 'Funk-groove': 'funk', 'Afro-latin-groove': 'funk', 'Trip-hop-dolce': 'funk', 'Beat-hip-hop': 'funk',
-    'Folk-balcanico': 'balcanico', 'Flamenco-chitarra': 'flamenco', 'Celtic-arpa-whistle': 'folk', 'Folk-strumming': 'folk', 'Hatha-base': 'folk',
-    'Gamelan-ambient': 'drone',
-  }[n] || { rock: 'rock', elettronico: 'elettro', ritmico: 'elettro', meditativo: 'drone' }[cat.famiglia] || 'cine';
+  const stile = Object.hasOwn(ARMONIE, cat.carattere || '') ? cat.carattere : DA_FAMIGLIA[cat.famiglia] || 'cine';
   const scala = stile === 'flamenco' ? 'frigiaDominante' : stile === 'balcanico' && t.minore ? 'armonica'
     : stile === 'blues' || stile === 'folk' || stile === 'drone' ? (t.minore ? 'pentaMinore' : 'pentaMaggiore')
       : stile === 'funk' && t.minore ? 'dorico' : t.minore ? 'minore' : 'maggiore';

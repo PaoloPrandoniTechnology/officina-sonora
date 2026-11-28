@@ -163,6 +163,16 @@
     "Hard-rock-strumentale": {
       "peso": 1,
       "attivo": true
+    },
+    "Canzone-italiana": {
+      "peso": 1,
+      "attivo": true,
+      "note": []
+    },
+    "Pop-inglese": {
+      "peso": 1,
+      "attivo": false,
+      "note": []
     }
   },
   "messaggi": {

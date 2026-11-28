@@ -72,5 +72,5 @@ test('arresto: il file STOP resta, altrimenti il supervisore riavvia', () => {
 });
 
 test('rigenerazione: il segno "vocale" resta', () => {
-  assert.match(leggi('src', 'blocks', '03a-controllo-qualita.js'), /vocale: !!/);
+  assert.match(leggi('src', 'blocks', '03a-controllo-qualita.js'), /vocale: voceDi/);
 });

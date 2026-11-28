@@ -12,7 +12,7 @@ const CONFIG = path.join(__dirname, '..', 'config');
 const ORA_MS = 3600000;
 const GIORNO_MS = 86400000;
 const MAX_PUNTI = { ora: 168, giorno: 366 };
-const FILTRI = ['ambito', 'famiglia', 'genere', 'tipo', 'struttura', 'modello'];
+const FILTRI = ['raccolta', 'famiglia', 'genere', 'tipo', 'struttura', 'modello'];
 
 const arrotonda = (x, cifre) => Math.round(x * 10 ** cifre) / 10 ** cifre;
 const mediaDi = (v) => (v.length ? v.reduce((a, b) => a + b, 0) / v.length : null);
@@ -200,13 +200,13 @@ function aggiungiGuide(modifiche, guide) {
   return modifiche;
 }
 
-// query: periodo, passo e i filtri (ambito, famiglia, genere, tipo, struttura)
+// query: periodo, passo e i filtri (raccolta, famiglia, genere, tipo, struttura)
 function leggi(query) {
   const catalogo = (leggiJson(path.join(CONFIG, 'catalogo.json')) || {}).categories || [];
   const perNome = new Map(catalogo.map((c) => [c.name, c]));
   const brani = schede().map((b) => {
     const c = perNome.get(b.categoria) || {};
-    return { ...b, ambito: c.ambito || null, famiglia: c.famiglia || null };
+    return { ...b, raccolta: c.raccolta || null, famiglia: c.famiglia || null };
   });
   const errori = [...righeJson(path.join(STATE, 'errori.jsonl.1')), ...righeJson(path.join(STATE, 'errori.jsonl'))];
   const modifiche = righeJson(path.join(CONFIG, 'history', 'controllo.jsonl'));
@@ -217,12 +217,12 @@ function leggi(query) {
     for (const n of nomi.filter((x) => /^guidance.*\.json$/.test(x))) guide.push({ nome: n, ...(leggiJson(path.join(dir, n)) || {}) });
   }
   aggiungiGuide(modifiche, guide);
-  // valori scelti nei menu: dipendono dai filtri precedenti (l'ambito restringe famiglie e generi)
+  // valori scelti nei menu: dipendono dai filtri precedenti (la raccolta restringe famiglie e generi)
   const opzioni = {};
   let restanti = brani;
   for (const f of FILTRI) {
     opzioni[f] = [...new Set(restanti.map((b) => valoreDi(b, f)).filter(Boolean))].sort();
-    if (query[f] && (f === 'ambito' || f === 'famiglia')) restanti = restanti.filter((b) => valoreDi(b, f) === query[f]);
+    if (query[f] && (f === 'raccolta' || f === 'famiglia')) restanti = restanti.filter((b) => valoreDi(b, f) === query[f]);
   }
   const scelta = Object.fromEntries([...FILTRI, 'periodo', 'passo'].map((k) => [k, query[k] || '']));
   return { ...calcola({ ...scelta, brani, errori, modifiche, ora: Date.now() }), opzioni, servizi: testi.prestazioni() };

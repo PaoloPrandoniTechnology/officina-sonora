@@ -68,7 +68,7 @@ function calcola() {
     const rec = {
       titolo: meta.titolo,
       modello: libreria.modelloTesto(meta),
-      ambito: fuori ? null : parti[0],
+      raccolta: fuori ? null : parti[0],
       famiglia: fuori ? null : parti[1],
       categoria: meta.categoria || null,
       tipo: typeof meta.tipo === 'string' ? meta.tipo : null,
@@ -107,7 +107,7 @@ function calcola() {
       nome: c.name,
       genere: c.genere || c.name,
       attivo: (sospesi[c.name] || {}).attivo !== false,
-      ambito: c.ambito || null,
+      raccolta: c.raccolta || null,
       famiglia: c.famiglia || null,
       energia: c.energia,
       bpm: c.bpm,
@@ -119,7 +119,7 @@ function calcola() {
       influenze: (c.influenze || []).map((i) => i.genere || i),
       varianti: (c.varianti || []).map((v) => v.nome),
       tonalita: c.tonalita || [],
-      vocale: !!c.vocale_senza_parole,
+      voce: c.voce || 'strumentale',
       colori: c.colori || [],
       brani: list.length,
       caricati: list.filter((t) => t.caricato).length,
@@ -215,7 +215,7 @@ function calcola() {
     libreria: {
       totale: tracce.length,
       durataTot_h: Math.round((durataTot / 3600) * 10) / 10,
-      perAmbito: contaPer(tracce, (t) => t.ambito),
+      perRaccolta: contaPer(tracce, (t) => t.raccolta),
       perFamiglia: contaPer(tracce, (t) => t.famiglia),
       perTipo: contaPer(tracce, (t) => t.tipo),
       timeline,
@@ -273,4 +273,7 @@ function datiAnalisi() {
   return cache.dati;
 }
 
-module.exports = { datiAnalisi };
+// dopo una modifica alle schede dei generi i dati vanno ricalcolati subito
+const scadi = () => { cache.t = 0; };
+
+module.exports = { datiAnalisi, scadi };

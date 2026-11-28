@@ -8,7 +8,7 @@ const controllo = require(path.join(__dirname, '..', '..', 'gateway', 'controllo
 test('controllo: la lettura contiene parametri, generi, guida e storico', () => {
   const d = controllo.lettura();
   assert.ok(Array.isArray(d.parametri) && d.parametri.length >= 10);
-  assert.ok(Array.isArray(d.generi) && d.generi.length === 39);
+  assert.ok(Array.isArray(d.generi) && d.generi.length === 41);
   assert.ok(Array.isArray(d.storico));
   for (const p of d.parametri) {
     assert.ok(p.valore >= p.min && p.valore <= p.max, `${p.chiave} fuori dai limiti`);

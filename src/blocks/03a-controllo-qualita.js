@@ -72,9 +72,10 @@ const target = meta.durata_s || CFG.durDefault;
 if (mp3.frames === 0) esito.problemi.push('file audio non leggibile');
 if (mp3.frames > 0 && mp3.corrotti / mp3.frames > 0.02) esito.problemi.push('file danneggiato (troppi frame non validi)');
 // Brano troppo corto: il motore a volte si ferma prima. Lo si rigenera (max 2 volte), non si carica.
-const durataCorta = mp3.durata_s > 0 && mp3.durata_s < target * (CFG.qcDurataMin ?? 0.85);
+// con le parole la durata richiesta e' una stima: si tollera molto di piu'
+const durataCorta = mp3.durata_s > 0 && mp3.durata_s < (meta.testo ? Math.max(60, target * 0.6) : target * (CFG.qcDurataMin ?? 0.85));
 if (durataCorta) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo corta rispetto a ${target}s`);
-if (mp3.durata_s > target * (CFG.qcDurataMax ?? 1.25)) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo lunga rispetto a ${target}s`);
+if (mp3.durata_s > target * (meta.testo ? 1.7 : CFG.qcDurataMax ?? 1.25)) esito.problemi.push(`durata ${Math.round(mp3.durata_s)}s troppo lunga rispetto a ${target}s`);
 if (mp3.bitrate_medio_kbps > 0 && mp3.bitrate_medio_kbps < 48) esito.problemi.push('bitrate troppo basso: possibile audio vuoto o degradato');
 
 // Analisi del suono (gateway): livello, silenzi e clipping. Se non disponibile, il brano passa come prima.
@@ -116,14 +117,16 @@ if (esito.problemi.length) {
     state.queue.unshift({
       titolo: meta.titolo, descrizione: meta.descrizione, bpm: meta.bpm, tonalita: meta.tonalita, durata_s: meta.durata_s,
       energia: meta.energia, attivita: meta.attivita, struttura: meta.struttura, style: meta.style, avoid: meta.avoid,
-      sezioni: meta.sezioni, lyrics: (meta.sezioni || []).join('\n\n'), categoria: meta.categoria, tipo: meta.tipo,
+      sezioni: meta.sezioni, lyrics: meta.testo ? meta.lyrics : (meta.sezioni || []).join('\n\n'), categoria: meta.categoria, tipo: meta.tipo,
+      ...(meta.testo ? { testo: meta.testo, lingua: meta.lingua } : {}),
       genere: meta.genere, variante: meta.variante, strumenti: meta.strumenti, influenza: meta.influenza, guida_versione: meta.guida_versione, ricetta: meta.ricetta, esperimento: meta.esperimento,
       // senza score: il blocco 5d ne compone uno nuovo (uno score del motore troppo corto non si ripete).
       // Uno score scelto a mano invece si riusa
       ...(meta.score_manuale && fs.existsSync(path.join(dest, path.basename(file).replace(/\.[^.]+$/, '.abc')))
         ? { abc: fs.readFileSync(path.join(dest, path.basename(file).replace(/\.[^.]+$/, '.abc')), 'utf8'), scoreManuale: meta.score_manuale, lyrics: meta.lyrics } : {}),
       attempts: 0, tentativi_render: tentativi,
-      vocale: !!((CFG.categories || []).find((x) => x.name === meta.categoria) || {}).vocale_senza_parole,
+      voce: voceDi(genereDi(meta.categoria)),
+      vocale: voceDi(genereDi(meta.categoria)) !== 'strumentale',
     });
     log(`qualità: "${meta.titolo}" troppo corto, rigenero (tentativo ${tentativi}): ${esito.problemi.join('; ')}`);
   } else {

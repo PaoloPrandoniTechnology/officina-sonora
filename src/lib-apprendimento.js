@@ -158,7 +158,11 @@ function pickSlot(state, guidance) {
   });
   const inEsperimento = new Set(state.experiments.map((e) => e.key));
   const candidati = [];
-  for (const cat of CFG.categories) {
+  // i generi con testo cantato senza parole pronte restano fuori: la produzione continua con gli altri
+  const pronti = CFG.categories.filter((c) => generePronto(c, state));
+  const forzato = CFG.comandi && CFG.comandi.produciGenere;
+  if (forzato && CFG.categories.some((c) => c.name === forzato) && !pronti.some((c) => c.name === forzato)) log(`"${forzato}" aspetta un testo approvato: intanto scelgo un altro genere`);
+  for (const cat of pronti) {
     const strutture = (guidance.struttura_pref && guidance.struttura_pref[cat.name]) || cat.strutture;
     const range = durRangeBpm(guidance, cat);
     for (const struttura of strutture) {
@@ -170,10 +174,11 @@ function pickSlot(state, guidance) {
     }
   }
   // Varieta': le categorie degli ultimi due brani non tornano subito, se esistono alternative
+  if (!candidati.length) return null;
   const ultime = (state.recent || []).slice(-5).map((r) => r.categoria);
   const altre = candidati.filter((c) => !ultime.includes(c.cat.name));
   let pool = altre.length ? altre : candidati;
-  if (CFG.comandi && CFG.comandi.produciGenere) pool = candidati; // "produci ora" ignora la varieta' recente
+  if (forzato && pronti.some((c) => c.name === forzato)) pool = candidati; // "produci ora" ignora la varieta' recente
   // Rotazione tra i generi: prima si sceglie il genere, con peso più alto per quelli meno rappresentati
   // in libreria (i generi senza brani pesano di più). Poi si applica la logica di ricetta solo a quel genere.
   const conta = {};
@@ -186,7 +191,7 @@ function pickSlot(state, guidance) {
   else {
     // uno score scelto a mano per un brano nuovo porta avanti il suo genere
     const archivio = readJsonSafe(path.join(CFG.dir, 'state', 'score.json'), {});
-    const attesa = (archivio.richieste || []).find((r) => !r.titolo && !(state.scoreUsati || {})[r.id] && CFG.categories.some((c) => c.name === r.categoria));
+    const attesa = (archivio.richieste || []).find((r) => !r.titolo && !(state.scoreUsati || {})[r.id] && pronti.some((c) => c.name === r.categoria));
     if (attesa) { nomi = [attesa.categoria]; pool = candidati; }
   }
   if (!nomi.length) nomi = tutti; // tutti sospesi: la produzione non si ferma
@@ -327,6 +332,21 @@ function tonalitaInglese(nome) {
   return `${nota}${alterazione} ${m[3] === 'minore' ? 'minor' : 'major'}`;
 }
 
+// ---- Voce, raccolta e lingua di un genere (servono anche al gateway) ----
+// 'strumentale' | 'vocalizzi' (voci senza parole) | 'testo' (parole cantate)
+function voceDi(cat) { return ['vocalizzi', 'testo'].includes((cat || {}).voce) ? cat.voce : 'strumentale'; }
+function raccoltaDi(cat) {
+  const nome = (cat || {}).raccolta || 'Sottofondo';
+  return (CFG.raccolte || []).find((r) => r.nome === nome) || { nome, playlist: nome };
+}
+function linguaDi(cat) {
+  const codice = (cat || {}).lingua;
+  return (CFG.lingue || []).find((l) => l.codice === codice) || (CFG.lingue || [])[0] || { codice: 'it', nome: 'Italiano', en: 'Italian', id3: 'ita' };
+}
+const slugNome = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// descrittore della voce solista, scelto nell'editor del genere
+const TIMBRI = { femminile: 'female lead vocal', maschile: 'male lead vocal', duetto: 'male and female duet vocals', coro: 'lead vocal with choir' };
+
 // ---- Blocchi di stile (usati anche dal gateway per la pagina Linee guida: funzioni senza effetti) ----
 // Perche' un termine non può essere un blocco di stile; stringa vuota se va bene
 function erroreBlocco(testo, { strumentale = false } = {}) {
@@ -353,9 +373,13 @@ function blocchiStile(cat, variante, strumenti, influenza, guidance, { bpm, tona
   const mio = (guidance.blocchi_generi || {})[cat.name] || {};
   const esclusi = new Set([...(guidance.style_avoid || []), ...(mio.esclusi || [])].map((s) => String(s).trim().toLowerCase()));
   // [origine, termini, argomento]: l'argomento serve solo alla pagina Linee guida
+  const voce = voceDi(cat);
+  const cantato = voce === 'testo';
   const gruppi = [
-    ['fisso', cat.vocale_senza_parole ? 'Wordless vocals' : 'Instrumental', 'fisso'],
+    ['fisso', cantato ? '' : voce === 'vocalizzi' ? 'Wordless vocals' : 'Instrumental', 'fisso'],
     ['catalogo', en.genre, 'genere'],
+    // il motore vuole voce e lingua subito dopo il genere
+    ['fisso', cantato ? `${linguaDi(cat).en} lyrics, ${TIMBRI[cat.timbro] || TIMBRI.femminile}` : '', 'fisso'],
     ...strumenti.map((s) => ['catalogo', (en.instruments || {})[s], 'strumenti']),
     ['catalogo', colore, 'variante'],
     ['catalogo', en.rhythm, 'ritmo'],
@@ -368,13 +392,15 @@ function blocchiStile(cat, variante, strumenti, influenza, guidance, { bpm, tona
     ['catalogo', en.space, 'produzione'],
     ['fisso', bpm ? `${bpm} BPM` : '', 'fisso'],
     ['fisso', tonalitaInglese(tonalita), 'fisso'],
-    ['fisso', cat.vocale_senza_parole ? 'no lyrics' : 'no vocals', 'fisso'],
+    ['fisso', cantato ? 'clear diction' : voce === 'vocalizzi' ? 'no lyrics' : 'no vocals', 'fisso'],
   ];
   // il motore pesa le parole: ogni frase compare una volta sola
   const viste = new Set();
   const blocchi = [];
   for (const [origine, valore, argomento] of gruppi) {
     for (const testo of String(valore || '').split(',').map((s) => s.trim()).filter(Boolean)) {
+      // un genere diventato cantato non deve portarsi dietro «instrumental», «no words» e simili
+      if (cantato && origine !== 'fisso' && /\binstrumental\b|\bwordless\b|\bno (vocals?|lyrics|words)\b/i.test(testo)) continue;
       const chiave = testo.toLowerCase();
       if (viste.has(chiave)) continue;
       viste.add(chiave);

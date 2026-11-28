@@ -8,7 +8,9 @@ const path = require('path');
 
 const DIR = path.join(__dirname, '..');
 const MAPPA = path.join(DIR, 'state', 'ripubblica.json');
-const NOSTRI = /^(yoga|musica|famiglia-|categoria-|energia-|struttura-|tipo-|Yoga - |Musica - )/i;
+// tag e playlist del sistema: quelli fissi e quelli di ogni raccolta del catalogo
+const RACCOLTE = ['Yoga', 'Musica', ...((() => { try { return JSON.parse(fs.readFileSync(path.join(DIR, 'config', 'catalogo.json'), 'utf8')).raccolte || []; } catch (e) { return []; } })().map((r) => r.playlist))];
+const NOSTRI = new RegExp(`^(famiglia-|categoria-|energia-|struttura-|tipo-|${RACCOLTE.map((r) => `${r.replace(/[^\p{L}\p{N} ]/gu, '.')} - |${r.toLowerCase().replace(/[^a-z0-9]+/g, '-')}$`).join('|')})`, 'iu');
 
 function prossimoPasso(r) {
   if (!r.nuovo) return 'carica';

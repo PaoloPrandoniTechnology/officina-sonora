@@ -21,6 +21,8 @@ const PAGINE = [
   { nome: '01-panoramica', pagina: 'panoramica' },
   { nome: '03-generi', pagina: 'generi' },
   { nome: '04-voti', pagina: 'voti' },
+  { nome: '42-testi', pagina: 'testi', dopo: clic('#paElenco [data-apri]'), fissa: 900 },
+  { nome: '43-genere-scheda', pagina: 'generi', dopo: clic('[data-scheda-genere="Canzone-italiana"]'), fissa: 900 },
   { nome: '14-andamento', pagina: 'andamento' },
   { nome: '36-andamento-modelli', pagina: 'andamento', dopo: "document.querySelector('#aModelli').closest('.card').scrollIntoView({block:'start'}); scrollBy(0,-100)", fissa: 620 },
   { nome: '05-qualita', pagina: 'qualita' },

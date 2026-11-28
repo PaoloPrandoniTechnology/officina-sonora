@@ -573,7 +573,7 @@ window.PaginaScore = function (app) {
       <div class="card sc-flusso"><h2>Come nasce lo score di un brano nuovo</h2><ol>
         <li><b>Score scelto da te</b>, se c'è: ha la precedenza su tutto.</li>
         <li><b>Generi creativi</b> (estro vivo o pieno): lo compone il compositore del progetto, con un tema che torna, variazioni, un assolo e a volte un richiamo.</li>
-        <li><b>Generi di quiete</b> (yoga e meditazione): lo scrive il modello YuE2; il sistema lo controlla, passa la melodia agli strumenti e, se è troncato o troppo lungo, lo recupera. Il compositore è di riserva.</li>
+        <li><b>Generi di quiete</b> (estro «quiete»): lo scrive il modello YuE2; il sistema lo controlla, passa la melodia agli strumenti e, se è troncato o troppo lungo, lo recupera. Il compositore è di riserva.</li>
         <li><b>Motore durante il render</b>: ultima risorsa, e unica strada per i generi con voci.</li></ol></div>
       ${Object.entries(gruppi).map(([nome, lista]) => `<div class="card cgroup"><h3>${esc(nome)}</h3>${lista.map((d) => `<div class="prow"><div><div class="nm">${esc(d.etichetta)}${d.chiave in miei ? '<span class="badge">modificato</span>' : ''}</div><div class="ds">${esc(d.descrizione)}${d.min !== undefined ? ` Da ${String(d.min).replace('.', ',')} a ${String(d.max).replace('.', ',')}.` : ''}</div></div><div class="ctl">${controllo(d)}</div><div></div></div>`).join('')}</div>`).join('')}
       <div class="sc-salva"><button type="button" class="btn" data-sc="regole" disabled>Salva</button><button type="button" class="btn ghost" data-sc="predefiniti" ${Object.keys(miei).length ? '' : 'disabled'}>Torna ${ambito === 'generale' ? 'ai predefiniti' : 'al generale'}</button></div>`;

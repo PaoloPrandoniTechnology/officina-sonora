@@ -32,7 +32,7 @@ const catalogo = (p) => { try { return JSON.parse(fs.readFileSync(p.catalogo, 'u
 function generiPerStile(p) {
   const out = {};
   for (const c of catalogo(p)) {
-    if (c.vocale_senza_parole || !(c.estro ?? (c.ambito === 'musica' ? 2 : 0))) continue;
+    if ((c.voce && c.voce !== 'strumentale') || !c.estro) continue;
     (out[Estro.stileDi(c)] ||= []).push({ nome: c.name, etichetta: c.genere || c.name });
   }
   return out;

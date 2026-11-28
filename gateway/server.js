@@ -6,13 +6,15 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { leggiStato } = require('./stato');
-const { datiAnalisi } = require('./analisi');
+const { datiAnalisi, scadi } = require('./analisi');
 const controllo = require('./controllo');
 const voti = require('./voti');
 const playlist = require('./playlist');
 const score = require('./score');
 const composizione = require('./composizione');
 const andamento = require('./andamento');
+const parole = require('./parole');
+const generi = require('./generi');
 const { crea: creaTesti, lms } = require('./testi');
 const { ammessa } = require('./protezione');
 const { scriviAtomico } = require('./disco');
@@ -25,7 +27,8 @@ process.on('uncaughtException', (e) => {
 });
 const STATICI = { '/dashboard': ['dashboard.html', 'text/html'], '/dashboard.css': ['dashboard.css', 'text/css'], '/dashboard.js': ['dashboard.js', 'text/javascript'],
   '/coda.js': ['coda.js', 'text/javascript'], '/lettore.js': ['lettore.js', 'text/javascript'], '/lettore.css': ['lettore.css', 'text/css'],
-  '/score-pagina.js': ['score-pagina.js', 'text/javascript'], '/composizione-pagina.js': ['composizione-pagina.js', 'text/javascript'], '/composizione-editor.js': ['composizione-editor.js', 'text/javascript'], '/composizione-lettore.js': ['composizione-lettore.js', 'text/javascript'], '/composizione-banco.js': ['composizione-banco.js', 'text/javascript'], '/score.css': ['score.css', 'text/css'] };
+  '/score-pagina.js': ['score-pagina.js', 'text/javascript'], '/parole-modello.js': ['parole-modello.js', 'text/javascript'],
+  '/parole-pagina.js': ['parole-pagina.js', 'text/javascript'], '/generi-editor.js': ['generi-editor.js', 'text/javascript'], '/parole.css': ['parole.css', 'text/css'], '/composizione-pagina.js': ['composizione-pagina.js', 'text/javascript'], '/composizione-editor.js': ['composizione-editor.js', 'text/javascript'], '/composizione-lettore.js': ['composizione-lettore.js', 'text/javascript'], '/composizione-banco.js': ['composizione-banco.js', 'text/javascript'], '/score.css': ['score.css', 'text/css'] };
 const MAX_CORPO = 300 * 1024 * 1024;
 
 const PORT = process.env.OFS_PORTA || 5790;
@@ -139,6 +142,8 @@ function inLibreria(file) {
   return abs;
 }
 const testi = creaTesti();
+const schedeGeneri = generi.crea({ testi, brani: () => Object.fromEntries(datiAnalisi().generi.map((g) => [g.nome, g.brani])) });
+const archivioParole = parole.crea({ testi });
 async function analizzaAudio(file) {
   const abs = inLibreria(file);
   const { MPEGDecoder } = require('mpg123-decoder');
@@ -234,6 +239,8 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && req.url === '/api/composizione') return rispondi(200, composizione.lettura());
     if (req.method === 'GET' && req.url === '/api/playlist') return rispondi(200, playlist.leggi());
+    if (req.method === 'GET' && req.url === '/api/generi') return rispondi(200, schedeGeneri.lettura());
+    if (req.method === 'GET' && req.url === '/api/parole') return rispondi(200, archivioParole.lettura());
     if (req.method === 'GET' && req.url.startsWith('/api/playlist/m3u?')) {
       const id = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('id');
       const d = playlist.leggi();
@@ -259,10 +266,15 @@ const server = http.createServer(async (req, res) => {
       return rispondi(r.codice, r.corpo);
     }
     const archivio = req.url.startsWith('/api/playlist/') ? [playlist, '/api/playlist/'] : req.url.startsWith('/api/score/') ? [score, '/api/score/']
-      : req.url.startsWith('/api/composizione/') ? [composizione, '/api/composizione/'] : req.url.startsWith('/api/testi/') ? [testi, '/api/testi/'] : null;
+      : req.url.startsWith('/api/composizione/') ? [composizione, '/api/composizione/'] : req.url.startsWith('/api/testi/') ? [testi, '/api/testi/']
+      : req.url.startsWith('/api/generi/') ? [schedeGeneri, '/api/generi/'] : req.url.startsWith('/api/parole/') ? [archivioParole, '/api/parole/'] : null;
     if (archivio) {
       if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
-      try { return rispondi(200, await archivio[0].gestisci(req.url.slice(archivio[1].length), JSON.parse(corpo.toString('utf8') || '{}'))); }
+      try {
+        const r = await archivio[0].gestisci(req.url.slice(archivio[1].length), JSON.parse(corpo.toString('utf8') || '{}'));
+        if (archivio[0] === schedeGeneri) scadi();
+        return rispondi(200, r);
+      }
       catch (e) { return rispondi(400, { ok: false, error: e.message }); }
     }
     if (req.url === '/tg') {
@@ -288,6 +300,12 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/llm/chat') {
       const { system, user, maxTokens, solo } = JSON.parse(corpo.toString('utf8'));
       try { return rispondi(200, { ok: true, ...(await testi.chiedi({ system, user, maxTokens, solo })) }); }
+      catch (e) { return rispondi(200, { ok: false, error: e.message }); }
+    }
+    // bozza di testo chiesta dalla produzione (generi cantati)
+    if (req.url === '/parole/bozza') {
+      const { genere, approvata } = JSON.parse(corpo.toString('utf8'));
+      try { return rispondi(200, { ok: true, testo: await archivioParole.bozza({ genere, approvata }) }); }
       catch (e) { return rispondi(200, { ok: false, error: e.message }); }
     }
     // gemma e il motore audio non stanno insieme in 6 GB: si scarica prima di un render

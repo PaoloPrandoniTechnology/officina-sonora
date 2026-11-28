@@ -9,7 +9,8 @@ if (!c.titolo) {
   log(`concept non valido (titolo mancante): ${JSON.stringify(c).slice(0, 200)}`);
   return [{ json: { state, error: 'concept non valido' } }];
 }
-const durata = Math.min(inp.dmax, Math.max(inp.dmin, clampDur(c.durata_s)));
+const testo = inp.testo || null;
+const durata = testo ? clampDur(testo.durata_s) : Math.min(inp.dmax, Math.max(inp.dmin, clampDur(c.durata_s)));
 
 const concept = {
   titolo: String(c.titolo).trim(),
@@ -27,17 +28,21 @@ const concept = {
   influenza: influenza || '',
   style: componiStile(cat, variante, strumenti, influenza, guidance, { bpm, tonalita }),
   avoid: divietiDi(cat, guidance),
-  sezioni: slot.sezioni,
-  lyrics: slot.sezioni.join('\n\n'),
+  // con le parole, sezioni e durata sono quelle del testo
+  sezioni: testo ? testo.lyrics.split('\n\n').map((s) => s.split('\n')[0]) : slot.sezioni,
+  lyrics: testo ? testo.lyrics : slot.sezioni.join('\n\n'),
+  ...(testo ? { testo: testo.id, lingua: testo.lingua } : {}),
   categoria: cat.name,
   tipo: slot.tipo,
   guida_versione: guidance.versione,
   ricetta: slot.ricetta,
   esperimento: slot.esperimento,
   punteggio: slot.punteggio,
-  vocale: !!cat.vocale_senza_parole,
+  voce: voceDi(cat),
+  vocale: voceDi(cat) !== 'strumentale',
   attempts: 0,
 };
+if (testo) state.testiUsati = Object.fromEntries([...Object.entries(state.testiUsati || {}), [testo.id, { titolo: concept.titolo, at: new Date().toISOString() }]].slice(-500));
 state.cursor++;
 state.queue.push(concept);
 log(`concept pronto: "${concept.titolo}" (${concept.genere}, variante ${concept.variante}, strumenti ${strumenti.join('/')}, ${concept.bpm} bpm, ${concept.tonalita}, ${concept.durata_s}s)`);

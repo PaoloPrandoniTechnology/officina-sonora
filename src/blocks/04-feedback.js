@@ -44,7 +44,7 @@ try {
   const famiglie = readJsonSafe(path.join(CFG.dir, 'config', 'vocabolario.json'), { famiglie: {} }).famiglie;
   // solo atmosfera e timbro: ritmo e produzione contengono generi e strumenti, che sporcano il suono
   const ammessi = new Set(famiglie.atmosfera || []);
-  const system = 'Sei il revisore artistico di un generatore di musica di sottofondo. Rispondi solo con JSON valido.';
+  const system = 'Sei il revisore artistico di un generatore di musica. Rispondi solo con JSON valido.';
   const user = `Brani votati dall'utente (voto da 1 a 5, le note sono indicazioni dirette; ogni voto utente pesa come 100 dati automatici):
 ${JSON.stringify(recent)}
 

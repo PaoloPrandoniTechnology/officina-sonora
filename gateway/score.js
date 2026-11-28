@@ -102,7 +102,7 @@ function lettura(base = BASE) {
   return {
     definizioni: Abc.IMPOSTAZIONI,
     impostazioni: { generale: conf.generale || {}, generi: conf.generi || {} },
-    generi: catalogo(p).map((c) => ({ nome: c.name, etichetta: c.genere || c.name, bpm: c.bpm, estro: c.estro, ambito: c.ambito, tonalita: c.tonalita || [], vocale: !!c.vocale_senza_parole, strutture: c.strutture || [] })),
+    generi: catalogo(p).map((c) => ({ nome: c.name, etichetta: c.genere || c.name, bpm: c.bpm, estro: c.estro, raccolta: c.raccolta, tonalita: c.tonalita || [], vocale: Boolean(c.voce) && c.voce !== 'strumentale', strutture: c.strutture || [] })),
     bozze: (archivio.bozze || []).slice().reverse(),
     richieste: (archivio.richieste || []).map((r) => ({ ...r, usata: usati[r.id] || null })).reverse(),
     inArrivo: [

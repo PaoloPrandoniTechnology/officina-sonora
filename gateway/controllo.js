@@ -22,7 +22,7 @@ const M = new Function(fs.readFileSync(path.join(DIR, 'src', 'lib-messaggi.js'),
 
 // Composizione dello stile: le stesse funzioni usate dai blocchi n8n
 const STILE = new Function('CFG', 'path', fs.readFileSync(path.join(DIR, 'src', 'lib-apprendimento.js'), 'utf8')
-  + '\nreturn { blocchiStile, erroreBlocco };')({ dir: DIR }, path);
+  + '\nreturn { blocchiStile, erroreBlocco };')({ dir: DIR, get lingue() { return leggiJson(CATALOGO, {}).lingue; } }, path);
 const VOCABOLARIO = path.join(DIR, 'config', 'vocabolario.json');
 // Spiegazioni dei termini per i tooltip: righe "termine|spiegazione" in config\spiegazioni
 function spiegazioni() {
@@ -36,7 +36,7 @@ function spiegazioni() {
   }
   return out;
 }
-const BLOCCO_FISSO = /^(instrumental|wordless vocals|no vocals|no lyrics)$/i;
+const BLOCCO_FISSO = /^(instrumental|wordless vocals|no vocals|no lyrics|clear diction)$/i;
 
 // Catalogo dei parametri: etichetta, gruppo, valore di default, limiti e spiegazione
 const PARAMETRI_DEF = [
@@ -107,7 +107,7 @@ function lettura() {
     generi: (leggiJson(CATALOGO, { categories: [] }).categories || []).map((c) => {
       const nome = c.name;
       const s = generiSalvati[nome] || {};
-      return { nome, etichetta: c.genere || nome, ambito: c.ambito || '', famiglia: c.famiglia || '', colore: (c.colori || [])[1] || '', bpm: c.bpm || [], strutture: c.strutture || [], peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
+      return { nome, etichetta: c.genere || nome, raccolta: c.raccolta || '', famiglia: c.famiglia || '', colore: (c.colori || [])[1] || '', bpm: c.bpm || [], strutture: c.strutture || [], peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
     }),
     guida: {
       versione: guida.versione || null,
@@ -225,7 +225,7 @@ function salvaBlocchi(salvata, { ambito, aggiunti, esclusi, azzera }) {
     return puliti;
   };
   // le aggiunte generali valgono anche per i generi strumentali
-  const piu = azzera ? [] : pulisci(aggiunti, 'aggiunti', 8, (v) => STILE.erroreBlocco(v, { strumentale: !(cat && cat.vocale_senza_parole) }));
+  const piu = azzera ? [] : pulisci(aggiunti, 'aggiunti', 8, (v) => STILE.erroreBlocco(v, { strumentale: !(cat && cat.voce && cat.voce !== 'strumentale') }));
   const meno = azzera ? [] : pulisci(esclusi, 'esclusi', 40, (v) => (BLOCCO_FISSO.test(v) ? 'è un blocco fisso'
     : v.length < 2 || v.length > 120 || /[,<>]/.test(v) ? 'blocco non valido' : ''));
   const doppio = piu.find((v) => meno.includes(v));
@@ -267,7 +267,7 @@ function stile(genere, indiceVariante) {
   if (esempio.length > 25) avvisi.push(`${esempio.length} blocchi: oltre 25 il motore pesa poco ogni termine.`);
   for (const b of blocchi) if (b.escluso && b.origine === 'tuo') avvisi.push(`"${b.testo}" è tra i tuoi blocchi ma escluso a livello generale.`);
   return {
-    genere, variante: variante ? variante.nome : '', varianti: varianti.map((v) => v.nome), vocale: !!cat.vocale_senza_parole,
+    genere, variante: variante ? variante.nome : '', varianti: varianti.map((v) => v.nome), voce: cat.voce || 'strumentale', vocale: Boolean(cat.voce) && cat.voce !== 'strumentale',
     blocchi, esempio: esempio.map((b) => b.testo).join(', '), conteggio: esempio.length, avvisi, bpm: `${min}-${max}`,
   };
 }
@@ -331,7 +331,7 @@ const testi = require('./testi').crea();
 async function traduci(testo, caricaLocale) {
   try {
     const r = await testi.chiedi({
-      system: 'You translate producer notes for an AI instrumental music generator into concise English style directions (max 20 words). Output only the English text, nothing else.',
+      system: 'You translate producer notes for an AI music generator into concise English style directions (max 20 words). Output only the English text, nothing else.',
       user: testo, temperature: 0.2, maxTokens: 90, json: false, attesaMs: 20000, caricaLocale,
     });
     return r.testo.replace(/^["']|["']$/g, '').trim().slice(0, 240) || null;

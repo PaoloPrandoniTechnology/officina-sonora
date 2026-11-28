@@ -48,17 +48,11 @@ const CFG = {
   durMin: 120,
   durMax: 270,
   durDefault: 180,
-  // energia 1 (molto calmo) .. 5 (molto energico). bpm: range di partenza, modificabile da guidance.json
-  categories: [
-    { name: 'Meditazione', energia: 1, bpm: [45, 65], attivita: 'meditazione, mindfulness', strutture: ['piatto', 'onda'] },
-    { name: 'Pranayama-respiro', energia: 1, bpm: [50, 75], attivita: 'esercizi di respiro', strutture: ['piatto', 'onda'] },
-    { name: 'Yin-Savasana', energia: 1, bpm: [40, 62], attivita: 'posizioni passive lunghe', strutture: ['piatto', 'onda'] },
-    { name: 'Restorative', energia: 2, bpm: [50, 72], attivita: 'rilassamento guidato', strutture: ['onda', 'arco'] },
-    { name: 'Sound-bath-rilassamento', energia: 2, bpm: [40, 60], attivita: 'sound bath', strutture: ['piatto', 'crescendo'] },
-    { name: 'Hatha-base', energia: 3, bpm: [70, 95], attivita: 'hatha, asana basilari', strutture: ['arco', 'onda'] },
-    { name: 'Vinyasa-dinamico', energia: 4, bpm: [90, 115], attivita: 'vinyasa, flusso', strutture: ['loop', 'crescendo', 'arco'] },
-    { name: 'Power-yoga', energia: 5, bpm: [110, 135], attivita: 'power yoga, forza', strutture: ['loop', 'arco'] },
-  ],
+  // i generi stanno in config\catalogo.json (dalla dashboard o da Telegram): senza catalogo non si produce
+  categories: [],
+  // raccolte: cartella della libreria e prefisso di playlist e tag. Lingue: per i generi con testo cantato
+  raccolte: [{ nome: 'Sottofondo', playlist: 'Musica' }],
+  lingue: [{ codice: 'it', nome: 'Italiano', en: 'Italian', id3: 'ita' }, { codice: 'en', nome: 'Inglese', en: 'English', id3: 'eng' }],
   tipi: ['ambient-pad', 'ambient-profondo', 'melodico-dolce', 'drone-spaziale', 'ritmico-leggero', 'ritmico-energico'],
   // Strutture: sezioni in ordine. Ogni categoria ne usa solo alcune.
   strutture: {
@@ -85,7 +79,7 @@ CFG.errorsFile = path.join(CFG.dir, 'state', 'errori.jsonl');
 (function caricaCatalogo() {
   try {
     const c = JSON.parse(fs.readFileSync(CFG.catalogoFile, 'utf8'));
-    for (const k of ['artista', 'categories', 'strutture', 'tag_extra', 'tassonomia']) if (c[k] !== undefined) CFG[k] = c[k];
+    for (const k of ['artista', 'categories', 'raccolte', 'lingue', 'strutture', 'tag_extra', 'tassonomia']) if (c[k] !== undefined) CFG[k] = c[k];
     // i tipi sono oggetti {name, palette}; nel resto del codice servono i nomi
     if (c.tipi) {
       CFG.tipiPalette = Object.fromEntries(c.tipi.map((t) => [typeof t === 'string' ? t : t.name, typeof t === 'string' ? '' : t.palette]));
@@ -153,16 +147,7 @@ const DEFAULT_GUIDANCE = {
   stile_generi: {}, // categoria -> parole solo per quel genere
   style_avoid: [], // blocchi tolti dallo stile di tutti i generi
   blocchi_generi: {}, // categoria -> { aggiunti, esclusi } scelti dalla dashboard
-  durata_hint: {
-    'Meditazione': '240-270',
-    'Pranayama-respiro': '180-240',
-    'Hatha-base': '180-240',
-    'Vinyasa-dinamico': '150-210',
-    'Power-yoga': '120-180',
-    'Yin-Savasana': '240-270',
-    'Restorative': '240-270',
-    'Sound-bath-rilassamento': '240-270',
-  },
+  durata_hint: {}, // categoria -> 'min-max' secondi; senza, vale la durata scritta nel genere
   bpm_range: {},
   struttura_pref: {},
   note: 'linee guida iniziali',
@@ -384,11 +369,33 @@ function uniquePath(dir, base, ext) {
   return path.join(dir, name + ext);
 }
 
-// Cartella di un brano: radice / Yoga o Sottofondo / famiglia / categoria / tipo
+// ---- Genere: voce, raccolta, lingua. Nessun genere e' trattato per nome. ----
+function genereDi(nome) { return (CFG.categories || []).find((x) => x.name === nome) || {}; }
+// Tag e playlist creati dal sistema (di ogni raccolta): non sono voti dell'utente
+function nostroNome(nome) {
+  const raccolte = [{ playlist: 'Yoga' }, { playlist: 'Musica' }, ...(CFG.raccolte || [])];
+  const n = String(nome || '').toLowerCase();
+  return /^(famiglia-|categoria-|energia-|struttura-|tipo-)/.test(n)
+    || raccolte.some((r) => n === slugNome(r.playlist) || n.startsWith(`${String(r.playlist).toLowerCase()} - `));
+}
+
+// ---- Testi cantati: li scrive solo il gateway (state\parole.json); l'uso si segna in state.testiUsati ----
+CFG.paroleFile = path.join(CFG.dir, 'state', 'parole.json');
+function testiLiberi(cat, state) {
+  const usati = (state || {}).testiUsati || {};
+  return (readJsonSafe(CFG.paroleFile, {}).testi || [])
+    .filter((t) => t.genere === cat.name && t.stato === 'approvato' && t.lingua === linguaDi(cat).codice && t.lyrics && !usati[t.id])
+    .sort((a, b) => String(a.creato).localeCompare(String(b.creato)));
+}
+// Un genere cantato entra in produzione solo se le parole ci sono o se le puo' scrivere da solo
+function generePronto(cat, state) {
+  return voceDi(cat) !== 'testo' || cat.testi === 'auto' || testiLiberi(cat, state).length > 0;
+}
+
+// Cartella di un brano: radice / raccolta / famiglia / categoria / tipo
 function cartellaBrano(categoria, tipo) {
-  const c = (CFG.categories || []).find((x) => x.name === categoria) || {};
-  const ambito = c.ambito === 'yoga' ? 'Yoga' : 'Sottofondo';
-  return path.join(CFG.root, ambito, c.famiglia || 'generale', categoria || 'senza-categoria', tipo || 'senza-tipo');
+  const c = genereDi(categoria);
+  return path.join(CFG.root, raccoltaDi(c).nome, c.famiglia || 'generale', categoria || 'senza-categoria', tipo || 'senza-tipo');
 }
 
 // Slot deterministico: ruota su categoria, tipo e struttura, cosi' i brani sono variati.
@@ -416,7 +423,7 @@ function clampDur(v) {
 
 // Intervallo "min-max" dal suggerimento di durata per categoria (default: intero range).
 function durRange(guidance, category) {
-  const h = (guidance.durata_hint || {})[category];
+  const h = (guidance.durata_hint || {})[category] || genereDi(category).durata;
   const m = /^(\d+)\s*-\s*(\d+)$/.exec(h || '');
   if (!m) return [CFG.durMin, CFG.durMax];
   return [clampDur(m[1]), clampDur(m[2])];

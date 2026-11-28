@@ -44,17 +44,18 @@ const ITALIANO = /\b(chitarra|basso|batteria|pianoforte|melodia|accordi?|modo|di
 const TONALITA = /\b[A-G](#|b)? (major|minor)\b/;
 
 test('stile: inglese, con bpm e tonalità, senza etichette né negazioni, per tutti i generi', () => {
-  assert.equal(CAT.categories.length, 39);
+  assert.equal(CAT.categories.length, 41);
   for (const c of CAT.categories) {
     for (const s of c.strumenti) assert.ok(c.en?.instruments?.[s], `${c.name}: manca la traduzione di "${s}"`);
     for (const v of c.varianti) {
-      const stile = L.componiStile(c, v, c.strumenti.slice(0, 4), c.influenze[0].genere, {}, { bpm: 98, tonalita: c.tonalita[0] });
+      const stile = L.componiStile(c, v, c.strumenti.slice(0, 4), ((c.influenze || [])[0] || {}).genere, {}, { bpm: 98, tonalita: c.tonalita[0] });
       assert.doesNotMatch(stile, ITALIANO, `${c.name}: ${stile}`);
       assert.doesNotMatch(stile, /(melody|chords|rhythm|emphasis|instruments|influence):/, c.name);
       assert.doesNotMatch(stile.replace(/no vocals|no lyrics|no words/g, ''), /\bno \w/, `${c.name}: ${stile}`);
       assert.match(stile, /98 BPM/);
       assert.match(stile, TONALITA, `${c.name}: ${stile}`);
-      assert.ok(stile.startsWith(c.vocale_senza_parole ? 'Wordless vocals, ' : 'Instrumental, '), stile);
+      if (c.voce === 'testo') assert.match(stile, / lyrics, .*clear diction/, stile);
+      else assert.ok(stile.startsWith(c.voce === 'vocalizzi' ? 'Wordless vocals, ' : 'Instrumental, '), stile);
     }
   }
 });

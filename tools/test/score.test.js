@@ -71,8 +71,9 @@ test('impostazioni: predefiniti, poi generali, poi genere; i valori sbagliati si
   const base = A.impostazioni(null, 'A');
   // "auto" si risolve col genere
   const r = (cat, extra) => { const x = A.risolvi({ ...base, ...extra }, cat); return [x.livello, x.fonte]; };
-  assert.deepEqual(r({ ambito: 'yoga', estro: 0 }), [0, 'modello']);
-  assert.deepEqual(r({ ambito: 'musica' }), [2, 'compositore']);
+  assert.deepEqual(r({ estro: 0 }), [0, 'modello']);
+  assert.deepEqual(r({}), [0, 'modello']);
+  assert.deepEqual(r({ estro: 2 }), [2, 'compositore']);
   assert.deepEqual(r({ estro: 1 }), [1, 'compositore']);
   assert.deepEqual(r({ estro: 2 }, { estro: 'quiete', fonte: 'motore' }), [0, 'motore']);
   assert.deepEqual(A.campionamento(base), { abc_sampling: { max_tokens: 6000 } });

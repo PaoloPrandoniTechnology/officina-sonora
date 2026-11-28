@@ -73,7 +73,7 @@ const dati = {
 
 let commento = '';
 if (con('commento')) try {
-  const j = await llmJson('Sei l\'analista di un generatore di musica di sottofondo. Rispondi solo con JSON valido.',
+  const j = await llmJson('Sei l\'analista di un generatore di musica. Rispondi solo con JSON valido.',
     `Dati di oggi: ${JSON.stringify(dati)}
 Scrivi un oggetto JSON con "sintesi" (2-3 frasi in italiano su cosa sta funzionando e cosa no) e "suggerimento" (una sola modifica concreta, o "nessuno"). Non proporre codice.`, 600);
   commento = `\n\n${j.sintesi || ''}${j.suggerimento && j.suggerimento !== 'nessuno' ? `\nSuggerimento: ${j.suggerimento}` : ''}`;

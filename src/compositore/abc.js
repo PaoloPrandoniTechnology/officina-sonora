@@ -439,8 +439,8 @@ const lyricsDi = (score) => lyricsDaScore({ ...score, sezioni: score.sezioni.map
 
 // ---- Impostazioni: come nascono gli score dei brani nuovi (config\score.json) ----
 const IMPOSTAZIONI = [
-  { chiave: 'fonte', gruppo: 'Chi scrive', etichetta: 'Chi scrive lo score', scelte: [['auto', 'Automatico, secondo l’estro'], ['modello', 'Modello YuE2, compositore di riserva'], ['compositore', 'Compositore del progetto'], ['motore', 'Motore durante il render']], def: 'auto', descrizione: 'Vale per i brani strumentali. I generi con voci usano sempre il motore.' },
-  { chiave: 'estro', gruppo: 'Chi scrive', etichetta: 'Estro', scelte: [['auto', 'Automatico dal genere'], ['quiete', 'Quiete: ripetizione voluta'], ['vivo', 'Vivo: tema, variazioni leggere, un assolo'], ['pieno', 'Pieno: anche cambi di tonalità e richiami']], def: 'auto', descrizione: 'Quanto il brano cambia mentre suona. Quiete per meditazione e yoga, pieno per la musica da ascolto.' },
+  { chiave: 'fonte', gruppo: 'Chi scrive', etichetta: 'Chi scrive lo score', scelte: [['auto', 'Automatico, secondo l’estro'], ['modello', 'Modello YuE2, compositore di riserva'], ['compositore', 'Compositore del progetto'], ['motore', 'Motore durante il render']], def: 'auto', descrizione: 'Vale per i brani strumentali. Con voci o parole lo score lo scrive sempre il motore.' },
+  { chiave: 'estro', gruppo: 'Chi scrive', etichetta: 'Estro', scelte: [['auto', 'Automatico dal genere'], ['quiete', 'Quiete: ripetizione voluta'], ['vivo', 'Vivo: tema, variazioni leggere, un assolo'], ['pieno', 'Pieno: anche cambi di tonalità e richiami']], def: 'auto', descrizione: 'Quanto il brano cambia mentre suona. Quiete dove la ripetizione è voluta, pieno dove il brano deve sorprendere.' },
   { chiave: 'lora', gruppo: 'Suono', etichetta: 'LoRA del render', scelte: [['strumentale', 'Solo la strumentale (KTO)'], ['genere', 'Solo quella del genere, dove esiste'], ['nessuna', 'Nessuna']], def: 'strumentale', descrizione: 'Il motore ne usa una sola per brano. Quella del genere sostituisce la strumentale: più carattere, ma può far comparire voci.' },
   { chiave: 'tentativi', gruppo: 'Modello YuE2', etichetta: 'Tentativi del modello', min: 1, max: 5, passo: 1, def: 3, descrizione: 'Quanti score si chiedono prima di passare al compositore. Ogni tentativo costa circa due minuti.' },
   { chiave: 'ripara', gruppo: 'Modello YuE2', etichetta: 'Recupera gli score troncati o troppo lunghi', si: true, def: true, descrizione: 'Taglia lo score a un confine di sezione vicino alla durata richiesta invece di buttarlo.' },
@@ -476,7 +476,7 @@ function impostazioni(conf, categoria) {
 // "auto" si risolve col genere: livello 0 quiete, 1 vivo, 2 pieno (campo estro del catalogo)
 function risolvi(imp, cat) {
   const c = cat || {};
-  const livello = { quiete: 0, vivo: 1, pieno: 2 }[imp.estro] ?? c.estro ?? (c.ambito === 'musica' ? 2 : 0);
+  const livello = { quiete: 0, vivo: 1, pieno: 2 }[imp.estro] ?? c.estro ?? 0;
   return { ...imp, livello, fonte: imp.fonte === 'auto' ? (livello ? 'compositore' : 'modello') : imp.fonte };
 }
 

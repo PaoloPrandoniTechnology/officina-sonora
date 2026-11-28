@@ -7,7 +7,7 @@ const A = require('../../src/compositore/abc.js');
 const C = require('../../src/compositore/compositore.js');
 
 const CAT = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'config', 'catalogo.json'), 'utf8'));
-const STRUMENTALI = CAT.categories.filter((c) => !c.vocale_senza_parole);
+const STRUMENTALI = CAT.categories.filter((c) => c.voce === 'strumentale');
 const genere = (n) => CAT.categories.find((c) => c.name === n);
 const brano = (nome, extra = {}) => {
   const cat = genere(nome);

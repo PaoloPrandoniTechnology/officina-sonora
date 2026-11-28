@@ -36,12 +36,19 @@ try {
   log(`elenco LoRA non disponibile: ${e.message}`);
 }
 const piena = (name) => ({ name, scale: 1.0, ar_scale: 1.0, nar_scale: 0.0 });
-const delGenere = (((CFG.categories || []).find((x) => x.name === concept.categoria) || {}).lora || [])[0];
+const delGenere = (genereDi(concept.categoria).lora || [])[0];
+const cantato = voceDi(genereDi(concept.categoria)) === 'testo';
 // dopo un render fallito, o al secondo ritento di un brano corto, si torna alla strumentale
-const vuoleGenere = imp.lora === 'genere' && delGenere && !concept.attempts && (concept.tentativi_render || 0) < 2;
+// nei brani cantati la strumentale non serve: vale la LoRA del genere, salvo impostazione «nessuna»
+const vuoleGenere = (imp.lora === 'genere' || (cantato && imp.lora !== 'nessuna')) && delGenere && !concept.attempts && (concept.tentativi_render || 0) < 2;
 if (vuoleGenere && presenti.length && !presenti.includes(delGenere.name)) log(`LoRA assente sul motore, uso la strumentale: ${delGenere.name}`);
 let adapters = [];
-if (vuoleGenere && presenti.includes(delGenere.name)) adapters = [delGenere];
+let innesco = '';
+if (vuoleGenere && presenti.includes(delGenere.name)) {
+  const { innesco: parola, ...lora } = delGenere; // la parola d'innesco va nello stile, non al motore
+  adapters = [lora];
+  innesco = parola || '';
+}
 else if (!concept.vocale && (imp.lora !== 'nessuna' || concept.attempts)) adapters = [piena('yue2-instrumental-kto')];
 
 // gemma esce dalla GPU prima del render: su 6 GB i due modelli insieme rallentano il caricamento
@@ -54,6 +61,7 @@ const piano = !manuale && imp.fonte === 'modello' && !concept.vocale && !concept
 const nostro = !piano && Boolean(concept.abc) && (manuale || ((concept.attempts || 0) <= (imp.livello ? 1 : 0) && imp.fonte !== 'motore'));
 const body = piano ? corpoPiano(concept, seed, ScoreAbc.campionamento(imp))
   : corpoRender(concept, adapters, seed, nostro ? concept.abc : null, nostro ? concept.durata_s : 0);
+if (innesco) body.style = `${innesco}, ${body.style}`;
 const id = await inviaSynth(body);
 if (!id) {
   // un rifiuto della richiesta (4xx) si ripete identico: dopo 5 volte il brano si abbandona

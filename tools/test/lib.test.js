@@ -68,7 +68,7 @@ test('stile: la chiusura dipende dal genere (strumentale o vocale senza parole)'
   const base = { stile: 'ambient pad', enfasi: 'costruzione', melodia: 'tema', accordi: 'ciclico', ritmica: 'lenta' };
   const strumentale = L.componiStile({ ...base }, null, ['pad'], '', { style_extra: ['calm'] });
   assert.match(strumentale, /^Instrumental, .*no vocals$/);
-  const vocale = L.componiStile({ ...base, vocale_senza_parole: true }, null, ['voce'], '', { style_extra: [] });
+  const vocale = L.componiStile({ ...base, voce: 'vocalizzi' }, null, ['voce'], '', { style_extra: [] });
   assert.match(vocale, /^Wordless vocals, .*no lyrics$/);
   assert.doesNotMatch(vocale, /no vocals/);
 });
@@ -162,7 +162,7 @@ test('catalogo: ogni genere e\' completo e coerente', () => {
     assert.ok(c.strumenti && c.strumenti.length > 0, `${c.name}: strumenti mancanti`);
     assert.ok(c.varianti && c.varianti.length > 0, `${c.name}: varianti mancanti`);
     assert.equal(c.colori.length, 3, `${c.name}: servono 3 colori`);
-    if (c.vocale_senza_parole) {
+    if (c.voce !== 'strumentale') {
       assert.doesNotMatch(c.stile, /instrumental/i, `${c.name}: genere vocale con stile strumentale`);
     }
   }

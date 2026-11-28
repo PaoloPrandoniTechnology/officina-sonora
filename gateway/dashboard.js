@@ -317,7 +317,7 @@
   const nomeModello = (m) => (!m ? 'non registrato' : m === 'openrouter/free' ? 'OpenRouter, a scelta' : m.split('/').pop().replace(/:free$/, '') + (m === 'google/gemma-4-e4b' ? ' (locale)' : ''));
   const etichettaModello = (m) => (m ? `<span class="tag${m === 'google/gemma-4-e4b' ? '' : ' acc'}" data-tip="Titolo e descrizione scritti da ${esc(m)}">${esc(nomeModello(m))}</span>` : '<span class="muted">—</span>');
 
-  const lib = { modello: '', q: '', genere: '', ambito: '', voto: '', ordine: 'generato_il', verso: -1, quanti: 50, ordinati: [] };
+  const lib = { modello: '', q: '', genere: '', raccolta: '', voto: '', ordine: 'generato_il', verso: -1, quanti: 50, ordinati: [] };
   const COL_LIB = [['titolo', 'Titolo'], ['categoria', 'Genere'], ['modello', 'Testi', 'extra'], ['durata_s', 'Durata', 'num'], ['bpm', 'BPM', 'num extra'], ['voto', 'Voto'], ['ascolti', 'Ascolti', 'num extra'], ['generato_il', 'Creato', 'extra']];
   const durata = (s) => (s ? Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0') : '—');
   function disegnaLibreria() {
@@ -325,15 +325,15 @@
     const tutti = dati.libreria.recenti;
     const generi = [...new Set(tutti.map((t) => t.categoria).filter(Boolean))].sort((a, b) => nm(a).localeCompare(nm(b)));
     imposta('#lGen', '<option value="">Tutti i generi</option>' + generi.map((g) => `<option value="${esc(g)}">${esc(nm(g))}</option>`).join(''));
-    imposta('#lAmbitoF', '<option value="">Yoga e sottofondo</option>' + Object.keys(dati.libreria.perAmbito).sort().map((a) => `<option value="${esc(a)}">Solo ${esc(a)}</option>`).join(''));
+    imposta('#lRaccoltaF', '<option value="">Tutte le raccolte</option>' + Object.keys(dati.libreria.perRaccolta).sort().map((a) => `<option value="${esc(a)}">Solo ${esc(a)}</option>`).join(''));
     const modelli = [...new Set(tutti.map((t) => t.modello).filter(Boolean))].sort();
     imposta('#lModF', '<option value="">Tutti i modelli</option>' + modelli.map((m) => `<option value="${esc(m)}">Testi: ${esc(nomeModello(m))}</option>`).join(''));
     $('#lModF').value = lib.modello;
     $('#lGen').value = lib.genere;
-    $('#lAmbitoF').value = lib.ambito;
+    $('#lRaccoltaF').value = lib.raccolta;
     const q = lib.q.trim().toLowerCase();
     const voti = { no: (v) => v === null, si: (v) => v !== null, alti: (v) => v >= 4, bassi: (v) => v !== null && v <= 2, cuore: (v, t) => lettore.preferito(t.numero) };
-    const lista = tutti.filter((t) => (!lib.genere || t.categoria === lib.genere) && (!lib.ambito || t.ambito === lib.ambito) && (!lib.modello || t.modello === lib.modello) && (!lib.voto || voti[lib.voto](t.voto, t))
+    const lista = tutti.filter((t) => (!lib.genere || t.categoria === lib.genere) && (!lib.raccolta || t.raccolta === lib.raccolta) && (!lib.modello || t.modello === lib.modello) && (!lib.voto || voti[lib.voto](t.voto, t))
       && (!q || [t.titolo, nm(t.categoria), t.categoria, t.tipo, t.famiglia, t.modello].join(' ').toLowerCase().includes(q)));
     const chiave = (t) => (lib.ordine === 'categoria' ? nm(t.categoria) : t[lib.ordine]);
     lista.sort((a, b) => {
@@ -400,10 +400,10 @@
       const tintaG = (g.colori || [])[1] || (g.colori || [])[0] || '';
       return `<article class="gc${g.attivo ? '' : ' sospeso'}"${/^#[0-9a-f]{6}$/i.test(tintaG) ? ` style="--tinta:${tintaG}"` : ''}>
         <h3><span>${esc(g.genere)}</span><label class="switch" data-tip="${g.attivo ? 'In produzione: clic per sospendere' : 'Sospeso: clic per produrlo di nuovo'}"><input type="checkbox" data-attiva="${esc(g.nome)}" aria-label="Produci ${esc(g.genere)}" ${g.attivo ? 'checked' : ''}><span></span></label></h3>
-        <div class="gn">${esc([g.famiglia, g.ambito].filter(Boolean).join(', '))}${g.vocale ? ', voci senza parole' : ''}${g.attivo ? '' : ' (sospeso)'}</div>
+        <div class="gn">${esc([g.raccolta, g.famiglia].filter(Boolean).join(', '))}${g.voce === 'testo' ? ', con testo cantato' : g.voce === 'vocalizzi' ? ', voci senza parole' : ''}${g.attivo ? '' : ' (sospeso)'}</div>
         <div class="attivita">${esc(g.attivita)}</div>
         <div class="dati"><div><b>${g.bpm[0]}–${g.bpm[1]}</b><small>BPM</small></div><div><b>${n0(g.brani)}</b><small>brani</small></div><div><b>${g.votoMedio === null ? '—' : n1(g.votoMedio)}</b><small>voto medio</small></div></div>
-        <div class="azioni"><button class="btn small" data-produci="${esc(g.nome)}" data-tip="Il prossimo brano sarà di questo genere">Produci ora</button><button class="btn small ghost" data-stile="${esc(g.nome)}">Modifica stile</button><button class="btn small ghost" data-brani="${esc(g.nome)}" ${g.brani ? '' : 'disabled'}>Ascolta i brani</button></div>
+        <div class="azioni"><button class="btn small" data-produci="${esc(g.nome)}" data-tip="Il prossimo brano sarà di questo genere">Produci ora</button><button class="btn small ghost" data-scheda-genere="${esc(g.nome)}">Modifica scheda</button><button class="btn small ghost" data-stile="${esc(g.nome)}">Stile</button><button class="btn small ghost" data-brani="${esc(g.nome)}" ${g.brani ? '' : 'disabled'}>Ascolta i brani</button></div>
         <details data-g="${esc(g.nome)}"${aperte.has(g.nome) ? ' open' : ''}><summary>Specifiche complete</summary>
           <div class="det">
             <p><b>Stile</b><br>${esc(g.stile)}</p>
@@ -790,7 +790,7 @@
   const vistaGeneri = { stato: '', ordine: '', verso: 1 };
   function generiMostrati() {
     const q = $('#cGenQ').value.trim().toLowerCase();
-    const lista = ctrl.generi.filter((g) => (!vistaGeneri.stato || g.attivo === (vistaGeneri.stato === 'si')) && [g.etichetta, g.nome, g.famiglia, g.ambito].join(' ').toLowerCase().includes(q));
+    const lista = ctrl.generi.filter((g) => (!vistaGeneri.stato || g.attivo === (vistaGeneri.stato === 'si')) && [g.etichetta, g.nome, g.famiglia, g.raccolta].join(' ').toLowerCase().includes(q));
     const k = vistaGeneri.ordine;
     if (k) lista.sort((a, b) => (typeof a[k] === 'string' ? a[k].localeCompare(b[k]) : a[k] - b[k]) * vistaGeneri.verso);
     return lista;
@@ -840,7 +840,7 @@
     document.querySelectorAll('#cGenFil [data-st]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.st === vistaGeneri.stato)));
     $('#gTbody').innerHTML = generiMostrati().map((g) => `
             <tr>
-              <td class="nm">${esc(g.etichetta)}<br><small class="muted">${esc([g.ambito, g.famiglia].filter(Boolean).join(' · '))}</small></td>
+              <td class="nm">${esc(g.etichetta)}<br><small class="muted">${esc([g.raccolta, g.famiglia].filter(Boolean).join(' · '))}</small></td>
               <td class="num">${n0(g.brani)}</td>
               <td><label class="switch"><input type="checkbox" data-att="${esc(g.nome)}" aria-label="${esc(g.etichetta)} attivo" ${g.attivo ? 'checked' : ''}><span></span></label></td>
               <td><div style="display:flex;align-items:center;gap:10px">
@@ -916,7 +916,7 @@
   function spiega(t) {
     const k = String(t).toLowerCase();
     const fisso = /^instrumental$/.test(k) ? 'Chiede un brano senza voce.' : /^wordless vocals$/.test(k) ? 'Chiede vocalizzi senza parole.'
-      : /^no (vocals|lyrics)$/.test(k) ? 'Ribadisce che il brano non deve avere parole o voce.' : /\bbpm$/.test(k) ? 'Velocità: battiti al minuto, scelta nella fascia del genere.'
+      : /^no (vocals|lyrics)$/.test(k) ? 'Ribadisce che il brano non deve avere parole o voce.' : k === 'clear diction' ? 'Chiede parole ben pronunciate.' : / lyrics, .*(vocal|choir)/.test(k) || / lyrics$/.test(k) ? 'Lingua delle parole e tipo di voce, dalla scheda del genere.' : /\bbpm$/.test(k) ? 'Velocità: battiti al minuto, scelta nella fascia del genere.'
       : /^[a-g](#|b)? (major|minor)$/.test(k) ? 'Tonalità del brano (major = maggiore, minor = minore).' : '';
     if (fisso) return fisso;
     const famiglia = Object.keys(EFFETTI).find((f) => (ctrl.vocabolario[f] || []).includes(k));
@@ -943,7 +943,7 @@
   const tinta = (c) => (/^#[0-9a-f]{6}$/i.test(c || '') ? c : '');
   const perFamiglia = (elenco) => {
     const gruppi = {};
-    for (const x of elenco) (gruppi[[x.ambito, x.famiglia].filter(Boolean).join(' · ') || 'altro'] ||= []).push(x);
+    for (const x of elenco) (gruppi[[x.raccolta, x.famiglia].filter(Boolean).join(' · ') || 'altro'] ||= []).push(x);
     return Object.entries(gruppi).sort((x, y) => x[0].localeCompare(y[0])).map(([titolo, lista]) => [titolo, lista.sort((x, y) => x.etichetta.localeCompare(y.etichetta))]);
   };
   const salvaGuida = (corpo, messaggio) => esegui(() => invia('/api/controllo/guida', corpo), messaggio);
@@ -1008,7 +1008,7 @@
     const quante = genere ? modifiche(guidaAmbito) : generali;
     const testa = `<div class="card guida-testa" style="${scheda && tinta(scheda.colore) ? 'border-left-color:' + tinta(scheda.colore) : ''}">
       <div><div class="occhiello">Stai modificando</div><h2>${esc(scheda ? scheda.etichetta : 'Tutti i generi')}</h2>
-        ${scheda ? `<span class="tag">${esc([scheda.ambito, scheda.famiglia].filter(Boolean).join(' · '))}</span> <span class="tag ${scheda.attivo ? 'acc' : ''}" data-tip="${scheda.attivo ? 'Il sistema produce brani di questo genere.' : 'Il genere è sospeso: si riattiva in Controllo, Generi.'}">${scheda.attivo ? 'in produzione' : 'sospeso'}</span> <span class="tag">${vocale ? 'vocalizzi senza parole' : 'strumentale'}</span> <span class="tag">${esc(a.bpm)} BPM</span>` : '<span class="muted" style="font-size:12.5px">Le scelte fatte qui valgono per ogni brano.</span>'}</div>
+        ${scheda ? `<span class="tag">${esc([scheda.raccolta, scheda.famiglia].filter(Boolean).join(' · '))}</span> <span class="tag ${scheda.attivo ? 'acc' : ''}" data-tip="${scheda.attivo ? 'Il sistema produce brani di questo genere.' : 'Il genere è sospeso: si riattiva in Controllo, Generi.'}">${scheda.attivo ? 'in produzione' : 'sospeso'}</span> <span class="tag">${a.voce === 'testo' ? 'testo cantato' : vocale ? 'vocalizzi senza parole' : 'strumentale'}</span> <span class="tag">${esc(a.bpm)} BPM</span>` : '<span class="muted" style="font-size:12.5px">Le scelte fatte qui valgono per ogni brano.</span>'}</div>
       <div class="azioni">${scheda ? '<button class="btn small ghost" id="gTempo" data-tip="Apre velocità, durata e forma di questo genere.">Tempo e struttura</button>' : ''}
         <button class="btn small ghost" id="gAzzera" data-tip="${genere ? 'Toglie i termini aggiunti, quelli da evitare e quelli della revisione per questo genere.' : 'Toglie i termini aggiunti ed evitati per tutti i generi.'}" ${quante ? '' : 'disabled'}>Torna al predefinito</button></div></div>`;
 
@@ -1438,6 +1438,10 @@
     $, esc, ic, imposta, nm, toast, chiedi, invia, leggi, data, n0, stelle, vai,
     popover: lettore.popover, pausaLettore: () => { lettore.pausa(); $('#vAudio').pause(); },
   });
+  // ---------- testi cantati (parole-pagina.js) e schede dei generi (generi-editor.js) ----------
+  const paroleCantate = window.PaginaParole({ $, esc, toast, chiedi, invia, leggi });
+  const editorGeneri = window.EditorGeneri({ $, esc, toast, chiedi, invia, leggi, salvato: async () => { await caricaControllo(true); await aggiornaDati(); } });
+  $('#gNuovo').addEventListener('click', () => editorGeneri.apri(''));
   // ---------- composizione (composizione-pagina.js) ----------
   const composizione = window.PaginaComposizione({ $, esc, imposta, toast, chiedi, invia, leggi, pausaLettore: () => { lettore.pausa(); $('#vAudio').pause(); } });
   $('#cmSub').addEventListener('click', (e) => { const b = e.target.closest('[data-scheda]'); if (b) vai(b.dataset.scheda === 'armonia' ? 'composizione' : 'composizione/' + b.dataset.scheda); });
@@ -1605,7 +1609,7 @@
 
   const COL_GENERI = [['genere', 'Genere', String], ['brani', 'Brani', n0], ['scartoPct', 'Scartati', conUnita('%')], ['voto', 'Voto', virgola], ['votati', 'Voti', n0], ['resa', 'Resa', virgola], ['renderMedio', 'Render (s)', virgola], ['rigeneratiPct', 'Rigenerati', conUnita('%')], ['ore', 'Ore', virgola], ['ascolti', 'Ascolti', n0]];
   const ESITI = { migliora: ['↑', 'var(--ok)'], stabile: ['→', 'var(--muted)'], peggiora: ['↓', 'var(--danger)'], 'dati insufficienti': ['–', 'var(--faint)'] };
-  const AN_FILTRI = { ambito: 'aAmbito', famiglia: 'aFamiglia', genere: 'aGenere', tipo: 'aTipo', struttura: 'aStruttura', modello: 'aModello' };
+  const AN_FILTRI = { raccolta: 'aRaccolta', famiglia: 'aFamiglia', genere: 'aGenere', tipo: 'aTipo', struttura: 'aStruttura', modello: 'aModello' };
   const an = { richiesta: 0, dati: null, ordine: 'brani', verso: -1 };
 
   function disegnaGeneriAn() {
@@ -1657,7 +1661,7 @@
     $('#aNota').textContent = 'Passo ' + (r.passo === 'ora' ? 'per ora' : 'per giorno') +
       ($('#aPasso').value && $('#aPasso').value !== r.passo ? ' (oltre 7 giorni i punti per ora non sono disponibili)' : '') +
       (r.troncato ? ' · i grafici mostrano solo gli intervalli più recenti, gli indici coprono tutto il periodo' : '') +
-      (filtrato ? ' · i filtri su ambito, famiglia, genere, tipo, struttura e modello non si applicano agli errori' : '');
+      (filtrato ? ' · i filtri su raccolta, famiglia, genere, tipo, struttura e modello non si applicano agli errori' : '');
     $('#aConfronto').textContent = r.precedente ? 'variazione sul periodo precedente di pari durata' : $('#aPeriodo').value ? 'nessun dato nel periodo precedente per il confronto' : 'tutto lo storico';
     $('#aKpi').innerHTML = indiciHtml(r.riepilogo, r.precedente);
 
@@ -1715,8 +1719,8 @@
     disegnaAndamento();
   }
   for (const id of ['aPeriodo', 'aPasso', 'aGenere', 'aTipo', 'aStruttura', 'aModello']) $('#' + id).addEventListener('change', caricaAndamento);
-  // cambiando ambito o famiglia le scelte più strette non valgono più
-  $('#aAmbito').addEventListener('change', () => { $('#aFamiglia').value = $('#aGenere').value = ''; caricaAndamento(); });
+  // cambiando raccolta o famiglia le scelte più strette non valgono più
+  $('#aRaccolta').addEventListener('change', () => { $('#aFamiglia').value = $('#aGenere').value = ''; caricaAndamento(); });
   $('#aFamiglia').addEventListener('change', () => { $('#aGenere').value = ''; caricaAndamento(); });
   $('#aModifiche').addEventListener('change', () => { if (an.dati) disegnaAndamento(); });
   $('#aAzzera').addEventListener('click', () => {
@@ -1737,7 +1741,7 @@
   setInterval(() => { if ($('#t-andamento').classList.contains('on')) caricaAndamento(); }, 30000);
 
   // ---------- navigazione ----------
-  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', playlist: 'Playlist', score: 'Score', composizione: 'Composizione', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
+  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', playlist: 'Playlist', testi: 'Testi', score: 'Score', composizione: 'Composizione', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
   function vai(indirizzo) {
     const parti = String(indirizzo || '').split('/');
     let tab = parti[0];
@@ -1763,6 +1767,7 @@
     if (tab === 'andamento') caricaAndamento();
     if (tab === 'playlist') lettore.pagina(parti[1]);
     if (tab === 'score') score.pagina(parti[1]); else score.ferma();
+    if (tab === 'testi') paroleCantate.pagina(); else paroleCantate.ferma();
     if (tab === 'composizione') composizione.pagina(parti[1]); else composizione.ferma();
     lettore.navigato();
   }
@@ -1787,7 +1792,7 @@
   }
   $('#bProd').onclick = () => cambiaPausa(!(statoUltimo && inPausa(statoUltimo)));
   document.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-vai], [data-ascolta], [data-info], [data-vota], [data-stile], [data-produci], [data-brani], [data-riprendi], [data-score]');
+    const b = e.target.closest('[data-vai], [data-ascolta], [data-info], [data-vota], [data-stile], [data-produci], [data-brani], [data-riprendi], [data-score], [data-scheda-genere]');
     if (!$('#sistema').contains(e.target)) $('#sistema').open = false;
     if (!b) return;
     if (b.dataset.ascolta) return lettore.ascolta(b);
@@ -1796,8 +1801,9 @@
     if (b.dataset.vai) return vai(b.dataset.vai);
     if (b.dataset.score) return score.apriBrano(Number(b.dataset.score));
     if (b.dataset.vota) { vt.richiesto = Number(b.dataset.vota); vt.filtro = ''; return vai('voti'); }
+    if (b.dataset.schedaGenere) return editorGeneri.apri(b.dataset.schedaGenere);
     if (b.dataset.stile) { apriGuida(encodeURIComponent(b.dataset.stile)); return vai('controllo/guida/' + encodeURIComponent(b.dataset.stile)); }
-    if (b.dataset.brani) { lib.genere = b.dataset.brani; lib.ambito = lib.voto = lib.q = lib.modello = ''; $('#lQ').value = $('#lVotoF').value = ''; disegnaLibreria(); return vai('libreria'); }
+    if (b.dataset.brani) { lib.genere = b.dataset.brani; lib.raccolta = lib.voto = lib.q = lib.modello = ''; $('#lQ').value = $('#lVotoF').value = ''; disegnaLibreria(); return vai('libreria'); }
     if ('riprendi' in b.dataset) return cambiaPausa(false);
     return produci(b.dataset.produci);
   });
@@ -1835,7 +1841,7 @@
   $('#lGen').onchange = (e) => { lib.genere = e.target.value; aggiornaLibreria(); };
   $('#lVotoF').onchange = (e) => { lib.voto = e.target.value; aggiornaLibreria(); };
   $('#lModF').onchange = (e) => { lib.modello = e.target.value; aggiornaLibreria(); };
-  $('#lAmbitoF').onchange = (e) => { lib.ambito = e.target.value; aggiornaLibreria(); };
+  $('#lRaccoltaF').onchange = (e) => { lib.raccolta = e.target.value; aggiornaLibreria(); };
   $('#lAltri').onclick = () => { lib.quanti += 50; disegnaLibreria(); };
   $('#recenti').addEventListener('click', (e) => {
     const b = e.target.closest('[data-lord]');

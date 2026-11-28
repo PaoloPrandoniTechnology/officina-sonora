@@ -10,7 +10,7 @@ const M = require('../../src/compositore/melodia.js');
 
 const RADICE = path.join(__dirname, '..', '..');
 const CAT = JSON.parse(fs.readFileSync(path.join(RADICE, 'config', 'catalogo.json'), 'utf8'));
-const CREATIVI = CAT.categories.filter((c) => c.estro && !c.vocale_senza_parole);
+const CREATIVI = CAT.categories.filter((c) => c.estro && c.voce === 'strumentale');
 const genere = (n) => CAT.categories.find((c) => c.name === n);
 const brano = (nome, extra = {}) => {
   const cat = genere(nome);

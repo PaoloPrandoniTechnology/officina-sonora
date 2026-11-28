@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="/dashboard.css">
 <link rel="stylesheet" href="/lettore.css">
 <link rel="stylesheet" href="/score.css">
+<link rel="stylesheet" href="/parole.css">
 </head>
 <body>
 <a class="salta" href="#principale">Vai al contenuto</a>
@@ -46,6 +47,7 @@
   <symbol id="i-trascina" viewBox="0 0 16 16"><path d="M6 4h.01M10 4h.01M6 8h.01M10 8h.01M6 12h.01M10 12h.01" stroke-width="2.4"/></symbol>
   <symbol id="i-score" viewBox="0 0 16 16"><path d="M2 3h12M2 6.5h5M2 10h4M2 13.5h12M11.5 11V5l2.5 1.5"/><circle cx="10" cy="11" r="1.6"/></symbol>
   <symbol id="i-composizione" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11zM6 2.5v7M10 2.5v7M2.5 9.5h11M8 9.5v4"/></symbol>
+  <symbol id="i-testi" viewBox="0 0 16 16"><path d="M2.5 3h8M2.5 6.5h8M2.5 10h5M2.5 13.5h5M13.5 5.5v6.5"/><circle cx="12" cy="12" r="1.5"/></symbol>
   <symbol id="i-menu" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11zM6 2.5v11M11.5 6 9.5 8l2 2"/></symbol>
   <symbol id="i-tema" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.500"/><path d="M8 2.500a5.500 5.500 0 0 1 0 11z" fill="currentColor"/></symbol>
 </svg>
@@ -61,6 +63,7 @@
       <button data-tab="voti"><svg class="ic"><use href="#i-voti"/></svg>Voti<span class="conta" id="navVoti" hidden></span></button>
       <p>Produzione</p>
       <button data-tab="generi"><svg class="ic"><use href="#i-generi"/></svg>Generi</button>
+      <button data-tab="testi"><svg class="ic"><use href="#i-testi"/></svg>Testi</button>
       <button data-tab="score"><svg class="ic"><use href="#i-score"/></svg>Score</button>
       <button data-tab="composizione"><svg class="ic"><use href="#i-composizione"/></svg>Composizione</button>
       <button data-tab="controllo"><svg class="ic"><use href="#i-controllo"/></svg>Controllo</button>
@@ -128,7 +131,7 @@
       <div class="toolbar">
         <input class="search" id="lQ" type="search" placeholder="Cerca per titolo, genere o tipo (tasto /)" aria-label="Cerca un brano">
         <select class="field" id="lGen" aria-label="Filtra per genere"><option value="">Tutti i generi</option></select>
-        <select class="field" id="lAmbitoF" aria-label="Filtra per ambito"><option value="">Yoga e sottofondo</option></select>
+        <select class="field" id="lRaccoltaF" aria-label="Filtra per raccolta"><option value="">Tutte le raccolte</option></select>
         <select class="field" id="lModF" aria-label="Filtra per modello dei testi"><option value="">Tutti i modelli</option></select>
         <select class="field" id="lVotoF" aria-label="Filtra per voto"><option value="">Tutti i voti</option><option value="no">Non votati</option><option value="si">Votati</option><option value="alti">4 e 5 stelle</option><option value="bassi">1 e 2 stelle</option><option value="cuore">Che ti piacciono</option></select>
         <span class="conteggio" id="lConta"></span>
@@ -184,6 +187,9 @@
     </section>
 
     <!-- GENERI -->
+    <!-- TESTI -->
+    <section class="tab" id="t-testi"><div id="paPagina"></div></section>
+
     <section class="tab" id="t-generi">
       <div class="sub-nav" id="gsub" role="group" aria-label="Vista dei generi">
         <button data-g-vista="schede" aria-pressed="true">Schede</button>
@@ -195,6 +201,7 @@
           <select class="field" id="gFam" aria-label="Famiglia"><option value="tutte">Tutte le famiglie</option></select>
           <select class="field" id="gOrd" aria-label="Ordina"><option value="">Ordine del catalogo</option><option value="genere">Per nome</option><option value="brani">Con più brani</option><option value="voto">Voto migliore</option></select>
           <span class="conteggio" id="gConta"></span>
+          <button type="button" class="btn" id="gNuovo">+ Nuovo genere</button>
         </div>
         <div class="gcards" id="gcards"></div>
       </div>
@@ -230,7 +237,7 @@
       <div class="toolbar an-filtri">
         <label>Periodo<select class="field" id="aPeriodo"><option value="1">Ultime 24 ore</option><option value="2">Ultime 48 ore</option><option value="7" selected>Ultimi 7 giorni</option><option value="30">Ultimi 30 giorni</option><option value="90">Ultimi 90 giorni</option><option value="">Tutto</option></select></label>
         <label>Passo<select class="field" id="aPasso"><option value="">Automatico</option><option value="ora">Per ora</option><option value="giorno">Per giorno</option></select></label>
-        <label>Ambito<select class="field" id="aAmbito"><option value="">Tutti</option></select></label>
+        <label>Raccolta<select class="field" id="aRaccolta"><option value="">Tutti</option></select></label>
         <label>Famiglia<select class="field" id="aFamiglia"><option value="">Tutte</option></select></label>
         <label>Genere<select class="field" id="aGenere"><option value="">Tutti i generi</option></select></label>
         <label>Tipo<select class="field" id="aTipo"><option value="">Tutti</option></select></label>
@@ -367,6 +374,9 @@
 <script src="/composizione-lettore.js"></script>
 <script src="/composizione-banco.js"></script>
 <script src="/composizione-pagina.js"></script>
+<script src="/parole-modello.js"></script>
+<script src="/parole-pagina.js"></script>
+<script src="/generi-editor.js"></script>
 <script src="/dashboard.js"></script>
 </body>
 </html>

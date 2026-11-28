@@ -57,7 +57,7 @@ test('una sola LoRA per brano: di serie la strumentale; a scelta quella del gene
   // in nessun genere e con nessuna scelta ne partono due
   for (const c of L.CFG.categories) {
     for (const lora of ['strumentale', 'genere', 'nessuna']) {
-      const r = await invia(c.name, { props: elenco('yue2-instrumental-kto', ...(c.lora || []).map((x) => x.name)), lora, vocale: !!c.vocale_senza_parole, abc: 'X:1' });
+      const r = await invia(c.name, { props: elenco('yue2-instrumental-kto', ...(c.lora || []).map((x) => x.name)), lora, vocale: c.voce !== 'strumentale', abc: 'X:1' });
       assert.ok((r.job.adapters || []).length <= 1, `${c.name} ${lora}`);
     }
   }

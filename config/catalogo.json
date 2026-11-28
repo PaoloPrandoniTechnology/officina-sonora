@@ -67,7 +67,6 @@
         "#4f7fa8",
         "#e7c77a"
       ],
-      "ambito": "yoga",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Meditazione",
@@ -100,7 +99,10 @@
         "scelta": [
           "drone di organo"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "drone"
     },
     {
       "name": "Pranayama-respiro",
@@ -163,7 +165,6 @@
         "#8fc3b8",
         "#f4efe1"
       ],
-      "ambito": "yoga",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Pranayama",
@@ -196,7 +197,10 @@
           "onde di sintetizzatore",
           "vento sintetico delicato"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "drone"
     },
     {
       "name": "Yin-Savasana",
@@ -259,7 +263,6 @@
         "#3a2d52",
         "#8a6fb3"
       ],
-      "ambito": "yoga",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Yin & Savasana",
@@ -292,7 +295,10 @@
         "scelta": [
           "natura lontana"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "drone"
     },
     {
       "name": "Restorative",
@@ -359,7 +365,6 @@
         "#c9a57a",
         "#f6e7c9"
       ],
-      "ambito": "yoga",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Restorative",
@@ -393,7 +398,10 @@
           "flauto da concerto caldo",
           "chitarra acustica con delay"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "drone"
     },
     {
       "name": "Sound-bath-rilassamento",
@@ -457,7 +465,6 @@
         "#7d5fa3",
         "#e9d8ff"
       ],
-      "ambito": "yoga",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Sound bath",
@@ -490,7 +497,10 @@
         "scelta": [
           "pad risonante"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "drone"
     },
     {
       "name": "Hatha-base",
@@ -558,7 +568,6 @@
         "#a9c28a",
         "#f5e9c4"
       ],
-      "ambito": "yoga",
       "famiglia": "ritmico",
       "copertina": {
         "etichetta": "Hatha",
@@ -594,7 +603,10 @@
           "kalimba",
           "flauto morbido"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "folk"
     },
     {
       "name": "Vinyasa-dinamico",
@@ -664,7 +676,6 @@
         "#e08a3c",
         "#ffd27a"
       ],
-      "ambito": "yoga",
       "famiglia": "ritmico",
       "copertina": {
         "etichetta": "Vinyasa",
@@ -702,7 +713,10 @@
           "arpeggi di sintetizzatore",
           "marimba"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "elettro"
     },
     {
       "name": "Power-yoga",
@@ -766,7 +780,6 @@
         "#2fb3c9",
         "#ff5d73"
       ],
-      "ambito": "yoga",
       "famiglia": "ritmico",
       "copertina": {
         "etichetta": "Power yoga",
@@ -801,7 +814,10 @@
           "pad ampio",
           "pluck sintetico"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "elettro"
     },
     {
       "name": "Funk-groove",
@@ -870,7 +886,6 @@
         "#c25b8f",
         "#ffd166"
       ],
-      "ambito": "yoga",
       "famiglia": "ritmico",
       "copertina": {
         "etichetta": "Funk",
@@ -916,7 +931,10 @@
           "rhodes elettrico",
           "sezione fiati"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "funk"
     },
     {
       "name": "Afro-latin-groove",
@@ -985,7 +1003,6 @@
         "#e07a3f",
         "#ffe08a"
       ],
-      "ambito": "yoga",
       "famiglia": "ritmico",
       "copertina": {
         "etichetta": "Afro-latin",
@@ -1031,7 +1048,10 @@
           "flauto vivace",
           "pianoforte montuno"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "funk"
     },
     {
       "name": "Trip-hop-dolce",
@@ -1100,7 +1120,6 @@
         "#5c7a86",
         "#e6c9a0"
       ],
-      "ambito": "yoga",
       "famiglia": "ritmico",
       "copertina": {
         "etichetta": "Trip-hop",
@@ -1146,7 +1165,10 @@
           "chitarra jazz pulita",
           "violoncello"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "funk"
     },
     {
       "name": "Reggae-dub-morbido",
@@ -1210,7 +1232,6 @@
         "#4f9a52",
         "#f2c94c"
       ],
-      "ambito": "yoga",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Reggae dub",
@@ -1245,7 +1266,10 @@
           "organo hammond",
           "melodica"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "funk"
     },
     {
       "name": "Jazz-lounge",
@@ -1314,7 +1338,6 @@
         "#8b5e83",
         "#f4d6a0"
       ],
-      "ambito": "yoga",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Jazz lounge",
@@ -1352,7 +1375,10 @@
           "vibrafono",
           "tromba con sordina"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "jazz"
     },
     {
       "name": "Folk-strumming",
@@ -1421,7 +1447,6 @@
         "#b7845a",
         "#f7e3b5"
       ],
-      "ambito": "yoga",
       "famiglia": "ritmico",
       "copertina": {
         "etichetta": "Folk",
@@ -1467,7 +1492,10 @@
           "armonica",
           "mandolino"
         ]
-      }
+      },
+      "raccolta": "Yoga",
+      "voce": "strumentale",
+      "carattere": "folk"
     },
     {
       "name": "Surf-rock-strumentale",
@@ -1535,7 +1563,6 @@
         "#1fa3b8",
         "#ffb84d"
       ],
-      "ambito": "musica",
       "famiglia": "rock",
       "copertina": {
         "etichetta": "Surf rock",
@@ -1571,7 +1598,10 @@
         "scelta": [
           "organo combo"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "rock"
     },
     {
       "name": "Post-rock-strumentale",
@@ -1640,7 +1670,6 @@
         "#4a6fa5",
         "#e8d5b5"
       ],
-      "ambito": "musica",
       "famiglia": "rock",
       "copertina": {
         "etichetta": "Post-rock",
@@ -1686,7 +1715,10 @@
           "glockenspiel",
           "archi"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "cine"
     },
     {
       "name": "Blues-shuffle-strumentale",
@@ -1755,7 +1787,6 @@
         "#b5651d",
         "#f5d27a"
       ],
-      "ambito": "musica",
       "famiglia": "rock",
       "copertina": {
         "etichetta": "Blues",
@@ -1793,7 +1824,10 @@
           "armonica blues",
           "pianoforte boogie"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "blues"
     },
     {
       "name": "Indie-rock-strumentale",
@@ -1861,7 +1895,6 @@
         "#3a9ad9",
         "#ffd166"
       ],
-      "ambito": "musica",
       "famiglia": "rock",
       "copertina": {
         "etichetta": "Indie rock",
@@ -1905,7 +1938,10 @@
         "scelta": [
           "tastiera vintage"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "rock"
     },
     {
       "name": "Rockabilly-strumentale",
@@ -1973,7 +2009,6 @@
         "#e04b5a",
         "#ffe066"
       ],
-      "ambito": "musica",
       "famiglia": "rock",
       "copertina": {
         "etichetta": "Rockabilly",
@@ -2009,7 +2044,10 @@
           "pianoforte boogie",
           "sax tenore ruvido"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "blues"
     },
     {
       "name": "Techno-minimale",
@@ -2077,7 +2115,6 @@
         "#2b4c5e",
         "#7ae7ff"
       ],
-      "ambito": "musica",
       "famiglia": "elettronico",
       "copertina": {
         "etichetta": "Techno minimale",
@@ -2121,7 +2158,10 @@
           "stab dub",
           "plucco analogico"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "elettro"
     },
     {
       "name": "Piano-minimalista",
@@ -2188,7 +2228,6 @@
         "#5d6b8a",
         "#f0e6d2"
       ],
-      "ambito": "musica",
       "famiglia": "meditativo",
       "copertina": {
         "etichetta": "Piano minimalista",
@@ -2222,7 +2261,10 @@
           "celesta",
           "archi sommessi"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "cine"
     },
     {
       "name": "Score-cinematico",
@@ -2292,7 +2334,6 @@
         "#7c4d6b",
         "#f2c57c"
       ],
-      "ambito": "musica",
       "famiglia": "orchestrale",
       "copertina": {
         "etichetta": "Cinematico",
@@ -2340,7 +2381,10 @@
           "oboe solista",
           "legni"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "cine"
     },
     {
       "name": "Folk-balcanico",
@@ -2409,7 +2453,6 @@
         "#c0503a",
         "#f6d37a"
       ],
-      "ambito": "musica",
       "famiglia": "world",
       "copertina": {
         "etichetta": "Folk balcanico",
@@ -2447,7 +2490,10 @@
           "violino",
           "tromba balcanica"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "balcanico"
     },
     {
       "name": "Beat-hip-hop",
@@ -2516,7 +2562,6 @@
         "#6d4c41",
         "#d7c49e"
       ],
-      "ambito": "musica",
       "famiglia": "elettronico",
       "copertina": {
         "etichetta": "Hip-hop",
@@ -2562,7 +2607,10 @@
           "sax campionato",
           "chitarra jazz campionata"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "funk"
     },
     {
       "name": "Manouche-swing",
@@ -2631,7 +2679,6 @@
         "#a77a3c",
         "#ffe9b0"
       ],
-      "ambito": "musica",
       "famiglia": "jazz",
       "copertina": {
         "etichetta": "Manouche swing",
@@ -2669,10 +2716,12 @@
           "clarinetto swing",
           "fisarmonica musette"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "jazz"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "loop",
         "arco"
@@ -2761,10 +2810,12 @@
           "arpeggiatore",
           "chitarra con chorus"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "elettro"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "loop",
         "crescendo"
@@ -2847,10 +2898,12 @@
         "scelta": [
           "contrabbasso"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "flamenco"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "arco",
         "onda"
@@ -2944,10 +2997,12 @@
           "violino celtico",
           "cornamusa irlandese"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "folk"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "loop",
         "crescendo"
@@ -3036,10 +3091,12 @@
           "pianoforte etereo",
           "sax soprano morbido"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "elettro"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "piatto",
         "onda"
@@ -3122,10 +3179,12 @@
         "scelta": [
           "flauto di bambù"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "drone"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "arco",
         "onda"
@@ -3214,10 +3273,12 @@
           "sax tenore soffiato",
           "pianoforte leggero"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "jazz"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "piatto",
         "onda"
@@ -3271,7 +3332,6 @@
         "#8e7cc3",
         "#f4ecff"
       ],
-      "vocale_senza_parole": true,
       "copertina": {
         "etichetta": "Vocalise",
         "prompt": "luminous soundwaves rising through a tall gothic cloister with soft light beams, ethereal painting, pearl and rose",
@@ -3298,10 +3358,12 @@
         "scelta": [
           "campane leggere"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "vocalizzi",
+      "carattere": "drone"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "piatto"
       ],
@@ -3354,7 +3416,6 @@
         "#4a6670",
         "#d6e6e8"
       ],
-      "vocale_senza_parole": true,
       "copertina": {
         "etichetta": "Overtone",
         "prompt": "concentric golden resonance rings over an endless steppe at twilight, mystical minimal painting, copper and deep blue",
@@ -3381,10 +3442,12 @@
         "scelta": [
           "campane"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "vocalizzi",
+      "carattere": "drone"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "piatto",
         "arco"
@@ -3439,7 +3502,6 @@
         "#7a6a4f",
         "#f5ecd6"
       ],
-      "vocale_senza_parole": true,
       "copertina": {
         "etichetta": "Canto monodico",
         "prompt": "candlelit romanesque abbey nave with stone arches and a single shaft of light, reverent chiaroscuro painting, amber and shadow",
@@ -3468,10 +3530,12 @@
           "organo a canne",
           "campane di chiesa"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "vocalizzi",
+      "carattere": "drone"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "loop",
         "arco"
@@ -3528,7 +3592,6 @@
         "#d1607a",
         "#ffd6a5"
       ],
-      "vocale_senza_parole": true,
       "copertina": {
         "etichetta": "Soul",
         "prompt": "vintage chrome microphone under a warm spotlight with velvet curtain, 1960s soul record sleeve, plum and gold",
@@ -3561,10 +3624,12 @@
           "fiati leggeri",
           "chitarra soul"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "vocalizzi",
+      "carattere": "elettro"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "loop",
         "crescendo"
@@ -3658,10 +3723,12 @@
         "scelta": [
           "tastiera di sottofondo"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "rock"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "loop",
         "crescendo"
@@ -3747,10 +3814,12 @@
           "sintetizzatore distorto",
           "rumori e texture"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "elettro"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "loop",
         "arco"
@@ -3839,10 +3908,12 @@
           "pianoforte scuro",
           "flauto trap"
         ]
-      }
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "elettro"
     },
     {
-      "ambito": "musica",
       "strutture": [
         "arco",
         "loop"
@@ -3936,6 +4007,188 @@
         "scelta": [
           "organo hammond"
         ]
+      },
+      "raccolta": "Sottofondo",
+      "voce": "strumentale",
+      "carattere": "rock"
+    },
+    {
+      "name": "Canzone-italiana",
+      "genere": "Canzone italiana",
+      "raccolta": "Canzoni",
+      "famiglia": "canzone",
+      "voce": "testo",
+      "testi": "approvazione",
+      "energia": 3,
+      "estro": 0,
+      "strutture": [
+        "arco",
+        "onda"
+      ],
+      "vietati": [],
+      "influenze": [],
+      "enfasi": "ritornello cantabile e memorabile",
+      "melodia": "linea vocale chiara",
+      "accordi": "giri semplici e caldi",
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "Italian pop ballad, piano and strings, sweeping chorus"
+        }
+      ],
+      "lingua": "it",
+      "timbro": "maschile",
+      "temi": "amore, ricordi, il mare d’estate, la propria città",
+      "carattere": "cine",
+      "bpm": [
+        70,
+        95
+      ],
+      "durata": "180-240",
+      "attivita": "ascolto",
+      "stile": "Italian pop ballad, piano and strings, sweeping chorus",
+      "ritmica": "4/4 lento",
+      "tonalita": [
+        "La minore",
+        "Do maggiore",
+        "Fa maggiore"
+      ],
+      "strumenti": [
+        "pianoforte",
+        "archi",
+        "basso elettrico",
+        "batteria morbida",
+        "chitarra classica"
+      ],
+      "organico": {
+        "fissi": [
+          "pianoforte",
+          "archi",
+          "basso elettrico"
+        ],
+        "scelta": [
+          "batteria morbida",
+          "chitarra classica"
+        ]
+      },
+      "lora": [
+        {
+          "name": "yue2-canzone-italiana",
+          "scale": 1,
+          "ar_scale": 1,
+          "nar_scale": 0,
+          "innesco": "cnzn"
+        }
+      ],
+      "colori": [
+        "#3a1f1f",
+        "#c0504d",
+        "#f6e7c9"
+      ],
+      "copertina": {
+        "font": "Georgia",
+        "corsivo": true,
+        "etichetta": "Canzone",
+        "prompt": "Italian seaside town at golden hour, vintage film photograph, warm red and cream"
+      },
+      "en": {
+        "genre": "Italian pop ballad",
+        "instruments": {
+          "pianoforte": "expressive piano",
+          "archi": "sweeping strings",
+          "basso elettrico": "warm electric bass",
+          "batteria morbida": "soft brushed drums",
+          "chitarra classica": "nylon string guitar"
+        },
+        "rhythm": "slow steady beat",
+        "mood": "warm, nostalgic, sweeping chorus",
+        "space": "close warm vocal with natural reverb",
+        "influences": {}
+      }
+    },
+    {
+      "name": "Pop-inglese",
+      "genere": "Pop inglese",
+      "raccolta": "Canzoni",
+      "famiglia": "canzone",
+      "voce": "testo",
+      "testi": "approvazione",
+      "energia": 3,
+      "estro": 0,
+      "strutture": [
+        "arco",
+        "onda"
+      ],
+      "vietati": [],
+      "influenze": [],
+      "enfasi": "ritornello cantabile e memorabile",
+      "melodia": "linea vocale chiara",
+      "accordi": "giri semplici e caldi",
+      "varianti": [
+        {
+          "nome": "base",
+          "keywords": "modern acoustic pop, catchy chorus"
+        }
+      ],
+      "lingua": "en",
+      "timbro": "femminile",
+      "temi": "new beginnings, city nights, friendship",
+      "carattere": "folk",
+      "bpm": [
+        92,
+        118
+      ],
+      "durata": "160-220",
+      "attivita": "ascolto",
+      "stile": "modern acoustic pop, catchy chorus",
+      "ritmica": "4/4",
+      "tonalita": [
+        "Do maggiore",
+        "Sol maggiore",
+        "La minore"
+      ],
+      "strumenti": [
+        "chitarra acustica",
+        "basso",
+        "batteria pop",
+        "pianoforte",
+        "pad"
+      ],
+      "organico": {
+        "fissi": [
+          "chitarra acustica",
+          "basso",
+          "batteria pop"
+        ],
+        "scelta": [
+          "pianoforte",
+          "pad"
+        ]
+      },
+      "colori": [
+        "#14213d",
+        "#fca311",
+        "#e5e5e5"
+      ],
+      "copertina": {
+        "etichetta": "Pop",
+        "prompt": "city street at dusk with soft bokeh lights, modern editorial photograph, navy and amber",
+        "font": "Bahnschrift",
+        "corsivo": false
+      },
+      "en": {
+        "genre": "modern acoustic pop",
+        "instruments": {
+          "chitarra acustica": "strummed acoustic guitar",
+          "basso": "round electric bass",
+          "batteria pop": "tight pop drums",
+          "pianoforte": "bright piano",
+          "pad": "soft synth pad"
+        },
+        "rhythm": "steady mid tempo beat",
+        "mood": "uplifting, catchy chorus",
+        "space": "clean modern mix with the vocal up front",
+        "influences": {}
       }
     }
   ],
@@ -4028,5 +4281,33 @@
     "passoBpm": 6,
     "limiteBpm": 15,
     "nota": "Per un nuovo genere basta aggiungerlo a config/catalogo.json con ambito, famiglia, colori e varianti: tag, playlist, voti e tempo funzionano da soli."
-  }
+  },
+  "raccolte": [
+    {
+      "nome": "Yoga",
+      "playlist": "Yoga"
+    },
+    {
+      "nome": "Sottofondo",
+      "playlist": "Musica"
+    },
+    {
+      "nome": "Canzoni",
+      "playlist": "Canzoni"
+    }
+  ],
+  "lingue": [
+    {
+      "codice": "it",
+      "nome": "Italiano",
+      "en": "Italian",
+      "id3": "ita"
+    },
+    {
+      "codice": "en",
+      "nome": "Inglese",
+      "en": "English",
+      "id3": "eng"
+    }
+  ]
 }

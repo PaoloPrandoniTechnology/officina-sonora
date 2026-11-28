@@ -2,7 +2,7 @@
 
 **Una piccola fabbrica di musica di sottofondo che lavora da sola sul tuo computer.**
 
-Inventa brani strumentali (o con voci senza parole) per yoga, studio o relax, controlla che siano riusciti, li mette
+Inventa brani di qualsiasi genere (strumentali, con vocalizzi o **cantati con parole**), controlla che siano riusciti, li mette
 in ordine e li carica sul tuo spazio musicale in rete (**iBroadcast**) con copertina e playlist. Tu ascolti, dai un
 voto e, se vuoi, chiedi cambiamenti: il sistema ne tiene conto per i brani successivi.
 
@@ -13,7 +13,7 @@ voto e, se vuoi, chiedi cambiamenti: il sistema ne tiene conto per i brani succe
 | Parola | Significato |
 |---|---|
 | **Brano** | un pezzo musicale prodotto dal sistema |
-| **Genere** | il tipo di musica (ne esistono 39) |
+| **Genere** | il tipo di musica (di serie 41; ne crei altri dalla dashboard) |
 | **Dashboard** | la pagina web da cui controlli tutto |
 | **Render** | il momento in cui il computer crea l'audio; dura alcuni minuti |
 | **YuE2** | il programma che **crea la musica** |
@@ -72,6 +72,8 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 | **Dare un voto** | stelle nel [lettore](#il-lettore), pagina [Voti](#voti), `/menu` su Telegram o stelle in iBroadcast |
 | **Non superare i 5 GB** di iBroadcast | è automatico: vedi [rotazione](#spazio-la-rotazione-dei-brani); dai voto 5 ai brani da conservare |
 | **Vedere, ascoltare e modificare uno score** | pagina [Score](#score) |
+| **Creare un genere** nuovo o cambiarne la scheda | [Creare o modificare un genere](#creare-o-modificare-un-genere) |
+| Scrivere o approvare le **parole** di un brano cantato | [Testi](#testi) |
 | **Vedere, cambiare o aggiungere** accordi, motivi, assoli, richiami e forme | [Composizione](#composizione) |
 | **Decidere come nascono gli score** nuovi | [Score → Come nascono](#come-nascono) |
 | Brani **più ricchi di variazioni** o, al contrario, più calmi | [Score → Come nascono](#come-nascono), voce *Estro* (vedi [Quiete o estro](#quiete-o-estro)) |
@@ -92,7 +94,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 
 1. il sistema **sceglie** genere, strumenti e forma, dando precedenza a ciò che hai votato bene;
 2. un **servizio di testo** in rete (o, se non risponde, **gemma**) inventa titolo e descrizione;
-3. si prepara lo **spartito** (calmo e ripetuto per yoga e meditazione, [ricco di variazioni](#quiete-o-estro) per gli altri generi) e **YuE2** crea l'audio (la parte più lunga);
+3. si prepara lo **spartito** (calmo e ripetuto o [ricco di variazioni](#quiete-o-estro), secondo l’estro del genere; per i brani con voci lo scrive il motore) e **YuE2** crea l'audio (la parte più lunga);
 4. il volume viene reso uniforme e il brano **controllato**: se non va bene viene rifatto;
 5. se è buono, viene salvato, **caricato** su iBroadcast e compare nella dashboard;
 6. i tuoi **voti** guidano le scelte successive.
@@ -139,6 +141,36 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | **1 Leggi stato** | Carica lo stato, prende il lock, esegue il comando "svuota coda" della dashboard e dice se c'è un render in corso. |
 | **2 Controlla render** | Chiede al motore lo stato del job. Quando è pronto lo **score**, lo rende strumentale, ne ricava durata e lyrics e avvia il render dell'audio; se lo score non va bene prova a **recuperarlo** (troncato o troppo lungo) e altrimenti ne chiede un altro (3 in tutto, [regolabili](#come-nascono)). Un render fallito, sparito o fermo da oltre 4 ore torna in coda; dopo 3 tentativi lo abbandona. |
 | **7 Scrivi stato** | Salva lo stato in modo atomico e rilascia il lock. Ci passano tutti i rami. Se lo stato risulta illeggibile ne viene tenuta una copia (`.corrotto`). |
+
+### Testi
+
+Le parole dei brani **cantati**. Compare un genere per ogni scheda con voce *Testo cantato* (di serie: *Canzone
+italiana* e *Pop inglese*, sospesi finché non li accendi in [Generi](#generi)).
+
+![La pagina Testi: elenco delle canzoni, sezioni con sillabe e rime, assistente e controlli](docs/screenshots/42-testi.png)
+
+| Zona | Cosa fa |
+|---|---|
+| **Elenco** (sinistra) | tutti i testi, con filtro per genere e stato: *Bozza*, *Approvato*, *Usato*. *+ Nuovo testo*: scegli il genere e scrivi, oppure incolla un testo già pronto (riconosce `[Strofa]`, `[Ritornello]`…) |
+| **Sezioni** (centro) | un blocco per strofa, ritornello, ponte…: cambia tipo, sposta, duplica, elimina. Un verso per riga; a fianco il numero di **sillabe** e la lettera della **rima** (stime). Salva da sola |
+| **Stato** | *Approva per la produzione*; ogni modifica riporta il testo in bozza. *Duplica*, *Annulla modifica*, *Elimina* |
+| **Assistente** | scrive tutto il testo da un tema, riscrive la sezione del cursore, propone alternative o rime per il verso; nulla va in produzione senza i passi sopra |
+| **Controlli** | in rosso ciò che impedisce l'approvazione (meno di quattro versi, indicazioni tra parentesi, testo troppo lungo), in giallo i consigli |
+| **Cosa riceve il motore** | il testo esattamente come va a YuE2 |
+
+Per ogni genere cantato scegli **chi scrive le parole** (pagina Generi, parte *Voce*):
+
+| Scelta | Cosa succede |
+|---|---|
+| **Automatico** | se non c'è un testo approvato, la produzione lo scrive e lo usa da sola |
+| **Automatico con approvazione** (di serie) | la produzione prepara una bozza per volta; il brano si produce solo dopo che l'hai approvata |
+| **Solo parole mie** | si producono solo i testi che hai scritto e approvato; l'IA aiuta se la chiami |
+
+Un testo vale per **un brano** (per rifarlo: *Duplica*). Un genere senza testi pronti viene saltato: la produzione
+continua con gli altri (un *Produci ora* resta in attesa e parte appena approvi il testo). I testi stanno in `state\parole.json`, **fuori da Git**. Lo score dei brani cantati lo scrive
+il motore; viene usata una sola LoRA, quella del genere (di serie *Canzone Italiana* per l'italiano). Le parole
+finiscono anche nell'MP3 (campo testo ID3). YuE2 non dichiara quali lingue sa cantare: **ascolta i primi brani**,
+soprattutto in italiano, prima di produrne molti.
 
 ### Composizione
 
@@ -239,7 +271,7 @@ Risponde alla domanda **«sta migliorando?»**.
 
 | Parte (dall'alto) | Cosa mostra |
 |---|---|
-| **Filtri** | scegli il periodo (da 24 ore a tutto) e, se vuoi, ambito, famiglia, genere, tipo, struttura o modello dei testi; *Azzera filtri* torna agli ultimi 7 giorni |
+| **Filtri** | scegli il periodo (da 24 ore a tutto) e, se vuoi, raccolta, famiglia, genere, tipo, struttura o modello dei testi; *Azzera filtri* torna agli ultimi 7 giorni |
 | **Il sistema sta migliorando?** | giudizio sugli ultimi 7 giorni rispetto ai 7 precedenti |
 | **Modelli a confronto** e **Affidabilità** | quale modello di testo rende di più (vedi sotto) |
 | **Indici del periodo** | brani, ore di musica buona, scarti, voto medio e altri numeri, con la differenza sul periodo precedente |
@@ -346,8 +378,8 @@ se lo togli, il voto resta. I voti dati da dashboard e Telegram non vengono scri
 ## 8. iBroadcast, copertine e metadati
 
 Ogni brano su [ibroadcast.com](https://ibroadcast.com) ha titolo, copertina, numero di traccia unico, album
-(il nome del genere; i brani più vecchi hanno il nome della categoria), tag (ambito, famiglia, categoria,
-energia, struttura, tipo) e playlist `Yoga - <categoria>` o `Musica - <categoria>`.
+(il nome del genere; i brani più vecchi hanno il nome della categoria), tag (raccolta, famiglia, categoria,
+energia, struttura, tipo) e playlist `<raccolta> - <categoria>` (per `Sottofondo` il prefisso resta `Musica`).
 
 Gli MP3 hanno tag ID3 completi (anche bpm, tonalità, mood, strumenti, variante e seed come campi aggiuntivi).
 
@@ -395,22 +427,39 @@ ricaricato (`ibroadcast.rimosso` nella scheda). Secondo iBroadcast i file svuota
 
 ## 9. Generi e libreria
 
-Tre livelli: **ambito** (`Yoga` o `Sottofondo`), **famiglia** (meditativo, ritmico, rock, elettronico,
-orchestrale, world, jazz) e **categoria** (il genere preciso). Il catalogo ha **39 generi**.
+Tutti i generi sono trattati allo stesso modo: ciò che li distingue sta nella loro **scheda** in
+`config\catalogo.json`, non nel codice. Tre livelli: **raccolta** (di serie `Yoga`, `Sottofondo`, `Canzoni`; ne
+crei altre), **famiglia** (meditativo, rock, jazz…) e **categoria** (il genere preciso). Di serie ci sono **41 generi**.
 
 ```
 E:\Musica di sottofondo\
-  Yoga\<famiglia>\<categoria>\<tipo>\        brano.mp3 + brano.json + brano.abc
-  Sottofondo\<famiglia>\<categoria>\<tipo>\  brano.mp3 + brano.json + brano.abc
+  <raccolta>\<famiglia>\<categoria>\<tipo>\  brano.mp3 + brano.json + brano.abc
   _scartati\                                 brani non superati dal controllo qualità
 ```
 
+La raccolta decide solo **cartella, playlist iBroadcast e tag**. I brani già prodotti restano dove sono.
 I brani prodotti prima del salvataggio dello score non hanno il file `.abc`.
 
-**Aggiungere un genere:** in `config\catalogo.json` aggiungi il campo `en` (descrittori inglesi per ogni strumento), `name`, `ambito`, `famiglia`, `energia` (1-5),
-`bpm`, `attivita`, `strutture`, `genere`, `stile`, `strumenti`, `vietati`, `influenze`, `enfasi`, `melodia`,
-`accordi`, `ritmica`, `tonalita`, `varianti`, `colori`; facoltativi `estro` (0-2), `organico`, `lora`, `copertina` e
-`vocale_senza_parole`. Poi ricostruisci e pubblica il workflow.
+### Creare o modificare un genere
+
+*Generi → + Nuovo genere* (o *Modifica scheda* su una carta). Si parte da zero, **copiando** un genere o
+descrivendolo e premendo **Proponi** (la scheda proposta dall'IA va controllata prima di salvare).
+
+![L'editor di un genere](docs/screenshots/43-genere-scheda.png)
+
+| Parte | Cosa si sceglie |
+|---|---|
+| **Identità** | nome, raccolta (anche nuova), famiglia, a cosa serve (solo un'etichetta) |
+| **Carattere** | energia, [estro](#quiete-o-estro), carattere del compositore (accordi e andamento) |
+| **Strumenti** | nome, descrizione in inglese per il motore e quando suona: *Sempre*, *A rotazione*, *Mai da solo* |
+| **Tempo e armonia** | velocità, tonalità, forme, durata facoltativa |
+| **Voce** | *Strumentale*, *Vocalizzi senza parole* o *Testo cantato* (con lingua, anche nuova, chi canta, chi scrive le parole, temi) e LoRA del genere |
+| **Suono e copertina** | descrittori inglesi, cose da evitare, nome, immagine e colori della copertina |
+
+Valgono **dal brano successivo**. Un genere nuovo nasce **sospeso**: accendilo con l'interruttore. Si elimina solo
+un genere senza brani; il nome interno non cambia (lega cartelle, playlist e voti). Prima di ogni modifica il
+catalogo precedente è copiato in `state\catalogo-precedente.json`. Da Telegram si crea un genere essenziale, da
+completare in dashboard.
 
 ---
 
@@ -486,7 +535,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
 | `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js` forma, `armonia.js` accordi, `melodia.js` fraseggio, `materiale.js` richiami, forme, controlli e unione con le tue modifiche), scrittura e validazione dello score ABC (`abc.js`) |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
-| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `composizione.js`, `composizione-pagina.js`, `composizione-editor.js` (modello delle voci e mini timeline), `composizione-banco.js` (banco di lavoro) e `composizione-lettore.js` (suono e riproduzione) pagina Composizione, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
+| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `composizione.js`, `composizione-pagina.js`, `composizione-editor.js` (modello delle voci e mini timeline), `composizione-banco.js` (banco di lavoro) e `composizione-lettore.js` (suono e riproduzione) pagina Composizione, `generi.js` e `generi-editor.js` schede dei generi, `parole.js`, `parole-pagina.js` e `parole-modello.js` pagina Testi, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `docs\ricerche\` · `docs\report\` | [ricerca sulla composizione](docs/ricerche/2026-11-28-composizione.md) · [report sui brani creativi](docs/report/2026-11-28-brani-creativi.md) |
@@ -533,6 +582,8 @@ In ordine di priorità. Il disegno completo è in
 
 | # | Miglioramento | Perché |
 |---|---|---|
+| 0 | **Provare il cantato**: approvare un testo, accendere un genere cantato e ascoltare; correggere descrittori, LoRA e stima della durata | l’italiano non è tra le lingue dichiarate da YuE2 e l’effetto non è misurabile dai test |
+| 0 | **Score cantato nostro**: far scrivere la melodia vocale al compositore, sillaba per sillaba | oggi nei brani con voci la melodia la decide il motore |
 | 0 | **Ascoltare i brani creativi** e votarli: correggere forme, richiami e organici che non convincono; valutare LoRA anche per i generi che non ne hanno | l'effetto sull'audio non è misurabile dai test; i voti pesano già su forme e richiami |
 | 0 bis | **Materiale da musica vera**: frasi e giri ricavati da raccolte con licenza (Weimar Jazz Database, McGill Billboard) | il salto successivo sul fraseggio; richiede di scaricarle e verificarne le licenze |
 | 1 | **Selezione sull'audio**: 2-3 versioni per brano e pubblicazione della migliore, giudicata da un modello (per esempio Meta Audiobox Aesthetics o SongEval) | richiede di scaricare pacchetto e pesi, e di verificarli sugli strumentali |

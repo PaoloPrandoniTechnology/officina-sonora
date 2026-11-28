@@ -55,6 +55,12 @@ function userFrame(nome, value) {
   return frame('TXXX', Buffer.concat([utf16(nome), Buffer.from([0, 0, 0xff, 0xfe]), Buffer.from(String(value), 'utf16le')]));
 }
 
+// Testo cantato (USLT): codifica UTF-16, lingua di tre lettere, descrizione vuota
+function testoFrame(testo, lingua) {
+  return frame('USLT', Buffer.concat([Buffer.from([1]), Buffer.from(String(lingua || 'und').padEnd(3).slice(0, 3), 'ascii'),
+    Buffer.from([0xff, 0xfe, 0, 0, 0xff, 0xfe]), Buffer.from(testo, 'utf16le')]));
+}
+
 // Copertina del brano: composta dal gateway sullo sfondo del genere; se non si puo', quella disegnata qui.
 async function copertinaPer(meta) {
   try {
@@ -81,8 +87,12 @@ function tagFile(file, meta, cop = copertinaProvvisoria(meta)) {
   const album = (cat.copertina && cat.copertina.etichetta) || String(meta.categoria || 'Raccolta').replace(/-/g, ' ');
   const durata = (meta.qualita && meta.qualita.durata_reale_s) || meta.durata_s;
   const editore = 'Officina Sonora';
+  const voce = meta.voce || voceDi(cat);
+  const lingua = linguaDi(meta.lingua ? { lingua: meta.lingua } : cat);
+  const parole = voce === 'testo' && meta.lyrics ? String(meta.lyrics) : '';
   const comment = [meta.descrizione, meta.attivita && `Attività: ${meta.attivita}`, meta.style && `Stile: ${meta.style}`,
-    meta.energia && `Energia: ${meta.energia}/5`, meta.struttura && `Struttura: ${meta.struttura}`, 'Strumentale, generato con YuE2']
+    meta.energia && `Energia: ${meta.energia}/5`, meta.struttura && `Struttura: ${meta.struttura}`,
+    `${voce === 'testo' ? `Cantato in ${lingua.nome.toLowerCase()}` : voce === 'vocalizzi' ? 'Voci senza parole' : 'Strumentale'}, generato con YuE2`]
     .filter(Boolean).join(' | ');
   const frames = [
     textFrame('TIT1', cat.famiglia),
@@ -98,7 +108,8 @@ function tagFile(file, meta, cop = copertinaProvvisoria(meta)) {
     textFrame('TBPM', meta.bpm),
     textFrame('TKEY', chiaveId3(meta.tonalita)),
     textFrame('TLEN', durata ? Math.round(durata * 1000) : ''),
-    textFrame('TLAN', 'zxx'),
+    textFrame('TLAN', parole ? lingua.id3 : 'zxx'),
+    parole ? testoFrame(parole.replace(/^\[[^\]]*\]\n?/gm, '').trim(), lingua.id3) : null,
     textFrame('TCOM', editore),
     textFrame('TPUB', editore),
     textFrame('TCOP', `${data.getFullYear()} ${editore}`),
@@ -119,12 +130,6 @@ function tagFile(file, meta, cop = copertinaProvvisoria(meta)) {
   fs.writeFileSync(file + '.tmp', Buffer.concat([header, body, audio]));
   fs.renameSync(file + '.tmp', file);
   return frames.length;
-}
-
-// Ambito del brano (yoga o musica), dal catalogo
-function ambitoDi(meta) {
-  const c = (CFG.categories || []).find((x) => x.name === meta.categoria);
-  return (c && c.ambito) || 'yoga';
 }
 
 // Chiamata all'API iBroadcast tramite il gateway locale (il token resta li')
@@ -149,7 +154,7 @@ async function playlistId(access, state, meta) {
   state.playlists = state.playlists || {};
   if (!state.playlists[meta.categoria]) {
     const r = await ibApi(access, 'createplaylist', {
-      name: `${ambitoDi(meta) === 'musica' ? 'Musica' : 'Yoga'} - ${meta.categoria}`,
+      name: `${raccoltaDi(genereDi(meta.categoria)).playlist} - ${meta.categoria}`,
       description: meta.attivita || meta.categoria,
       make_public: false,
       mood: MOOD_BY_ENERGIA[meta.energia] || '',
@@ -165,7 +170,7 @@ async function organizza(access, meta, trackId, state) {
   const slug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const extra = (CFG.tag_extra && CFG.tag_extra[meta.categoria]) || [];
   const fam = ((CFG.categories || []).find((x) => x.name === meta.categoria) || {}).famiglia;
-  const names = [ambitoDi(meta), fam ? `famiglia-${slug(fam)}` : null, `categoria-${slug(meta.categoria)}`, `energia-${meta.energia}`, `struttura-${slug(meta.struttura)}`, `tipo-${slug(meta.tipo)}`, ...extra.map(slug)].filter((n) => n && !n.endsWith('-undefined'));
+  const names = [slug(raccoltaDi(genereDi(meta.categoria)).playlist), fam ? `famiglia-${slug(fam)}` : null, `categoria-${slug(meta.categoria)}`, `energia-${meta.energia}`, `struttura-${slug(meta.struttura)}`, `tipo-${slug(meta.tipo)}`, ...extra.map(slug)].filter((n) => n && !n.endsWith('-undefined'));
   for (const n of names) {
     const id = await tagId(access, state, n);
     await ibApi(access, 'tagtracks', { tagid: id, tracks: [tid], untag: false });
