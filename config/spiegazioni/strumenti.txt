@@ -1,0 +1,279 @@
+808 bass|basso sintetico profondo della drum machine TR-808
+ableton|suono da produzione al computer (nome di un software)
+accordion|fisarmonica
+acoustic bass|basso acustico dal suono caldo
+acoustic drums|batteria acustica
+acoustic guitar|chitarra acustica
+acoustic guitar with delay|chitarra acustica con ripetizioni in eco
+acoustic piano|pianoforte acustico
+acousticguitar|chitarra acustica (scritta unita, tag di YuE)
+airy pads|tappeti di synth leggeri e ariosi
+alto saxophone|sassofono contralto, voce chiara
+analog synth lead|melodia di sintetizzatore analogico
+arpeggiated clean guitar|chitarra pulita in arpeggi
+background keyboard|tastiere di sottofondo
+bamboo flute|flauto di bambù
+bandura|cordofono ucraino a pizzico
+banjo|banjo, timbro secco e brillante
+bass|basso
+bass guitar|basso elettrico
+beat|base ritmica
+beatboxing|percussioni imitate con la bocca
+bells|campane e campanelli
+bongos|bonghi, piccole percussioni a mano
+boom bap drums|batteria hip-hop secca e marcata
+booming 808 bass|basso 808 gonfio e rimbombante
+brass|sezione di ottoni
+breathy bamboo flute|flauto di bambù con soffio udibile
+breathy tenor saxophone|sax tenore caldo e soffiato
+brushed drum kit|batteria suonata con le spazzole
+brushed drums|batteria a spazzole, morbida
+building drums|batteria in crescendo
+cajon|cassa di legno percossa con le mani
+cavaquinho|piccola chitarra brasiliana dal suono vivace
+celesta|tastiera dal timbro di campanelli
+cello|violoncello
+celtic fiddle|violino nello stile celtico
+celtic harp arpeggios|arpeggi di arpa celtica
+charango|piccola chitarra andina
+church bells|campane di chiesa
+clavinet|tastiera funk dal suono secco e percussivo
+clean funk guitar with muted strums|chitarra funk pulita con pennate stoppate
+clean jazz guitar|chitarra jazz dal suono pulito e rotondo
+computer|suoni generati al computer
+concert harp arpeggios|arpeggi di arpa da concerto
+concertina|piccola fisarmonica esagonale
+congas|conga, percussioni cubane
+crisp breakbeat|batteria spezzata nitida
+crisp claps|battiti di mani secchi
+crisp synthetic hi-hats|hi-hat sintetici brillanti
+dark pad|tappeto di synth scuro
+dark warm drone|bordone grave, scuro e caldo
+deep bass|basso profondo
+deep drum machine kick|cassa elettronica profonda
+deep gong swells|ondate gravi di gong
+deep reggae bass|basso reggae rotondo e in primo piano
+deep sub bass|sub-basso molto grave, più sentito che udito
+delayed electric guitar|chitarra elettrica con eco ritmico
+dholak|tamburo a barile indiano
+distant cello|violoncello lontano nel mix
+distant natural ambience|suoni di natura in lontananza
+distant soft strings|archi morbidi in lontananza
+distorted bass|basso distorto
+distorted rhythm guitars with palm muted riffs|chitarre distorte con riff stoppati col palmo
+distorted synths|sintetizzatori distorti
+dobro|chitarra resofonica suonata con slide
+dobro guitar|chitarra dobro, timbro metallico da blues e country
+double bass drums|doppia cassa, tipica del metal
+driving rock bass|basso rock che spinge
+driving rock drums|batteria rock incalzante
+driving synth bass|basso synth pulsante e propulsivo
+drum|tamburo, percussione di base
+drum machine|batteria elettronica
+drums|batteria
+drums with ride cymbal and tom fills|batteria con piatto ride e passaggi sui tom
+dulcimer|salterio a corde percosse
+dusty broken beat drums|batteria spezzata dal suono polveroso
+electric bass|basso elettrico
+electric guitar|chitarra elettrica
+electric piano|pianoforte elettrico
+electric rhythm guitar|chitarra elettrica di accompagnamento
+electricguitar|chitarra elettrica (scritta unita, tag di YuE)
+electricpiano|piano elettrico (scritta unita, tag di YuE)
+erhu|violino cinese a due corde, molto cantabile
+fast shuffled hi-hats|hi-hat veloci e swingati
+felt acoustic piano|pianoforte con feltro, ovattato e intimo
+fiddle|violino popolare
+filtered synth bass|basso synth filtrato, che si apre e si chiude
+fingerpicked banjo|banjo suonato con le dita
+fingerpicked nylon guitar|chitarra classica pizzicata con le dita
+flamenco guitar with rasgueado|chitarra flamenca con pennate a ventaglio
+flute|flauto
+frame drum|tamburo a cornice
+french horns|corni francesi, solenni e caldi
+funky bass|basso funk sincopato
+gated reverb drum machine|batteria elettronica con riverbero troncato anni Ottanta
+gentle synthetic wind|vento sintetico leggero
+glockenspiel|metallofono acuto e cristallino
+groovy electric bass|basso elettrico con molto groove
+guitars|più chitarre
+hammond organ|organo Hammond, caldo e vibrante
+handclaps|battiti di mani
+harmonica|armonica a bocca
+harp|arpa
+harpsichord|clavicembalo, timbro barocco
+heavy distorted kick|cassa pesante e distorta
+horn|corno o strumento a fiato
+horns|sezione di fiati
+hu lu si|flauto cinese a zucca, timbro dolce
+industrial bass|basso metallico e aggressivo
+interlocking gamelan metallophones|metallofoni gamelan a parti incastrate
+jangly electric guitar|chitarra elettrica scintillante e tintinnante
+kalimba|pianoforte a pollice africano
+kanun|salterio mediorientale a pizzico
+keyboard|tastiera
+keyboards|tastiere
+keys|tastiere in genere
+koto|cetra giapponese
+lead guitar with string bends|chitarra solista con corde tirate
+light bells|campanelli delicati
+light combo organ|organetto elettrico leggero anni Sessanta
+light horns|fiati leggeri
+light percussion|percussioni leggere
+light timbales|timbales latini suonati piano
+lightly prepared piano|pianoforte con piccoli oggetti sulle corde
+long evolving synth pad|tappeto di synth che muta lentamente
+low bowed strings|archi gravi suonati con l'arco
+lush analog pads|tappeti analogici ricchi e avvolgenti
+mallet|percussioni suonate con battenti
+mallets|strumenti a battenti come marimba e vibrafono
+maracas|maracas
+mellow flute|flauto morbido
+melodic bell|campana usata per la melodia
+melodic lead guitar solos|assoli di chitarra cantabili
+metallic percussion|percussioni metalliche
+musical instrument|tag generico: uno strumento qualsiasi, poco utile
+ney|flauto di canna mediorientale
+noise textures|tessiture di rumore
+none|tag senza significato: meglio non usarlo
+nylon string guitar|chitarra con corde di nylon
+oboe|oboe
+oboes|più oboi
+offbeat skank guitar|chitarra in levare tipica del reggae e dello ska
+oud|liuto arabo
+overdriven rhythm guitar riffs|riff ritmici con chitarra in saturazione
+palmas handclaps|battiti di mani flamenco
+pandeira|tamburello (pandeiro) brasiliano
+pedal steel|chitarra pedal steel, note che scivolano
+pedal steel guitar|chitarra pedal steel tipica del country
+percussion|percussioni
+percussive noise|rumori usati come percussioni
+picked electric bass|basso elettrico suonato col plettro
+pipe organ|organo a canne
+plucked acoustic guitar|chitarra acustica pizzicata
+plucked kalimba|kalimba pizzicata
+power chord rhythm guitar|chitarra ritmica con accordi di potenza
+powerful drums|batteria potente
+pulsing synth lead|melodia synth pulsante
+pulsing warm bass|basso caldo pulsante
+pumping manouche rhythm guitar|chitarra ritmica manouche pompata
+punchy drum machine|drum machine incisiva
+punchy kick|cassa secca e d'impatto
+qanun|cetra mediorientale a pizzico
+resonant pad|tappeto di synth risonante
+resonant tibetan singing bowls|campane tibetane molto risonanti
+rhodes electric piano|piano elettrico Rhodes, morbido e rotondo
+rhythmic nylon guitar montuno|figura cubana ripetuta su chitarra nylon
+rolling hi-hats|hi-hat a raffiche
+sampled piano|pianoforte campionato
+sampled vibraphone|vibrafono campionato
+saxophone|sassofono
+sequenced arpeggiator|arpeggi elettronici programmati
+shaker|shaker, fruscio ritmico
+shaker and cajon|shaker con cajon
+shakers|più shaker
+shakuhachi|flauto di bambù giapponese
+shimmering crystal bowls|campane di cristallo scintillanti
+short dub synth stabs|brevi colpi di synth in stile dub
+shuffle drums|batteria con andamento shuffle
+sitar|sitar indiano
+slap bass|basso suonato in slap
+slap upright bass|contrabbasso in slap, da rockabilly
+slide guitar lead|melodia di chitarra con slide
+slideguitar|chitarra slide (scritta unita, tag di YuE)
+slow swelling synthesizer|sintetizzatore che cresce lentamente
+snare with tape echo|rullante con eco a nastro
+soaring lead guitar solos|assoli di chitarra ampi che si librano
+soft acoustic bass|basso acustico delicato
+soft airy synth pad|tappeto synth soffice e arioso
+soft bodhran|tamburo irlandese suonato piano
+soft brass|ottoni morbidi
+soft drone|bordone delicato
+soft electric bass|basso elettrico morbido
+soft horn section|sezione fiati soffusa
+soft pad|tappeto sonoro morbido
+soft shaker|shaker delicato
+soft synth stabs|brevi accordi di synth ovattati
+soul drum kit|batteria dal suono soul
+spring reverb electric guitar lead with tremolo picking|chitarra solista surf: riverbero a molla e tremolo rapido
+steel guitar|chitarra con slide d'acciaio
+steel pan|tamburo d'acciaio caraibico
+string|corde, archi
+strings|sezione d'archi
+strummed acoustic guitar|chitarra acustica a pennate
+suspended gong|gong sospeso
+sustained organ drone|bordone d'organo tenuto
+swing violin|violino swing
+swinging drums|batteria con swing
+symphonic strings|archi sinfonici
+syncopated nylon guitar|chitarra nylon sincopata
+synth|sintetizzatore
+synth arpeggios|arpeggi di sintetizzatore
+synth bass|basso sintetico
+synth drums|batteria sintetica
+synth_lead|synth solista (tag di YuE)
+synthesizer|sintetizzatore
+tabla|coppia di tamburi indiani
+tambourine|tamburello
+tanpura drone|bordone di tanpura indiana
+tibetan singing bowls|campane tibetane
+timpani|timpani orchestrali
+tin whistle melody|melodia di flauto irlandese
+toms|tamburi tom
+tribal hand percussion|percussioni tribali a mano
+trombone|trombone
+trumpet|tromba
+turntables|giradischi e scratch
+twangy electric guitar|chitarra elettrica twang, metallica e schioccante
+twangy rhythm guitar|chitarra ritmica twang
+ukulele|ukulele
+upright bass|contrabbasso
+vibraphone|vibrafono
+vintage keyboard|tastiera d'epoca
+vinyl crackle|fruscio e scricchiolii da vinile
+violin|violino
+virtuosic acoustic lead guitar|chitarra acustica solista virtuosa
+virtuosic clarinet|clarinetto virtuoso
+walking bass|basso che cammina nota dopo nota
+walking upright bass|contrabbasso walking jazz
+warm acoustic bass|basso acustico caldo
+warm concert flute|flauto traverso caldo
+warm pad|tappeto sonoro caldo
+warm sub bass|sub-basso morbido
+whistle|fischietto o flauto a fischietto
+zither|cetra
+主唱|tag cinese: voce solista
+二胡|tag cinese: erhu, violino a due corde
+人声|tag cinese: voce umana
+低音|tag cinese: bassi
+原声吉他|tag cinese: chitarra acustica
+口琴|tag cinese: armonica a bocca
+古筝|tag cinese: guzheng, cetra cinese
+合成器|tag cinese: sintetizzatore
+吉他|tag cinese: chitarra
+声乐|tag cinese: parti vocali
+大提琴|tag cinese: violoncello
+女声|tag cinese: voce femminile
+小提琴|tag cinese: violino
+弦乐|tag cinese: archi
+手风琴|tag cinese: fisarmonica
+打击乐器|tag cinese: percussioni
+扬琴|tag cinese: salterio cinese
+木吉他|tag cinese: chitarra acustica
+木琴|tag cinese: xilofono
+班卓琴|tag cinese: banjo
+电吉他|tag cinese: chitarra elettrica
+电脑|tag cinese: computer
+竖琴|tag cinese: arpa
+笛子|tag cinese: flauto traverso cinese
+萨克斯管|tag cinese: sassofono
+萨克斯风|tag cinese: sassofono
+贝斯|tag cinese: basso
+采样器|tag cinese: campionatore
+钢琴|tag cinese: pianoforte
+铜管乐器|tag cinese: ottoni
+键盘|tag cinese: tastiera
+键盘乐器|tag cinese: strumenti a tastiera
+长笛|tag cinese: flauto
+风琴|tag cinese: organo
+鼓机|tag cinese: drum machine

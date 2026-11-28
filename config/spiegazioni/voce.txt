@@ -1,0 +1,228 @@
+aggressive vocal|voce aggressiva
+agitated vocal|voce agitata
+airy vocal|voce ariosa, con molto fiato
+alto vocal|voce di contralto
+athletic vocal|voce vigorosa e agile
+baritone vocal|voce di baritono
+barking vocal|voce abbaiata, a scatti
+barrel vocal|voce piena e cavernosa
+barrel-shaped vocal|voce ampia e rotonda
+barren vocal|voce spoglia, asciutta
+bass heavy vocal|voce ricca di basse
+bass vocal|voce di basso
+bellowing vocal|voce urlata e tonante
+bitter vocal|voce amara
+blue vocal|voce malinconica, bluesy
+bold vocal|voce sicura
+boomy vocal|voce rimbombante
+bouncy vocal|voce saltellante
+breakable vocal|voce fragile, che si incrina
+breathy vocal|voce soffiata
+breezy vocal|voce leggera e disinvolta
+bright vocal|voce brillante
+broad vocal|voce larga
+bulky vocal|voce massiccia
+changeable vocal|voce mutevole
+charismatic vocal|voce carismatica
+child|voce di bambino
+children|voci di bambini
+choir|coro
+clear vocal|voce limpida
+commanding vocal|voce autorevole
+crisp vocal|voce nitida
+crunchy vocal|voce graffiata
+dainty vocal|voce delicata e minuta
+dark vocal|voce scura
+deep vocal|voce profonda
+distortion vocal|voce distorta
+dulcet vocal|voce dolcissima
+dusty vocal|voce vissuta, polverosa
+elevated pitch vocal|voce spostata verso l'acuto
+elevated vocal|voce alta e in evidenza
+emotional vocal|voce emotiva
+exaggerated vocal|voce teatrale, esagerata
+exuberant vocal|voce esuberante
+female|voce femminile
+flat vocal|voce piatta, poco espressiva
+flexible vocal|voce duttile
+fruity vocal|voce rotonda e succosa
+frustrated vocal|voce frustrata
+full bodied vocal|voce corposa
+full vocal|voce piena
+full-bodied vocal|voce di grande corpo
+gliding vocal|voce che scivola tra le note
+glorious vocal|voce solenne e splendente
+graceful vocal|voce aggraziata
+grainy vocal|voce granulosa
+grassy vocal|tag insolito: voce ruspante, effetto incerto
+gravelly vocal|voce rauca, ghiaiosa
+gritty vocal|voce grintosa e sporca
+gruff vocal|voce burbera
+happy vocal|voce allegra
+harmonic overtone voice|canto armonico con sovratoni
+harsh vocal|voce aspra
+hellosing vocal|tag poco chiaro: effetto imprevedibile
+helmet vocal|voce chiusa, come in un casco
+helmeted vocal|voce ovattata, chiusa
+high pitched vocal|voce acuta
+high vocal|voce alta
+high-pitched vocal|voce di registro acuto
+hoarse vocal|voce roca
+hollow vocal|voce vuota, cava
+honeyed vocal|voce mielata
+human|presenza umana, generico
+human female voice|voce umana femminile
+human vocal|voce umana
+human voice|voce umana in genere
+husky vocal|voce bassa e roca
+light vocal|voce leggera
+long vocal|note vocali lunghe
+long_release vocal|voce con code lunghe (tag tecnico)
+loud vocal|voce forte
+low pitched vocal|voce grave
+low vocal|voce bassa
+low-pitched vocal|voce di registro grave
+lyrics|presenza di testo cantato
+male|voce maschile
+male and female voices singing vowels in unison|voci maschili e femminili che cantano vocali all'unisono
+medium vocal|voce di registro medio
+mellow vocal|voce morbida
+melodic vocal|voce melodica
+mezzo-soprano|voce di mezzosoprano
+muddy vocal|voce impastata
+muffled vocal|voce attutita
+multiphonic vocal|voce con più suoni insieme
+mushy vocal|voce molle, poco definita
+narrow vocal|voce sottile e stretta
+nasal vocal|voce nasale
+neat vocal|voce ordinata e pulita
+neo soul vocalise|vocalizzi neo soul senza parole
+noble vocal|voce nobile
+nonlinear_env vocal|tag tecnico: effetto imprevedibile
+not applicable vocal|tag senza significato: meglio non usarlo
+not specified vocal|tag generico: voce non precisata
+open vocal|voce aperta
+opulent vocal|voce sontuosa
+overtone throat singing|canto di gola con armonici
+passionate vocal|voce appassionata
+pensive vocal|voce pensosa
+percussive vocal|voce usata in modo percussivo
+persuasive vocal|voce persuasiva
+piercing vocal|voce penetrante
+placid vocal|voce placida
+plastic vocal|voce artificiale
+plucky vocal|voce vivace e decisa
+plush vocal|voce vellutata
+polished vocal|voce levigata
+pontificate vocal|voce declamatoria
+potent vocal|voce possente
+powerful vocal|voce potente
+preenched vocal|tag poco chiaro: effetto imprevedibile
+preened vocal|voce molto curata
+preppy vocal|voce brillante e giovanile
+preteen vocal|voce di preadolescente
+prettily produced vocal|voce rifinita in produzione
+prettily vocal|voce graziosa
+pretty vocal|voce graziosa e dolce
+prevalent vocal|voce predominante nel mix
+projected vocal|voce proiettata
+punchy vocal|voce incisiva
+pure vocal|voce pura
+quaint vocal|voce dal gusto antico
+range vocal|voce di ampia estensione
+rap|rap parlato a ritmo
+rapping|azione del rappare
+rapping vocal|voce rap
+raspy vocal|voce raschiante
+raw vocal|voce grezza
+rebellious vocal|voce ribelle
+reed vocal|timbro di voce simile a un'ancia
+reedy vocal|voce sottile e nasale
+resonant vocal|voce risonante
+reverb vocal|voce con riverbero
+rhythm vocal|voce ritmica
+rhythmic vocal|voce molto scandita
+rhytmic vocal|refuso di «rhythmic»: voce ritmica
+rich vocal|voce ricca
+roaring vocal|voce ruggente
+robust vocal|voce robusta
+rough vocal|voce ruvida
+round vocal|voce rotonda
+rumbly vocal|voce grave e borbottante
+sacred choral vocalise|vocalizzi corali sacri senza parole
+screamo|urlato emotivo
+screamy vocal|voce urlata
+screeching vocal|voce stridula urlata
+screechy vocal|voce stridente
+shaky vocal|voce tremante
+sharp vocal|voce tagliente
+shimmering vocal|voce scintillante
+shouty vocal|voce gridata
+shrill vocal|voce acuta e stridula
+singer-songwriter|voce da cantautore
+singing|canto
+singing vocal|voce cantata
+singing voice|voce che canta
+singing voice vocal|voce cantata (tag ripetitivo)
+smooth vocal|voce liscia
+soft choir singing ah and oh vowels|coro soffuso su vocali «ah» e «oh»
+soft vocal|voce delicata
+soothing vocal|voce rassicurante
+soprano|voce di soprano
+soprano saxophone|sax soprano (classificato tra le voci)
+soprano vocal|voce di soprano
+soulful vocal|voce soul, intensa
+soulful voice improvising on vowels|voce soul che improvvisa su vocali
+squeaky|suono squillante e stridulo
+squeaky vocal|voce squittante
+strong vocal|voce forte
+sultry vocal|voce sensuale e calda
+sweet vocal|voce dolce
+tempo-synced vocal|voce sincronizzata al tempo
+tender vocal|voce tenera
+tenor|voce di tenore
+tenor vocal|voce tenorile
+textural vocal|voce usata come tessitura
+textured vocal|voce con grana
+thin vocal|voce sottile
+treble vocal|voce ricca di acuti
+uplifting vocal|voce che solleva
+variable vocal|voce variabile
+varied vocal|voce varia
+velvet vocal|voce di velluto
+velvety vocal|voce vellutata
+vibrant vocal|voce vibrante
+vivacious vocal|voce brillante e vivace
+vocal|presenza di voce
+vocal fry vocal|voce gracchiante in registro «fry»
+vocal range vocal|voce che sfrutta l'estensione
+vocal samples|frammenti di voce campionati
+vocal vocal|presenza di voce (tag ripetuto)
+vocalist vocal|voce solista
+vocals|parti cantate
+vocals vocal|parti cantate (tag ripetuto)
+voice|voce
+warm vocal|voce calda
+weathered vocal|voce segnata dal tempo
+whimsical vocal|voce estrosa
+whiny vocal|voce lamentosa
+whispery vocal|voce sussurrata
+wide vocal|voce ampia
+young vocal|voce giovane
+youthful vocal|voce giovanile
+为了让声乐更加生动，使用了混响效果。 vocal|frase cinese: voce resa viva dal riverbero
+低沉 vocal|tag cinese: voce grave
+充满活力 vocal|tag cinese: voce piena di energia
+圆润 vocal|tag cinese: voce rotonda
+年轻 vocal|tag cinese: voce giovane
+强有力 vocal|tag cinese: voce molto forte
+成熟 vocal|tag cinese: voce matura
+明亮 vocal|tag cinese: voce brillante
+有力 vocal|tag cinese: voce potente
+柔和 vocal|tag cinese: voce morbida
+清脆 vocal|tag cinese: voce limpida
+温暖 vocal|tag cinese: voce calda
+童声|tag cinese: voce infantile
+童声 vocal|tag cinese: voce di bambino
+轻盈 vocal|tag cinese: voce leggera
+青春 vocal|tag cinese: voce adolescenziale

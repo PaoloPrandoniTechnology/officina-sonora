@@ -23,6 +23,18 @@ const M = new Function(fs.readFileSync(path.join(DIR, 'src', 'lib-messaggi.js'),
 const STILE = new Function('CFG', 'path', fs.readFileSync(path.join(DIR, 'src', 'lib-apprendimento.js'), 'utf8')
   + '\nreturn { blocchiStile, erroreBlocco };')({ dir: DIR }, path);
 const VOCABOLARIO = path.join(DIR, 'config', 'vocabolario.json');
+// Spiegazioni dei termini per i tooltip: righe "termine|spiegazione" in config\spiegazioni
+function spiegazioni() {
+  const dir = path.join(DIR, 'config', 'spiegazioni');
+  const out = {};
+  for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
+    for (const riga of fs.readFileSync(path.join(dir, f), 'utf8').split(/\r?\n/)) {
+      const i = riga.indexOf('|');
+      if (i > 0) out[riga.slice(0, i).trim().toLowerCase()] = riga.slice(i + 1).trim();
+    }
+  }
+  return out;
+}
 const BLOCCO_FISSO = /^(instrumental|wordless vocals|no vocals|no lyrics)$/i;
 
 // Catalogo dei parametri: etichetta, gruppo, valore di default, limiti e spiegazione
@@ -106,6 +118,7 @@ function lettura() {
       struttura_pref: guida.struttura_pref || {},
     },
     vocabolario: leggiJson(VOCABOLARIO, { famiglie: {} }).famiglie,
+    spiegazioni: spiegazioni(),
     storico: righe.slice(-80).map((r) => JSON.parse(r)).reverse(),
   };
 }

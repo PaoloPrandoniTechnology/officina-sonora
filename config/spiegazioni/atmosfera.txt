@@ -1,0 +1,179 @@
+admirative|tono di ammirazione, luminoso
+adventure|senso di avventura e scoperta
+adventurous|slancio avventuroso
+advertising|carattere da spot pubblicitario, immediato
+affectionate|tono affettuoso
+aggressive|aggressivo, duro e teso
+agile|agile e scattante
+airy|arioso e leggero
+ambitious|ambizioso, in crescita
+angry|rabbioso
+anthemic|da inno, con aperture corali
+asian|sfumature asiatiche
+at sea|evoca il mare aperto
+atmospheric|crea un ambiente più che una melodia
+attitude|carattere deciso e sfrontato
+ballad|andamento da ballata
+beautiful|gradevole e curato
+bold|audace
+brawny|muscoloso, corposo
+bright|luminoso
+brutal|brutale, molto pesante
+calm|calmo
+calming|che tranquillizza
+celebratory|festoso, di celebrazione
+cheerful|allegro
+chill|disteso
+christmas|clima natalizio
+cinematic|da scena di un film
+comedy|tono comico
+commercial|orecchiabile, da prodotto commerciale
+communication|tono comunicativo
+confident|sicuro di sé
+contemplative|contemplativo
+cool|fresco e distaccato
+danceable|ballabile
+dancing|voglia di ballare
+dancy|ritmo che fa ballare
+dark|scuro
+deep|profondo
+delicate|delicato
+determined|determinato
+dissonant|armonie aspre e tese
+documentary|accompagnamento da documentario
+dramatic|drammatico
+dreamy|sognante
+driving|propulsivo, che spinge
+dusty|polveroso, di sapore antico
+easygoing|spensierato
+elegant|elegante
+emotion|carico di emozione
+emotional|emotivo
+emotive|che muove emozioni
+empowering|che dà forza
+energetic|energico
+enthusiastic|entusiasta
+exciting|eccitante
+expansive|ampio, che si apre
+expressive|espressivo
+fast-paced|passo rapido
+fast_decay|suoni brevi che si spengono presto (tag tecnico di YuE)
+festive|di festa
+fiery|focoso
+film|colore cinematografico
+flowing|scorrevole
+focused|concentrato, senza distrazioni
+funky|sapore funk
+funny|divertente
+furious|furioso
+futuristic|futuristico
+gentle|gentile
+gloomy|cupo
+gory|truce, da horror
+groovy|con molto groove
+grounded|radicato, stabile
+happy|felice
+hard|duro
+heartfelt|sentito, sincero
+heavy|pesante
+honest|schietto, senza artifici
+hopeful|pieno di speranza
+hypnotic|ipnotico per ripetizione
+improvisational|libero come un'improvvisazione
+inspiration|senso di ispirazione
+inspirational|che ispira
+inspiring|stimolante
+intense|intenso
+intimacy|intimità
+intimate|intimo
+introspective|introspettivo
+joyful|gioioso
+lively|vivace
+longing|nostalgico desiderio
+loose|rilassato, poco rigido
+loud|forte di volume
+love|clima amoroso
+meditative|meditativo
+melancholic|malinconico
+mellow|morbido e maturo
+melodic|melodia in primo piano
+modern|moderno
+motivational|motivante
+neon|luci al neon, urbano e notturno
+nostalgic|nostalgico
+nurturing|accogliente, che si prende cura
+optimistic|ottimista
+passionate|appassionato
+pastoral|campestre, bucolico
+peaceful|pacifico
+pensive|pensoso
+playful|giocoso
+positive|positivo
+powerful|potente
+precise|preciso e netto
+rebellious|ribelle
+reflective|riflessivo
+relaxed|rilassato
+relaxing|rilassante
+reminiscent|evocativo di ricordi
+restful|riposante
+reverent|raccolto e riverente
+romance|clima romantico
+romantic|romantico
+rough|ruvido
+sacred|sacro
+sad|triste
+saloon|da saloon del vecchio West
+sassy|sfacciato e brioso
+satisfied|appagato
+seductive|seducente
+sensual|sensuale
+sentimental|sentimentale
+serene|sereno
+shimmering|scintillante
+sleepy|sonnolento, adatto al riposo
+smooth|vellutato, senza spigoli
+soft|soffice
+soothing|lenitivo
+soulful|pieno d'anima
+soundscape|paesaggio sonoro
+spacious|spazioso
+spiritual|spirituale
+still|immobile e quieto
+storytelling|tono narrativo
+street|urbano, di strada
+success|senso di traguardo raggiunto
+summer|estivo
+sunny|solare
+sweeping|ampio e travolgente
+tender|tenero
+thought-provoking|che fa riflettere
+thoughtful|ponderato
+tough|tosto, grintoso
+travel|da viaggio
+upbeat|allegro e vivace
+uplifting|che solleva l'umore
+vibrant|vibrante
+vintage|d'altri tempi
+violent|violento
+vivacious|esuberante
+warm|caldo
+weightless|senza peso, fluttuante
+侵略性|tag cinese: aggressivo
+史诗|tag cinese: epico
+向上|tag cinese: slancio positivo
+希望|tag cinese: speranza
+忧郁|tag cinese: malinconico
+快乐|tag cinese: allegro
+怀旧|tag cinese: nostalgico
+感性|tag cinese: sentimentale
+愤怒|tag cinese: rabbioso
+抒情|tag cinese: lirico
+放松|tag cinese: rilassante
+时尚|tag cinese: alla moda
+暴力|tag cinese: violento
+梦幻|tag cinese: sognante
+残酷|tag cinese: crudele, duro
+沟通|tag cinese: comunicativo
+浪漫|tag cinese: romantico
+黑暗|tag cinese: oscuro

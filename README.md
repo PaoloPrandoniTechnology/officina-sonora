@@ -326,7 +326,9 @@ Tre sottosezioni:
   *Tutti i generi* contiene le regole generali). In alto, sempre visibile, il genere che stai modificando. I termini
   del prompt sono ordinati per argomento e colorati per origine: un clic li toglie o li rimette; sotto, l'esempio di
   prompt. Nel **Vocabolario** ogni termine ha **+** (aggiungi) e **−** (da evitare); un secondo clic annulla. Se un
-  termine non c'è, scrivilo nella ricerca. Le voci si possono aggiungere solo ai generi vocali.
+  termine non c'è, scrivilo nella ricerca. Le voci si possono aggiungere solo ai generi vocali. Passando il mouse
+  (o con il tasto Tab) un **tooltip** spiega in italiano ogni termine e cosa succede se lo applichi; i testi sono in
+  `config\spiegazioni` e sono indicativi, non misurati sul motore.
 - **Tempo e struttura.** Tabella di tutti i generi con fascia di bpm, durata e strutture usate; un campo vuoto vale
   il predefinito.
 - **Note.** Note per il sistema, lette dalla revisione automatica.

@@ -1,0 +1,201 @@
+8-bit|suoni da videogioco anni Ottanta, onde quadre e arpeggi veloci
+80s|sonorità anni Ottanta: synth brillanti, batteria con riverbero
+acoustic ambient|ambient suonato con strumenti acustici, calmo e arioso
+acoustic downtempo|ritmo lento e rilassato con strumenti acustici
+acoustic folk|folk suonato solo con strumenti acustici, caldo e semplice
+african|ritmi e percussioni di ispirazione africana
+afro-cuban|percussioni cubane e sincopi di matrice africana
+afro-latin groove|andamento ballabile tra Africa e America Latina
+alternative rock|rock meno convenzionale, chitarre ruvide e dinamiche marcate
+ambient|paesaggio sonoro lento, senza forte pulsazione
+ambient electronic|ambient costruito con sintetizzatori e tessiture elettroniche
+ambient rock|rock dilatato, chitarre riverberate e atmosfera ampia
+americana|folk e country statunitensi, chitarre acustiche e slide
+avant-garde|scrittura sperimentale, armonie e forme insolite
+balkan brass|banda di ottoni balcanica, energica e veloce
+balkan folk dance|danza popolare balcanica con tempi dispari
+beats|base ritmica in primo piano, in stile produzione hip-hop
+big band|orchestra jazz con sezioni di fiati
+black metal|metal estremo, chitarre taglienti e batteria velocissima
+bluegrass|banjo, violino e mandolino a ritmo rapido
+blues|giro blues, note «blue» e andamento sentito
+blues shuffle|blues con ritmo ternario saltellante
+bolero|ballata latina lenta e romantica
+boogie|blues ritmato con basso incalzante e ripetuto
+boom bap hip-hop beat|base hip-hop classica con cassa e rullante secchi
+boom-bap|stile hip-hop anni Novanta, batteria campionata e marcata
+bossa nova|samba morbida brasiliana, chitarra nylon e sincopi leggere
+bossanova|variante di scrittura di bossa nova: morbida e sincopata
+breathing ambient|ambient che respira, con onde lente adatte al respiro
+celtic|melodie di tradizione celtica, arpa, flauti e violino
+celtic folk|folk celtico acustico, danze e melodie modali
+chamber music|piccolo ensemble classico, dettagliato e intimo
+chanson|canzone francese, melodica e narrativa
+chillout|elettronica distesa da ascolto rilassato
+chinese|colori e scale di tradizione cinese
+choral|scrittura corale a più voci
+cinematic orchestral score|colonna sonora con orchestra, epica e narrativa
+classic rock|rock anni Sessanta e Settanta, riff di chitarra caldi
+classical|linguaggio della musica classica, strumenti orchestrali
+country|chitarre acustiche, slide e ritmo regolare di campagna
+country rock|country con energia e chitarre rock
+crossover country|country dal suono pop, accessibile
+dance|ritmo ballabile e regolare, energia alta
+dance pop|pop ballabile con ritornelli immediati
+dancehall|ritmo giamaicano sincopato e moderno
+dark ambient|ambient scuro, bordoni gravi e atmosfera inquieta
+death metal|metal estremo, riff gravi e doppia cassa
+deathcore|metal estremo con rallentamenti molto pesanti
+deep dark ambient|ambient molto scuro e profondo, quasi immobile
+deep house|house morbida con bassi caldi e accordi soffusi
+disco|cassa regolare, basso funky e archi brillanti
+downtempo|elettronica lenta con ritmo disteso
+drone doom|bordoni distorti lentissimi e molto pesanti
+dub|basso profondo, vuoti ed echi in primo piano
+dub techno|techno ovattata con accordi ripetuti e riverberi
+dubstep|basso oscillante e ritmo dimezzato
+easy listening|musica leggera e piacevole, mai invadente
+easylistening|variante di easy listening: leggera e accomodante
+electro|elettronica ritmica dal suono sintetico e secco
+electro pop|pop costruito su sintetizzatori
+electro-pop|variante di electro pop: synth e melodie immediate
+electronic|strumenti elettronici come base del suono
+electronic dance|elettronica da ballo, cassa regolare ed energia
+electronic workout|elettronica spinta da allenamento
+emo|rock emotivo, dinamiche tra quiete ed esplosione
+epic|crescendo grandioso e solenne
+espanol|colori della musica in lingua spagnola
+ethno|influenze etniche e strumenti tradizionali
+eurodance|dance europea anni Novanta, veloce e brillante
+eurovision|pop spettacolare con grandi aperture
+experimental|suoni e strutture non convenzionali
+experimental hip-hop|hip-hop con campioni e ritmi insoliti
+experimental pop|pop con soluzioni sonore inattese
+film score|musica da film, che accompagna un'immagine
+flamenco|chitarra flamenca, palmas e accenti andalusi
+folk|musica popolare acustica e melodica
+funk|groove sincopato con basso e chitarra ritmica in evidenza
+gamelan ambient|metallofoni indonesiani in un'atmosfera sospesa
+girl group|pop corale femminile in stile anni Sessanta
+glam rock|rock teatrale con riff e cori ampi
+glitch|elettronica fatta di scatti, errori e micro-suoni
+goregrind|metal estremo rumoroso e caotico
+gospel|energia corale religiosa, organo e crescendo
+goth rock|rock cupo, basso marcato e riverbero
+grime|elettronica britannica aggressiva e spezzata
+grindcore|brani furiosi, velocissimi e rumorosi
+grunge|rock sporco anni Novanta, chitarre dense
+guitar|musica centrata sulla chitarra
+gypsy jazz|jazz manouche con chitarre acustiche veloci
+gypsy jazz manouche swing|swing manouche con chitarra ritmica pompata
+hard rock|rock potente con riff forti
+hardcore|energia punk o elettronica molto intensa
+heavy metal|chitarre distorte, batteria potente, assoli
+hip hop|base ritmica hip-hop con basso evidente
+hip-hop|base ritmica hip-hop con basso evidente
+hiphop|variante di hip-hop: ritmo marcato e campioni
+house|cassa in quattro e accordi ripetuti da club
+improvisation|andamento libero, con assoli improvvisati
+indian|scale e strumenti di tradizione indiana
+indian classical|raga e bordone nello stile classico indiano
+indie|pop rock indipendente, suono genuino
+indie folk|folk intimo di gusto indipendente
+indie pop|pop leggero e personale di gusto indipendente
+indie rock|rock indipendente con chitarre limpide o ruvide
+indie-rock|variante di indie rock: chitarre vivaci e suono diretto
+industrial|suoni meccanici, distorti e martellanti
+industrial techno|techno dura con timbri metallici
+instrumental pop|pop senza canto, melodia affidata agli strumenti
+instrumental rock|rock senza canto, chitarra protagonista
+international|colori di musiche dal mondo
+italian pop|pop melodico di gusto italiano
+j-rock|rock giapponese, melodico ed energico
+jazz|armonie ricche, swing e improvvisazione
+jazz hop|hip-hop morbido con accordi jazz
+k-pop|pop coreano, produzione brillante e molto varia
+klezmer|musica ebraica dell'Est con clarinetto espressivo
+latin|ritmi e percussioni latinoamericane
+latin pop|pop con ritmo latino
+light country|country delicato e solare
+light disco|disco morbida e leggera
+light funk|funk misurato e arioso
+liquid drum and bass|drum and bass fluida e melodica
+lo-fi|suono imperfetto e caldo, con fruscio
+lounge|atmosfera da salotto, elegante e soffusa
+lounge jazz|jazz morbido da sottofondo
+meditative drone ambient|bordoni immobili adatti alla meditazione
+melodic death metal|death metal con linee di chitarra melodiche
+melodic trance|trance con melodie ampie e crescendo
+metal|chitarre molto distorte e batteria potente
+metalcore|metal e hardcore con rallentamenti pesanti
+middle eastern|scale e strumenti mediorientali
+minimal techno|techno essenziale, pochi elementi che mutano piano
+minimalism|cellule ripetute che cambiano lentamente
+minimalist piano|pianoforte essenziale e ripetitivo
+modern monodic chant|canto a una sola linea, di gusto moderno
+mpb|canzone popolare brasiliana raffinata
+musette|valzer francese con fisarmonica
+neoclassical|classica moderna, pianoforte e archi essenziali
+new age|suono disteso e luminoso per il benessere
+new wave|pop rock anni Ottanta con synth
+noise|rumore come materia musicale
+noise rock|rock ruvido con feedback e dissonanze
+opera|stile lirico e teatrale
+operatic|carattere operistico, solenne ed espressivo
+orchestral|orchestra piena: archi, fiati, percussioni
+organic house|house con strumenti acustici e percussioni naturali
+oriental|colori orientaleggianti nelle scale e nei timbri
+pop|struttura semplice e melodia orecchiabile
+pop punk|punk veloce e melodico
+pop rock|rock accessibile e melodico
+popfolk|pop con strumenti folk
+poprock|variante di pop rock: melodico e diretto
+post-hardcore|hardcore articolato, tra tensione e melodia
+post-rock|crescendo lunghi di chitarre riverberate
+power metal|metal veloce, epico e melodico
+power pop|pop energico con chitarre brillanti
+progressive rock|rock con forme lunghe e cambi di tempo
+punk|veloce, semplice e grezzo
+r&b|groove morbido, accordi ricchi e basso rotondo
+reggae|accenti in levare e basso protagonista
+reggaeton|ritmo latino urbano molto marcato
+regional mexican|musica tradizionale messicana
+rnb|variante di r&b: groove morbido e moderno
+rock|chitarre elettriche, basso e batteria
+rock and roll|rock anni Cinquanta, saltellante
+rock nacional|rock in stile latinoamericano
+rockabilly|rock anni Cinquanta con chitarra twang e basso slap
+salsa|ritmo cubano ballabile con fiati e percussioni
+samba|ritmo brasiliano vivace in due
+shoegaze|muri di chitarre riverberate e sognanti
+ska|levare veloce con fiati
+soft roots reggae dub|reggae dub morbido e profondo
+soft trip-hop|trip-hop soffuso e lento
+soul|calore espressivo, organo e fiati
+soul-r&b|soul e r&b fusi, groove caldo
+sound bath|bagno sonoro: gong e campane lunghe
+soundtrack|andamento da colonna sonora
+surf rock|chitarre riverberate e ritmo da spiaggia anni Sessanta
+swing|andamento swing jazz, ballabile
+symphonic|ampiezza sinfonica con orchestra
+symphonic metal|metal con orchestra e cori
+synthpop|pop con synth in primo piano
+synthwave|synth retrò anni Ottanta, atmosfera notturna
+techno|cassa martellante e ripetizione ipnotica
+tejano|musica texana-messicana con fisarmonica
+thrash metal|metal velocissimo e aggressivo
+trap|hi-hat rapidi, bassi 808 e ritmo dimezzato
+trap beat|base trap strumentale
+tribal|percussioni primitive e ripetute
+trip-hop|battiti lenti e atmosfera scura e fumosa
+world|mescolanza di musiche dal mondo
+中国传统音乐|tag cinese: musica tradizionale cinese
+国际音乐|tag cinese: musica internazionale
+基督教音乐|tag cinese: musica cristiana
+拉丁|tag cinese: musica latina
+摇滚|tag cinese: rock
+旋律死亡金属|tag cinese: death metal melodico
+死亡金属|tag cinese: death metal
+民乐|tag cinese: musica per strumenti tradizionali
+民谣|tag cinese: folk
+流行|tag cinese: pop

@@ -1,0 +1,50 @@
+acoustic quintet|suono da quintetto acustico dal vivo
+airy natural hall|sala naturale ariosa, riverbero leggero
+airy reverb|riverbero chiaro e leggero
+big live band mix|missaggio ampio da grande gruppo dal vivo
+cathedral reverb|riverbero lunghissimo da cattedrale
+clean deep club mix|suono da club pulito con bassi profondi
+clean deep wide mix|mix pulito, ampio e con bassi profondi
+clean modern punchy mix|mix moderno, nitido e d'impatto
+close organic mix|strumenti vicini e naturali
+close piano|pianoforte ripreso da vicino, si sentono i martelletti
+crisp mix|mix brillante e definito
+deep dark reverb|riverbero profondo e scuro
+dry close acoustic mix|acustico asciutto e ravvicinato, senza eco
+intimate acoustic mix|acustico raccolto, come in una stanza
+intimate mix|suono raccolto e vicino
+intimate room|piccola stanza, presenza ravvicinata
+live band|resa da gruppo che suona insieme
+live ensemble|insieme di musicisti ripreso dal vivo
+live folk ensemble|gruppo folk ripreso dal vivo
+live percussion ensemble|percussioni d'insieme dal vivo
+live room|sala di ripresa con riflessioni naturali
+long reverb|code di riverbero lunghe
+natural dynamics|dinamica naturale, poco compressa
+natural room|ambiente di una stanza reale
+natural wooden room|stanza in legno, calda
+punchy low end|bassi compatti e incisivi
+raw warehouse mix|suono grezzo da capannone
+resonant open space|spazio aperto che risuona
+resonant stone space|spazio in pietra molto risonante
+small club|atmosfera da piccolo locale
+soft hall reverb|riverbero di sala morbido
+soft mix|mix delicato, senza punte
+soft warm mix|mix morbido e caldo
+spacious dub echoes and spring reverb|echi dub ampi e riverbero a molla
+tight modern metal mix|mix metal moderno, serrato e preciso
+vast reverb|riverbero immenso
+vintage room|stanza dal sapore d'epoca
+vintage slapback echo|eco breve anni Cinquanta
+warm hall reverb|riverbero di sala caldo
+warm lo-fi mix|suono caldo e volutamente imperfetto
+warm mix|mix caldo, acuti addolciti
+warm sampled lo-fi mix|campioni caldi con resa lo-fi
+warm tube amps|calore degli amplificatori a valvole
+warm vintage mix|mix caldo di sapore analogico
+wide 1980s production|produzione ampia in stile anni Ottanta
+wide clean mix|mix largo e pulito
+wide concert hall|grande sala da concerto
+wide layered mix|mix largo a molti strati
+wide long reverb|riverbero lungo e avvolgente
+wide mix|immagine stereo larga

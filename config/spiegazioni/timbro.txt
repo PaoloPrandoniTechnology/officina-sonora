@@ -1,0 +1,106 @@
+accordion dance|danza guidata dalla fisarmonica
+acoustic guitar strumming|pennate di chitarra acustica
+acoustic strumming|accompagnamento acustico a pennate
+airy bamboo flute|flauto di bambù arioso
+balkan rhythm|ritmo balcanico asimmetrico
+banjo picking|banjo arpeggiato col plettro o le dita
+boom-bap drums|batteria hip-hop secca
+breath texture|tessitura che imita il respiro
+bright cymbals|piatti brillanti
+brush drums|batteria a spazzole
+build-up risers|salite di tensione prima di un'apertura
+celesta and piano|celesta insieme al pianoforte
+cinematic score|colore da colonna sonora
+claps|battiti di mani
+clean|suono pulito, senza distorsione
+clean arpeggio guitars|chitarre pulite arpeggiate
+clean funk guitar|chitarra funk pulita
+cosmic pad|tappeto di synth spaziale
+crystal bowls|campane di cristallo
+dark nature ambience|ambiente naturale cupo
+deep swell|ondata grave che cresce e cala
+delayed guitars|chitarre con eco
+distant low rumble|rombo grave in lontananza
+djembe|tamburo africano
+driving drums|batteria incalzante
+drop|stacco e ripartenza a piena energia
+dub echoes|echi lunghi in stile dub
+dub techno chords|accordi ovattati e ripetuti dub techno
+dusty drums|batteria dal suono polveroso
+echoes|echi
+energetic guitars|chitarre energiche
+energetic synth lead|synth solista vivace
+fast clarinet|clarinetto veloce
+fast drums|batteria veloce
+fiddle dance|danza guidata dal violino
+filtered bass|basso filtrato
+flowing arpeggios|arpeggi scorrevoli
+gentle acoustic bass|basso acustico delicato
+gentle clarinet|clarinetto dolce
+gentle ocean-like movement|movimento lento come onde del mare
+glassy overtones|armonici limpidi, vitrei
+gong waves|ondate di gong
+groove|andamento che invita a muoversi
+gypsy jazz quintet|quintetto jazz manouche
+hammond organ blues|organo Hammond in stile blues
+hand drums|tamburi a mano
+harp arpeggios|arpeggi d'arpa
+heavy stillness|immobilità densa e pesante
+hypnotic kick|cassa ripetitiva e ipnotica
+jangly guitars|chitarre tintinnanti
+jazzy|sfumatura jazz
+lead violin|violino solista
+live bass|basso suonato dal vivo
+live percussion|percussioni suonate dal vivo
+lively ensemble|insieme vivace
+long decay|suoni che si spengono lentamente
+manouche guitar|chitarra jazz manouche
+marimba|marimba, legno caldo
+microtonal|intervalli più piccoli del semitono
+minimal kick|cassa essenziale
+minimal patterns|figure ridotte all'essenziale
+nylon guitar|chitarra con corde di nylon
+nylon guitar montuno|montuno cubano su chitarra nylon
+orchestral crescendo|crescendo dell'orchestra
+organ|organo
+overtones|armonici in evidenza
+piano|pianoforte
+piano trio|pianoforte, basso e batteria
+pulsing bass|basso pulsante
+pulsing synth bass|basso synth pulsante
+repeating patterns|motivi che si ripetono
+resonant|suono risonante, che vibra a lungo
+reverb guitar lead|chitarra solista con riverbero
+rhodes piano|piano elettrico Rhodes
+rhythm guitar|chitarra d'accompagnamento
+rock drums|batteria rock
+rockabilly guitar|chitarra rockabilly con eco breve
+roots reggae|colore reggae delle origini
+sitar-like resonance|risonanza simile al sitar
+slide guitar blues|chitarra slide in stile blues
+soft broken beat|ritmo spezzato delicato
+soft strings|archi morbidi
+soft swell|crescendo e calo delicati
+soft tenor sax|sax tenore soffuso
+solo piano|pianoforte solo
+spacious reverb|riverbero ampio
+sparse hats|hi-hat radi
+surf guitar with organ|chitarra surf con organo
+sweeping strings|archi ampi e avvolgenti
+swing rhythm|ritmo swing
+tight bass|basso asciutto e preciso
+tribal percussion|percussioni tribali
+twangy guitar|chitarra twang
+twangy rhythm|accompagnamento twang
+very slow evolution|trasformazioni lentissime
+vibraphone sample|campione di vibrafono
+warm bass|basso caldo
+warm flute|flauto caldo
+warm guitar|chitarra calda
+warm guitar skank|levare caldo di chitarra reggae
+warm low drone|bordone grave e caldo
+warm organ|organo caldo
+warm pads|tappeti caldi
+wide reverb|riverbero largo
+wind pad|tappeto che ricorda il vento
+woodwind warmth|calore dei legni

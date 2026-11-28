@@ -50,3 +50,11 @@ test('vocabolario: termini validi, una sola famiglia, catalogo e tag di YuE', ()
     for (const t of termini) assert.equal(L.erroreBlocco(t, { strumentale: f !== 'voce' }), '', `${f}: ${t}`);
   }
 });
+
+test('spiegazioni: ogni termine del vocabolario ha il suo testo per il tooltip', () => {
+  const { famiglie } = JSON.parse(leggi('config', 'vocabolario.json'));
+  const dir = path.join(RADICE, 'config', 'spiegazioni');
+  const spiegati = new Set(fs.readdirSync(dir).flatMap((f) => leggi('config', 'spiegazioni', f).split(/\r?\n/))
+    .filter((r) => r.includes('|') && r.split('|')[1].trim()).map((r) => r.split('|')[0].trim().toLowerCase()));
+  assert.deepEqual(Object.values(famiglie).flat().filter((t) => !spiegati.has(t)), []);
+});
