@@ -301,15 +301,18 @@ Le modifiche valgono dal brano successivo e sono registrate nello **Storico** co
 ![Produzione](docs/screenshots/07-controllo-produzione.png)
 ![Parametri](docs/screenshots/08-controllo-parametri.png)
 ![Generi: pesi](docs/screenshots/09-controllo-generi.png)
-![Linee guida](docs/screenshots/10-controllo-guida.png)
+![Linee guida generali](docs/screenshots/10-controllo-guida.png)
+![Linee guida di un genere](docs/screenshots/15-controllo-guida-genere.png)
 ![Note per genere](docs/screenshots/11-controllo-note.png)
 ![Storico](docs/screenshots/12-controllo-storico.png)
 
 #### Linee guida a blocchi
-- **Ambito:** *Generale* vale per tutti i generi; scegliendo un genere vedi il suo prompt a blocchi, colorati per
-  origine (catalogo, tuoi, generali, revisione, note). Un clic toglie o rimette un blocco.
-- **Scegli i blocchi:** per famiglia o con la ricerca, in modalità *Aggiungi* o *Da evitare*; c'è anche il termine
-  libero (bordo tratteggiato). Le voci si propongono solo ai generi vocali.
+- **A sinistra** l'elenco dei generi con ricerca; il numero indica quante modifiche ha un genere, i sospesi sono
+  attenuati. *Tutti i generi* contiene le regole generali e le note per il sistema.
+- **In alto**, sempre visibile, il genere che stai modificando, con stato, fascia di bpm e *Torna al predefinito*.
+- **Stile del genere:** i blocchi, colorati per origine; un clic li toglie o li rimette. Sotto, l'esempio di prompt.
+- **Aggiungi o evita un termine:** per famiglia o con la ricerca; se il termine non c'è, la ricerca lo propone
+  come termine libero (bordo tratteggiato). Le voci si propongono solo ai generi vocali.
 - **Controlli:** blocchi di 2-60 caratteri, senza virgole, negazioni, BPM o tonalità; niente voci nei generi
   strumentali; massimo 8 aggiunte per ambito; avvisi se non resta uno strumento, se si esclude il genere o se i
   blocchi sono più di 25.

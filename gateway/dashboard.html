@@ -291,6 +291,23 @@
   .vrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .vrow span:first-child { min-width: 0; overflow-wrap: anywhere; }
   /* linee guida a blocchi */
+  .guida { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 14px; align-items: start; }
+  .guida-corpo { display: grid; gap: 14px; min-width: 0; }
+  .guida-lato { position: sticky; top: 14px; display: flex; flex-direction: column; gap: 8px; max-height: calc(100vh - 28px); padding: 12px; }
+  .guida-voci { overflow: auto; display: flex; flex-direction: column; gap: 2px; }
+  .guida-voci h3 { margin: 10px 8px 2px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+  .gvoce { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 9px; padding: 7px 9px; border-radius: 9px; font-size: 13px; color: var(--muted); }
+  .gvoce:hover { color: var(--text); background: rgba(255,255,255,.03); }
+  .gvoce:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .gvoce[aria-current="true"] { color: var(--text); background: rgba(94,234,212,.14); box-shadow: inset 3px 0 0 var(--accent); font-weight: 600; }
+  .gvoce i { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--line2); }
+  .gvoce span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gvoce em { font-style: normal; font-size: 11px; color: var(--accent); border: 1px solid rgba(94,234,212,.35); border-radius: 999px; padding: 0 7px; }
+  .gvoce.sospeso { opacity: .55; }
+  .guida-testa { position: sticky; top: 0; z-index: 5; border-left: 5px solid var(--accent); background: #101722; display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; justify-content: space-between; }
+  .guida-testa .occhiello { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+  .guida-testa h2 { margin: 2px 0 6px; font-size: 22px; text-transform: none; letter-spacing: 0; color: var(--text); }
+  .guida-testa .azioni { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .blocco { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 12.5px; border: 1px solid var(--line2); background: rgba(5,7,11,.35); color: var(--text); transition: border-color .15s, background .15s, opacity .15s; }
   .blocco:hover { border-color: var(--accent); }
   .blocco:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -303,13 +320,19 @@
   .blocco.o-fisso { border-style: dotted; color: var(--muted); }
   .blocco.escluso { text-decoration: line-through; color: var(--muted); border-color: rgba(248,113,113,.4); background: rgba(248,113,113,.08); }
   .blocco.libero { border-style: dashed; }
-  .blocco.scelto { opacity: .45; }
-  .legenda { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-  .legenda .blocco { font-size: 11px; padding: 2px 8px; pointer-events: none; }
+  .blocco.scelto { opacity: .4; }
+  .legenda { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 11.5px; color: var(--faint); }
+  .legenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .legenda .blocco { width: 14px; height: 10px; padding: 0; pointer-events: none; }
   .blocchi { display: flex; flex-wrap: wrap; gap: 7px; }
-  .blocchi.vocab { max-height: 260px; overflow: auto; padding: 2px; }
+  .blocchi.vocab { max-height: 220px; overflow: auto; padding: 2px; }
+  .sezione { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .sezione h4 { margin: 0 0 8px; font-size: 12px; font-weight: 600; color: var(--muted); display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
   .prompt { font-family: var(--mono); font-size: 12px; line-height: 1.6; background: rgba(5,7,11,.45); border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; overflow-wrap: anywhere; }
   .avviso { color: var(--warn); font-size: 12.5px; margin-top: 8px; }
+  .famiglie { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+  .famiglie .fchip { font-size: 12px; }
+  @media (max-width: 900px) { .guida { grid-template-columns: minmax(0, 1fr); } .guida-lato { position: static; max-height: 260px; } .guida-testa { position: static; } }
 </style>
 </head>
 <body>
@@ -979,6 +1002,7 @@
       <div class="card kpi c3"><div class="kpi-mini"><b>${n0(statoUltimo ? statoUltimo.pipeline.coda : 0)}</b><span>brani in coda</span></div></div>
       <div class="card kpi c3"><div class="kpi-mini"><b>${n0(personalizzati)}</b><span>parametri personalizzati</span></div></div>
       <div class="card kpi c3"><div class="kpi-mini"><b>${n0(sospesi)}</b><span>generi sospesi</span></div></div>`;
+    $('#cRiepilogo').style.display = ctrlSub === 'guida' ? 'none' : ''; // la pagina a blocchi ha la sua intestazione
     document.querySelectorAll('#csub button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.s === ctrlSub ? 'true' : 'false'));
     CTRL_SEZIONI.forEach((s) => { $('#c-' + s).hidden = s !== ctrlSub; });
     if (ctrlSub === 'produzione') disegnaProduzione();
@@ -1202,11 +1226,12 @@
   }
 
   // Linee guida a blocchi: si salvano solo le aggiunte e le esclusioni rispetto al catalogo
-  let guidaAmbito = 'generale', guidaFam = 'strumenti', guidaModo = 'aggiungi', guidaCerca = '', guidaVariante = 0, guidaRichiesta = 0;
+  let guidaAmbito = 'generale', guidaFam = 'strumenti', guidaModo = 'aggiungi', guidaCerca = '', guidaFiltro = '', guidaVariante = 0, guidaRichiesta = 0;
   const FAMIGLIE = { genere: 'Genere', strumenti: 'Strumenti', ritmo: 'Ritmo', atmosfera: 'Atmosfera', timbro: 'Timbro', produzione: 'Produzione', voce: 'Voce' };
-  const ORIGINI = { fisso: 'fisso', catalogo: 'catalogo', tuo: 'tuo', generale: 'generale', revisione: 'revisione', nota: 'dalle note' };
+  const ORIGINI = { catalogo: 'catalogo', tuo: 'tuo', generale: 'per tutti i generi', revisione: 'revisione automatica', nota: 'dalle note', fisso: 'fisso' };
 
   async function disegnaGuida() {
+    if (guidaAmbito !== 'generale' && !ctrl.generi.some((x) => x.nome === guidaAmbito)) guidaAmbito = 'generale';
     const richiesta = ++guidaRichiesta;
     let anteprima = null;
     if (guidaAmbito !== 'generale') {
@@ -1217,117 +1242,157 @@
     if (richiesta === guidaRichiesta) mostraGuida(anteprima);
   }
 
+  function scegliAmbito(nome) {
+    guidaAmbito = nome; guidaVariante = 0; guidaCerca = '';
+    history.replaceState(null, '', '#controllo/guida' + (nome === 'generale' ? '' : '/' + encodeURIComponent(nome)));
+    disegnaGuida();
+  }
+
   function mostraGuida(a) {
     const g = ctrl.guida;
     const genere = guidaAmbito !== 'generale';
+    const scheda = genere ? ctrl.generi.find((x) => x.nome === guidaAmbito) : null;
     const salvati = genere ? (g.blocchi_generi[guidaAmbito] || {}) : { aggiunti: g.style_extra, esclusi: g.style_avoid };
     const aggiunti = (salvati.aggiunti || []).map((v) => v.toLowerCase());
     const esclusi = (salvati.esclusi || []).map((v) => v.toLowerCase());
     const noti = new Set(Object.values(ctrl.vocabolario).flat());
     const vocale = !!(a && a.vocale);
-    if (!vocale && guidaFam === 'voce' && guidaModo === 'aggiungi') guidaFam = 'strumenti';
+    const famiglie = Object.keys(FAMIGLIE).filter((f) => f !== 'voce' || vocale || guidaModo === 'escludi');
+    if (!famiglie.includes(guidaFam)) guidaFam = 'strumenti';
     const salva = (piu, meno, messaggio, azzera) => esegui(() => invia('/api/controllo/guida', { campo: 'blocchi', ambito: guidaAmbito, aggiunti: piu, esclusi: meno, azzera }), messaggio);
     const senza = (lista, v) => lista.filter((x) => x !== v);
-    const aggiungi = (v) => salva(senza(aggiunti, v).concat(v), senza(esclusi, v), 'Aggiunto: ' + v);
-    const escludi = (v) => salva(senza(aggiunti, v), senza(esclusi, v).concat(v), 'Escluso: ' + v);
+    const applica = (v) => guidaModo === 'aggiungi'
+      ? salva(senza(aggiunti, v).concat(v), senza(esclusi, v), 'Aggiunto: ' + v)
+      : salva(senza(aggiunti, v), senza(esclusi, v).concat(v), 'Da evitare: ' + v);
     const chip = (testo, classe, extra, etichetta) => `<button type="button" class="blocco ${classe}" data-t="${esc(testo)}" ${extra || ''} title="${esc(etichetta)}" aria-label="${esc(testo + ': ' + etichetta)}">${esc(testo)}</button>`;
+    const libero = (v) => (noti.has(v) ? '' : ' libero');
+    const tinta = (c) => (/^#[0-9a-f]{6}$/i.test(c || '') ? c : '');
+    const modifiche = (n) => {
+      const b = g.blocchi_generi[n] || {};
+      return (b.aggiunti || []).length + (b.esclusi || []).length + ((g.stile_generi || {})[n] || []).length;
+    };
 
-    const prompt = !genere ? '' : `<div class="card c12"><h2>Prompt del genere <small>clic su un blocco per toglierlo o rimetterlo</small></h2>
-      <div class="blocchi" id="gPrompt">${a.blocchi.map((b) => {
-        const k = b.testo.toLowerCase();
-        if (b.origine === 'fisso') return chip(b.testo, 'o-fisso', 'disabled', 'blocco fisso, sempre presente');
-        if (b.escluso) return chip(b.testo, 'escluso', 'data-fai="ripristina"', esclusi.includes(k) ? 'escluso: clic per rimetterlo' : 'escluso a livello generale');
-        const libero = (b.origine === 'tuo' || b.origine === 'generale') && !noti.has(k) ? ' libero' : '';
-        if (b.origine === 'tuo') return chip(b.testo, 'o-tuo' + libero, 'data-fai="rimuovi"', 'tuo: clic per rimuoverlo');
-        return chip(b.testo, 'o-' + b.origine + libero, 'data-fai="escludi"', ORIGINI[b.origine] + ': clic per escluderlo');
-      }).join('')}</div>
-      <div class="legenda">${['catalogo', 'tuo', 'generale', 'revisione', 'nota', 'fisso'].map((o) => `<span class="blocco o-${o}">${ORIGINI[o]}</span>`).join('')}<span class="blocco libero">termine libero</span><span class="blocco escluso">escluso</span></div></div>`;
+    // elenco dei generi
+    const gruppi = {};
+    for (const x of ctrl.generi) (gruppi[[x.ambito, x.famiglia].filter(Boolean).join(' · ') || 'altro'] ||= []).push(x);
+    const voce = (nome, testo, extra = '') => `<button type="button" class="gvoce ${extra}" data-g="${esc(nome)}" aria-current="${nome === guidaAmbito}">`;
+    const generali = g.style_extra.length + g.style_avoid.length;
+    const lato = `<aside class="card guida-lato" aria-label="generi">
+      <input class="field" id="gFiltro" type="search" placeholder="Cerca un genere" aria-label="cerca un genere" value="${esc(guidaFiltro)}">
+      <div class="guida-voci" id="gVoci">${voce('generale')}<i style="background:var(--accent2)"></i><span>Tutti i generi</span>${generali ? `<em title="modifiche">${generali}</em>` : ''}</button>
+        ${Object.entries(gruppi).sort((x, y) => x[0].localeCompare(y[0])).map(([titolo, elenco]) => `<div data-gruppo><h3>${esc(titolo)}</h3>${elenco.sort((x, y) => x.etichetta.localeCompare(y.etichetta)).map((x) => `${voce(x.nome, '', x.attivo ? '' : 'sospeso')}<i style="${tinta(x.colore) ? 'background:' + tinta(x.colore) : ''}"></i><span title="${esc(x.etichetta + (x.attivo ? '' : ' (sospeso)'))}">${esc(x.etichetta)}</span>${modifiche(x.nome) ? `<em title="modifiche">${modifiche(x.nome)}</em>` : ''}</button>`).join('')}</div>`).join('')}</div></aside>`;
 
-    const elenco = (titolo, lista, campo, vuoto) => `<div class="card c6"><h2>${titolo} <small>${n0(lista.length)} blocchi</small></h2>
-      <div class="blocchi" data-elenco="${campo}">${lista.map((v) => chip(v, (campo === 'esclusi' ? 'escluso' : 'o-tuo') + (noti.has(v) ? '' : ' libero'), 'data-fai="togli"', 'clic per togliere dall\'elenco')).join('') || `<span class="muted" style="font-size:12.5px">${vuoto}</span>`}</div></div>`;
+    // intestazione: cosa si sta modificando
+    const quante = genere ? modifiche(guidaAmbito) : generali;
+    const testa = `<div class="card guida-testa" style="${scheda && tinta(scheda.colore) ? 'border-left-color:' + tinta(scheda.colore) : ''}">
+      <div><div class="occhiello">Stai modificando</div><h2>${esc(scheda ? scheda.etichetta : 'Tutti i generi')}</h2>
+        ${scheda ? `<span class="tag">${esc([scheda.ambito, scheda.famiglia].filter(Boolean).join(' · '))}</span> <span class="tag ${scheda.attivo ? 'acc' : ''}">${scheda.attivo ? 'in produzione' : 'sospeso'}</span> <span class="tag">${vocale ? 'vocalizzi senza parole' : 'strumentale'}</span>` : '<span class="muted" style="font-size:12.5px">Le scelte fatte qui valgono per ogni brano.</span>'}</div>
+      <div class="azioni">${scheda ? `<label class="muted" style="font-size:12.5px">BPM <input class="field num" style="width:100px" value="${esc(a.bpm)}" data-bpm="${esc(guidaAmbito)}" aria-label="fascia di bpm, formato minimo-massimo"></label>` : ''}
+        <button class="btn small ghost" id="gAzzera" ${quante ? '' : 'disabled'}>Torna al predefinito</button></div></div>`;
 
-    const famiglie = Object.keys(FAMIGLIE).filter((f) => f !== 'voce' || vocale || guidaModo === 'escludi');
-    const bpm = Object.entries(g.bpm_range).sort((x, y) => x[0].localeCompare(y[0]));
-    $('#c-guida').innerHTML = `
-      <div class="grid">
-        <div class="card c12"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-          <label for="gAmbito" class="muted" style="font-size:13px">Ambito</label>
-          <select class="field" id="gAmbito" style="min-width:260px"><option value="generale">Generale (tutti i generi)</option>
-            ${ctrl.generi.map((x) => x.nome).sort().map((n) => `<option value="${esc(n)}" ${n === guidaAmbito ? 'selected' : ''}>${esc(n)}${g.blocchi_generi[n] ? ' •' : ''}</option>`).join('')}</select>
-          <button class="btn small ghost" id="gAzzera">Torna al predefinito</button></div></div>
-        ${prompt}
-        ${elenco(genere ? 'Aggiunti a questo genere' : 'Aggiunti a tutti i generi', aggiunti, 'aggiunti', 'Nessun blocco aggiunto.')}
-        ${elenco(genere ? 'Da evitare per questo genere' : 'Da evitare in tutti i generi', esclusi, 'esclusi', 'Nessun blocco escluso.')}
-        <div class="card c12"><h2>Scegli i blocchi <small>${guidaModo === 'aggiungi' ? 'al massimo 8 aggiunti' : 'i blocchi scelti vengono tolti dallo stile'}</small></h2>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <div class="sub-nav" role="group" aria-label="modalità">${['aggiungi', 'escludi'].map((m) => `<button type="button" data-modo="${m}" aria-pressed="${m === guidaModo}">${m === 'aggiungi' ? 'Aggiungi allo stile' : 'Da evitare'}</button>`).join('')}</div>
-            <div class="sub-nav" role="group" aria-label="famiglia">${famiglie.map((f) => `<button type="button" data-fam="${f}" aria-pressed="${f === guidaFam}">${FAMIGLIE[f]}</button>`).join('')}</div>
-          </div>
-          <input class="field" id="gCerca" type="search" placeholder="Cerca in tutte le famiglie, per esempio: guitar" value="${esc(guidaCerca)}" aria-label="cerca un blocco" style="width:100%;margin-bottom:10px">
-          <div class="blocchi vocab" id="gVocab"></div>
-          <div class="addrow" style="margin-top:12px"><input class="field" id="gLibero" maxlength="60" placeholder="Termine libero in inglese (meglio quelli dell'elenco)" aria-label="termine libero"><button class="btn small" id="gLiberoVai">${guidaModo === 'aggiungi' ? 'Aggiungi' : 'Escludi'}</button></div></div>
-        ${genere ? `<div class="card c12"><h2>Anteprima <small>${n0(a.conteggio)} blocchi · esempio con tre strumenti</small></h2>
-          ${a.varianti.length ? `<div style="margin-bottom:10px"><label for="gVariante" class="muted" style="font-size:13px">Variante </label><select class="field" id="gVariante">${a.varianti.map((v, i) => `<option value="${i}" ${i === guidaVariante ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select></div>` : ''}
-          <div class="prompt">${esc(a.esempio)}</div>
-          ${a.avvisi.map((x) => `<div class="avviso" role="status">${esc(x)}</div>`).join('')}</div>` : ''}
-        <div class="card c6"><h2>Note per il sistema <small>lette dalla revisione periodica</small></h2>
-          ${g.note.map((n, i) => `<div class="srv"><span style="font-size:13px">${esc(n)}</span><button class="btn small ghost" data-nota="${i}">Rimuovi</button></div>`).join('') || '<div class="empty">Nessuna nota.</div>'}
-          <div class="addrow" style="margin-top:10px"><input class="field" id="in-note" placeholder="Scrivi una nota, per esempio: più pause tra le sezioni" maxlength="300"><button class="btn small" id="gNotaVai">Aggiungi</button></div></div>
-        <div class="card c6"><h2>Fasce di bpm ${genere ? 'del genere' : 'per genere'} <small>formato minimo-massimo</small></h2>
-          <div class="scroll" style="max-height:340px;overflow:auto"><table>
-            ${(genere ? [[guidaAmbito, a.bpm]] : bpm).map(([nome, v]) => `<tr><td>${esc(nome)}</td><td class="num" style="width:120px"><input class="field num" style="width:110px" value="${esc(v)}" data-bpm="${esc(nome)}" aria-label="bpm ${esc(nome)}"></td></tr>`).join('') || '<tr><td class="muted">Nessuna fascia salvata: usa quelle del catalogo.</td></tr>'}
-          </table></div></div>
-        <div class="card c12 muted" style="font-size:12.5px">Versione linee guida ${esc(g.versione ?? '—')} · aggiornate ${data(g.aggiornato)}. Le modifiche vengono applicate al prossimo brano.</div>
-      </div>`;
+    // stile attuale
+    let stileHtml;
+    if (genere) {
+      const presenti = new Set(a.blocchi.map((b) => b.testo.toLowerCase()));
+      const altri = esclusi.filter((v) => !presenti.has(v));
+      const origini = [...new Set(a.blocchi.filter((b) => !b.escluso).map((b) => b.origine))];
+      stileHtml = `<div class="card"><h2>Stile del genere <small>clic su un blocco per toglierlo o rimetterlo</small></h2>
+        <div class="blocchi" id="gPrompt">${a.blocchi.map((b) => {
+          const k = b.testo.toLowerCase();
+          if (b.origine === 'fisso') return chip(b.testo, 'o-fisso', 'disabled', 'blocco fisso, sempre presente');
+          if (b.escluso) return chip(b.testo, 'escluso', 'data-fai="ripristina"', esclusi.includes(k) ? 'escluso: clic per rimetterlo' : 'escluso per tutti i generi');
+          const extra = b.origine === 'tuo' || b.origine === 'generale' ? libero(k) : '';
+          if (b.origine === 'tuo') return chip(b.testo, 'o-tuo' + extra, 'data-fai="rimuovi"', 'tuo: clic per rimuoverlo');
+          return chip(b.testo, 'o-' + b.origine + extra, 'data-fai="escludi"', ORIGINI[b.origine] + ': clic per escluderlo');
+        }).join('')}</div>
+        <div class="legenda">${Object.keys(ORIGINI).filter((o) => origini.includes(o)).map((o) => `<span><b class="blocco o-${o}"></b>${ORIGINI[o]}</span>`).join('')}${a.blocchi.some((b) => b.escluso) ? '<span><b class="blocco escluso"></b>escluso</span>' : ''}</div>
+        ${altri.length ? `<div class="sezione"><h4>Altri termini da evitare</h4><div class="blocchi" data-elenco="esclusi">${altri.map((v) => chip(v, 'escluso', 'data-fai="togli"', 'clic per togliere dall\'elenco')).join('')}</div></div>` : ''}
+        <div class="sezione"><h4>Esempio di prompt inviato al motore · ${n0(a.conteggio)} blocchi
+          ${a.varianti.length ? `<label style="font-weight:400">Variante <select class="field" id="gVariante">${a.varianti.map((v, i) => `<option value="${i}" ${i === guidaVariante ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select></label>` : ''}</h4>
+          <div class="prompt">${esc(a.esempio)}</div>${a.avvisi.map((x) => `<div class="avviso" role="status">${esc(x)}</div>`).join('')}</div></div>`;
+    } else {
+      const elenco = (titolo, lista, campo, vuoto) => `<h4>${titolo}</h4><div class="blocchi" data-elenco="${campo}">${lista.map((v) => chip(v, (campo === 'esclusi' ? 'escluso' : 'o-generale') + libero(v), 'data-fai="togli"', 'clic per togliere')).join('') || `<span class="muted" style="font-size:12.5px">${vuoto}</span>`}</div>`;
+      stileHtml = `<div class="card"><h2>Regole per tutti i generi <small>clic su un blocco per toglierlo</small></h2>
+        ${elenco('Aggiunti allo stile', aggiunti, 'aggiunti', 'Nessun blocco: scegline uno qui sotto.')}
+        <div class="sezione">${elenco('Da evitare', esclusi, 'esclusi', 'Nessun blocco escluso.')}</div></div>`;
+    }
+
+    const scelta = `<div class="card"><h2>Aggiungi o evita un termine <small>${guidaModo === 'aggiungi' ? aggiunti.length + ' aggiunti su 8' : 'il termine scelto viene tolto dallo stile'}</small></h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div class="sub-nav" role="group" aria-label="cosa fare" style="margin:0">${[['aggiungi', 'Aggiungi allo stile'], ['escludi', 'Da evitare']].map(([m, t]) => `<button type="button" data-modo="${m}" aria-pressed="${m === guidaModo}">${t}</button>`).join('')}</div>
+        <input class="field" id="gCerca" type="search" maxlength="60" placeholder="Cerca un termine, o scrivine uno e premi Invio" value="${esc(guidaCerca)}" aria-label="cerca o scrivi un termine" style="flex:1;min-width:220px"></div>
+      <div class="famiglie" id="gFamiglie" role="group" aria-label="famiglia">${famiglie.map((f) => `<button type="button" class="fchip" data-fam="${f}" aria-pressed="${f === guidaFam}">${FAMIGLIE[f]}</button>`).join('')}</div>
+      <div class="blocchi vocab" id="gVocab"></div></div>`;
+
+    const note = genere ? '' : `<div class="card"><h2>Note per il sistema <small>lette dalla revisione automatica</small></h2>
+      ${g.note.map((n, i) => `<div class="srv"><span style="font-size:13px">${esc(n)}</span><button class="btn small ghost" data-nota="${i}">Rimuovi</button></div>`).join('') || '<div class="empty">Nessuna nota.</div>'}
+      <div class="addrow" style="margin-top:10px"><input class="field" id="in-note" placeholder="Scrivi una nota, per esempio: più pause tra le sezioni" maxlength="300"><button class="btn small" id="gNotaVai">Aggiungi</button></div></div>`;
 
     const radice = $('#c-guida');
+    const scorrimento = $('#gVoci') ? $('#gVoci').scrollTop : null;
+    radice.innerHTML = `<div class="guida">${lato}<div class="guida-corpo">${testa}${stileHtml}${scelta}${note}
+      <div class="muted" style="font-size:12px">Versione linee guida ${esc(g.versione ?? '—')} · aggiornate ${data(g.aggiornato)}. Le modifiche valgono dal prossimo brano.</div></div></div>`;
+
     const clic = (selettore, fn) => radice.querySelectorAll(selettore).forEach((b) => { b.onclick = () => fn(b); });
+    const voci = $('#gVoci');
+    if (scorrimento !== null) voci.scrollTop = scorrimento;
+    else { const corrente = voci.querySelector('[aria-current="true"]'); voci.scrollTop = corrente.offsetTop - voci.offsetTop - 60; }
+    const filtra = () => {
+      const f = guidaFiltro.trim().toLowerCase();
+      voci.querySelectorAll('.gvoce').forEach((b) => { b.style.display = !f || (b.textContent + ' ' + b.dataset.g).toLowerCase().includes(f) ? '' : 'none'; });
+      voci.querySelectorAll('[data-gruppo]').forEach((d) => { d.style.display = [...d.querySelectorAll('.gvoce')].some((b) => b.style.display !== 'none') ? '' : 'none'; });
+    };
+    filtra();
+    $('#gFiltro').oninput = (e) => { guidaFiltro = e.target.value; filtra(); };
+    clic('.gvoce', (b) => scegliAmbito(b.dataset.g));
+
     const mostraVocabolario = () => {
       const cerca = guidaCerca.trim().toLowerCase();
+      $('#gFamiglie').style.display = cerca ? 'none' : '';
       const fonte = cerca ? famiglie.flatMap((f) => ctrl.vocabolario[f] || []) : (ctrl.vocabolario[guidaFam] || []);
       const trovati = fonte.filter((t) => t.includes(cerca));
       const presi = guidaModo === 'aggiungi' ? aggiunti : esclusi;
-      $('#gVocab').innerHTML = trovati.slice(0, 160).map((t) => presi.includes(t) ? chip(t, 'scelto', 'disabled', 'già scelto') : chip(t, '', 'data-fai="scegli"', guidaModo === 'aggiungi' ? 'clic per aggiungerlo' : 'clic per escluderlo')).join('')
-        + (trovati.length > 160 ? `<span class="muted" style="font-size:12px">altri ${n0(trovati.length - 160)}: usa la ricerca</span>` : '')
-        || '<span class="muted" style="font-size:12.5px">Nessun blocco trovato: usa il termine libero.</span>';
-      clic('#gVocab [data-fai="scegli"]', (b) => (guidaModo === 'aggiungi' ? aggiungi : escludi)(b.dataset.t));
+      const nuovo = cerca.length > 1 && !noti.has(cerca) ? chip(cerca, 'libero o-tuo', 'data-fai="scegli"', 'usa come termine libero').replace(`>${esc(cerca)}</button>`, `>+ termine libero: ${esc(cerca)}</button>`) : '';
+      $('#gVocab').innerHTML = nuovo + trovati.slice(0, 160).map((t) => presi.includes(t) ? chip(t, 'scelto', 'disabled', 'già scelto') : chip(t, '', 'data-fai="scegli"', guidaModo === 'aggiungi' ? 'clic per aggiungerlo' : 'clic per evitarlo')).join('')
+        + (trovati.length > 160 ? `<span class="muted" style="font-size:12px;align-self:center">altri ${n0(trovati.length - 160)}: usa la ricerca</span>` : '');
+      clic('#gVocab [data-fai="scegli"]', (b) => applica(b.dataset.t));
     };
     mostraVocabolario();
-    $('#gAmbito').onchange = (e) => { guidaAmbito = e.target.value; guidaVariante = 0; disegnaGuida(); };
+    $('#gCerca').oninput = (e) => { guidaCerca = e.target.value; mostraVocabolario(); };
+    $('#gCerca').onkeydown = (e) => {
+      const v = guidaCerca.trim().toLowerCase();
+      if (e.key !== 'Enter' || !v) return;
+      guidaCerca = '';
+      applica(v);
+    };
     $('#gAzzera').onclick = async () => {
-      const testo = genere ? 'Si tolgono i blocchi aggiunti, quelli esclusi e le parole della revisione per ' + guidaAmbito + '.' : 'Si svuotano i blocchi aggiunti ed esclusi a livello generale.';
+      const testo = genere ? 'Si tolgono i blocchi aggiunti, quelli da evitare e le parole della revisione per ' + scheda.etichetta + '.' : 'Si tolgono i blocchi aggiunti e quelli da evitare per tutti i generi.';
       if (await chiedi('Tornare al predefinito?', testo, 'Torna al predefinito')) salva([], [], 'Ripristinato', true);
     };
     if ($('#gVariante')) $('#gVariante').onchange = (e) => { guidaVariante = Number(e.target.value); disegnaGuida(); };
     clic('[data-modo]', (b) => { guidaModo = b.dataset.modo; mostraGuida(a); });
-    clic('[data-fam]', (b) => { guidaFam = b.dataset.fam; guidaCerca = ''; mostraGuida(a); });
-    $('#gCerca').oninput = (e) => { guidaCerca = e.target.value; mostraVocabolario(); };
+    clic('[data-fam]', (b) => { guidaFam = b.dataset.fam; mostraGuida(a); });
     clic('#gPrompt [data-fai]', (b) => {
       const v = b.dataset.t.toLowerCase(), fai = b.dataset.fai;
-      if (fai === 'escludi') return escludi(v);
+      if (fai === 'escludi') return salva(senza(aggiunti, v), senza(esclusi, v).concat(v), 'Da evitare: ' + v);
       if (fai === 'rimuovi') return salva(senza(aggiunti, v), esclusi, 'Rimosso: ' + v);
-      if (!esclusi.includes(v)) return toast('Escluso a livello generale: cambia l\'ambito in Generale', 'err');
+      if (!esclusi.includes(v)) return toast('Escluso per tutti i generi: cambialo in "Tutti i generi"', 'err');
       return salva(aggiunti, senza(esclusi, v), 'Rimesso: ' + v);
     });
     clic('[data-elenco] [data-fai]', (b) => {
       const v = b.dataset.t, campo = b.parentElement.dataset.elenco;
       salva(campo === 'aggiunti' ? senza(aggiunti, v) : aggiunti, campo === 'esclusi' ? senza(esclusi, v) : esclusi, 'Tolto: ' + v);
     });
-    const libero = () => {
-      const v = $('#gLibero').value.trim().toLowerCase();
-      if (!v) return toast('Scrivi prima un termine', 'err');
-      return (guidaModo === 'aggiungi' ? aggiungi : escludi)(v);
-    };
-    $('#gLiberoVai').onclick = libero;
-    $('#gLibero').onkeydown = (e) => { if (e.key === 'Enter') libero(); };
-    const salvaNote = (lista) => esegui(() => invia('/api/controllo/guida', { campo: 'note', valori: lista }), 'Note aggiornate');
-    clic('[data-nota]', (b) => salvaNote(g.note.filter((_, k) => k !== Number(b.dataset.nota))));
-    $('#gNotaVai').onclick = () => {
-      const testo = $('#in-note').value.trim();
-      if (!testo) return toast('Scrivi prima una nota', 'err');
-      return salvaNote(g.note.concat([testo]));
-    };
-    $('#in-note').onkeydown = (e) => { if (e.key === 'Enter') $('#gNotaVai').click(); };
+    if (!genere) {
+      const salvaNote = (lista) => esegui(() => invia('/api/controllo/guida', { campo: 'note', valori: lista }), 'Note aggiornate');
+      clic('[data-nota]', (b) => salvaNote(g.note.filter((_, k) => k !== Number(b.dataset.nota))));
+      $('#gNotaVai').onclick = () => {
+        const testo = $('#in-note').value.trim();
+        if (!testo) return toast('Scrivi prima una nota', 'err');
+        return salvaNote(g.note.concat([testo]));
+      };
+      $('#in-note').onkeydown = (e) => { if (e.key === 'Enter') $('#gNotaVai').click(); };
+    }
     radice.querySelectorAll('input[data-bpm]').forEach((i) => {
       i.onchange = () => esegui(() => invia('/api/controllo/guida', { campo: 'bpm_range', categoria: i.dataset.bpm, valore: i.value.trim() }),
         `Bpm di ${i.dataset.bpm}: ${i.value.trim()}`);
@@ -1626,11 +1691,12 @@
     const parti = String(indirizzo || '').split('/');
     let tab = parti[0];
     if (parti[1] && CTRL_SEZIONI.includes(parti[1])) ctrlSub = parti[1]; // es. #controllo/note
+    if (parti[1] === 'guida' && parti[2]) guidaAmbito = decodeURIComponent(parti[2]); // es. #controllo/guida/Metal
     if (!TITOLI[tab]) tab = 'panoramica';
     document.querySelectorAll('section.tab').forEach((s) => s.classList.toggle('on', s.id === 't-' + tab));
     document.querySelectorAll('#nav button').forEach((b) => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
     $('#titolo').textContent = TITOLI[tab];
-    const hash = tab === 'controllo' ? '#controllo/' + ctrlSub : '#' + tab;
+    const hash = tab === 'controllo' ? '#controllo/' + ctrlSub + (ctrlSub === 'guida' && guidaAmbito !== 'generale' ? '/' + encodeURIComponent(guidaAmbito) : '') : '#' + tab;
     if (location.hash !== hash) history.replaceState(null, '', hash);
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (tab === 'controllo') caricaControllo();

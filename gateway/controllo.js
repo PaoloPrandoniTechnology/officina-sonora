@@ -88,9 +88,10 @@ function lettura() {
     },
     comandi: leggiJson(COMANDI, {}),
     sfondi: sfondi.stato(),
-    generi: catalogoNomi().map((nome) => {
+    generi: (leggiJson(CATALOGO, { categories: [] }).categories || []).map((c) => {
+      const nome = c.name;
       const s = generiSalvati[nome] || {};
-      return { nome, peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
+      return { nome, etichetta: c.genere || nome, ambito: c.ambito || '', famiglia: c.famiglia || '', colore: (c.colori || [])[1] || '', peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
     }),
     guida: {
       versione: guida.versione || null,

@@ -27,6 +27,7 @@ $pagine = @(
   @{ n = '08-controllo-parametri';  h = 'controllo/parametri' },
   @{ n = '09-controllo-generi';     h = 'controllo/generi' },
   @{ n = '10-controllo-guida';      h = 'controllo/guida' },
+  @{ n = '15-controllo-guida-genere'; h = 'controllo/guida/Blues-shuffle-strumentale' },
   @{ n = '11-controllo-note';       h = 'controllo/note' },
   @{ n = '12-controllo-storico';    h = 'controllo/storico' },
   @{ n = '13-log';               h = 'log' },
