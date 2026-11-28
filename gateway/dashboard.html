@@ -200,6 +200,23 @@
   .esiti div { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 10px; font-size: 13px; color: var(--muted); }
   .esiti b { color: var(--text); font-weight: 600; }
   .esiti i { font-style: normal; font-weight: 700; width: 1em; text-align: center; }
+  .an-filtri label { display: grid; gap: 3px; font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: .05em; }
+  .an-filtri label.riga { display: flex; align-items: center; align-self: end; gap: 7px; padding: 9px 0; text-transform: none; letter-spacing: 0; font-size: 12.5px; color: var(--muted); }
+  .an-filtri .field { text-transform: none; letter-spacing: 0; font-size: 13px; max-width: 220px; }
+  .an-filtri .btn { align-self: end; }
+  .an-kpi { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
+  .an-kpi div { border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px; display: grid; align-content: start; }
+  .an-kpi small { color: var(--muted); font-size: 11.5px; }
+  .an-kpi b { font-size: 22px; font-weight: 650; }
+  .an-kpi em { font-style: normal; font-size: 11.5px; color: var(--faint); }
+  .an-kpi em.su { color: var(--ok); } .an-kpi em.giu { color: var(--danger); }
+  .an-gen th button, .an-gen td button { all: unset; cursor: pointer; }
+  .an-gen td button { color: var(--accent); }
+  .an-gen button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .an-gen td { white-space: nowrap; }
+  #t-andamento summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+  #t-andamento details .scroll { max-height: 360px; overflow: auto; margin-top: 10px; }
+  #t-andamento .hb { grid-template-columns: minmax(0, 1.6fr) 1fr 44px; }
   footer { color: var(--faint); font-size: 11px; margin-top: 26px; }
 
   @media (max-width: 880px) {
@@ -508,20 +525,40 @@
     <section class="tab" id="t-andamento">
       <div class="grid">
         <div class="card c12">
-          <h2>Il sistema sta migliorando? <small>ultimi 7 giorni contro i 7 precedenti</small></h2>
-          <div class="toolbar">
-            <select class="field" id="aGenere" aria-label="Filtra per genere"><option value="">Tutti i generi</option></select>
-            <select class="field" id="aPasso" aria-label="Passo dei grafici">
-              <option value="">Passo automatico</option><option value="ora">Per ora</option><option value="giorno">Per giorno</option>
-            </select>
-            <small class="muted" id="aNota">Il filtro genere non si applica agli errori</small>
+          <h2>Filtri</h2>
+          <div class="toolbar an-filtri">
+            <label>Periodo<select class="field" id="aPeriodo"><option value="1">Ultime 24 ore</option><option value="2">Ultime 48 ore</option><option value="7" selected>Ultimi 7 giorni</option><option value="30">Ultimi 30 giorni</option><option value="90">Ultimi 90 giorni</option><option value="">Tutto</option></select></label>
+            <label>Passo<select class="field" id="aPasso"><option value="">Automatico</option><option value="ora">Per ora</option><option value="giorno">Per giorno</option></select></label>
+            <label>Ambito<select class="field" id="aAmbito"><option value="">Tutti</option></select></label>
+            <label>Famiglia<select class="field" id="aFamiglia"><option value="">Tutte</option></select></label>
+            <label>Genere<select class="field" id="aGenere"><option value="">Tutti i generi</option></select></label>
+            <label>Tipo<select class="field" id="aTipo"><option value="">Tutti</option></select></label>
+            <label>Struttura<select class="field" id="aStruttura"><option value="">Tutte</option></select></label>
+            <label class="riga"><input type="checkbox" id="aModifiche" checked> Mostra le modifiche nei grafici</label>
+            <button type="button" class="btn ghost small" id="aAzzera">Azzera filtri</button>
           </div>
+          <small id="aNota" role="status"></small>
+        </div>
+        <div class="card c12">
+          <h2>Il sistema sta migliorando? <small>ultimi 7 giorni contro i 7 precedenti, con i filtri scelti</small></h2>
           <div class="esiti" id="aEsito"><div class="empty">Caricamento…</div></div>
         </div>
+        <div class="card c12"><h2>Indici del periodo <small id="aConfronto"></small></h2><div class="an-kpi" id="aKpi"></div></div>
+        <div class="card c12"><h2>Brani generati <small>accettati e scartati</small></h2><div id="aProduzione"></div></div>
         <div class="card c6"><h2>Voto medio <small>punti vuoti: meno di 5 voti</small></h2><div id="aVoto"></div></div>
         <div class="card c6"><h2>Brani scartati (%)</h2><div id="aScarti"></div></div>
-        <div class="card c6"><h2>Secondi di render per secondo di musica buona</h2><div id="aResa"></div></div>
+        <div class="card c6"><h2>Secondi di render per secondo di musica buona <small>più basso è meglio</small></h2><div id="aResa"></div></div>
+        <div class="card c6"><h2>Render medio per brano (s)</h2><div id="aRender"></div></div>
+        <div class="card c6"><h2>Brani rigenerati (%) <small>almeno un secondo tentativo</small></h2><div id="aRigenerati"></div></div>
+        <div class="card c6"><h2>Durata ottenuta sulla richiesta (%)</h2><div id="aDurata"></div></div>
+        <div class="card c6"><h2>Ore di musica buona</h2><div id="aOre"></div></div>
         <div class="card c6"><h2>Errori <small>tutti i generi</small></h2><div id="aErrori"></div></div>
+        <div class="card c6"><h2>Distribuzione dei voti</h2><div id="aDistribuzione"></div></div>
+        <div class="card c6"><h2>Motivi di scarto</h2><div id="aMotivi"></div></div>
+        <div class="card c12"><h2>Errori più frequenti <small>tutti i generi</small></h2><div id="aErroriTop"></div></div>
+        <div class="card c12"><h2>Dettaglio per genere <small>clic sul nome per filtrare, sulla colonna per ordinare</small></h2><div class="scroll" id="aGeneri"></div></div>
+        <div class="card c6"><details><summary id="aModTitolo">Modifiche nel periodo</summary><div class="scroll" id="aModElenco"></div></details></div>
+        <div class="card c6"><details><summary>Dati dei grafici in tabella</summary><div class="scroll" id="aTabella"></div></details></div>
       </div>
     </section>
 
@@ -1716,65 +1753,207 @@
   });
 
   // ---------- andamento ----------
-  // Grafico a linea nel tempo: la linea si interrompe sui valori mancanti, le modifiche sono linee verticali
-  function lineaTempo(punti, modifiche, campo, opz = {}) {
-    const { passo = 'giorno', min = 0, maxFisso = null, formato = (v) => String(v), vuoto = () => false, dettaglio = () => '' } = opz;
-    if (!punti.some((p) => p[campo] !== null)) return '<div class="empty">Dati insufficienti</div>';
-    const w = 640, h = 200, pad = { l: 40, r: 14, t: 14, b: 26 };
-    const valori = punti.map((p) => p[campo]).filter((v) => v !== null);
-    const alto = Math.max(...valori, min + 1) * 1.1;
-    const max = maxFisso ?? (opz.intero ? Math.ceil(alto / 4) * 4 : alto); // conteggi: tacche intere
+  const quandoPunto = (iso, passo) => new Date(iso).toLocaleString('it-IT', passo === 'ora' ? { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' } : { day: '2-digit', month: '2-digit' });
+  const virgola = (v) => (v === null || v === undefined ? '—' : String(v).replace('.', ','));
+  const conUnita = (u) => (v) => (v === null || v === undefined ? '—' : virgola(v) + u);
+
+  // Cornice comune dei grafici nel tempo: griglia, date e modifiche (una linea per intervallo)
+  function telaio(punti, modifiche, opz, min, max, x0, x1, w) {
+    const { passo = 'giorno', formato = virgola } = opz;
+    const h = 200, pad = { l: 40, r: 14, t: 14, b: 26 };
     const t0 = Date.parse(punti[0].da), t1 = Date.parse(punti[punti.length - 1].da);
-    const x = (t) => t1 > t0 ? pad.l + ((t - t0) / (t1 - t0)) * (w - pad.l - pad.r) : (pad.l + w - pad.r) / 2;
+    const x = (t) => t1 > t0 ? x0 + ((t - t0) / (t1 - t0)) * (x1 - x0) : (x0 + x1) / 2;
     const y = (v) => pad.t + (h - pad.t - pad.b) * (1 - (v - min) / (max - min));
-    const quando = (iso) => new Date(iso).toLocaleString('it-IT', passo === 'ora' ? { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' } : { day: '2-digit', month: '2-digit' });
     let g = '';
     for (let i = 0; i <= 4; i++) {
       const v = min + (max - min) * i / 4, yy = y(v);
       g += `<line class="gridline" x1="${pad.l}" x2="${w - pad.r}" y1="${yy}" y2="${yy}"/><text class="axis" x="${pad.l - 8}" y="${yy + 3}" text-anchor="end">${esc(formato(Math.round(v * 10) / 10))}</text>`;
     }
     const tacche = [...new Set([0, Math.floor((punti.length - 1) / 2), punti.length - 1])];
-    g += tacche.map((i) => `<text class="axis" x="${x(Date.parse(punti[i].da))}" y="${h - 8}" text-anchor="middle">${esc(quando(punti[i].da))}</text>`).join('');
+    g += tacche.map((i) => `<text class="axis" x="${x(Date.parse(punti[i].da))}" y="${h - 8}" text-anchor="middle">${esc(quandoPunto(punti[i].da, passo))}</text>`).join('');
+    const gruppi = new Map();
+    for (const m of modifiche) {
+      let i = punti.length - 1;
+      while (i > 0 && Date.parse(punti[i].da) > Date.parse(m.ts)) i--;
+      if (!gruppi.has(i)) gruppi.set(i, []);
+      gruppi.get(i).push(data(m.ts) + ' · ' + m.sezione + ': ' + m.chiave);
+    }
+    g += [...gruppi].map(([i, voci]) => {
+      const xx = x(Date.parse(punti[i].da)).toFixed(1);
+      const testo = voci.slice(0, 8).join('\n') + (voci.length > 8 ? '\n… e altre ' + (voci.length - 8) : '');
+      return `<g><title>${esc(testo)}</title><line x1="${xx}" x2="${xx}" y1="${pad.t}" y2="${h - pad.b}" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/><line x1="${xx}" x2="${xx}" y1="${pad.t}" y2="${h - pad.b}" stroke="transparent" stroke-width="8"/></g>`;
+    }).join('');
+    return { w, h, pad, x, y, g };
+  }
+  const svg = (t, titolo, corpo) => `<svg class="chart" viewBox="0 0 ${t.w} ${t.h}" role="img" aria-label="${esc(titolo)} nel tempo">${t.g}${corpo}</svg>`;
+  const tetto = (valori, min, intero) => { const alto = Math.max(...valori, min + 1) * 1.1; return intero ? Math.ceil(alto / 4) * 4 : alto; };
+
+  // Grafico a linea nel tempo: la linea si interrompe sui valori mancanti
+  function lineaTempo(punti, modifiche, campo, opz = {}) {
+    const { passo = 'giorno', min = 0, maxFisso = null, formato = virgola, vuoto = () => false, dettaglio = () => '' } = opz;
+    const validi = punti.filter((p) => p[campo] !== null);
+    if (!validi.length) return '<div class="empty">Nessun dato nel periodo</div>';
+    const max = maxFisso ?? tetto(validi.map((p) => p[campo]), min, opz.intero); // conteggi: tacche intere
+    const t = telaio(punti, modifiche, opz, min, max, 40, 626, 640);
     let d = '', aperto = false;
     for (const p of punti) {
       if (p[campo] === null) { aperto = false; continue; }
-      d += (aperto ? 'L' : 'M') + x(Date.parse(p.da)).toFixed(1) + ' ' + y(p[campo]).toFixed(1) + ' ';
+      d += (aperto ? 'L' : 'M') + t.x(Date.parse(p.da)).toFixed(1) + ' ' + t.y(p[campo]).toFixed(1) + ' ';
       aperto = true;
     }
-    const linee = modifiche.map((m) => {
-      const xx = Math.min(x(Date.parse(m.ts)), w - pad.r).toFixed(1);
-      return `<g><title>${esc(data(m.ts) + ' · ' + m.sezione + ': ' + m.chiave)}</title><line x1="${xx}" x2="${xx}" y1="${pad.t}" y2="${h - pad.b}" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/><line x1="${xx}" x2="${xx}" y1="${pad.t}" y2="${h - pad.b}" stroke="transparent" stroke-width="10"/></g>`;
+    const fitto = punti.length > 60;
+    const dots = validi.map((p) => {
+      const cx = t.x(Date.parse(p.da)).toFixed(1), cy = t.y(p[campo]).toFixed(1);
+      return `<g><title>${esc(quandoPunto(p.da, passo) + ': ' + formato(p[campo]) + dettaglio(p))}</title><circle cx="${cx}" cy="${cy}" r="${fitto ? 5 : 10}" fill="transparent"/><circle cx="${cx}" cy="${cy}" r="${fitto ? 2 : 4}" fill="${vuoto(p) ? 'var(--bg)' : '#5eead4'}" stroke="#5eead4" stroke-width="${fitto ? 1.5 : 2}"/></g>`;
     }).join('');
-    const dots = punti.filter((p) => p[campo] !== null).map((p) => {
-      const cx = x(Date.parse(p.da)).toFixed(1), cy = y(p[campo]).toFixed(1), cavo = vuoto(p);
-      return `<g><title>${esc(quando(p.da) + ': ' + formato(p[campo]) + dettaglio(p))}</title><circle cx="${cx}" cy="${cy}" r="10" fill="transparent"/><circle cx="${cx}" cy="${cy}" r="4" fill="${cavo ? 'var(--bg)' : '#5eead4'}" stroke="#5eead4" stroke-width="2"/></g>`;
-    }).join('');
-    return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(opz.titolo || '')} nel tempo">${g}${linee}<path d="${d}" fill="none" stroke="#5eead4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
+    return svg(t, opz.titolo, `<path d="${d}" fill="none" stroke="#5eead4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}`);
   }
 
-  const ESITI = { migliora: ['↑', 'var(--ok)'], stabile: ['→', 'var(--muted)'], peggiora: ['↓', 'var(--danger)'], 'dati insufficienti': ['–', 'var(--faint)'] };
-  const an = { richiesta: 0, generi: '' };
-  async function caricaAndamento() {
-    const genere = $('#aGenere').value, passo = $('#aPasso').value, n = ++an.richiesta;
-    let r;
-    try { r = await leggi('/api/andamento?genere=' + encodeURIComponent(genere) + '&passo=' + encodeURIComponent(passo)); }
-    catch (e) { if (n === an.richiesta) $('#aEsito').innerHTML = '<span class="err">Impossibile leggere l\'andamento: ' + esc(e.message) + '</span>'; return; }
-    if (n !== an.richiesta) return; // e' gia' partita una richiesta piu' recente
-    if (r.generi.join('|') !== an.generi) {
-      an.generi = r.generi.join('|');
-      $('#aGenere').innerHTML = '<option value="">Tutti i generi</option>' + r.generi.map((g) => `<option value="${esc(g)}"${g === genere ? ' selected' : ''}>${esc(g)}</option>`).join('');
-    }
-    const voce = (nome, esito) => { const [segno, c] = ESITI[esito] || ESITI['dati insufficienti']; return `<div><i style="color:${c}" aria-hidden="true">${segno}</i>${nome}: <b>${esc(esito)}</b></div>`; };
-    $('#aEsito').innerHTML = voce('Voto', r.esito.voto) + voce('Scarti', r.esito.scarti) +
-      `<div>Passo: <b>${r.passo === 'ora' ? 'per ora' : 'per giorno'}</b></div><div>Modifiche nel periodo: <b>${r.modifiche.length}</b></div>`;
-    const p = r.punti, m = r.modifiche, n0f = (v) => String(v).replace('.', ',');
-    $('#aVoto').innerHTML = lineaTempo(p, m, 'voto', { titolo: 'Voto medio', passo: r.passo, min: 1, maxFisso: 5, formato: n0f, vuoto: (x) => x.votati < 5, dettaglio: (x) => ` (${x.votati} voti)` });
-    $('#aScarti').innerHTML = lineaTempo(p, m, 'scartoPct', { titolo: 'Brani scartati (%)', passo: r.passo, maxFisso: 100, formato: (v) => n0f(v) + '%', dettaglio: (x) => ` (${x.scartati} su ${x.brani})` });
-    $('#aResa').innerHTML = lineaTempo(p, m, 'resa', { titolo: 'Secondi di render per secondo di musica buona', passo: r.passo, formato: n0f, dettaglio: (x) => ` (${x.brani} brani)` });
-    $('#aErrori').innerHTML = lineaTempo(p, m, 'errori', { titolo: 'Errori', passo: r.passo, intero: true, formato: n0f });
+  // Barre impilate a tutta larghezza: accettati in basso, scartati sopra
+  function barreTempo(punti, modifiche, passo) {
+    if (!punti.some((p) => p.brani)) return '<div class="empty">Nessun brano nel periodo</div>';
+    const w = 1280, spazio = (w - 54) / punti.length, larga = Math.min(Math.max(spazio - 2, 1), 40);
+    const t = telaio(punti, modifiche, { passo }, 0, tetto(punti.map((p) => p.brani), 0, true), 40 + spazio / 2, w - 14 - spazio / 2, w);
+    const rettangoli = punti.map((p) => {
+      if (!p.brani) return '';
+      const x = (t.x(Date.parse(p.da)) - larga / 2).toFixed(1), base = t.y(0), a = t.y(p.accettati), s = t.y(p.brani);
+      return `<g><title>${esc(quandoPunto(p.da, passo) + ': ' + p.accettati + ' accettati, ' + p.scartati + ' scartati')}</title>` +
+        (p.accettati ? `<rect x="${x}" y="${a}" width="${larga}" height="${base - a}" rx="2" fill="#5eead4"/>` : '') +
+        (p.scartati ? `<rect x="${x}" y="${s}" width="${larga}" height="${Math.max(a - s - (p.accettati ? 2 : 0), 1)}" rx="2" fill="#f87171"/>` : '') + '</g>';
+    }).join('');
+    return svg(t, 'Brani generati', rettangoli) + '<div class="legenda"><span><i class="dot" style="background:#5eead4"></i>Accettati</span><span><i class="dot" style="background:#f87171"></i>Scartati</span></div>';
   }
-  $('#aGenere').addEventListener('change', caricaAndamento);
-  $('#aPasso').addEventListener('change', caricaAndamento);
+
+  // [campo, nome, formato, verso: 1 alto è meglio, -1 basso è meglio, 0 neutro, unità della differenza]
+  const INDICI = [
+    ['brani', 'Brani generati', n0, 0, ''],
+    ['ore', 'Ore di musica buona', conUnita(' h'), 0, ' h'],
+    ['scartoPct', 'Brani scartati', conUnita('%'), -1, ' punti'],
+    ['voto', 'Voto medio', virgola, 1, ''],
+    ['coperturaPct', 'Brani votati', conUnita('%'), 1, ' punti'],
+    ['resa', 'Render per secondo di musica buona', conUnita(' s'), -1, ' s'],
+    ['renderMedio', 'Render medio per brano', conUnita(' s'), -1, ' s'],
+    ['rigeneratiPct', 'Brani rigenerati', conUnita('%'), -1, ' punti'],
+    ['durataPct', 'Durata ottenuta sulla richiesta', conUnita('%'), 0, ' punti'],
+    ['caricatiPct', 'Caricati su iBroadcast', conUnita('%'), 1, ' punti'],
+    ['ascolti', 'Ascolti dei brani del periodo', n0, 0, ''],
+    ['errori', 'Errori', n0, -1, ''],
+  ];
+  function indiciHtml(adesso, prima) {
+    return INDICI.map(([c, nome, formato, verso, unita]) => {
+      let sotto = c === 'voto' && adesso.votati ? 'su ' + adesso.votati + ' voti' : '', classe = '';
+      if (prima && adesso[c] !== null && prima[c] !== null) {
+        const d = Math.round((adesso[c] - prima[c]) * 100) / 100;
+        if (d && verso) classe = d * verso > 0 ? 'su' : 'giu';
+        sotto = (sotto ? sotto + ' · ' : '') + (d ? (d > 0 ? '↑ +' : '↓ ') + virgola(d) + unita : '→ invariato');
+      }
+      return `<div><small>${nome}</small><b>${esc(formato(adesso[c]))}</b><em class="${classe}">${esc(sotto)}</em></div>`;
+    }).join('');
+  }
+
+  const COL_GENERI = [['genere', 'Genere', String], ['brani', 'Brani', n0], ['scartoPct', 'Scartati', conUnita('%')], ['voto', 'Voto', virgola], ['votati', 'Voti', n0], ['resa', 'Resa', virgola], ['renderMedio', 'Render (s)', virgola], ['rigeneratiPct', 'Rigenerati', conUnita('%')], ['ore', 'Ore', virgola], ['ascolti', 'Ascolti', n0]];
+  const ESITI = { migliora: ['↑', 'var(--ok)'], stabile: ['→', 'var(--muted)'], peggiora: ['↓', 'var(--danger)'], 'dati insufficienti': ['–', 'var(--faint)'] };
+  const AN_FILTRI = { ambito: 'aAmbito', famiglia: 'aFamiglia', genere: 'aGenere', tipo: 'aTipo', struttura: 'aStruttura' };
+  const an = { richiesta: 0, dati: null, ordine: 'brani', verso: -1 };
+
+  function disegnaGeneriAn() {
+    const righe = [...an.dati.perGenere].sort((a, b) => {
+      const x = a[an.ordine], y = b[an.ordine];
+      if (x === null || y === null) return (x === null) - (y === null); // i valori mancanti in fondo
+      return (typeof x === 'string' ? x.localeCompare(y) : x - y) * an.verso;
+    });
+    const freccia = (c) => (an.ordine === c ? (an.verso > 0 ? ' ↑' : ' ↓') : '');
+    $('#aGeneri').innerHTML = !righe.length ? '<div class="empty">Nessun brano nel periodo</div>' : '<table class="an-gen"><thead><tr>' +
+      COL_GENERI.map(([c, nome]) => `<th${an.ordine === c ? ` aria-sort="${an.verso > 0 ? 'ascending' : 'descending'}"` : ''} class="${c === 'genere' ? '' : 'num'}"><button type="button" data-ordina="${c}">${nome}${freccia(c)}</button></th>`).join('') + '</tr></thead><tbody>' +
+      righe.map((r) => '<tr>' + COL_GENERI.map(([c, , formato]) => c === 'genere'
+        ? `<td><button type="button" data-genere="${esc(r.genere)}">${esc(r.genere)}</button></td>`
+        : `<td class="num">${esc(formato(r[c]))}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+  }
+
+  function disegnaAndamento() {
+    const r = an.dati;
+    const voce = (nome, esito) => { const [segno, c] = ESITI[esito] || ESITI['dati insufficienti']; return `<div><i style="color:${c}" aria-hidden="true">${segno}</i>${nome}: <b>${esc(esito)}</b></div>`; };
+    $('#aEsito').innerHTML = voce('Voto', r.esito.voto) + voce('Scarti', r.esito.scarti);
+    const filtrato = Object.values(AN_FILTRI).some((id) => $('#' + id).value);
+    $('#aNota').textContent = 'Passo ' + (r.passo === 'ora' ? 'per ora' : 'per giorno') +
+      ($('#aPasso').value && $('#aPasso').value !== r.passo ? ' (oltre 7 giorni i punti per ora non sono disponibili)' : '') +
+      (r.troncato ? ' · i grafici mostrano solo gli intervalli più recenti, gli indici coprono tutto il periodo' : '') +
+      (filtrato ? ' · i filtri su ambito, famiglia, genere, tipo e struttura non si applicano agli errori' : '');
+    $('#aConfronto').textContent = r.precedente ? 'variazione sul periodo precedente di pari durata' : $('#aPeriodo').value ? 'nessun dato nel periodo precedente per il confronto' : 'tutto lo storico';
+    $('#aKpi').innerHTML = indiciHtml(r.riepilogo, r.precedente);
+
+    const p = r.punti, passo = r.passo, m = $('#aModifiche').checked ? r.modifiche : [];
+    $('#aProduzione').innerHTML = barreTempo(p, m, passo);
+    const linea = (id, campo, titolo, opz = {}) => { $(id).innerHTML = lineaTempo(p, m, campo, { titolo, passo, dettaglio: (x) => ` (${x.brani} brani)`, ...opz }); };
+    linea('#aVoto', 'voto', 'Voto medio', { min: 1, maxFisso: 5, vuoto: (x) => x.votati < 5, dettaglio: (x) => ` (${x.votati} voti)` });
+    linea('#aScarti', 'scartoPct', 'Brani scartati', { maxFisso: 100, formato: conUnita('%'), dettaglio: (x) => ` (${x.scartati} su ${x.brani})` });
+    linea('#aResa', 'resa', 'Secondi di render per secondo di musica buona');
+    linea('#aRender', 'renderMedio', 'Render medio per brano', { intero: true });
+    linea('#aRigenerati', 'rigeneratiPct', 'Brani rigenerati', { maxFisso: 100, formato: conUnita('%') });
+    linea('#aDurata', 'durataPct', 'Durata ottenuta sulla richiesta', { formato: conUnita('%') });
+    linea('#aOre', 'ore', 'Ore di musica buona');
+    linea('#aErrori', 'errori', 'Errori', { intero: true, dettaglio: () => '' });
+
+    $('#aDistribuzione').innerHTML = r.distribuzione.some(Boolean)
+      ? barre(r.distribuzione.map((n, i) => ({ etichetta: (i + 1) + '★', valore: n })), { h: 220 })
+      : '<div class="empty">Nessun voto nel periodo</div>';
+    $('#aMotivi').innerHTML = barreOrizz(r.motivi);
+    $('#aErroriTop').innerHTML = barreOrizz(r.erroriTop);
+    disegnaGeneriAn();
+
+    $('#aModTitolo').textContent = 'Modifiche nel periodo (' + r.modifiche.length + ')';
+    $('#aModElenco').innerHTML = r.modifiche.length ? '<table><tbody>' + [...r.modifiche].reverse().map((x) => `<tr><td>${esc(data(x.ts))}</td><td>${esc(x.sezione)}</td><td>${esc(x.chiave)}</td></tr>`).join('') + '</tbody></table>' : '<div class="empty">Nessuna modifica</div>';
+    const col = [['accettati', 'Accettati'], ['scartati', 'Scartati'], ['voto', 'Voto'], ['resa', 'Resa'], ['renderMedio', 'Render (s)'], ['rigeneratiPct', 'Rigen. %'], ['durataPct', 'Durata %'], ['ore', 'Ore'], ['errori', 'Errori']];
+    const pieni = p.filter((x) => x.brani || x.errori).reverse();
+    $('#aTabella').innerHTML = pieni.length ? '<table><thead><tr><th>Intervallo</th>' + col.map(([, n]) => `<th class="num">${n}</th>`).join('') + '</tr></thead><tbody>' +
+      pieni.map((x) => `<tr><td>${esc(quandoPunto(x.da, passo))}</td>` + col.map(([c]) => `<td class="num">${esc(virgola(x[c]))}</td>`).join('') + '</tr>').join('') + '</tbody></table>' : '<div class="empty">Nessun dato</div>';
+  }
+
+  function menuAndamento(opzioni) {
+    for (const [campo, id] of Object.entries(AN_FILTRI)) {
+      const sel = $('#' + id), scelto = sel.value;
+      const valori = scelto && !opzioni[campo].includes(scelto) ? [...opzioni[campo], scelto] : opzioni[campo];
+      // si ridisegna solo se cambia, così un menu aperto non si richiude a ogni aggiornamento
+      if (sel.dataset.voci === valori.join('|')) continue;
+      sel.dataset.voci = valori.join('|');
+      sel.innerHTML = sel.options[0].outerHTML + valori.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+      sel.value = scelto;
+    }
+  }
+
+  async function caricaAndamento() {
+    const n = ++an.richiesta;
+    const q = new URLSearchParams({ periodo: $('#aPeriodo').value, passo: $('#aPasso').value });
+    for (const [campo, id] of Object.entries(AN_FILTRI)) if ($('#' + id).value) q.set(campo, $('#' + id).value);
+    let r;
+    try { r = await leggi('/api/andamento?' + q); }
+    catch (e) { if (n === an.richiesta) $('#aEsito').innerHTML = '<span class="err">Impossibile leggere l\'andamento: ' + esc(e.message) + '</span>'; return; }
+    if (n !== an.richiesta) return; // è già partita una richiesta più recente
+    if (!r.riepilogo) { $('#aEsito').innerHTML = '<span class="err">Il gateway è di una versione precedente: va riavviato</span>'; return; }
+    an.dati = r;
+    menuAndamento(r.opzioni);
+    disegnaAndamento();
+  }
+  for (const id of ['aPeriodo', 'aPasso', 'aGenere', 'aTipo', 'aStruttura']) $('#' + id).addEventListener('change', caricaAndamento);
+  // cambiando ambito o famiglia le scelte più strette non valgono più
+  $('#aAmbito').addEventListener('change', () => { $('#aFamiglia').value = $('#aGenere').value = ''; caricaAndamento(); });
+  $('#aFamiglia').addEventListener('change', () => { $('#aGenere').value = ''; caricaAndamento(); });
+  $('#aModifiche').addEventListener('change', () => { if (an.dati) disegnaAndamento(); });
+  $('#aAzzera').addEventListener('click', () => {
+    for (const id of Object.values(AN_FILTRI)) $('#' + id).value = '';
+    $('#aPeriodo').value = '7'; $('#aPasso').value = ''; $('#aModifiche').checked = true;
+    caricaAndamento();
+  });
+  $('#aGeneri').addEventListener('click', (e) => {
+    const o = e.target.closest('button[data-ordina]'), g = e.target.closest('button[data-genere]');
+    if (o) {
+      const c = o.dataset.ordina;
+      an.verso = an.ordine === c ? -an.verso : c === 'genere' ? 1 : -1;
+      an.ordine = c;
+      disegnaGeneriAn();
+      $('#aGeneri').querySelector(`[data-ordina="${c}"]`).focus({ preventScroll: true });
+    } else if (g) { $('#aGenere').value = g.dataset.genere; caricaAndamento(); }
+  });
   setInterval(() => { if ($('#t-andamento').classList.contains('on')) caricaAndamento(); }, 30000);
 
   // ---------- navigazione ----------

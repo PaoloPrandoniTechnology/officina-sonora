@@ -199,7 +199,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && (req.url === '/api/andamento' || req.url.startsWith('/api/andamento?'))) {
       const q = new URLSearchParams(req.url.slice('/api/andamento'.length));
-      return rispondi(200, andamento.leggi({ genere: q.get('genere') || '', passo: q.get('passo') || '' }));
+      return rispondi(200, andamento.leggi(Object.fromEntries(q)));
     }
     if (req.method !== 'POST') return rispondi(405, { ok: false });
     const corpo = await leggiCorpo(req);

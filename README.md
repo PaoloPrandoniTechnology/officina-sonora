@@ -269,10 +269,22 @@ da correggere con l'ascolto.
 ### Andamento
 ![Andamento](docs/screenshots/14-andamento.png)
 
-Quattro grafici: voto medio, brani scartati, secondi di render per secondo di musica buona, errori.
-Passo per ora (48 ore) o per giorno (60 giorni). Il voto è collocato quando il brano è stato **generato**.
-Le linee tratteggiate indicano le tue modifiche e le nuove linee guida. Il giudizio confronta gli ultimi
-7 giorni con i 7 precedenti:
+**Filtri** (valgono per indici, grafici e tabella): periodo (24 ore, 48 ore, 7, 30, 90 giorni, tutto), passo,
+ambito, famiglia, genere, tipo e struttura. *Azzera filtri* torna agli ultimi 7 giorni. Gli errori seguono
+solo il periodo.
+
+| Parte | Cosa mostra |
+|---|---|
+| Indici del periodo | brani, ore di musica buona, scarti, voto medio, brani votati, secondi di render per secondo buono, render medio, rigenerati, durata ottenuta sulla richiesta, caricati, ascolti, errori; ognuno con la variazione sul periodo precedente di pari durata |
+| Grafici nel tempo | brani generati (accettati e scartati), voto, scarti, resa, render medio, rigenerati, durata ottenuta, ore, errori |
+| Riepiloghi | distribuzione dei voti, motivi di scarto, errori più frequenti |
+| Dettaglio per genere | tabella ordinabile; un clic sul nome filtra quel genere |
+| In fondo | elenco delle modifiche e dati dei grafici in tabella |
+
+Passo automatico: per ora se nel periodo c'è meno di una settimana di dati, altrimenti per giorno (oltre
+7 giorni sempre per giorno, al massimo 168 ore o 366 giorni). Voto e ascolti contano nel momento in cui il
+brano è stato **generato**. Le linee tratteggiate (disattivabili) indicano le tue modifiche e le nuove linee
+guida, una per intervallo. Il giudizio confronta gli ultimi 7 giorni con i 7 precedenti, con i filtri scelti:
 
 | Giudizio su | Minimo per periodo | Soglia di cambiamento |
 |---|---|---|

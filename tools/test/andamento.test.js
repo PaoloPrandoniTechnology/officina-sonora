@@ -99,7 +99,8 @@ test('andamento: soglia del voto senza arrotondamenti, giudizio uguale per ora e
   // 14 giorni di dati: i punti per ora sono solo 48, ma il giudizio usa tutti i brani
   const lista = [...conVoti(12, ripeti(10, 3)), ...conVoti(5, [...ripeti(7, 3), ...ripeti(3, 4)])];
   const per = (passo) => andamento.calcola({ brani: lista, errori: [], modifiche: [], genere: '', passo, ora: ORA }).esito;
-  assert.equal(andamento.calcola({ brani: lista, errori: [], modifiche: [], genere: '', passo: 'ora', ora: ORA }).punti.length, 48);
+  const orari = andamento.calcola({ brani: lista, errori: [], modifiche: [], genere: '', passo: 'ora', ora: ORA });
+  assert.deepEqual([orari.punti.length, orari.troncato], [168, true]);
   assert.deepEqual(per('ora'), per('giorno'));
   assert.equal(per('ora').voto, 'migliora');
 });
@@ -123,9 +124,30 @@ test('andamento: lista vuota e filtro genere', () => {
   assert.equal(tutti.punti.reduce((a, p) => a + p.errori, 0), 2);
   assert.equal(power.punti.reduce((a, p) => a + p.brani, 0), 2);
   assert.deepEqual(tutti.modifiche.map((m) => m.sezione), ['parametri']);
-  // storia sotto 7 giorni: passo automatico per ora, al massimo 48 punti
+  // storia sotto 7 giorni: passo automatico per ora, dal primo brano a adesso
   const auto = andamento.calcola({ brani: lista, errori, modifiche, genere: '', passo: '', ora: ORA });
   assert.equal(auto.passo, 'ora');
-  assert.equal(auto.punti.length, 48);
+  assert.deepEqual([auto.punti.length, auto.troncato], [74, false]);
   assert.ok(JSON.stringify(auto).indexOf('NaN') < 0);
+});
+
+test('andamento: filtro periodo, confronto con il periodo precedente e filtri combinati', () => {
+  const lista = [
+    ...brani(1, 3, (i) => ({ tipo: 'drone', ambito: 'yoga', scartato: i === 0, problemi: i === 0 ? ['durata 69s troppo corta rispetto a 260s'] : [], voto: i === 1 ? 5 : null, tentativi: i, richiesta_s: 250, caricato: i > 0, ascolti: 2 })),
+    ...brani(10, 2, () => ({ tipo: 'drone', ambito: 'yoga' })),
+    ...brani(1, 4, () => ({ tipo: 'loop', ambito: 'sottofondo', categoria: 'Power' })),
+  ];
+  const base = { brani: lista, errori: [{ ts: iso(ORA - GIORNO), key: 'x' }, { ts: iso(ORA - 9 * GIORNO), key: 'x' }], modifiche: [], ora: ORA };
+  const r = andamento.calcola({ ...base, periodo: '7', ambito: 'yoga', tipo: 'drone' });
+  assert.deepEqual([r.riepilogo.brani, r.riepilogo.scartati, r.precedente.brani, r.riepilogo.errori, r.precedente.errori], [3, 1, 2, 1, 1]);
+  assert.deepEqual([r.riepilogo.voto, r.riepilogo.coperturaPct, r.riepilogo.rigeneratiPct, r.riepilogo.durataPct, r.riepilogo.caricatiPct, r.riepilogo.ascolti], [5, 50, 66.7, 80, 100, 4]);
+  assert.deepEqual(r.distribuzione, [0, 0, 0, 0, 1]);
+  assert.deepEqual(r.motivi, [{ nome: 'durata #s troppo corta rispetto a #s', valore: 1 }]);
+  assert.deepEqual(r.erroriTop, [{ nome: 'x', valore: 1 }]);
+  assert.deepEqual(r.perGenere.map((g) => [g.genere, g.brani]), [['Yin', 3]]);
+  assert.equal(r.punti.reduce((a, p) => a + p.brani, 0), 3);
+  const tutto = andamento.calcola({ ...base, periodo: '' });
+  assert.deepEqual([tutto.riepilogo.brani, tutto.precedente], [9, null]);
+  // oltre 7 giorni il passo e' per giorno anche se richiesto per ora
+  assert.equal(andamento.calcola({ ...base, periodo: '30', passo: 'ora' }).passo, 'giorno');
 });
