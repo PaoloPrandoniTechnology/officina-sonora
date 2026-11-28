@@ -303,16 +303,21 @@ Le modifiche valgono dal brano successivo e sono registrate nello **Storico** co
 ![Generi: pesi](docs/screenshots/09-controllo-generi.png)
 ![Linee guida generali](docs/screenshots/10-controllo-guida.png)
 ![Linee guida di un genere](docs/screenshots/15-controllo-guida-genere.png)
+![Tempo e struttura](docs/screenshots/16-controllo-guida-tempo.png)
 ![Note per genere](docs/screenshots/11-controllo-note.png)
 ![Storico](docs/screenshots/12-controllo-storico.png)
 
 #### Linee guida a blocchi
-- **A sinistra** l'elenco dei generi con ricerca; il numero indica quante modifiche ha un genere, i sospesi sono
-  attenuati. *Tutti i generi* contiene le regole generali e le note per il sistema.
-- **In alto**, sempre visibile, il genere che stai modificando, con stato, fascia di bpm e *Torna al predefinito*.
-- **Stile del genere:** i blocchi, colorati per origine; un clic li toglie o li rimette. Sotto, l'esempio di prompt.
-- **Aggiungi o evita un termine:** per famiglia o con la ricerca; se il termine non c'è, la ricerca lo propone
-  come termine libero (bordo tratteggiato). Le voci si propongono solo ai generi vocali.
+Tre sottosezioni:
+
+- **Stile.** A sinistra l'elenco dei generi con ricerca (il numero indica le modifiche, i sospesi sono attenuati;
+  *Tutti i generi* contiene le regole generali). In alto, sempre visibile, il genere che stai modificando. I termini
+  del prompt sono ordinati per argomento e colorati per origine: un clic li toglie o li rimette; sotto, l'esempio di
+  prompt. Nel **Vocabolario** ogni termine ha **+** (aggiungi) e **−** (da evitare); un secondo clic annulla. Se un
+  termine non c'è, scrivilo nella ricerca. Le voci si possono aggiungere solo ai generi vocali.
+- **Tempo e struttura.** Tabella di tutti i generi con fascia di bpm, durata e strutture usate; un campo vuoto vale
+  il predefinito.
+- **Note.** Note per il sistema, lette dalla revisione automatica.
 - **Controlli:** blocchi di 2-60 caratteri, senza virgole, negazioni, BPM o tonalità; niente voci nei generi
   strumentali; massimo 8 aggiunte per ambito; avvisi se non resta uno strumento, se si esclude il genere o se i
   blocchi sono più di 25.

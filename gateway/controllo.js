@@ -91,7 +91,7 @@ function lettura() {
     generi: (leggiJson(CATALOGO, { categories: [] }).categories || []).map((c) => {
       const nome = c.name;
       const s = generiSalvati[nome] || {};
-      return { nome, etichetta: c.genere || nome, ambito: c.ambito || '', famiglia: c.famiglia || '', colore: (c.colori || [])[1] || '', peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
+      return { nome, etichetta: c.genere || nome, ambito: c.ambito || '', famiglia: c.famiglia || '', colore: (c.colori || [])[1] || '', bpm: c.bpm || [], strutture: c.strutture || [], peso: typeof s.peso === 'number' ? s.peso : 1, attivo: s.attivo !== false, brani: brani[nome] || 0, note: s.note || [] };
     }),
     guida: {
       versione: guida.versione || null,
@@ -102,6 +102,8 @@ function lettura() {
       stile_generi: guida.stile_generi || {},
       blocchi_generi: guida.blocchi_generi || {},
       bpm_range: guida.bpm_range || {},
+      durata_hint: guida.durata_hint || {},
+      struttura_pref: guida.struttura_pref || {},
     },
     vocabolario: leggiJson(VOCABOLARIO, { famiglie: {} }).famiglie,
     storico: righe.slice(-80).map((r) => JSON.parse(r)).reverse(),
@@ -264,16 +266,32 @@ function guida({ campo, valori, categoria, valore, ...blocchi }) {
     const prima = salvata.note || [];
     salvata.note = puliti;
     registra('linee guida', 'note', prima, puliti);
-  } else if (campo === 'bpm_range') {
-    if (!catalogoNomi().includes(categoria)) throw new Error(`genere sconosciuto: ${categoria}`);
-    const m = /^(\d{2,3})\s*-\s*(\d{2,3})$/.exec(String(valore || '').trim());
-    if (!m) throw new Error('bpm: formato "minimo-massimo", per esempio 50-70');
-    const a = Number(m[1]), b = Number(m[2]);
-    if (a < 30 || b > 200 || a >= b) throw new Error('bpm: valori tra 30 e 200 e minimo minore del massimo');
-    salvata.bpm_range = salvata.bpm_range || {};
-    const prima = salvata.bpm_range[categoria] || null;
-    salvata.bpm_range[categoria] = `${a}-${b}`;
-    registra('linee guida', `bpm ${categoria}`, prima, salvata.bpm_range[categoria]);
+  } else if (campo === 'bpm_range' || campo === 'durata_hint') {
+    // fascia "minimo-massimo" di un genere; vuota: torna al predefinito
+    categoria_(categoria);
+    const [nome, basso, alto] = campo === 'bpm_range' ? ['bpm', 30, 200] : ['durata', 60, 600];
+    const testo = String(valore || '').trim();
+    const mappa = (salvata[campo] = salvata[campo] || {});
+    const prima = mappa[categoria] || null;
+    if (!testo) delete mappa[categoria];
+    else {
+      const m = /^(\d{2,3})\s*-\s*(\d{2,3})$/.exec(testo);
+      if (!m) throw new Error(`${nome}: formato "minimo-massimo", per esempio ${nome === 'bpm' ? '50-70' : '150-210'}`);
+      const a = Number(m[1]), b = Number(m[2]);
+      if (a < basso || b > alto || a >= b) throw new Error(`${nome}: valori tra ${basso} e ${alto} e minimo minore del massimo`);
+      mappa[categoria] = `${a}-${b}`;
+    }
+    registra('linee guida', `${nome} ${categoria}`, prima, mappa[categoria] || null);
+  } else if (campo === 'struttura_pref') {
+    // strutture da usare per un genere; nessuna o tutte: predefinito
+    const cat = categoria_(categoria);
+    if (!Array.isArray(valori) || !valori.every((v) => (cat.strutture || []).includes(v))) throw new Error('strutture: scegline tra quelle del genere');
+    const mappa = (salvata.struttura_pref = salvata.struttura_pref || {});
+    const prima = mappa[categoria] || null;
+    const scelte = (cat.strutture || []).filter((s) => valori.includes(s));
+    if (!scelte.length || scelte.length === cat.strutture.length) delete mappa[categoria];
+    else mappa[categoria] = scelte;
+    registra('linee guida', `strutture ${categoria}`, prima, mappa[categoria] || null);
   } else throw new Error(`campo sconosciuto: ${campo}`);
   salvata.aggiornato = new Date().toISOString();
   salvata.versione = (salvata.versione || 1);

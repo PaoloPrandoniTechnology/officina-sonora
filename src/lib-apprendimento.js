@@ -316,32 +316,33 @@ function blocchiStile(cat, variante, strumenti, influenza, guidance, { bpm, tona
   const colore = variante && !(cat.en && variante.keywords === cat.stile) ? variante.keywords : '';
   const mio = (guidance.blocchi_generi || {})[cat.name] || {};
   const esclusi = new Set([...(guidance.style_avoid || []), ...(mio.esclusi || [])].map((s) => String(s).trim().toLowerCase()));
+  // [origine, termini, argomento]: l'argomento serve solo alla pagina Linee guida
   const gruppi = [
-    ['fisso', cat.vocale_senza_parole ? 'Wordless vocals' : 'Instrumental'],
-    ['catalogo', en.genre],
-    ...strumenti.map((s) => ['catalogo', (en.instruments || {})[s]]),
-    ['catalogo', colore],
-    ['catalogo', en.rhythm],
-    ['catalogo', en.mood],
-    ...[].concat(influenza || []).map((i) => ['catalogo', (en.influences || {})[i]]),
-    ['nota', note.map((d) => d.replace(/\.$/, '')).join(', ')],
-    ['generale', (guidance.style_extra || []).join(', ')],
-    ['tuo', (mio.aggiunti || []).join(', ')],
-    ['revisione', ((guidance.stile_generi || {})[cat.name] || []).join(', ')],
-    ['catalogo', en.space],
-    ['fisso', bpm ? `${bpm} BPM` : ''],
-    ['fisso', tonalitaInglese(tonalita)],
-    ['fisso', cat.vocale_senza_parole ? 'no lyrics' : 'no vocals'],
+    ['fisso', cat.vocale_senza_parole ? 'Wordless vocals' : 'Instrumental', 'fisso'],
+    ['catalogo', en.genre, 'genere'],
+    ...strumenti.map((s) => ['catalogo', (en.instruments || {})[s], 'strumenti']),
+    ['catalogo', colore, 'variante'],
+    ['catalogo', en.rhythm, 'ritmo'],
+    ['catalogo', en.mood, 'atmosfera'],
+    ...[].concat(influenza || []).map((i) => ['catalogo', (en.influences || {})[i], 'genere']),
+    ['nota', note.map((d) => d.replace(/\.$/, '')).join(', '), 'aggiunte'],
+    ['generale', (guidance.style_extra || []).join(', '), 'aggiunte'],
+    ['tuo', (mio.aggiunti || []).join(', '), 'aggiunte'],
+    ['revisione', ((guidance.stile_generi || {})[cat.name] || []).join(', '), 'aggiunte'],
+    ['catalogo', en.space, 'produzione'],
+    ['fisso', bpm ? `${bpm} BPM` : '', 'fisso'],
+    ['fisso', tonalitaInglese(tonalita), 'fisso'],
+    ['fisso', cat.vocale_senza_parole ? 'no lyrics' : 'no vocals', 'fisso'],
   ];
   // il motore pesa le parole: ogni frase compare una volta sola
   const viste = new Set();
   const blocchi = [];
-  for (const [origine, valore] of gruppi) {
+  for (const [origine, valore, argomento] of gruppi) {
     for (const testo of String(valore || '').split(',').map((s) => s.trim()).filter(Boolean)) {
       const chiave = testo.toLowerCase();
       if (viste.has(chiave)) continue;
       viste.add(chiave);
-      blocchi.push({ testo, origine, escluso: origine !== 'fisso' && esclusi.has(chiave) });
+      blocchi.push({ testo, origine, argomento, escluso: origine !== 'fisso' && esclusi.has(chiave) });
     }
   }
   return blocchi;

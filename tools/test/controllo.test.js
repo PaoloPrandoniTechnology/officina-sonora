@@ -59,3 +59,16 @@ test('controllo: anteprima dello stile di un genere', () => {
   assert.match(s.esempio, /^Instrumental, .*BPM.*no vocals$/);
   assert.throws(() => controllo.stile('Inventato'), /sconosciuto/);
 });
+
+test('controllo: fasce e strutture di ogni genere, con i rifiuti', async () => {
+  const d = controllo.lettura();
+  for (const g of d.generi) assert.ok(g.bpm.length === 2 && g.strutture.length, g.nome);
+  assert.equal(typeof d.guida.durata_hint, 'object');
+  assert.equal(typeof d.guida.struttura_pref, 'object');
+  for (const corpo of [{ campo: 'durata_hint', categoria: 'Meditazione', valore: '30-900' }, { campo: 'durata_hint', categoria: 'Inventato', valore: '' },
+    { campo: 'bpm_range', categoria: 'Meditazione', valore: 'veloce' }, { campo: 'struttura_pref', categoria: 'Meditazione', valori: ['loop'] },
+    { campo: 'struttura_pref', categoria: 'Meditazione', valori: 'onda' }]) {
+    assert.equal((await controllo.gestisci('/api/controllo/guida', corpo)).codice, 400, JSON.stringify(corpo));
+  }
+  assert.ok(controllo.stile('Blues-shuffle-strumentale').blocchi.every((b) => b.argomento));
+});
