@@ -1,5 +1,5 @@
-// Editor della Composizione: il modello di ogni voce (letto e riscritto nel formato del compositore), la mini
-// timeline e i pulsanti. Si sceglie, non si scrive: ogni operazione lascia la voce valida.
+// Modello di ogni voce della Composizione (letto e riscritto nel formato del compositore) e la mini timeline
+// dell'elenco. Il banco di lavoro dove si modifica sta in composizione-banco.js.
 (function (radice) {
   'use strict';
   const NOTE = ['Do', 'Do#', 'Re', 'Mib', 'Mi', 'Fa', 'Fa#', 'Sol', 'Lab', 'La', 'Sib', 'Si'];
@@ -53,48 +53,40 @@
   }));
   const scriviNote = (battute) => battute.map((b) => b.map((f) => `${f.pausa ? '-' : nomeNota(f.midi)}:${f.d}`).join(' ')).join(' | ');
 
-  // dopo ogni modifica: almeno una nota, appoggiatura mai sulle pause, anticipo solo sull'ultima nota
-  function sistema(battuta) {
-    if (battuta.every((f) => f.pausa)) { battuta[0].pausa = false; if (battuta[0].midi === null) battuta[0].midi = 60; }
-    battuta.forEach((f, i) => {
-      if (f.pausa) { f.app = false; f.ant = false; if ('midi' in f) f.midi = null; if ('g' in f) f.g = 'x'; }
-      if (i < battuta.length - 1) f.ant = false;
-    });
-    return battuta;
-  }
-  const nuovaPausa = (come, d) => ({ ...come, d, pausa: true, app: false, ant: false, ...('midi' in come ? { midi: null } : {}), ...('g' in come ? { g: 'x' } : {}) });
-  const massimo = (battuta, i) => 32 - battuta.slice(0, i).reduce((a, f) => a + f.d, 0);
-  // allungare mangia le figure che seguono; accorciare lascia il tempo avanzato in pausa
-  function cambiaDurata(battuta, i, d) {
-    const f = battuta[i];
-    if (d < 1 || d > massimo(battuta, i)) return battuta;
-    let manca = d - f.d;
-    f.d = d;
-    while (manca > 0) {
-      const poi = battuta[i + 1];
-      if (poi.d <= manca) { manca -= poi.d; battuta.splice(i + 1, 1); }
-      else { poi.d -= manca; manca = 0; }
+  // ---------- note posizionate: è così che si lavora sulla timeline (le pause sono gli spazi vuoti) ----------
+  const inNote = (battuta) => {
+    let pos = 0;
+    const out = [];
+    for (const { d, pausa, ...resto } of battuta) {
+      if (!pausa) out.push({ ...resto, pos, d });
+      pos += d;
     }
-    if (manca < 0) {
-      const poi = battuta[i + 1];
-      if (poi && poi.pausa) poi.d -= manca;
-      else battuta.splice(i + 1, 0, nuovaPausa(f, -manca));
+    return out;
+  };
+  // di nuovo figure che sommano a 32; l'anticipo vale solo per la nota che tocca la fine della battuta
+  function inFigure(note, tipo) {
+    const pausa = (d) => ({ d, pausa: true, app: false, ant: false, ...(tipo === 'richiamo' ? { midi: null } : {}), ...(tipo === 'assolo' ? { g: 'x' } : {}) });
+    const out = [];
+    let pos = 0;
+    for (const { pos: da, ...n } of [...note].sort((a, b) => a.pos - b.pos)) {
+      if (da > pos) out.push(pausa(da - pos));
+      out.push({ ...n, pausa: false, app: !!n.app, ant: !!n.ant && da + n.d === 32 });
+      pos = da + n.d;
     }
-    return sistema(battuta);
+    if (pos < 32) out.push(pausa(32 - pos));
+    return out;
   }
-  function dividi(battuta, i) {
-    const f = battuta[i];
-    if (f.d < 2) return battuta;
-    const meta = Math.ceil(f.d / 2);
-    battuta.splice(i + 1, 0, { ...f, d: f.d - meta, app: false });
-    f.d = meta; f.ant = false;
-    return sistema(battuta);
-  }
-  function unisci(battuta, i) {
-    if (i + 1 >= battuta.length) return battuta;
-    const [poi] = battuta.splice(i + 1, 1);
-    battuta[i].d += poi.d; battuta[i].ant = poi.ant;
-    return sistema(battuta);
+  // mette una nota in una battuta a voce sola: le note che copre si accorciano o spariscono
+  function posa(note, nuova) {
+    const fine = nuova.pos + nuova.d;
+    const out = [];
+    for (const n of note) {
+      const sua = n.pos + n.d;
+      if (sua <= nuova.pos || n.pos >= fine) out.push(n);
+      else if (n.pos < nuova.pos) out.push({ ...n, d: nuova.pos - n.pos });
+      else if (sua > fine) out.push({ ...n, pos: fine, d: sua - fine });
+    }
+    return [...out, nuova].sort((a, b) => a.pos - b.pos);
   }
 
   // ---------- forme ----------
@@ -119,40 +111,32 @@
     return { testo: scriviForma(m.sezioni) };
   }
 
-  const modello = { NOTE, DURATE, MIN, MAX, GRADI, TIPI, SEZ, durataTesto, nomeNota, smonta, monta, nomeAccordo, noteAccordo, leggiAccordi, scriviAccordi, leggiRitmo, scriviRitmo, scriviGesti, leggiNote, scriviNote, sistema, massimo, cambiaDurata, dividi, unisci, leggiForma, scriviForma, modelloDi, campiDi };
+  const modello = { NOTE, DURATE, MIN, MAX, GRADI, TIPI, SEZ, durataTesto, nomeNota, smonta, monta, nomeAccordo, noteAccordo, leggiAccordi, scriviAccordi, leggiRitmo, scriviRitmo, scriviGesti, leggiNote, scriviNote, inNote, inFigure, posa, leggiForma, scriviForma, modelloDi, campiDi };
   if (typeof module !== 'undefined') module.exports = modello;
   if (!radice) return;
 
   // ---------- timeline (usata nell'elenco, in piccolo, e nell'editor) ----------
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  // blocco: largo quanto dura; tasto se si può scegliere, altrimenti solo disegno
-  function blocco({ peso, testo, sotto = '', classe = '', dati = null, scelto = false, etichetta = '', stile = '' }) {
-    const attr = dati ? ` data-t="${dati}" aria-pressed="${scelto}" aria-label="${esc(etichetta || testo)}"` : '';
-    const el = dati ? 'button type="button"' : 'div';
-    return `<${el} class="tl-blocco ${classe}" style="flex:${peso} 1 0${stile ? ';' + stile : ''}"${attr} title="${esc(etichetta)}"><b>${esc(testo)}</b>${sotto ? `<span>${esc(sotto)}</span>` : ''}</${dati ? 'button' : 'div'}>`;
-  }
+  const blocco = ({ peso, testo, sotto = '', classe = '', etichetta = '', stile = '' }) => `<div class="tl-blocco ${classe}" style="flex:${peso} 1 0${stile ? ';' + stile : ''}" title="${esc(etichetta)}"><b>${esc(testo)}</b>${sotto ? `<span>${esc(sotto)}</span>` : ''}</div>`;
   const altezza = (midi) => (midi === null ? '' : `--alto:${Math.round(((midi - MIN) / (MAX - MIN)) * 100)}%`);
 
-  // modello di una voce: { tipo, accordi?, figure?, sezioni? } e la scelta corrente [battuta, elemento, corsia]
-  function timeline(m, { scelta = null, tonica = 0, gesti = {} } = {}) {
-    const attivo = (c, b, i) => !!scelta && scelta[0] === c && scelta[1] === b && scelta[2] === i;
-    const mini = !scelta;
+  // la mini timeline dell'elenco: { tipo, accordi?, figure?, sezioni? }
+  function timeline(m, { tonica = 0, gesti = {} } = {}) {
     if (m.sezioni) {
-      return `<div class="tl tl-forma${mini ? ' mini' : ''}"><div class="tl-corsia">${m.sezioni.map((s, i) => blocco({ peso: s.battute, testo: SEZ[s.ruolo] || s.ruolo, sotto: `${s.battute} batt.${s.priorita ? ` · extra ${s.priorita}` : ''}`, classe: `ruolo-${s.ruolo}${s.priorita ? ' extra' : ''}`, dati: mini ? null : `s:0:${i}`, scelto: attivo('s', 0, i), etichetta: `${SEZ[s.ruolo] || s.ruolo}, ${s.battute} battute, ${s.priorita ? 'entra se la durata lo permette' : 'sempre presente'}` })).join('')}</div><i class="tl-testa" hidden></i></div>`;
+      return `<div class="tl tl-forma mini"><div class="tl-corsia">${m.sezioni.map((s) => blocco({ peso: s.battute, testo: SEZ[s.ruolo] || s.ruolo, sotto: `${s.battute} batt.${s.priorita ? ` · extra ${s.priorita}` : ''}`, classe: `ruolo-${s.ruolo}${s.priorita ? ' extra' : ''}`, etichetta: `${SEZ[s.ruolo] || s.ruolo}, ${s.battute} battute, ${s.priorita ? 'entra se la durata lo permette' : 'sempre presente'}` })).join('')}</div></div>`;
     }
     const quante = Math.max(m.accordi ? m.accordi.length : 0, m.figure ? m.figure.length : 0);
     const colonne = Array.from({ length: quante }, (_, b) => {
       const accordi = m.accordi && m.accordi[b];
       const figure = m.figure && m.figure[b];
       return `<div class="tl-battuta"><small>${b + 1}</small>
-        ${accordi ? `<div class="tl-corsia tl-accordi">${accordi.map((a, i) => { const c = smonta(a); return blocco({ peso: 1, testo: a, sotto: nomeAccordo(c, tonica), classe: 'accordo', dati: mini ? null : `a:${b}:${i}`, scelto: attivo('a', b, i), etichetta: `Battuta ${b + 1}, accordo ${a}, ${nomeAccordo(c, tonica)}` }); }).join('')}</div>` : ''}
-        ${figure ? `<div class="tl-corsia ${m.tipo === 'richiamo' ? 'tl-note' : 'tl-ritmo'}">${figure.map((f, i) => {
+        ${accordi ? `<div class="tl-corsia tl-accordi">${accordi.map((a) => blocco({ peso: 1, testo: a, sotto: nomeAccordo(smonta(a), tonica), classe: 'accordo', etichetta: `Battuta ${b + 1}, accordo ${a}` })).join('')}</div>` : ''}
+        ${figure ? `<div class="tl-corsia ${m.tipo === 'richiamo' ? 'tl-note' : 'tl-ritmo'}">${figure.map((f) => {
           const testo = f.pausa ? '–' : m.tipo === 'richiamo' ? nomeNota(f.midi) : f.g !== undefined ? (gesti[f.g] ? gesti[f.g][0] : f.g) : (f.app ? '↘ ' : '') + '♪' + (f.ant ? ' ⌒' : '');
-          const lunga = `Battuta ${b + 1}, ${f.pausa ? 'pausa' : m.tipo === 'richiamo' ? nomeNota(f.midi) : 'nota'}, durata ${durataTesto(f.d)}${f.app ? ', appoggiatura' : ''}${f.ant ? ', anticipo' : ''}${f.g && gesti[f.g] ? `, ${gesti[f.g][1]}` : ''}`;
-          return blocco({ peso: f.d, testo, sotto: mini ? '' : durataTesto(f.d), classe: `figura${f.pausa ? ' pausa' : ''}`, dati: mini ? null : `f:${b}:${i}`, scelto: attivo('f', b, i), etichetta: lunga, stile: m.tipo === 'richiamo' ? altezza(f.midi) : '' });
+          return blocco({ peso: f.d, testo, classe: `figura${f.pausa ? ' pausa' : ''}`, etichetta: `Battuta ${b + 1}, durata ${durataTesto(f.d)}`, stile: m.tipo === 'richiamo' ? altezza(f.midi) : '' });
         }).join('')}</div>` : ''}</div>`;
     }).join('');
-    return `<div class="tl${mini ? ' mini' : ''}" style="--colonne:${m.tipo === 'motivo' || m.tipo === 'cadenza' ? 2 : m.tipo === 'assolo' ? 1 : 4}">${colonne}<i class="tl-testa" hidden></i></div>`;
+    return `<div class="tl mini" style="--colonne:${m.tipo === 'motivo' || m.tipo === 'cadenza' ? 2 : m.tipo === 'assolo' ? 1 : 4}">${colonne}</div>`;
   }
   radice.EditorComposizione = { ...modello, esc, timeline, modelloDi, campiDi };
 })(typeof window !== 'undefined' ? window : null);

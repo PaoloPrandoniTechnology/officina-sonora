@@ -130,31 +130,44 @@ test('editor: ogni voce di serie, letta e riscritta, resta identica per il compo
   }
 });
 
-test('editor: qualsiasi sequenza di pulsanti lascia battute complete e voci valide', () => {
-  let seme = 7;
+test('editor: note posizionate e figure sono la stessa cosa, per ogni voce di serie', () => {
+  for (const v of M.unisci({}).filter((x) => ['motivo', 'cadenza', 'assolo', 'richiamo'].includes(x.tipo))) {
+    const m = Ed.modelloDi(v);
+    const figure = m.figure.map((b) => Ed.inFigure(Ed.inNote(b), v.tipo));
+    assert.deepEqual(Ed.campiDi({ ...m, figure }), Ed.campiDi(m), v.id);
+  }
+});
+
+test('editor: posare, spostare e allungare note a caso lascia battute complete a voce sola', () => {
+  let seme = 11;
   const caso = (n) => { seme = (seme * 48271) % 2147483647; return seme % n; };
   for (const tipo of ['motivo', 'assolo', 'richiamo']) {
     const base = M.unisci({}).find((v) => v.tipo === tipo);
     const m = Ed.modelloDi(base);
+    const note = m.figure.map(Ed.inNote);
     for (let passo = 0; passo < 600; passo++) {
-      const bar = m.figure[caso(m.figure.length)], i = caso(bar.length), azione = caso(6);
-      if (azione === 0) Ed.cambiaDurata(bar, i, 1 + caso(32));
-      else if (azione === 1) Ed.dividi(bar, i);
-      else if (azione === 2) Ed.unisci(bar, i);
-      else if (azione === 3) { bar[i].pausa = !bar[i].pausa; if (tipo === 'richiamo') bar[i].midi = bar[i].pausa ? null : Ed.MIN + caso(37); Ed.sistema(bar); }
-      else if (azione === 4 && !bar[i].pausa) { bar[i].app = !bar[i].app; Ed.sistema(bar); }
-      else if (azione === 5 && !bar[i].pausa) { bar[i].ant = !bar[i].ant; Ed.sistema(bar); }
-      for (const b of m.figure) assert.equal(b.reduce((a, f) => a + f.d, 0), 32, `${tipo} ${passo}`);
-      assert.doesNotThrow(() => M.controlla({ ...base, ...Ed.campiDi(m) }), `${tipo} passo ${passo}: ${JSON.stringify(Ed.campiDi(m))}`);
+      const b = caso(note.length), pos = caso(32), d = 1 + caso(32 - pos);
+      const nuova = { pos, d, app: !caso(4), ant: !caso(4), ...(tipo === 'richiamo' ? { midi: Ed.MIN + caso(37) } : {}), ...(tipo === 'assolo' ? { g: 'xpnascr'[caso(7)] } : {}) };
+      if (caso(5) === 0 && note[b].length > 1) note[b].splice(caso(note[b].length), 1); else note[b] = Ed.posa(note[b], nuova);
+      note[b].forEach((n, i) => assert.ok(n.d >= 1 && n.pos >= 0 && n.pos + n.d <= 32 && (!i || n.pos >= note[b][i - 1].pos + note[b][i - 1].d), `${tipo} ${passo}: ${JSON.stringify(note[b])}`));
+      const campi = Ed.campiDi({ ...m, figure: note.map((x) => Ed.inFigure(x, tipo)) });
+      assert.doesNotThrow(() => M.controlla({ ...base, ...campi }), `${tipo} passo ${passo}: ${JSON.stringify(campi)}`);
     }
   }
 });
 
-test('editor: allungare mangia le figure dopo, accorciare lascia una pausa', () => {
-  const [bar] = Ed.leggiRitmo('8 8 8 8');
-  assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 0, 20)]), '20 4 8');
-  assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 0, 4)]), '4 -16 4 8');
-  assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 3, 32)]), '4 -16 4 8', 'oltre la fine della battuta non si va');
+test('editor: una nota posata sopra accorcia, sposta o cancella quelle sotto', () => {
+  const n = (pos, d) => ({ pos, d });
+  assert.deepEqual(Ed.posa([n(0, 8), n(8, 8), n(16, 16)], n(4, 16)), [n(0, 4), n(4, 16), n(20, 12)]);
+  assert.deepEqual(Ed.posa([n(0, 32)], n(8, 8)), [n(0, 8), n(8, 8)]);
+  assert.equal(Ed.scriviRitmo([Ed.inFigure([{ pos: 4, d: 4 }, { pos: 24, d: 8, ant: true }], 'motivo')]), '-4 4 -16 8~');
+});
+
+test('prova di una forma: tante battute quante ne sono disegnate, per ogni forma di serie', () => {
+  for (const v of M.unisci({}).filter((x) => x.tipo === 'forma')) {
+    const attese = M.formaDi(v.testo).reduce((a, x) => a + x.battute, 0);
+    assert.equal(A.analizza(G.gestisci('prova', v).abc).battute, attese, v.id);
+  }
 });
 
 // ---- timeline di riproduzione: ciò che mostra è ciò che si sente ----

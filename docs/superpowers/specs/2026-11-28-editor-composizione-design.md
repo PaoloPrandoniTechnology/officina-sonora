@@ -31,3 +31,8 @@ Una finestra sempre uguale, in tre passi numerati:
 | Formati salvati invariati; controlli del gateway invariati | nessuna migrazione, una sola verità |
 | Modello separato (`composizione-editor.js`), provato su tutte le voci di serie | l'editor non deve alterare ciò che non si tocca |
 | Si scrive solo il nome di richiami e forme, già precompilato | è testo libero, non può rompere nulla |
+
+## Revisione: banco di lavoro
+Dopo la prova: l'editor a pulsanti non permetteva di agire sulla timeline né di scorrerla. Sostituito da un banco
+ispirato ai piano roll (righello con cursore, corsia accordi, griglia delle note, Play/Pausa e Stop): si lavora a
+note posizionate, le pause sono gli spazi vuoti; i formati salvati non cambiano (`composizione-banco.js`).

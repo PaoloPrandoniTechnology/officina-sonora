@@ -99,6 +99,14 @@
     };
   }
 
+  // programma sull'orologio audio tutto ciò che suona dal secondo "da" a "fino"
+  function programma(ctx, ev, inizio, da, fino = Infinity) {
+    const nota = voce(ctx);
+    const metti = (x, midi, forma, volume) => { const a = Math.min(x.t + x.durata, fino); const t = Math.max(x.t, da); if (a - t > 0.02) nota(midi, inizio + t, a - t, forma, volume); };
+    for (const a of ev.accordi) { metti(a, 36 + a.basso, 'triangle', 0.11); for (const n of a.note) metti(a, 48 + n, 'sine', 0.05); }
+    for (const x of ev.note) metti(x, x.midi, 'triangle', 0.22);
+  }
+
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const TESTA = 0.3;          // la riga ferma, a questa frazione della larghezza
   const BATTUTE_IN_VISTA = 2.6;
@@ -188,11 +196,8 @@
     function suonaDa(da) {
       chiudiAudio();
       ctx = new AudioContext();
-      const nota = voce(ctx);
       inizio = ctx.currentTime + 0.15 - da;
-      const metti = (x, midi, forma, volume) => { const a = x.t + x.durata; if (a > da + 0.02) { const t = Math.max(x.t, da); nota(midi, inizio + t, a - t, forma, volume); } };
-      for (const a of ev.accordi) { metti(a, 36 + a.basso, 'triangle', 0.11); for (const n of a.note) metti(a, 48 + n, 'sine', 0.05); }
-      for (const x of ev.note) metti(x, x.midi, 'triangle', 0.22);
+      programma(ctx, ev, inizio, da);
       finito = false;
       el('pausa').textContent = '❚❚ Pausa';
       mostra(da);
@@ -251,5 +256,5 @@
     return { ferma, eventi: ev };
   }
 
-  radice.LettoreComposizione = { eventi, posizione, nomeAccordo, apri, voce };
+  radice.LettoreComposizione = { eventi, posizione, partiAccordo, nomeAccordo, tastiDi, tempoUdibile, apri, voce, programma, tastiera, leggiSincronia };
 })(typeof window !== 'undefined' ? window : null);

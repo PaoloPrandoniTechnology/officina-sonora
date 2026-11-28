@@ -25,7 +25,7 @@ process.on('uncaughtException', (e) => {
 });
 const STATICI = { '/dashboard': ['dashboard.html', 'text/html'], '/dashboard.css': ['dashboard.css', 'text/css'], '/dashboard.js': ['dashboard.js', 'text/javascript'],
   '/coda.js': ['coda.js', 'text/javascript'], '/lettore.js': ['lettore.js', 'text/javascript'], '/lettore.css': ['lettore.css', 'text/css'],
-  '/score-pagina.js': ['score-pagina.js', 'text/javascript'], '/composizione-pagina.js': ['composizione-pagina.js', 'text/javascript'], '/composizione-editor.js': ['composizione-editor.js', 'text/javascript'], '/composizione-lettore.js': ['composizione-lettore.js', 'text/javascript'], '/score.css': ['score.css', 'text/css'] };
+  '/score-pagina.js': ['score-pagina.js', 'text/javascript'], '/composizione-pagina.js': ['composizione-pagina.js', 'text/javascript'], '/composizione-editor.js': ['composizione-editor.js', 'text/javascript'], '/composizione-lettore.js': ['composizione-lettore.js', 'text/javascript'], '/composizione-banco.js': ['composizione-banco.js', 'text/javascript'], '/score.css': ['score.css', 'text/css'] };
 const MAX_CORPO = 300 * 1024 * 1024;
 
 const PORT = process.env.OFS_PORTA || 5790;

@@ -106,7 +106,10 @@ function provaForma(p, campi, genere) {
   const cat = catalogo(p).find((c) => c.name === scelto.nome);
   const materiale = Materiale.pronto(utente(p));
   materiale.forme.prova = Materiale.formaDi(campi.testo);
-  const r = Estro.componi({ cat, bpm: Math.round((cat.bpm[0] + cat.bpm[1]) / 2), tonalita: cat.tonalita[0], durata_s: 180, estro: cat.estro, seed: crypto.randomInt(1e9), materiale, formaForzata: 'prova', candidati: 8 });
+  const bpm = Math.round((cat.bpm[0] + cat.bpm[1]) / 2);
+  // la durata è quella di tutta la forma: la prova ha una battuta per ogni battuta disegnata
+  const durata = (materiale.forme.prova.reduce((a, x) => a + x.battute, 0) * 240) / bpm;
+  const r = Estro.componi({ cat, bpm, tonalita: cat.tonalita[0], durata_s: durata, estro: cat.estro, seed: crypto.randomInt(1e9), materiale, formaForzata: 'prova', candidati: 4 });
   return { abc: r.abc, genere: scelto.etichetta };
 }
 

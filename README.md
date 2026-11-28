@@ -161,7 +161,7 @@ Ogni voce dell'elenco ha una **mini timeline**: la riconosci a colpo d'occhio.
 | Pulsante | Cosa fa |
 |---|---|
 | **Ascolta** | apre la [timeline di riproduzione](#la-timeline-di-riproduzione) e suona la voce: per motivi e assoli su un giro di prova, per le forme un brano intero. Serve a giudicare note e ritmo, **non** il suono finale |
-| **Modifica** | apre l'[editor guidato](#leditor-in-tre-passi) |
+| **Modifica** | apre il [banco di lavoro](#il-banco-di-lavoro) |
 | **Duplica** | parte da una copia per crearne una tua |
 | **Spegni / Accendi** | il compositore non la usa più, senza cancellarla. Se un gruppo resta tutto spento, usa le voci di serie |
 | **Ripristina** | toglie la tua modifica a una voce di serie |
@@ -169,8 +169,8 @@ Ogni voce dell'elenco ha una **mini timeline**: la riconosci a colpo d'occhio.
 
 #### La timeline di riproduzione
 
-Pensata per chi non legge la musica. Durante l'ascolto prende il posto della voce (e, nell'editor, dei pulsanti):
-si guarda una cosa sola. *Chiudi* fa tornare tutto.
+Pensata per chi non legge la musica: è l'ascolto **dall'elenco**. Prende il posto della voce, così si guarda una
+cosa sola; *Chiudi* fa tornare tutto. Mentre modifichi si ascolta invece dal [banco di lavoro](#il-banco-di-lavoro).
 
 ![L'ascolto: nastro che scorre, riga ferma e tastiera accesa](docs/screenshots/41-composizione-ascolto.png)
 
@@ -181,28 +181,47 @@ si guarda una cosa sola. *Chiudi* fa tornare tutto.
 | **Tastiera** | in **rosso** la nota della melodia, in **blu** i tasti dell'accordo, con il nome sul tasto |
 | Barra sottile | tutto l'ascolto: premi un punto (o usa le frecce) per saltare |
 | *Pausa* · ↺ · *Chiudi* | ferma e riprende, ricomincia, chiude |
-| **Sincronia** | la riga segue ciò che la scheda audio sta facendo uscire; se con le tue cuffie (tipico quelle senza fili) arriva prima o dopo il suono, correggila di 50 ms alla volta: il valore resta memorizzato nel browser |
+| **Sincronia** | la riga segue ciò che la scheda audio sta facendo uscire (vale anche per il banco di lavoro); se con le tue cuffie (tipico quelle senza fili) arriva prima o dopo il suono, correggila di 50 ms alla volta: il valore resta memorizzato nel browser |
 
 Le spiegazioni stanno nei **suggerimenti**, che compaiono solo passando sopra: il **?** accanto alla nota, la
 tastiera, la barra, *Sincronia* e, nell'editor, le etichette sottolineate a puntini (*Grado*, *Durata*,
 *Movimento*…).
 
-#### L'editor in tre passi
+#### Il banco di lavoro
 
-![L'editor degli accordi: dove si usa, timeline e pulsanti](docs/screenshots/39-composizione-modifica.png)
+*Modifica*, *Duplica* e *Nuovo* aprono un banco a tutto schermo, come nei programmi di musica.
 
-| Passo | Cosa fai |
+![Il banco di lavoro di un richiamo: riproduzione, righello, accordi, griglia delle note e tastiera](docs/screenshots/40-composizione-richiamo.png)
+
+| Zona | Cosa fa |
 |---|---|
-| **1 Dove si usa** | stile, parte, modo o andamento; per richiami e forme anche il nome (l'unica cosa che si scrive). Sotto leggi in quali generi si sentirà |
-| **2 Componi** | premi un elemento sulla **timeline**: sotto compaiono solo i pulsanti che lo riguardano; passando su un'etichetta leggi che cosa vuol dire. Accordi e note si sentono appena scelti. *Annulla modifica*, *Ripeti*, *Ricomincia* |
-| **3 Controlla e salva** | ✓ a posto, ✗ da completare (blocca *Salva*), ○ consiglio. *Ascolta*, poi *Salva* |
+| **▶ Play / Pausa**, **■ Stop** | ascolta **dal cursore**; Pausa si ferma dove sei, Stop torna al punto di partenza. ⏮ porta all'inizio, 🔁 ripete in continuo |
+| **Righello** | clic o trascinamento per mettere il **cursore** dove vuoi, anche durante l'ascolto |
+| **Timeline** | scorre liberamente (barre, rotella, dito); durante l'ascolto segue la riga, ma non se la stai scorrendo tu. − + o `Ctrl`+rotella per ingrandire |
+| **Tastiera** | si accende con i tasti che suonano |
+| **Proprietà** (sotto) | i pulsanti dell'elemento scelto: tutto si può cambiare anche da qui |
+| *Dove si usa* | stile, parte, modo, andamento (si apre con un clic); il nome sta in alto |
+| Controlli (in fondo) | ✓ a posto, ✗ blocca *Salva*, ○ consiglio |
 
-![L'editor di un richiamo: accordi e note sulla stessa timeline](docs/screenshots/40-composizione-richiamo.png)
+| Voce | Come si modifica sulla timeline |
+|---|---|
+| **Note** (richiami, motivi, chiusure) | clic su un punto vuoto = nuova nota (trascinando la allunghi); trascina per spostarla nel tempo e, nei richiami, in altezza; tira il bordo destro per allungarla; doppio clic per toglierla. La **griglia** (1/16, 1/8, 1/4, 1/2) decide gli agganci |
+| **Assoli** | come le note; ogni riga è un movimento (arrivo, passo, arpeggio…): trascina su un'altra riga per cambiarlo |
+| **Accordi** | premi un accordo e scegli nota di base, tipo e basso; *Dividi* ne mette due in una battuta, *Copia nella successiva* lo ripete |
+| **Forme** | trascina le sezioni per riordinarle, tira il bordo per la lunghezza, *+ Strofa*, *+ Ritornello*… per aggiungerne; il finale resta in coda |
 
-- **Le battute restano sempre complete:** allungando una figura si accorciano quelle dopo, accorciandola il tempo
-  avanzato diventa pausa. In ogni battuta resta almeno una nota; il finale di una forma sta sempre in coda.
-- **Tastiera:** frecce per muoversi sulla timeline, `Ctrl+Z` e `Ctrl+Y`. `Esc` non chiude se ci sono modifiche non
-  salvate: usa *Esci senza salvare*.
+![Gli accordi sul banco](docs/screenshots/39-composizione-modifica.png)
+
+| Tasto | Effetto |
+|---|---|
+| **Spazio** · **Inizio** | Play o Pausa · cursore all'inizio |
+| **← → ↑ ↓** | sposta la nota scelta (senza nota scelta, le frecce muovono il cursore) |
+| **Maiusc + ← →** | accorcia o allunga la nota |
+| **Canc** | elimina la nota |
+| `Ctrl+Z` · `Ctrl+Y` | annulla · ripeti la modifica |
+
+Le note di una battuta sono a **voce sola**: posandone una sopra un'altra, quella sotto si accorcia o sparisce; gli
+spazi vuoti sono pause. `Esc` non chiude se ci sono modifiche non salvate.
 
 ![I richiami a temi celebri](docs/screenshots/38-composizione-richiami.png)
 
@@ -467,7 +486,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
 | `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js` forma, `armonia.js` accordi, `melodia.js` fraseggio, `materiale.js` richiami, forme, controlli e unione con le tue modifiche), scrittura e validazione dello score ABC (`abc.js`) |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
-| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `composizione.js`, `composizione-pagina.js`, `composizione-editor.js` (timeline ed editor a pulsanti) e `composizione-lettore.js` (timeline di riproduzione) pagina Composizione, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
+| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `composizione.js`, `composizione-pagina.js`, `composizione-editor.js` (modello delle voci e mini timeline), `composizione-banco.js` (banco di lavoro) e `composizione-lettore.js` (suono e riproduzione) pagina Composizione, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `docs\ricerche\` · `docs\report\` | [ricerca sulla composizione](docs/ricerche/2026-11-28-composizione.md) · [report sui brani creativi](docs/report/2026-11-28-brani-creativi.md) |

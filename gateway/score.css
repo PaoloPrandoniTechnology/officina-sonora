@@ -65,21 +65,11 @@ body.suona .sc-salva { bottom: 86px; }
 .cm-voce h3 { margin: 0; font-size: 13.5px; }
 .cm-voce p { margin: 0; font-size: 12.5px; }
 .cm-tasti { display: flex; flex-wrap: wrap; gap: 6px; }
-/* Editor guidato: tre passi, timeline e pulsanti */
-#finestra:has(.cm-form) { width: min(96vw, 900px); max-width: 96vw; }
-.cm-form > p { font-size: 12.5px; max-width: 90ch; margin: 0 0 10px; }
-.cm-passo { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
-.cm-passo h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 8px; font-size: 14px; }
-.cm-passo h3 i { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font: 600 12px var(--testo); }
-.cm-storia { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; font-weight: 400; }
-.cm-form .cm-riga { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 8px; }
 .cm-riga > span { flex: 0 0 82px; font-size: 12px; color: var(--muted); }
 .cm-tasto { min-width: 34px; height: 28px; padding: 0 8px; font-size: 12.5px; background: var(--panel); color: var(--ink); border: 1px solid var(--line-2); border-radius: 4px; }
 .cm-tasto:disabled { opacity: .35; cursor: not-allowed; }
 .cm-tasto[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
-.cm-nome { display: grid; gap: 4px; font-size: 12px; color: var(--muted); margin-bottom: 8px; max-width: 420px; }
-.cm-generi, .cm-spiega, .cm-guida { margin: 0 0 8px; font-size: 12.5px; }
-.cm-guida { color: var(--muted); }
+.cm-generi, .cm-spiega { margin: 0 0 8px; font-size: 12.5px; }
 .cm-pannello { margin-top: 12px; padding: 10px 12px 4px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; }
 .cm-pannello .cm-scelta { margin: 0 0 10px; font-size: 13px; }
 .cm-controlli { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 3px; font-size: 12.5px; }
@@ -88,7 +78,6 @@ body.suona .sc-salva { bottom: 86px; }
 .cm-controlli .nota { color: var(--warn); }
 /* timeline */
 .tl { display: grid; grid-template-columns: repeat(var(--colonne, 4), minmax(0, 1fr)); gap: 8px 6px; }
-.cm-form, .cm-passo, #cmLinea, .cm-elenco > * { min-width: 0; }
 .tl-forma { display: block; }
 .tl-battuta { min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 3px; border-radius: 5px; border: 1px solid var(--line); }
 .tl-battuta > small { font-size: 10.5px; line-height: 1; color: var(--faint); }
@@ -122,7 +111,7 @@ button.tl-blocco:hover { border-color: var(--accent); }
 /* riproduzione: nastro che scorre, tastiera, poche cose */
 .cm-voce.in-ascolto { grid-column: 1 / -1; }
 .cm-voce.in-ascolto > .tl, .cm-voce.in-ascolto > .cm-tasti, .cm-voce.in-ascolto > p { display: none; }
-.cm-qui:empty, #cmLettore:empty { display: none; }
+.cm-qui:empty { display: none; }
 .cm-riga > span.aiuto { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
 .lt { margin: 6px 0 10px; padding: 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--panel); }
 .lt-ora { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 10px; }
@@ -162,9 +151,79 @@ button.tl-blocco:hover { border-color: var(--accent); }
 .lt-sincro button { width: 24px; height: 24px; padding: 0; border: 1px solid var(--line-2); border-radius: 4px; background: var(--panel); color: var(--ink); }
 .lt-sincro b { min-width: 4.6em; text-align: center; font: 12px var(--mono); }
 @media (max-width: 640px) { .lt { padding: 10px; } .lt-ora strong { font-size: 30px; } .lt-ora small { margin-left: 0; flex-basis: 100%; order: 3; } .lt-scena { height: 190px; } .lt-tastiera { height: 64px; } .lt-tastiera span { font-size: 8px; } .lt-sincro { margin-left: 0; } }
-/* mentre si ascolta nell'editor c'è solo il lettore */
-.cm-passo:has(#cmLettore:not(:empty)) :is(#cmGuida, #cmLinea, #cmPannello) { display: none; }
 @media (max-width: 640px) { .tl { grid-template-columns: repeat(min(var(--colonne, 4), 2), minmax(0, 1fr)); } .cm-riga > span { flex-basis: 100%; } .cm-storia { margin-left: 0; } }
-#finestra:has(.cm-form) { max-height: 94vh; }
-/* la timeline resta in vista mentre si scorrono i pulsanti, se lo schermo è abbastanza alto */
-@media (min-height: 760px) and (min-width: 641px) { #cmLinea { position: sticky; top: -20px; z-index: 1; padding: 6px 0; background: var(--panel); } }
+/* ---------- banco di lavoro: righello, accordi, griglia delle note, riproduzione ---------- */
+.cm-form, .cm-elenco > * { min-width: 0; }
+.cm-riga { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 6px; }
+#finestra:has(.bn) { width: 98vw; max-width: 98vw; height: 96vh; max-height: 96vh; padding: 12px 14px; }
+.bn { display: flex; flex-direction: column; gap: 8px; min-height: 100%; }
+header.bn-testa { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+header.bn-testa h2 { margin: 0; font-size: 17px; }
+header.bn-testa > span { margin-right: auto; }
+.bn-nome { flex: 1 1 220px; max-width: 420px; margin-right: auto; }
+.bn-dove { border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; font-size: 12.5px; }
+.bn-dove summary { cursor: pointer; color: var(--muted); }
+.bn-dove[open] summary { margin-bottom: 8px; }
+.bn-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 7px 8px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; }
+.bn-play { min-width: 96px; }
+.bn-barra [aria-pressed="true"].btn { background: var(--accent-soft); border-color: var(--accent); }
+#bnPosizione { min-width: 11.5em; font: 600 13px var(--mono); }
+.bn-gruppo { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.bn-destra { margin-left: auto; }
+.bn-etich { font-size: 12px; color: var(--muted); margin: 0 2px 0 8px; }
+.bn-guida { margin: 0; font-size: 12.5px; color: var(--muted); }
+.bn-campo { position: relative; flex: 1 0 auto; overflow: auto; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel-2); overscroll-behavior: contain; }
+.bn-richiamo { height: 40vh; min-height: 300px; flex-grow: 0; }
+.bn-motivo, .bn-cadenza, .bn-assolo, .bn-armonia, .bn-forma { flex-grow: 0; }
+.bn-foglio { display: flex; width: max-content; min-width: 100%; user-select: none; -webkit-user-select: none; }
+.bn-etichette { flex: none; position: sticky; left: 0; z-index: 6; background: var(--panel); border-right: 1px solid var(--line-2); }
+.bn-angolo { position: sticky; top: 0; z-index: 7; height: 28px; background: var(--panel); border-bottom: 1px solid var(--line-2); }
+.bn-richiamo .bn-nome-corsia { position: sticky; top: 28px; z-index: 7; background: var(--panel); }
+.bn-nome-corsia { display: flex; align-items: center; padding-left: 8px; height: 56px; font-size: 11.5px; color: var(--muted); border-bottom: 1px solid var(--line-2); }
+.bn-etichetta { display: flex; align-items: center; padding-left: 8px; font-size: 11.5px; border-bottom: 1px solid var(--line); box-sizing: border-box; white-space: nowrap; }
+.bn-etichetta.nera { background: #3a3a40; color: #fff; }
+.bn-etichetta.suona { background: var(--danger); color: #fff; font-weight: 700; }
+.bn-corpo { position: relative; flex: none; }
+.bn-righello { position: sticky; top: 0; z-index: 5; height: 28px; cursor: pointer; touch-action: none; border-bottom: 1px solid var(--line-2); background: var(--panel) repeating-linear-gradient(to right, var(--line-2) 0 1px, transparent 1px var(--battito)) 0 100% / 100% 7px no-repeat; }
+.bn-righello span { position: absolute; top: 3px; bottom: 0; padding-left: 5px; border-left: 2px solid var(--faint); font: 600 11px var(--mono); color: var(--muted); pointer-events: none; overflow: hidden; }
+.bn-accordi { position: relative; height: 56px; border-bottom: 1px solid var(--line-2); background: var(--panel-2); }
+.bn-richiamo .bn-accordi { position: sticky; top: 28px; z-index: 4; }
+.bn-armonia .bn-accordi { height: 150px; }
+.bn-accordo { position: absolute; top: 3px; bottom: 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 0 2px; overflow: hidden; background: var(--panel); color: var(--ink); border: 1px solid var(--line-2); border-radius: 7px; white-space: nowrap; }
+.bn-accordo:hover { border-color: var(--accent); }
+.bn-accordo b { font-size: 14px; }
+.bn-accordo span { font: 11px var(--mono); color: var(--muted); }
+.bn-accordo small { font-size: 11px; color: var(--muted); }
+.bn-accordo[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--accent-soft); }
+.bn-griglia { position: relative; cursor: crosshair; touch-action: pan-x pan-y; }
+.bn-riga { position: absolute; left: 0; right: 0; border-bottom: 1px solid var(--line); box-sizing: border-box; pointer-events: none; }
+.bn-riga.nera { background: var(--line); }
+.bn-riga.do { border-bottom-color: var(--faint); }
+.bn-linee { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to right, var(--faint) 0 2px, transparent 2px var(--battuta)), repeating-linear-gradient(to right, var(--line-2) 0 1px, transparent 1px var(--battito)), repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px var(--passo)); }
+.bn-nota { position: absolute; z-index: 2; box-sizing: border-box; display: flex; align-items: center; padding: 0 4px; overflow: hidden; background: var(--s1); color: #fff; border: 1px solid var(--panel); border-radius: 4px; font-size: 11px; font-weight: 700; white-space: nowrap; cursor: grab; touch-action: none; }
+.bn-nota:active { cursor: grabbing; }
+.bn-nota span { pointer-events: none; }
+.bn-nota i, .bn-sezione i { position: absolute; top: 0; bottom: 0; right: 0; width: min(10px, 40%); cursor: ew-resize; touch-action: none; background: rgba(255, 255, 255, .35); }
+.bn-nota[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: -1px; z-index: 3; }
+.bn-nota.suona { background: var(--danger); }
+.bn-accordo.suona { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.bn-accordo.suona span, .bn-accordo.suona small { color: var(--accent-ink); }
+.bn-sezioni { position: relative; height: 120px; }
+.bn-sezione { position: absolute; top: 8px; bottom: 8px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0 10px 0 4px; overflow: hidden; background: var(--panel); border: 1px solid var(--line-2); border-radius: 7px; font-size: 12.5px; white-space: nowrap; cursor: grab; touch-action: none; }
+.bn-sezione span { font-size: 11px; color: var(--muted); }
+.bn-sezione i { background: var(--line-2); }
+.bn-sezione.extra { border-style: dashed; }
+.bn-sezione.ruolo-rit { background: var(--accent-soft); }
+.bn-sezione[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: -2px; }
+.bn-sezione.suona { background: var(--accent); color: var(--accent-ink); }
+.bn-sezione.suona span { color: var(--accent-ink); }
+.bn-corpo > .bn-testa { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--danger); z-index: 8; pointer-events: none; display: block; }
+.bn-corpo > .bn-testa::before { content: ''; position: absolute; top: 0; left: -5px; border: 6px solid transparent; border-top-color: var(--danger); }
+.bn-piano { flex: none; height: 54px; margin-top: 0; }
+.bn-piano span { font-size: 9px; }
+.bn .cm-pannello { margin-top: 0; }
+.bn footer .cm-controlli { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; }
+.bn footer .err { margin: 4px 0 0; }
+.bn-piano[hidden] { display: none; }
+@media (max-width: 640px) { #finestra:has(.bn) { padding: 8px; } .bn-destra { margin-left: 0; } .bn-piano { height: 40px; } .bn-richiamo { height: 44vh; min-height: 240px; } }
+
