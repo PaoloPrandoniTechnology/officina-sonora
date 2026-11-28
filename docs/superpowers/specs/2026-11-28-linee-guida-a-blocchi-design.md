@@ -1,6 +1,6 @@
 # Linee guida a blocchi: progetto
 
-**Stato:** in attesa di approvazione.
+**Stato:** approvato e realizzato il 2026-11-28.
 
 ## Scopo
 
