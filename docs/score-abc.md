@@ -39,17 +39,18 @@ Fonti: guide di composizione (motivo, frase, periodo, note dell'accordo) e MeloF
 - La memoria per genere fissa il materiale (progressioni, celle, variazioni) e i voti ne correggono i pesi.
 
 ## Compositore estro (generi creativi)
-`src/compositore/estro.js`, usato quando il genere ha `estro` 1 o 2. Aggiornato il 28/11/2026.
+Usato quando il genere ha `estro` 1 o 2. Terza versione, 28/11/2026: dettagli e fonti in
+[composizione-design](superpowers/specs/2026-11-28-composizione-design.md).
 
-- Perché: negli score del modello la ripetizione mediana era 0,87-0,9, spesso con un solo interlude di oltre
-  cento battute e 1-3 accordi.
-- Dopo il primo ascolto («troppo complicato») è stato semplificato: forme per ruoli con poche sezioni speciali,
-  tre giri armonici con un accordo per battuta, celle di poche note, frase A B A e chiusura, metro sempre 4/4,
-  al massimo un cambio di tonalità sull'ultimo ritornello (`K:` di sezione).
-- Richiami di pubblico dominio trascritti a memoria in forma ridotta (4/4, 2-4 battute): sono allusioni, non edizioni.
-- Revisore: accordo sui tempi forti 25, varietà 20 (ideale due battute diverse su tre), gancio che torna 25,
-  salti 15, contrasto 10, climax 5; 85% qualità e 15% novità. Forma e richiamo si scelgono prima, escludendo i recenti.
-- Misure su 208 brani di prova: ripetizione mediana 0,43 (tra 0,32 e 0,62), durata entro il 3%.
+- `armonia.js`: periodi in gradi romani (`i | bVII/II | iv7 V7`) per stile, modo e ruolo.
+- `melodia.js`: scheletro di note dell'accordo (programmazione dinamica, costo dei salti, percorso ad arco);
+  motivi di due battute con gesti; scala piegata sull'accordo quando esce dalla tonalità; appoggiature e
+  anticipi (legatura sulla stessa altezza oltre la stanghetta); frasi d'assolo di una battuta.
+- `estro.js`: forma a budget di battute, periodo domanda-risposta, memoria delle frasi (tornano al massimo due volte),
+  richiami, cambio di tonalità sull'ultimo ritornello.
+- Revisore: grado 20, recupero dei salti 15, note dell'accordo sui tempi forti 15 (ideale 70-95%), note estranee
+  risolte 15, apice 10, varietà 10, ritorno del gancio 10, salti larghi 5; 85% qualità e 15% novità.
+- Misure su 208 brani di prova: ripetizione mediana 0,39, cambi di accordo mediani 100, durata entro l'1%.
 
 ## Da verificare
 - Quanto fedelmente YuE2 segue uno score scritto da regole, in particolare con metri diversi dal 4/4.

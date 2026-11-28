@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const A = require('../../src/compositore/abc.js');
 const E = require('../../src/compositore/estro.js');
+const { ARMONIA, grado } = require('../../src/compositore/armonia.js');
+const M = require('../../src/compositore/melodia.js');
 
 const RADICE = path.join(__dirname, '..', '..');
 const CAT = JSON.parse(fs.readFileSync(path.join(RADICE, 'config', 'catalogo.json'), 'utf8'));
@@ -59,7 +61,7 @@ test('di brano in brano forma e richiamo cambiano; le sorprese restano poche', (
     fatti.push(r);
   }
   const tutte = new Set(fatti.flatMap((r) => r.trovate));
-  for (const t of ['solo', 'ponte', 'modulazione', 'cameo', 'fill']) assert.ok(tutte.has(t), t);
+  for (const t of ['solo', 'ponte', 'modulazione', 'cameo', 'anticipi', 'riarmonizzazione']) assert.ok(tutte.has(t), t);
   const conCameo = fatti.filter((r) => r.cameo).length;
   assert.ok(conCameo >= 4 && conCameo <= 24, `${conCameo}`);
 });
@@ -85,6 +87,42 @@ test('il richiamo è nello score, intero e trasportato nella tonalità', () => {
 test('forma scelta a mano (editor): si rispettano le sezioni richieste', () => {
   const sezioni = ['intro', 'verse', 'chorus', 'bridge', 'outro'];
   assert.deepEqual(brano('Surf-rock-strumentale', { sezioni }).score.sezioni.map((s) => s.nome), sezioni);
+});
+
+test('armonia: gradi letti bene, periodi di 8 battute (4 il pre), strofa e ritornello con più accordi per giro', () => {
+  assert.deepEqual(grado('bVImaj7'), { semi: 8, tipo: 'maj7', basso: null });
+  assert.deepEqual(grado('ii7/I'), { semi: 2, tipo: 'm7', basso: 0 });
+  assert.deepEqual(grado('#ivø'), { semi: 6, tipo: 'm7b5', basso: null });
+  assert.throws(() => grado('Ix'), /non riconosciuto/);
+  for (const [stile, modi] of Object.entries(ARMONIA)) {
+    for (const [modo, ruoli] of Object.entries(modi)) {
+      for (const [ruolo, periodi] of Object.entries(ruoli)) {
+        for (const p of periodi) {
+          assert.equal(p.length, ruolo === 'pre' ? 4 : 8, `${stile} ${modo} ${ruolo}`);
+          if (ruolo === 'strofa' || ruolo === 'rit') assert.ok(new Set(p.flat().map((g) => `${g.semi}${g.tipo}${g.basso}`)).size >= 3, `${stile} ${modo} ${ruolo}`);
+        }
+      }
+    }
+  }
+});
+
+test('motivi: ogni battuta somma a 32; le frasi di assolo hanno un gesto per figura', () => {
+  for (const testo of [...Object.values(M.MOTIVI).flat(), ...M.CADENZE]) {
+    for (const b of testo.split('|')) assert.equal(M.leggiMotivo(b).reduce((a, n) => a + n.durata, 0), 32, b);
+  }
+  for (const [ritmo, gesti] of M.LICK) {
+    assert.equal(M.leggiMotivo(ritmo).reduce((a, n) => a + n.durata, 0), 32, ritmo);
+    assert.equal(gesti.length, ritmo.split(' ').length, ritmo);
+  }
+});
+
+test('melodia: soprattutto per grado, salti larghi rari, note estranee sui tempi forti che risolvono, accordi vari', () => {
+  const medie = {};
+  const casi = CREATIVI.flatMap((cat) => [1, 2, 3].map((seed) => E.componi({ cat, bpm: cat.bpm[0], tonalita: cat.tonalita[seed % cat.tonalita.length], durata_s: 190, estro: cat.estro, seed: seed * 31, candidati: 12 })));
+  for (const r of casi) for (const [k, v] of Object.entries(r.dettagli)) medie[k] = (medie[k] || 0) + v / casi.length;
+  for (const [k, min] of Object.entries({ grado: 0.9, larghi: 0.85, recupero: 0.85, accordo: 0.85, risolte: 0.9, apice: 0.8 })) assert.ok(medie[k] >= min, `${k} ${medie[k]}`);
+  // anticipi: la nota legata continua identica nella battuta dopo (lo score è già validato), e ce ne sono
+  assert.ok(casi.filter((r) => r.trovate.includes('anticipi')).length > casi.length * 0.9);
 });
 
 test('organico: fissi sempre, uno a scelta che cambia; niente varianti né doppioni nello stile', () => {

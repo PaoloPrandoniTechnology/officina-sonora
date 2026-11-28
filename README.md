@@ -251,19 +251,24 @@ Ogni genere ha un livello di **estro** (campo `estro` del catalogo, modificabile
 | **Vivo** (1) | Funk, Afro-latin, Trip-hop, Reggae dub, Jazz lounge, Folk strumming, Bossa nova, Celtic, Piano minimalista, Soul vocalise | un tema che torna, variazioni leggere, un assolo; richiami rari |
 | **Pieno** (2) | rock, metal, blues, elettronica, hip-hop, trap, swing, balcanico, flamenco, orchestrale | come sopra, un po' più ardito: a volte l'ultimo ritornello sale di tonalità; richiami circa un brano su tre |
 
-Nei livelli 1 e 2 lo score è del compositore **estro** (`src\compositore\estro.js`), perché gli score del modello
-ripetono in media 87 battute su 100 con due o tre accordi; i suoi ne ripetono circa 43 su 100: abbastanza perché il tema si riconosca,
-senza diventare un ciclo.
+Nei livelli 1 e 2 lo score è del compositore **estro**, perché gli score del modello ripetono in media 87
+battute su 100 con due o tre accordi; i suoi ne ripetono circa 39 su 100. Lavora in tre strati, come un
+arrangiatore ([analisi e fonti](docs/superpowers/specs/2026-11-28-composizione-design.md)):
+
+| Strato | Cosa fa | File in `src\compositore\` |
+|---|---|---|
+| **Armonia** | 184 periodi scritti a mano per genere (8 battute, 4 per il pre-ritornello) con cadenze, due accordi per battuta dove serve, rivolti, dominanti secondarie e accordi presi in prestito. La strofa resta aperta, il ritornello chiude, il ponte parte lontano; al ritorno il ritornello si arricchisce di una dominante | `armonia.js` |
+| **Scheletro** | sceglie una nota dell'accordo per ogni mezza battuta lungo un percorso che sale verso un apice e ridiscende, con movimenti piccoli | `melodia.js` |
+| **Superficie** | motivi di due battute con ritmo del genere: note di passaggio e di volta, arpeggi, appoggiature che risolvono, anticipi legati oltre la stanghetta | `melodia.js` |
 
 | Ingrediente | Cosa fa |
 |---|---|
-| **Forme** | semplici, con una sola sezione speciale (assolo o ponte) o due al massimo; non si ripete la forma dei due brani precedenti del genere |
-| **Armonie** | tre giri (strofa, ritornello, ponte), un accordo per battuta; l'assolo suona sul giro della strofa |
-| **Fraseggi** | poche note e respiri; frase domanda, risposta, domanda, chiusura; la strofa che ritorna cambia solo la risposta |
-| **Chiusure** | una piccola corsa a fine sezione |
-| **Assolo** | sale poco a poco, si muove soprattutto per grado e richiama il ritornello |
-| **Tonalità** (pieno) | circa un brano su tre alza l'ultimo ritornello; il metro resta sempre 4/4 |
+| **Forme** | *canzone, arena, viaggio* e, per jazz e blues, *jam*: sezioni scelte in base alla durata; la forma del brano precedente del genere non si ripete |
+| **Frasi** | domanda e risposta (A B A chiusura); il ritornello ripete il gancio e chiude sulla tonica; la strofa che ritorna cambia la risposta |
+| **Assolo** | frasi di un vocabolario proprio, sul giro di strofa o ritornello, con una citazione del gancio e un respiro finale |
+| **Tonalità** (pieno) | circa un brano su tre alza l'ultimo ritornello; il metro resta 4/4 |
 | **Richiami** | 2-4 battute di un tema di **pubblico dominio** (Bach, Beethoven, Mozart, Grieg, Rossini, Bizet, Offenbach, canti tradizionali) in apertura o in chiusura, mai uno degli ultimi quattro. La descrizione del brano dice quale: *Richiamo nascosto: …* |
+| **Revisore** | tra 30 candidati sceglie quello che si muove soprattutto per grado, compensa i salti, risolve le note estranee e ha l'apice dopo la metà |
 
 I richiami sono limitati al pubblico dominio: citare canzoni recenti esporrebbe a rivendicazioni di copyright.
 Quanto fedelmente YuE2 renda ogni dettaglio dello score e dello stile va giudicato **ascoltando**.
@@ -1088,7 +1093,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 |---|---|
 | `src\blocks\` | i blocchi del workflow |
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
-| `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js`), scrittura e validazione dello score ABC (`abc.js`) |
+| `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js` forma, `armonia.js` accordi, `melodia.js` fraseggio), scrittura e validazione dello score ABC (`abc.js`) |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
 | `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
@@ -1136,6 +1141,7 @@ In ordine di priorità. Il disegno completo è in
 | # | Miglioramento | Perché |
 |---|---|---|
 | 0 | **Ascoltare i brani creativi** e votarli: correggere forme, richiami e organici che non convincono; valutare LoRA anche per i generi che non ne hanno | l'effetto sull'audio non è misurabile dai test; i voti pesano già su forme e richiami |
+| 0 bis | **Materiale da musica vera**: frasi e giri ricavati da raccolte con licenza (Weimar Jazz Database, McGill Billboard) | il salto successivo sul fraseggio; richiede di scaricarle e verificarne le licenze |
 | 1 | **Selezione sull'audio**: 2-3 versioni per brano e pubblicazione della migliore, giudicata da un modello (per esempio Meta Audiobox Aesthetics o SongEval) | richiede di scaricare pacchetto e pesi, e di verificarli sugli strumentali |
 | 2 | **Ascoltare e votare** i brani del nuovo percorso, poi correggere i descrittori `en` e le soglie dello score | la qualità musicale non è verificabile dai test |
 | 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |

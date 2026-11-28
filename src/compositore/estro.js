@@ -1,71 +1,17 @@
-// Compositore "estro" per i generi che non sono di quiete. Idea: un tema chiaro che torna, e poche sorprese ben
-// distanziate (un assolo, una variazione, a volte un salto di tonalità o un richiamo a un tema di pubblico dominio).
+// Compositore "estro" per i generi che non sono di quiete. Lavora come un arrangiatore: forma a periodi,
+// armonia con cadenze scritta per genere (armonia.js), melodia da scheletro e motivi (melodia.js), un assolo,
+// a volte un salto di tonalità o un richiamo a un tema di pubblico dominio.
 // livello 1 (vivo) e livello 2 (pieno, un po' più ardito). Deterministico dato il seed.
 const Abc = typeof ScoreAbc !== 'undefined' ? ScoreAbc : require('./abc.js');
 const Base = typeof Compositore !== 'undefined' ? Compositore : require('./compositore.js');
+const { ARMONIA } = typeof Armonia !== 'undefined' ? Armonia : require('./armonia.js');
+const M = typeof Melodia !== 'undefined' ? Melodia : require('./melodia.js');
 
-const { casuale, tonica, profilo, adatta, somiglianza, peso, pesato, SCALE, QUALITA, DIESIS, BEMOLLI } = Base;
+const { casuale, tonica, profilo, somiglianza, peso, pesato, SCALE, DIESIS, BEMOLLI } = Base;
 const scegli = (r, v) => v[Math.floor(r() * v.length)];
 const mescola = (r, v) => { const resto = [...v]; return v.map(() => resto.splice(Math.floor(r() * resto.length), 1)[0]); };
-const BASSO = 55, ALTO = 84; // dopo la modulazione (massimo +3) si resta entro 55-87
-
-// ---- Armonie: "semitoni:qualità" dalla tonica, un accordo per battuta ("a+b" = due nella stessa battuta) ----
-const GIRI = {
-  rock: {
-    m: ['0:m 10: 8: 10:', '0:m 3: 10: 5:', '0:m 8: 3: 10:', '5:m 8: 10: 0:m', '0:m 1: 0:m 10:+7:7', '8: 10: 0:m 7:7', '0:m 5: 8: 7:7', '3: 10: 5:m 8:+10:'],
-    M: ['0: 10: 5: 0:', '0: 3: 5: 10:', '9:m 5: 0: 7:', '0: 5: 8:+10: 0:', '5: 7: 4:m 9:m', '0: 4:7 9:m 5:+5:m', '8: 10: 0: 0:'],
-  },
-  blues: {
-    m: ['0:m7 0:m7 5:m7 0:m7 8:7 7:7 0:m7 7:7', '0:m 5:7 0:m 0:m7 5:m7 3:7+2:7 0:m 7:7', '0:m6 5:m6 0:m6+8:7 7:7'],
-    M: ['0:7 5:7 0:7 0:7 7:7 5:7 0:7 7:7', '0:7 0:7 5:7 6:dim 0:7+9:7 2:7+7:7 0:7 7:7', '0:6 5:7 0:7+8:7 7:7'],
-  },
-  jazz: {
-    m: ['0:m7 5:m7 2:m7b5 7:7', '8:maj7 2:m7b5 7:7 0:m6', '0:m 0:m7 9:m7b5 8:maj7', '5:m7 10:7 3:maj7 2:m7b5+7:7', '0:m6 1:7 0:m6 2:m7b5+7:7', '3:maj7 8:maj7 2:m7b5 7:7'],
-    M: ['0:maj7 9:7 2:m7 7:7', '4:m7 9:7 2:m7 1:7', '5:maj7 5:m6 4:m7+9:7 2:m7+7:7', '0:6 1:dim 2:m7 7:7', '2:m7 7:7 4:m7+9:7 2:m7+1:7', '0:maj7 10:7 9:7 8:7+7:7'],
-  },
-  funk: {
-    m: ['0:m7 5:7 0:m7 5:7', '0:m7 3:7 5:7 8:7+7:7', '0:m7 10:7 8:maj7 7:7', '5:m7 10:7 3:maj7 8:maj7', '0:m7 0:m7 1:maj7 0:m7', '2:m7 7:7 0:m7 9:7'],
-    M: ['0:7 10:7 5:7 0:7', '0:maj7 4:m7 5:maj7 7:sus4', '2:m7 7:7 4:m7 9:7', '0:7 3:7 5:7 8:7+7:7', '5:maj7 4:m7 2:m7+7:7 0:maj7'],
-  },
-  elettro: {
-    m: ['0:m 8: 3: 10:', '0:m 0:m 8: 10:', '5:m 0:m 8: 7:sus4', '0:m 1: 0:m 10:', '8:maj7 10: 0:m 3:', '0:m7 5:m7 8:maj7+10: 0:m7'],
-    M: ['0: 7: 9:m 5:', '9:m 5: 0: 7:', '5:maj7 7: 9:m 0:', '0: 10: 5: 5:m', '2:m7 4:m7 5:maj7 7:sus4'],
-  },
-  cine: {
-    m: ['0:m 8: 3: 10:', '0:m 8:maj7 5:m 7:7', '8: 10: 0:m 0:m', '0:m 1: 8: 7:7', '5:m 0:m 6:dim 7:7', '0:m 3:maj7 8:maj7 5:m+7:7'],
-    M: ['0: 4:m 5: 5:m', '0: 7: 9:m 4:m', '5:maj7 7: 4:m 9:m', '0: 8: 10: 0:', '9:m 4: 5: 2:m+7:'],
-  },
-  folk: {
-    m: ['0:m 10: 0:m 7:7', '0:m 3: 10: 0:m', '8: 3: 10: 0:m', '0:m 5: 10: 3:+10:', '5:m 10: 3: 7:7'],
-    M: ['0: 5: 0: 7:', '0: 10: 5: 0:', '9:m 5: 0: 7:sus4', '0: 4:m 5: 7:', '2:m 7: 0: 9:m+7:'],
-  },
-  balcanico: {
-    m: ['0:m 5:m 7:7 0:m', '5:m 0:m 7:7 0:m', '8: 7:7 8: 7:7', '0:m 1: 10:m 0:m', '3: 10:7 3:+8: 7:7'],
-    M: ['0: 1: 0: 10:m', '5:m 1: 0: 0:', '0: 5:m 1:+10:m 0:', '10:m 0: 1: 0:'],
-  },
-  flamenco: {
-    m: ['5:m 3: 1: 0:', '0: 1: 0: 10:m', '8:7 7: 1:maj7 0:', '5:m 5:m 1:+3: 0:', '0: 5:m 3:+1: 0:'],
-    M: ['0: 1: 0: 1:', '5:m 3: 1: 0:', '8: 10:m 1:+3: 0:'],
-  },
-  drone: { m: ['0:m 8:maj7 3:maj7 10:', '0:sus2 5:sus2 8:maj7 10:'], M: ['0:maj7 5:maj7 9:m7 7:sus4', '0: 9:m7 5:sus2 7:'] },
-};
-
-// ---- Celle ritmiche di una battuta di 4/4 in trentaduesimi (8 = quarto); negativi = pause. Poche note, con respiro ----
-const PASSI = {
-  dritto: [[8, 4, 4, 8, 8], [12, 4, 8, 8], [8, 8, 8, 8], [6, 6, 4, 16], [-4, 4, 8, 16], [16, 8, 8], [12, 4, 16]],
-  swing: [[12, 4, 6, 2, 8], [6, 2, 8, 16], [-8, 6, 2, 16], [8, 6, 2, 8, 8], [16, 12, 4], [12, 4, 16]],
-  sincopato: [[6, 6, 4, -8, 8], [-4, 4, 8, 6, 2, 8], [8, -4, 4, 16], [12, 4, -8, 8], [6, 2, 8, -16], [4, -4, 8, 16]],
-  ampio: [[16, 16], [24, 8], [12, 4, 16], [8, 8, 16], [16, 8, 8], [32]],
-  danza: [[4, 4, 8, 8, 8], [6, 2, 8, 16], [8, 4, 4, 8, 8], [8, 8, 8, 8], [12, 4, 16], [4, 4, 4, 4, 16]],
-};
+const BASSO = 55, ALTO = 84; // dopo la modulazione (massimo +2) si resta entro 55-86
 const FEEL = { rock: 'dritto', elettro: 'dritto', blues: 'swing', jazz: 'swing', funk: 'sincopato', cine: 'ampio', drone: 'ampio', folk: 'danza', balcanico: 'danza', flamenco: 'danza' };
-
-// celle dell'assolo: più mosse del tema, ma cantabili
-const VOLO = [[4, 4, 4, 4, 8, 8], [6, 2, 4, 4, 16], [8, 4, 4, 8, 8], [-4, 4, 4, 4, 16], [12, 4, 4, 4, 8], [4, 4, 8, 4, 4, 8], [16, 4, 4, 8]];
-
-// passi sulla scala, ripetuti a ciclo: soprattutto per grado, salti piccoli
-const DISEGNI = { scala: [1], discesa: [-1], arpeggio: [2, 2, -1], onda: [1, 1, -1], domanda: [-1, 2, -1] };
-const MOSSE = [-1, -1, -1, 1, 1, 1, 0, -2, 2];
 
 // ---- Richiami: temi di pubblico dominio. Note [semitoni dalla tonica, durata]; null = pausa ----
 const n = (...v) => v;
@@ -94,159 +40,167 @@ const CAMEI_PER_STILE = {
   flamenco: ['habanera', 'bellaciao', 'turca'], drone: ['scarborough', 'greensleeves'],
 };
 
-// ---- Forme: [sezione dello score, ruolo, peso]. Una sola sezione "speciale" per forma ----
-const R = { intro: ['intro', 'gancio', 1], str: ['verse', 'strofa', 2], pre: ['pre-chorus', 'pre', 1], rit: ['chorus', 'rit', 2], solo: ['interlude', 'solo', 2], ponte: ['bridge', 'ponte', 1], coda: ['outro', 'finale', 1] };
-const forma = (sigle) => sigle.split(' ').map((s) => R[s]);
+// ---- Forme: [ruolo, battute, priorità]. Si prendono le sezioni in ordine di priorità finché la durata lo consente ----
+const SEZIONE = { gancio: 'intro', strofa: 'verse', pre: 'pre-chorus', rit: 'chorus', solo: 'interlude', ponte: 'bridge', finale: 'outro' };
+const forma = (testo) => testo.split(' ').map((t) => { const [ruolo, battute, priorita] = t.split(':'); return { ruolo, battute: Number(battute), priorita: Number(priorita) }; });
 const FORME = {
-  vivo: { canzone: 'intro str rit str rit solo rit coda', ponte: 'intro str rit str ponte rit coda', viaggio: 'intro str pre rit solo str rit coda' },
-  pieno: { canzone: 'intro str pre rit str pre rit solo rit coda', arena: 'intro str rit str rit solo ponte rit coda', corsa: 'intro rit str rit solo str rit coda', suite: 'intro str str pre rit ponte solo rit coda' },
+  canzone: forma('gancio:4:0 strofa:8:0 pre:4:5 rit:8:0 strofa:8:2 pre:4:6 rit:8:3 solo:8:1 rit:8:4 finale:4:0'),
+  arena: forma('gancio:4:0 strofa:8:0 rit:8:0 strofa:8:3 rit:8:4 ponte:8:2 solo:8:1 rit:8:5 finale:4:0'),
+  viaggio: forma('gancio:4:0 rit:8:0 strofa:8:0 pre:4:3 rit:8:2 solo:8:1 ponte:8:4 rit:8:5 finale:4:0'),
+  jam: forma('gancio:4:0 strofa:8:0 strofa:8:2 solo:8:0 solo:8:4 ponte:8:1 strofa:8:3 finale:4:0'),
 };
 const FORME_PER_STILE = { jazz: ['jam', 'canzone'], blues: ['jam', 'arena'] };
-FORME.pieno.jam = 'intro str str solo ponte solo str coda';
-const CENTRI = { gancio: 69, strofa: 66, pre: 69, rit: 72, solo: 72, ponte: 67, finale: 68 };
-const DA_SEZIONE = { intro: R.intro, verse: R.str, 'pre-chorus': R.pre, chorus: R.rit, bridge: R.ponte, interlude: R.solo, instrumental: R.solo, outro: R.coda };
+const DA_SEZIONE = { intro: 'gancio', verse: 'strofa', 'pre-chorus': 'pre', chorus: 'rit', bridge: 'ponte', interlude: 'solo', instrumental: 'solo', outro: 'finale' };
+const CENTRI = { gancio: 69, strofa: 67, pre: 70, rit: 73, solo: 73, ponte: 68, finale: 69 };
 
-// Battute per sezione, pari, la cui somma si avvicina al totale
-function dividi(pesi, totale) {
-  const somma = pesi.reduce((a, b) => a + b, 0);
-  const out = pesi.map((p) => Math.max(2, 4 * Math.round((p * totale) / somma / 4)));
-  for (let giro = 0; giro < 300; giro++) {
-    const diff = totale - out.reduce((a, b) => a + b, 0);
-    if (Math.abs(diff) < 2) break;
-    const i = out.map((b, k) => k).filter((k) => diff > 0 || out[k] > 2)
-      .sort((a, b) => (diff > 0 ? out[a] / pesi[a] - out[b] / pesi[b] : out[b] / pesi[b] - out[a] / pesi[a]))[0];
-    if (i === undefined) break;
-    out[i] += diff > 0 ? 2 : -2;
-  }
-  return out;
+function componiForma(nomeForma, totale) {
+  const tutte = FORME[nomeForma];
+  const prese = new Set(tutte.filter((x) => x.priorita === 0));
+  const lunghezza = () => [...prese].reduce((a, x) => a + x.battute, 0);
+  for (const x of [...tutte].sort((a, b) => a.priorita - b.priorita)) if (!prese.has(x) && lunghezza() + x.battute <= totale + 2) prese.add(x);
+  const piano = tutte.filter((x) => prese.has(x)).map((x) => ({ ...x }));
+  // brani lunghi: un altro assolo e un altro ritornello prima del finale
+  let resto = totale - lunghezza();
+  for (let i = 0; resto >= 8; i++, resto -= 8) piano.splice(piano.length - 1, 0, { ruolo: i % 2 ? 'rit' : 'solo', battute: 8 });
+  // brani brevi: si accorciano le sezioni, partendo dal fondo
+  for (let i = piano.length - 2; i >= 1 && resto <= -4; i--) if (piano[i].battute === 8) { piano[i].battute = 4; resto += 4; }
+  piano[piano.length - 1].battute = Math.max(2, piano[piano.length - 1].battute + resto);
+  return piano;
+}
+
+// Forma scelta a mano (editor): le sezioni restano quelle, le battute seguono la durata
+function formaScelta(sezioni, totale) {
+  const piano = sezioni.map((s) => { const ruolo = DA_SEZIONE[s.replace(/[[\]]/g, '')] || 'strofa'; return { ruolo, peso: ['gancio', 'finale', 'pre'].includes(ruolo) ? 1 : 2 }; });
+  const somma = piano.reduce((a, x) => a + x.peso, 0);
+  let usate = 0, fatto = 0;
+  return piano.map((x) => {
+    fatto += x.peso;
+    const battute = Math.max(2, Math.round((fatto * totale) / somma) - usate);
+    usate += battute;
+    return { ...x, battute };
+  });
 }
 
 function candidato(r, { cat, bpm, tonalita, durata_s, sezioni, estro = 2 }, { nomeForma, idCameo }) {
   const t = tonica(tonalita);
   const p = profilo(cat, t);
   const pieno = estro >= 2;
-  const scala = p.scala.length < 7 ? SCALE[t.minore ? 'minore' : 'maggiore'] : p.scala;
   const modoM = t.minore ? 'm' : 'M';
+  const scala = p.stile === 'flamenco' ? SCALE.frigiaDominante : p.stile === 'balcanico' ? (t.minore ? SCALE.armonica : SCALE.frigiaDominante)
+    : t.minore ? (p.stile === 'funk' ? SCALE.dorico : SCALE.minore) : SCALE.maggiore;
   const nomiAccordi = /b|^(F|Dm|Gm|Cm|Fm)$/.test(t.sigla) ? BEMOLLI : DIESIS;
-  const accordo = (testo) => {
-    const [semi, q] = testo.split(':');
-    const radice = (t.pc + Number(semi) + 12) % 12;
-    // i gradi abbassati si chiamano col bemolle (in La minore Sib, non La#)
-    const nomi = [1, 3, 8, 10].includes((Number(semi) + 12) % 12) ? BEMOLLI : nomiAccordi;
-    return { sigla: nomi[radice] + q, pcs: QUALITA[q].map((x) => (radice + x) % 12) };
-  };
+  const nome = (semi) => ([1, 3, 8, 10].includes(semi) ? BEMOLLI : nomiAccordi)[(t.pc + semi) % 12];
+  const accordo = ({ semi, tipo, basso }, pos = 0) => ({
+    pos,
+    sigla: nome(semi) + tipo + (basso === null ? '' : `/${nome(basso)}`),
+    pcs: Abc.noteAccordo(nome(semi) + tipo).note,
+  });
+  const dom = { semi: 7, tipo: '7', basso: null };
+  const tonicaFinale = { semi: 0, tipo: p.stile === 'flamenco' || !t.minore ? '' : 'm', basso: null };
 
-  const forme = FORME[pieno ? 'pieno' : 'vivo'];
-  const piano = sezioni ? sezioni.map((s) => DA_SEZIONE[s.replace(/[[\]]/g, '')] || R.str) : forma(forme[nomeForma]);
-  const totale = Math.max(piano.length * 2, Math.round((durata_s * bpm) / 240));
-  const quante = dividi(piano.map((x) => x[2]), totale);
+  const totale = Math.max(8, Math.round((durata_s * bpm) / 240));
+  const piano = sezioni ? formaScelta(sezioni, totale) : componiForma(nomeForma, totale);
 
-  // armonia: tre giri (strofa, ritornello, ponte), un accordo per battuta; l'assolo suona sul giro della strofa
-  const giri = mescola(r, GIRI[p.stile][modoM]);
-  const giroDi = (ruolo) => giri[({ gancio: 1, rit: 1, finale: 1, ponte: 2, pre: 2 }[ruolo] || 0) % giri.length].split(' ').map((b) => accordo(b.split('+')[0]));
+  // armonia: un periodo per ruolo, lo stesso a ogni ritorno
+  const mio = ARMONIA[p.stile][modoM];
+  const periodi = { strofa: scegli(r, mio.strofa), pre: scegli(r, mio.pre), rit: scegli(r, mio.rit), ponte: scegli(r, mio.ponte) };
+  periodi.gancio = periodi.finale = periodi.rit;
+  periodi.solo = r() < 0.5 ? periodi.strofa : periodi.rit;
 
-  // l'unico cambio di tonalità: l'ultimo ritornello più in alto, nei brani pieni e non sempre
-  const ultimoRit = piano.map((x) => x[1]).lastIndexOf('rit');
+  const ultimoRit = piano.map((x) => x.ruolo).lastIndexOf('rit');
   const sale = pieno && ultimoRit > 0 && r() < 0.35 ? scegli(r, [1, 2]) : 0;
 
   // richiamo: il tema è scelto a monte; sta in apertura o in chiusura, dove non spezza il discorso
   let cameo = null;
   if (idCameo) {
-    const posti = piano.map((x, i) => ({ i, ruolo: x[1] })).filter((x) => ['gancio', 'finale'].includes(x.ruolo) && quante[x.i] >= CAMEI[idCameo].note.length + 1);
+    const lungo = CAMEI[idCameo].note.length;
+    const posti = piano.map((x, i) => ({ i, ruolo: x.ruolo })).filter((x) => (x.ruolo === 'gancio' && piano[x.i].battute >= lungo) || (x.ruolo === 'finale' && piano[x.i].battute > lungo));
     if (posti.length) cameo = { id: idCameo, ...scegli(r, posti) };
   }
 
-  const gradi = [];
-  for (let m = BASSO; m <= ALTO; m++) if (scala.includes((m - t.pc + 120) % 12)) gradi.push(m);
-  const vicino = (midi, ammesse) => ammesse.reduce((a, b) => (Math.abs(b - midi) < Math.abs(a - midi) ? b : a));
-  const diAccordo = (midi, c) => { const v = []; for (let m = BASSO; m <= ALTO; m++) if (c.pcs.includes(m % 12)) v.push(m); return vicino(midi, v); };
-
-  // i temi: due celle per strofa, ritornello e ponte; frase A B A + chiusura
-  const celle = PASSI[FEEL[p.stile]];
-  const nuovaCella = () => { const ritmo = scegli(r, celle); return { ritmo, mosse: ritmo.map(() => scegli(r, MOSSE)) }; };
-  const due = () => { const a = nuovaCella(); let b = nuovaCella(); while (b.ritmo === a.ritmo) b = nuovaCella(); return [a, b]; };
-  const temaStrofa = due(), temaRit = due(), temaPonte = due();
-  const trovate = new Set();
+  // motivi: ritmo scritto a mano, gesti propri del brano
+  const [a, b, h, h2, d, e] = mescola(r, M.MOTIVI[FEEL[p.stile]]).map((testo) => M.motivo(r, testo));
+  const cadenze = mescola(r, M.CADENZE).map((testo) => M.motivo(r, testo));
+  const FRASI = {
+    strofa: [a, b, a, cadenze[0]], pre: [b, cadenze[1]], rit: [h, h2, h, cadenze[2]], ponte: [d, d, e, cadenze[3]],
+    gancio: [null, h], finale: [h, cadenze[2]], solo: [],
+  };
   const volte = {};
-  let ultima = vicino(CENTRI.strofa, gradi);
+  const memoria = new Map(); // frasi già scritte: tornano uguali, al massimo due volte
+  let ultima = 67;
+  const trovate = new Set();
   const usate = new Set();
 
-  // una battuta di melodia: ritmo e passi sulla scala; sui tempi forti si appoggia all'accordo
-  function melodia({ ritmo, mosse, parti, lunghezza, accordo: c, centro, chiude = false }) {
-    let idx = gradi.indexOf(vicino(parti === undefined ? ultima : parti, gradi));
-    let pos = 0;
-    const adattate = adatta(ritmo, lunghezza);
-    return adattate.map((d, k) => {
-      const durata = Math.abs(d);
-      const inizio = pos;
-      pos += durata;
-      if (d < 0) return { midi: null, durata };
-      if (k) idx += mosse[k % mosse.length];
-      idx = Math.max(0, Math.min(gradi.length - 1, idx));
-      // fuori dal registro della sezione la linea torna indietro
-      while (idx > 0 && gradi[idx] > centro + 9) idx -= 1;
-      while (idx < gradi.length - 1 && gradi[idx] < centro - 9) idx += 1;
-      let midi = gradi[idx];
-      if (inizio === 0 || inizio === 16 || (chiude && k === adattate.length - 1)) {
-        midi = diAccordo(midi, c);
-        idx = gradi.indexOf(vicino(midi, gradi));
-      }
-      ultima = midi;
-      return { midi, durata };
-    });
-  }
-  // chiusura di sezione: una piccola corsa nella seconda metà, oppure una nota che respira
-  function chiusura(c, lunghezza, centro) {
-    trovate.add('fill');
-    const ritmo = scegli(r, [[16, 4, 4, 4, 4], [12, 4, 4, 4, 8], [8, 8, 4, 4, 8]]);
-    return melodia({ ritmo, mosse: [scegli(r, [1, -1])], lunghezza, accordo: c, centro });
-  }
-
-  const lunghezza = Abc.unita('4/4');
-  const scoreSezioni = piano.map(([nome, ruolo], s) => {
+  const scoreSezioni = piano.map(({ ruolo, battute: quante }, s) => {
     const volta = (volte[ruolo] = (volte[ruolo] || 0) + 1) - 1;
-    const quanteB = quante[s];
-    const giro = giroDi(ruolo);
-    const centro = CENTRI[ruolo];
-    const disegni = mescola(r, Object.keys(DISEGNI));
+    const centro = CENTRI[ruolo] + (ruolo === 'solo' ? volta * 2 : 0);
     const ultimaSezione = s === piano.length - 1;
     if (ruolo === 'solo' || ruolo === 'ponte') trovate.add(ruolo);
-    ultima = vicino(centro, gradi);
-    // la strofa che ritorna cambia solo la risposta
-    const risposta = volta && ruolo === 'strofa' ? nuovaCella() : null;
+    const periodo = periodi[ruolo];
+    // il pre porta sempre alla fine del suo periodo; un ritornello accorciato tiene la cadenza
+    const parti = quante < periodo.length && (ruolo === 'rit' || ruolo === 'strofa') ? periodo.slice(periodo.length - quante) : periodo;
+    const gradi = Array.from({ length: quante }, (_, i) => parti[i % parti.length]);
+    // al ritorno del ritornello la penultima battuta si arricchisce di una dominante verso l'ultima
+    if (ruolo === 'rit' && volta && quante >= 4) {
+      const meta = gradi[quante - 1][0];
+      gradi[quante - 2] = [gradi[quante - 2][0], { semi: (meta.semi + 7) % 12, tipo: '7', basso: null }];
+      trovate.add('riarmonizzazione');
+    }
+    if (ruolo === 'pre') gradi[quante - 1] = [gradi[quante - 1][0].semi === 7 ? gradi[quante - 1][0] : gradi[quante - 1][0], ...gradi[quante - 1].slice(1)];
+    if (ultimaSezione) { gradi[quante - 1] = [tonicaFinale]; if (quante >= 2 && ruolo === 'finale') gradi[quante - 2] = [dom]; }
+    const accordi = gradi.map((g) => g.slice(0, 2).map((x, i) => accordo(x, i * 16)));
 
-    const battute = Array.from({ length: quanteB }, (_, i) => {
-      const fineBrano = ultimaSezione && i === quanteB - 1;
-      let c = giro[i % giro.length];
-      if (ruolo === 'pre' && i === quanteB - 1) c = accordo('7:7');
-      if (fineBrano) c = accordo(`0:${p.stile === 'flamenco' ? '' : t.minore ? 'm' : ''}`);
-      const scrivi = (ins) => ({ accordi: [{ pos: 0, sigla: c.sigla }], vocal: null, ins });
-      if (fineBrano) return scrivi([{ midi: vicino(centro, gradi.filter((g) => g % 12 === t.pc)), durata: lunghezza }]);
-
-      const nella = i % 4;
-      const frase = Math.floor(i / 4);
-      const chiude = i === quanteB - 1;
-      if (chiude && ruolo !== 'finale') return scrivi(chiusura(c, lunghezza, centro));
-
+    const melodia = Array(quante).fill(null);
+    const passi = Math.ceil(quante / 2);
+    for (let u = 0; u < passi; u++) {
+      const da = u * 2;
+      const qui = accordi.slice(da, da + 2);
+      const finale = u === passi - 1;
+      const meta = qui[qui.length - 1].at(-1);
+      // domanda e risposta: a metà periodo si resta aperti, il ritornello e il finale chiudono sulla tonica
+      const cadenza = finale ? (ruolo === 'rit' || ruolo === 'finale' ? [t.pc] : [meta.pcs[2] ?? meta.pcs[0]]) : u % 2 ? [meta.pcs[1]] : null;
+      let m;
       if (ruolo === 'solo') {
-        // l'assolo sale poco a poco, cambia disegno a ogni frase e a metà richiama il ritornello
-        const alto = centro - 4 + Math.round((i / quanteB) * 8);
-        if (frase % 2 === 1 && nella < 2) return scrivi(melodia({ ...temaRit[nella], parti: alto, lunghezza, accordo: c, centro: alto }));
-        if (nella === 3) return scrivi(melodia({ ritmo: [8, 8, 16], mosse: [-1], lunghezza, accordo: c, centro: alto, chiude: true }));
-        return scrivi(melodia({ ritmo: scegli(r, VOLO), mosse: DISEGNI[disegni[frase % disegni.length]], lunghezza, accordo: c, centro: alto }));
+        if (finale) m = cadenze[4];
+        else if (u % 4 === 2) m = h; // a metà l'assolo cita il gancio
+        else {
+          const [x, y] = [scegli(r, M.LICK), scegli(r, M.LICK)];
+          const note = M.leggiMotivo(`${x[0]} | ${y[0]}`);
+          const gesti = [...x[1], ...y[1]];
+          m = { testo: x[0] + y[0], note, gesti: note.map((_, i) => gesti[i] || 'p'), verso: note.map(() => (r() < 0.5 ? 1 : -1)) };
+        }
+      } else {
+        const lista = FRASI[ruolo];
+        // sezioni brevi: l'ultima coppia è sempre la chiusura
+        m = finale && lista.length > 2 ? lista.at(-1) : lista[u % lista.length];
+        // la strofa che ritorna cambia la risposta
+        if (ruolo === 'strofa' && volta && u === 1) m = e;
+        if (ruolo === 'gancio') m = u === 0 && passi > 1 ? null : h;
       }
-      if (ruolo === 'gancio' && i < Math.floor(quanteB / 2)) return scrivi(null); // il brano entra con gli accordi
+      if (!m) continue;
+      const chiave = `${m.testo}|${qui.flat().map((x) => x.sigla).join()}|${finale}`;
+      const nota = memoria.get(chiave);
+      if (nota && nota.volte < 2 && ruolo !== 'solo') {
+        nota.volte++;
+        nota.battute.forEach((x, i) => { if (da + i < quante) melodia[da + i] = x.map((n) => ({ ...n })); });
+        ultima = [...nota.battute.flat()].reverse().find((n) => n.midi !== null)?.midi ?? ultima;
+      } else {
+        const salita = ruolo === 'rit' || ruolo === 'solo' ? 9 : ruolo === 'pre' ? 8 : 6;
+        const arco = ruolo === 'solo' ? Math.round((u / passi) * 6) - 2 : (u === 2 ? 2 : 0);
+        const arrivi = M.scheletro(r, { battute: qui, centro: centro + arco, basso: BASSO, alto: ALTO, daNota: ultima, cadenza, salita });
+        const righe = M.frase({ battute: qui, m, arrivi, scala, tonica: t.pc, basso: BASSO, alto: ALTO });
+        righe.forEach((x, i) => { melodia[da + i] = x; });
+        memoria.set(chiave, { volte: 1, battute: righe });
+        ultima = arrivi.at(-1);
+      }
+      if ((ruolo === 'rit' || ruolo === 'finale') && m === h) usate.add(M.leggiMotivo(h.testo.split('|')[0]).map((x) => (x.pausa ? -x.durata : x.durata)).join());
+    }
 
-      const tema = ruolo === 'strofa' ? temaStrofa : ruolo === 'ponte' || ruolo === 'pre' ? temaPonte : temaRit;
-      const m = nella === 1 ? tema[1] : nella === 3 ? risposta || tema[1] : tema[0];
-      // a inizio frase si riparte dalla stessa altezza: così il tema si riconosce
-      const parti = nella === 0 ? centro : nella === 2 ? centro + [0, 3, -2, 5][(frase + volta) % 4] : undefined;
-      let { ritmo, mosse } = m;
-      if (nella === 1 && (frase + volta) % 2) mosse = mosse.map((x) => -x); // la risposta si rovescia una volta sì e una no
-      if (nella === 3) { ritmo = frase % 2 ? [8, 24] : [8, 8, 16]; mosse = [-1]; }
-      if (nella === 0) usate.add(ritmo.join());
-      return scrivi(melodia({ ritmo, mosse, parti, lunghezza, accordo: c, centro, chiude: nella === 3 }));
-    });
+    let battute = accordi.map((ac, i) => ({ accordi: ac.map(({ pos, sigla }) => ({ pos, sigla })), vocal: null, ins: melodia[i] }));
+    if (ultimaSezione) {
+      const midi = M.scalaDi(scala, t.pc, accordi[quante - 1][0], BASSO, ALTO).filter((x) => x % 12 === t.pc).reduce((x, y) => (Math.abs(y - ultima) < Math.abs(x - ultima) ? y : x));
+      battute[quante - 1].ins = [{ midi, durata: 32 }];
+    }
 
     // il richiamo sostituisce le battute della sezione scelta, trasportato nella tonalità o nella sua relativa
     if (cameo && cameo.i === s) {
@@ -255,61 +209,90 @@ function candidato(r, { cat, bpm, tonalita, durata_s, sezioni, estro = 2 }, { no
       const altezze = c.note.flat().filter((x) => x[0] !== null).map((x) => x[0]);
       const centrale = (Math.min(...altezze) + Math.max(...altezze)) / 2;
       const base = t.pc + sposta + 12 * Math.round((70 - centrale - t.pc - sposta) / 12);
-      const da = ruolo === 'finale' ? Math.max(0, quanteB - c.note.length - 1) : 0;
+      const inizio = ruolo === 'finale' ? Math.max(0, quante - c.note.length - 1) : 0;
       c.note.forEach((battuta, k) => {
-        const [semi, q] = c.accordi[k % c.accordi.length].split(':');
-        const sigla = accordo(`${(Number(semi) + sposta + 12) % 12}:${q}`).sigla;
-        battute[da + k] = { accordi: [{ pos: 0, sigla }], vocal: null, ins: battuta.map(([x, durata]) => ({ midi: x === null ? null : base + x, durata })) };
+        const [semi, tipo] = c.accordi[k % c.accordi.length].split(':');
+        const sigla = accordo({ semi: (Number(semi) + sposta + 12) % 12, tipo, basso: null }).sigla;
+        battute[inizio + k] = { accordi: [{ pos: 0, sigla }], vocal: null, ins: battuta.map(([x, durata]) => ({ midi: x === null ? null : base + x, durata })) };
       });
-      cameo.battute = [da, da + c.note.length];
+      cameo.battute = [inizio, inizio + c.note.length];
     }
-
-    const sezione = { nome, battute };
-    if (!sale || s < ultimoRit) return sezione;
-    trovate.add('modulazione');
-    const tr = Abc.trasponi({ tonalita: t.sigla, sezioni: [sezione] }, sale);
-    return { ...tr.sezioni[0], tonalita: tr.tonalita };
+    return { nome: SEZIONE[ruolo], battute };
   });
 
   if (cameo) trovate.add('cameo');
-  const ritmi = (m) => m.map((x) => x.ritmo.join()).join('|');
+  const tutte = scoreSezioni.flatMap((x) => x.battute);
+  // la nota prima del richiamo non si lega dentro il richiamo, che resta com'è
+  if (cameo) {
+    const prima = scoreSezioni.slice(0, cameo.i).reduce((n, x) => n + x.battute.length, 0) + cameo.battute[0];
+    const ultimo = tutte[prima - 1]?.ins?.at(-1);
+    if (ultimo) delete ultimo.lega;
+  }
+  M.salda(tutte);
+  if (tutte.some((x) => x.ins?.some((n) => n.lega))) trovate.add('anticipi');
+
+  let sezioniFinali = scoreSezioni;
+  if (sale) {
+    trovate.add('modulazione');
+    // una legatura non attraversa il cambio di tonalità
+    const ultimo = scoreSezioni[ultimoRit - 1]?.battute.at(-1)?.ins?.at(-1);
+    if (ultimo) delete ultimo.lega;
+    sezioniFinali = scoreSezioni.map((x, i) => {
+      if (i < ultimoRit) return x;
+      const tr = Abc.trasponi({ tonalita: t.sigla, sezioni: [x] }, sale);
+      return { ...tr.sezioni[0], tonalita: tr.tonalita };
+    });
+  }
+
+  const firmaDi = (...m) => m.map((x) => x.note.map((n) => n.durata).join()).join('|');
   return {
-    score: { bpm, metro: '4/4', tonalita: t.sigla, sezioni: scoreSezioni },
+    score: { bpm, metro: '4/4', tonalita: t.sigla, sezioni: sezioniFinali },
     ritornello: usate,
     cameo: cameo ? { id: cameo.id, nome: CAMEI[cameo.id].nome, sezione: cameo.i, battute: cameo.battute } : null,
     trovate: [...trovate].sort(),
     parametri: { progressioni: [], celle: [], trasformazioni: [], forma: nomeForma, cameo: cameo ? cameo.id : null, trovate: [...trovate].sort() },
-    firma: { tema: ritmi(temaStrofa), mosse: [...temaStrofa, ...temaRit].map((x) => x.mosse.join()).join('|'), ritornello: ritmi(temaRit), progressioni: giri.slice(0, 3).join('/'), tonalita: t.sigla, forma: nomeForma, cameo: cameo ? cameo.id : null },
+    firma: { tema: firmaDi(a, b), mosse: [a, b, h, h2].map((x) => x.gesti.join('')).join('|') + firmaDi(h), ritornello: firmaDi(h, h2), progressioni: [periodi.strofa, periodi.rit].map((x) => x.flat().map((g) => g.semi + g.tipo).join(' ')).join('/'), tonalita: t.sigla, forma: nomeForma, cameo: cameo ? cameo.id : null },
   };
 }
 
-// Revisore: premia varietà, contrasto tra sezioni e un gancio che torna, senza note a caso sui tempi forti
+// Revisore: le regole di buona scrittura (movimento per grado, salti compensati, note estranee che risolvono,
+// apice dopo la metà, tema che torna senza diventare un ciclo)
 function revisiona(c, precedenti = []) {
-  const battute = c.score.sezioni.flatMap((s, i) => s.battute.map((b) => ({ ...b, s: i })));
+  const battute = c.score.sezioni.flatMap((s) => s.battute);
   const piene = battute.filter((b) => b.ins && b.ins.some((x) => x.midi !== null));
-  const note = piene.flatMap((b) => b.ins.filter((x) => x.midi !== null));
-  const media = (v) => v.reduce((a, x) => a + x, 0) / (v.length || 1);
-  let forti = 0, buone = 0;
-  for (const b of piene) {
-    const prima = b.ins[0];
-    if (prima.midi === null) continue;
-    forti++;
-    const m = Abc.noteAccordo(b.accordi[0].sigla);
-    if (m && m.note.includes(prima.midi % 12)) buone++;
+  const note = [];
+  let accordoOra = null;
+  for (const b of battute) {
+    let pos = 0;
+    for (const e of b.ins || []) {
+      const cambio = [...(b.accordi || [])].reverse().find((a) => a.pos <= pos);
+      if (cambio) accordoOra = Abc.noteAccordo(cambio.sigla).note;
+      if (e.midi !== null) note.push({ midi: e.midi, forte: pos % 16 === 0, dentro: accordoOra.includes(e.midi % 12) });
+      pos += e.durata;
+    }
+    if (!b.ins) accordoOra = Abc.noteAccordo(b.accordi[0].sigla).note;
   }
-  // né un ciclo né un fiume di materiale sempre nuovo: circa due battute su tre diverse
-  const diverse = new Set(piene.map((b) => JSON.stringify(b.ins))).size / (piene.length || 1);
-  const varieta = Math.max(0, 1 - Math.abs(diverse - 0.65) * 3);
-  const ritorno = Math.min(1, piene.filter((b) => c.ritornello.has(b.ins.map((x) => (x.midi === null ? -x.durata : x.durata)).join())).length / (piene.length || 1) / 0.35);
-  const densita = c.score.sezioni.map((_, i) => media(battute.filter((b) => b.s === i && b.ins).map((b) => b.ins.filter((x) => x.midi !== null).length)));
-  const contrasto = Math.min(1, (Math.max(...densita) - Math.min(...densita)) / 3);
-  const salti = note.slice(1).filter((x, i) => Math.abs(x.midi - note[i].midi) > 7).length / (note.length || 1);
+  const salti = note.slice(1).map((x, i) => x.midi - note[i].midi);
+  const mossi = salti.filter((x) => x !== 0);
+  const quota = (v, test) => v.filter(test).length / (v.length || 1);
+  const entro = (x, da, a, caduta) => Math.max(0, 1 - Math.max(da - x, x - a, 0) / caduta);
+  const grado = entro(quota(mossi, (x) => Math.abs(x) <= 2), 0.55, 0.8, 0.25);
+  const larghi = Math.max(0, 1 - quota(salti, (x) => Math.abs(x) > 9) * 25);
+  const compensati = salti.slice(0, -1).map((x, i) => [x, salti[i + 1]]).filter(([x]) => Math.abs(x) >= 5);
+  const recupero = compensati.length ? quota(compensati, ([x, y]) => y * x <= 0 || Math.abs(y) <= 2) : 1;
+  const forti = note.filter((x) => x.forte);
+  const accordo = entro(quota(forti, (x) => x.dentro), 0.7, 0.95, 0.25);
+  const estranee = note.map((x, i) => [x, note[i + 1]]).filter(([x, y]) => x.forte && !x.dentro && y);
+  const risolte = estranee.length ? quota(estranee, ([x, y]) => Math.abs(y.midi - x.midi) <= 2) : 1;
   const picco = Math.max(...note.map((x) => x.midi));
-  const climax = note.findIndex((x) => x.midi === picco) / (note.length || 1) >= 0.4 ? 1 : 0;
-  const accordo = forti ? buone / forti : 0;
+  const apice = entro(note.findIndex((x) => x.midi === picco) / (note.length || 1), 0.5, 0.9, 0.4);
+  const diverse = new Set(piene.map((b) => JSON.stringify(b.ins))).size / (piene.length || 1);
+  const varieta = entro(diverse, 0.55, 0.8, 0.3);
+  const ritorno = Math.min(1, piene.filter((b) => c.ritornello.has(b.ins.map((x) => (x.midi === null ? -x.durata : x.durata)).join())).length / (piene.length || 1) / 0.12);
   const novita = 1 - Math.max(0, ...precedenti.map((x) => somiglianza(c.firma, x)));
-  const qualita = accordo * 25 + varieta * 20 + ritorno * 25 + contrasto * 10 + Math.max(0, 1 - salti * 10) * 15 + climax * 5;
-  return { punteggio: Math.round((qualita * 0.85 + novita * 15) * 10) / 10, dettagli: { accordo: +accordo.toFixed(2), varieta: +varieta.toFixed(2), ritorno: +ritorno.toFixed(2), contrasto: +contrasto.toFixed(2), salti: +salti.toFixed(3), climax, novita: +novita.toFixed(2) } };
+  const qualita = grado * 20 + larghi * 5 + recupero * 15 + accordo * 15 + risolte * 15 + apice * 10 + varieta * 10 + ritorno * 10;
+  const dettagli = Object.fromEntries(Object.entries({ grado, larghi, recupero, accordo, risolte, apice, varieta, ritorno, novita }).map(([k, v]) => [k, +v.toFixed(2)]));
+  return { punteggio: Math.round((qualita * 0.85 + novita * 15) * 10) / 10, dettagli };
 }
 
 // Stessa interfaccia di Compositore.componi, con in più cameo e trovate
@@ -323,8 +306,8 @@ function componi({ candidati = 30, seed = 1, precedenti = [], preferenze: pref =
     const libere = voci.filter((v) => !recenti.includes(v));
     return libere.length ? libere : voci;
   };
-  const forme = pieno && FORME_PER_STILE[stile] ? FORME_PER_STILE[stile] : Object.keys(FORME[pieno ? 'pieno' : 'vivo']);
-  const nomeForma = richiesta.sezioni ? 'scelta' : pesato(r, fresco(forme, 'forma', 2), (x) => peso(pref, `forma:${x}`));
+  const forme = FORME_PER_STILE[stile] || ['canzone', 'arena', 'viaggio'];
+  const nomeForma = richiesta.sezioni ? 'scelta' : pesato(r, fresco(forme, 'forma', 1), (x) => peso(pref, `forma:${x}`));
   const idCameo = r() < (pieno ? 0.35 : 0.15) ? pesato(r, fresco(CAMEI_PER_STILE[stile], 'cameo', 4), (x) => peso(pref, `cameo:${x}`)) : null;
   const gia = new Set(precedenti.map((x) => x.mosse));
   let migliore = null;
@@ -339,4 +322,4 @@ function componi({ candidati = 30, seed = 1, precedenti = [], preferenze: pref =
   return { ...resto, score, abc: Abc.scriviAbc(score), lyrics: Abc.lyricsDi(score), durata_s: Math.round(Abc.durataSecondi(score)) };
 }
 
-if (typeof module !== 'undefined') module.exports = { componi, revisiona, CAMEI, GIRI };
+if (typeof module !== 'undefined') module.exports = { componi, revisiona, CAMEI, FORME };
