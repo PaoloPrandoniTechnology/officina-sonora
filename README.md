@@ -1098,6 +1098,8 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
+| `docs\ricerche\` · `docs\report\` | [ricerca sulla composizione](docs/ricerche/2026-11-28-composizione.md) · [report sui brani creativi](docs/report/2026-11-28-brani-creativi.md) |
+| `docs\skills\` | [skill di composizione](docs/skills/LEGGIMI.md) di terzi, solo da consultare, con le loro licenze |
 | `officina-sonora-workflow.json` | workflow generato |
 
 ```powershell
