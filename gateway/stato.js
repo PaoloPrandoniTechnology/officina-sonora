@@ -4,6 +4,8 @@ const path = require('path');
 const http = require('http');
 const { execFile } = require('child_process');
 
+const testi = require('./testi').crea();
+
 const STATE = 'E:\\n8n\\officina-sonora\\state';
 const LMS = path.join(process.env.USERPROFILE || '', '.cache', 'lm-studio', 'bin', 'lms.exe');
 
@@ -124,6 +126,7 @@ async function leggiStato() {
       lmStudio: lmAttivo,
       gemmaCaricato: /gemma/i.test(ps),
     },
+    testi: testi.riepilogo(),
     render,
     pipeline: {
       occupata: lockEta !== null && lockEta < 900,

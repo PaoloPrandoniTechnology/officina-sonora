@@ -17,7 +17,8 @@ voto e, se vuoi, chiedi cambiamenti: il sistema ne tiene conto per i brani succe
 | **Dashboard** | la pagina web da cui controlli tutto |
 | **Render** | il momento in cui il computer crea l'audio; dura alcuni minuti |
 | **YuE2** | il programma che **crea la musica** |
-| **gemma** | il programma che **scrive** titoli, descrizioni e analisi (gira dentro *LM Studio*) |
+| **Servizi di testo** | i modelli in rete (Gemini, Groq, OpenRouter) che **scrivono** titoli, descrizioni e analisi |
+| **gemma** | il modello di testo sul tuo computer (dentro *LM Studio*), usato quando i servizi in rete non rispondono |
 | **n8n** | il «direttore d'orchestra» che fa eseguire i passi nell'ordine giusto |
 | **Gateway** | il piccolo servizio che fa funzionare la dashboard |
 | **Watchdog / supervisore** | i guardiani che riavviano i programmi se si fermano |
@@ -62,6 +63,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 |---|---|
 | **Avviare** la produzione | doppio clic su `E:\n8n\avvia-automazione.vbs` |
 | **Spegnere** tutto | doppio clic su `E:\n8n\ferma-automazione.vbs`; resta spento finché non riavvii tu (LM Studio resta acceso) |
+| Usare i **modelli di testo in rete**, gratis | [Servizi di testo](#servizi-di-testo): inserisci le chiavi con `tools\chiavi.ps1` |
 | Fare una **pausa** senza spegnere | *Metti in pausa* in alto a destra, in ogni pagina; su Telegram `/pausa` e `/riprendi` |
 | **Vedere se funziona** | [Panoramica](#panoramica): la riga delle fasi e gli eventuali avvisi |
 | **Ritrovare e riascoltare** un brano | [Libreria](#libreria) (tasto `/` per cercare) |
@@ -85,7 +87,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 **In parole semplici**, ogni brano passa da questi passi, uno alla volta:
 
 1. il sistema **sceglie** genere, strumenti e forma, dando precedenza a ciò che hai votato bene;
-2. **gemma** inventa titolo e descrizione;
+2. un **servizio di testo** in rete (o, se non risponde, **gemma**) inventa titolo e descrizione;
 3. si prepara lo **spartito** e **YuE2** crea l'audio (la parte più lunga);
 4. il volume viene reso uniforme e il brano **controllato**: se non va bene viene rifatto;
 5. se è buono, viene salvato, **caricato** su iBroadcast e compare nella dashboard;
@@ -96,6 +98,7 @@ Lo schema seguente è per chi vuole i dettagli.
 ```
  watchdog (ogni minuto): tiene vivi gateway, n8n, LM Studio, motore YuE2
                          e scarica gemma dalla GPU durante i render
+ testi: gateway ──► Gemini ► Groq ► OpenRouter ► gemma in locale
 
  n8n (ogni minuto)
    1 Leggi stato ── render in corso? ──no──► 5a ricetta ► 5b titolo ► 5c stile ► 5d ripiego ► 6 invio a YuE2
@@ -138,7 +141,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | Blocco | Cosa fa |
 |---|---|
 | **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, strumenti (due fissi del genere più 1-2 che cambiano, dalla [memoria](#la-memoria-di-composizione)), un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
-| **5b Titolo** | Chiede a gemma titolo, descrizione, bpm e durata, entro i limiti del genere. Gli indica le prime parole dei titoli recenti da non ripetere. Se il modello non è caricato, riprova al giro successivo. |
+| **5b Titolo** | Chiede ai [servizi di testo](#servizi-di-testo) titolo, descrizione, bpm e durata, entro i limiti del genere. Gli indica le prime parole dei titoli recenti da non ripetere. Se nessun modello risponde, riprova al giro successivo. |
 | **5c Componi concept** | Compone il testo di **stile** in inglese e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
 | **5d Componi score** | Prepara lo score di **ripiego** del compositore (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere): di norma si usa solo se il modello non ne scrive uno valido; nelle [impostazioni degli score](#come-nascono) può diventare la prima scelta. |
 | **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali) oppure direttamente l'audio (voci, ripieghi e [score scelti da te](#da-produrre)). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
@@ -159,10 +162,10 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
 | Blocco | Cosa fa |
 |---|---|
-| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, il blocco carica gemma, che rivede gli ultimi 30 brani votati e propone nuove linee guida. I termini di stile che propone sono presi dal vocabolario e valgono solo per i generi dei brani votati (`stile_generi` in `configguidance.json`, visibili in *Controllo → Linee guida* e su Telegram); non modifica i blocchi scelti da te. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
+| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, un modello di testo rivede gli ultimi 30 brani votati e propone nuove linee guida. I termini di stile che propone sono presi dal vocabolario e valgono solo per i generi dei brani votati (`stile_generi` in `config\guidance.json`, visibili in *Controllo → Linee guida* e su Telegram); non modifica i blocchi scelti da te. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
 | **8a Comandi Telegram** | Risponde ai comandi, raccoglie voti e interpreta richieste in italiano, applicandole solo dopo il tuo **Conferma**. |
 | **8b Avvisi** | Un errore ripetuto 3 volte in un'ora genera un avviso (al massimo uno ogni 30 minuti per tipo). |
-| **9 Rapporto giornaliero** | Una volta al giorno: brani, voti, errori, salute del sistema, ricette migliori e peggiori, commento di gemma. |
+| **9 Rapporto giornaliero** | Una volta al giorno: brani, voti, errori, salute del sistema, ricette migliori e peggiori, commento del modello di testo. |
 | **10 Voti da iBroadcast** | Ogni 10 minuti legge stelle, tag, playlist e cestino e li trasforma in voti; applica anche `piu-veloce` / `piu-lento`. |
 | **11 Riepilogo** | Alla frequenza scelta, nella fascia oraria, un messaggio con i brani caricati. |
 
@@ -171,9 +174,47 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | Componente | Ruolo |
 |---|---|
 | `gateway\server.js` (porta 5790) | Unico processo che conosce i token; parla con iBroadcast e Telegram, analizza l'audio, serve dashboard, voti e copertine. |
+| `gateway\testi.js` | Catena dei modelli di testo: servizi in rete, poi gemma, che carica solo quando serve. |
 | `watchdog.ps1` | Ogni minuto tiene vivi gateway, n8n, LM Studio e motore; libera la GPU durante i render. |
 | `supervisore.ps1` | Ogni 5 minuti riavvia il watchdog se è morto o se il suo battito è fermo da 15 minuti. |
 | `stop.ps1` | Ferma watchdog, n8n, motore e gateway. |
+
+---
+
+## Servizi di testo
+
+Titoli, descrizioni, revisione delle linee guida, comandi di Telegram, rapporto e traduzione delle note passano da
+una catena di servizi gratuiti. Il gateway li prova nell'ordine di `config\servizi.json`; se nessuno risponde usa
+**gemma** sul tuo computer. La **musica** nasce sempre e solo sul tuo computer, con YuE2.
+
+| Ordine | Servizio | Modello | Dove si crea la chiave |
+|---|---|---|---|
+| 1 | `gemini` | `gemini-3.8-flash` | [Google AI Studio](https://aistudio.google.com/apikey) |
+| 2 | `gemini-lite` | `gemini-3.5-flash-lite` (stessa chiave) | |
+| 3 | `groq` | `openai/gpt-oss-120b` | [Groq](https://console.groq.com/keys) |
+| 4 | `openrouter` | `google/gemma-4-31b-it:free` | [OpenRouter](https://openrouter.ai/keys) |
+| 5 | `openrouter-riserva` | `openrouter/free` (stessa chiave) | |
+| ultimo | gemma | `google/gemma-4-e4b` in LM Studio | nessuna |
+
+**Per attivarli** crea gli account gratuiti (bastano anche uno o due) e inserisci le chiavi:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File E:\n8n\officina-sonora\tools\chiavi.ps1
+```
+
+Lo script le salva cifrate in `secrets\`, prova ogni servizio e dice quale funziona. Non serve riavviare nulla.
+Non incollare le chiavi in file del progetto o in chat. Senza chiavi il sistema usa solo gemma.
+
+**Quando un servizio non risponde** si passa al successivo. Se ha finito la quota si mette in pausa per il tempo che
+indica (altrimenti 15 minuti); se rifiuta chiave o modello, per un'ora. Il riquadro dei servizi nella
+[Panoramica](#panoramica) e in [Log e sistema](#log-e-sistema) mostra per ognuno: *senza chiave*, *pronto* con le
+richieste di oggi (conteggio per giorno UTC), oppure *in pausa fino alle*; passandoci sopra si vedono modello e
+ultimo errore.
+
+**Quote:** cambiano nel tempo e dipendono dal tuo account. Al 28/11/2026 Groq dichiara 1.000 richieste e 200.000
+token al giorno, OpenRouter 50 richieste al giorno sui modelli gratuiti; i limiti di Gemini si leggono in AI Studio.
+Per cambiare modello, ordine o spegnere un servizio (`"attivo": false`) modifica `config\servizi.json`: vale dalla
+richiesta successiva.
 
 ---
 
@@ -858,7 +899,8 @@ Windows 11 con GPU NVIDIA (qui una RTX 3060 Laptop da 6 GB).
 | Node.js 24 | nel PATH | gateway e test |
 | YuE2 Studio | `E:\MusicAI\YuE2 Studio` | motore yue2.cpp sulla porta 18087 (CUDA), LoRA in `data\adapters` |
 | ffmpeg | `E:\MusicAI\ffmpeg` | mastering |
-| LM Studio | porta 1234 | modello `google/gemma-4-e4b` |
+| LM Studio | porta 1234 | modello `google/gemma-4-e4b`, ripiego dei testi |
+| Chiavi Gemini, Groq, OpenRouter (facoltative) | `secrets\` | piani gratuiti, vedi [Servizi di testo](#servizi-di-testo) |
 | Account iBroadcast e bot Telegram | | token cifrati in `secrets\` |
 
 Non sono nel repository: n8n, i file `avvia-automazione.vbs` e `ferma-automazione.vbs` (in `E:\n8n`), motore e
@@ -868,7 +910,11 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 
 ## 11. Sicurezza
 
-- Token Telegram e iBroadcast cifrati con **DPAPI**: leggibili solo dal tuo utente su questo PC.
+- Token Telegram, token iBroadcast e chiavi dei servizi di testo cifrati con **DPAPI**: leggibili solo dal tuo utente
+  su questo PC.
+- **Con le chiavi inserite, i testi escono dal computer**: titoli, descrizioni, generi, voti, note sui brani e
+  messaggi scritti al bot vanno al servizio che risponde. I piani gratuiti possono usare questi dati per migliorare i
+  propri modelli: non scrivere nelle note informazioni personali.
 - Solo il **gateway** li conosce; i blocchi n8n lo chiamano su `127.0.0.1`.
 - Se `config\parametri.json` o le linee guida risultano illeggibili, la dashboard rifiuta di salvare invece di
   sovrascriverli.
@@ -894,8 +940,9 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 | "mastering fallito" | verifica ffmpeg e riavvia il gateway; dopo 5 tentativi il motore consegna l'MP3 |
 | Molti brani "troppo corti" | limite noto (vedi miglioramenti); le soglie sono in *Controllo → Parametri* |
 | Voci in un brano strumentale | vota 1 con una nota; la LoRA in uso è registrata nella scheda |
-| "revisione non riuscita: LLM HTTP 400" | gemma non era caricato: le linee guida restano invariate |
-| "risposta del modello troncata (max_tokens)" | il ragionamento di gemma ha esaurito il margine (`RAGIONAMENTO_TOKEN` in `src/lib.js`) |
+| "revisione non riuscita: LLM HTTP 400" | nessun servizio in rete ha risposto e gemma non era caricabile: le linee guida restano invariate |
+| "servizi di testo non disponibili (...)" | i servizi indicati non hanno risposto e ha scritto gemma; controlla quota e chiave con `tools\chiavi.ps1` |
+| "risposta del modello troncata (max_tokens)" | il ragionamento del modello ha esaurito il margine (`margine` in `config\servizi.json`; per gemma `MARGINE_LOCALE` in `gateway\testi.js`) |
 | "token non valido" | rinnova il token (vedi Sicurezza) |
 | Un brano manca su iBroadcast | si ritenta da solo ogni ora; se resta in attesa la Panoramica lo segnala: cerca il motivo in `state\tick.log` |
 
@@ -912,7 +959,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
 | `src\compositore\` | compositore, revisore, scrittura e validazione dello score ABC |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
-| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
+| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione, prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `officina-sonora-workflow.json` | workflow generato |
@@ -964,3 +1011,5 @@ In ordine di priorità. Il disegno completo è in
 | 5 | **Lettore**: equalizzatore, playlist inviate a iBroadcast, cronologia comune a più browser | oggi restano su questo PC e nel browser |
 | 6 | **Schede artistiche** più ricche per i generi attivi: forme e varianti vere al posto di quelle segnaposto | generi più distinti |
 | 7 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |
+| 8 | **Servizi di testo dalla dashboard**: accendere, spegnere e ordinare; aggiungere Cloudflare Workers AI | oggi si modifica `config\servizi.json` |
+| 9 | **Prova di un motore musicale in rete** (ACE-Step su Hugging Face, pochi brani al giorno) | valutata e non attivata: vedi [analisi](docs/superpowers/specs/2026-11-28-motori-cloud-design.md) |

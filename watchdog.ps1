@@ -93,10 +93,8 @@ while (-not (Test-Path $StopFlag)) {
   $ps = Invoke-Lms @('ps')
   if (HasJob) {
     if ($ps -match 'gemma') { Log 'render in corso: scarico gemma dalla GPU'; Invoke-Lms @('unload', '--all') | Out-Null }
-  } elseif ($ps -notmatch 'gemma') {
-    Log 'nessun render: carico gemma'
-    Invoke-Lms @('load', 'google/gemma-4-e4b', '-y', '-c', '16384') | Out-Null
   }
+  # gemma non si precarica: scrive i testi solo se i servizi cloud non rispondono e la carica il gateway
 
   # Motore YuE2: riavvia solo se il processo non esiste (evita doppie istanze mentre lavora)
   if (-not (Up 'http://127.0.0.1:18087/health')) {

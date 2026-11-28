@@ -12,6 +12,7 @@ const voti = require('./voti');
 const playlist = require('./playlist');
 const score = require('./score');
 const andamento = require('./andamento');
+const { crea: creaTesti, lms } = require('./testi');
 const { ammessa } = require('./protezione');
 const { scriviAtomico } = require('./disco');
 const { copertinaDi } = require('./id3');
@@ -136,19 +137,7 @@ function inLibreria(file) {
   if (!abs.toLowerCase().startsWith(LIBRERIA + path.sep)) throw new Error('file fuori dalla libreria');
   return abs;
 }
-const LMS = path.join(require('os').homedir(), '.cache', 'lm-studio', 'bin', 'lms.exe');
-function lms(args) {
-  return new Promise((resolve) => {
-    // lms scrive diversi messaggi su stderr: si restituiscono entrambi i canali
-    require('child_process').execFile(LMS, args, { windowsHide: true, timeout: 180000 }, (e, out, err) => resolve(e ? { ok: false, error: e.message.slice(0, 200) } : { ok: true, testo: `${out}\n${err}` }));
-  });
-}
-// gemma una sola volta: un secondo load creerebbe una seconda copia in memoria
-async function caricaGemma() {
-  const ps = await lms(['ps']);
-  if (/gemma/i.test(ps.testo || '')) return { ok: true };
-  return lms(['load', 'google/gemma-4-e4b', '-y', '-c', '16384']);
-}
+const testi = creaTesti();
 async function analizzaAudio(file) {
   const abs = inLibreria(file);
   const { MPEGDecoder } = require('mpg123-decoder');
@@ -288,8 +277,13 @@ const server = http.createServer(async (req, res) => {
       if (path.extname(sorgente).toLowerCase() !== '.wav' || path.extname(destinazione).toLowerCase() !== '.mp3') throw new Error('formati non ammessi');
       return rispondi(200, { ok: true, ...(await require('./master').master(sorgente, destinazione)) });
     }
-    // gemma e il motore audio non stanno insieme in 6 GB: i blocchi la caricano e scaricano quando serve
-    if (req.url === '/llm/carica') return rispondi(200, await caricaGemma());
+    // Testi: servizi cloud in catena e, se non rispondono, gemma
+    if (req.url === '/llm/chat') {
+      const { system, user, maxTokens, solo } = JSON.parse(corpo.toString('utf8'));
+      try { return rispondi(200, { ok: true, ...(await testi.chiedi({ system, user, maxTokens, solo })) }); }
+      catch (e) { return rispondi(200, { ok: false, error: e.message }); }
+    }
+    // gemma e il motore audio non stanno insieme in 6 GB: si scarica prima di un render
     if (req.url === '/llm/scarica') return rispondi(200, await lms(['unload', '--all']));
     if (req.url === '/copertina') {
       const r = await require('./copertina').componi(JSON.parse(corpo.toString('utf8')));

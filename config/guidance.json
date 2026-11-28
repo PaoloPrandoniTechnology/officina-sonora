@@ -1,14 +1,15 @@
 {
-  "versione": 7,
+  "versione": 13,
   "bpm_range": {
-    "Power-yoga": "103-130",
+    "Power-yoga": "115-140",
     "Meditazione": "30-70",
-    "Pranayama-respiro": "50-75",
-    "Hatha-base": "70-107",
-    "Yin-Savasana": "40-60",
-    "Restorative": "50-80",
-    "Sound-bath-rilassamento": "35-55",
-    "Post-rock-strumentale": "95-110"
+    "Pranayama-respiro": "50-80",
+    "Hatha-base": "70-95",
+    "Yin-Savasana": "40-65",
+    "Restorative": "50-85",
+    "Sound-bath-rilassamento": "35-60",
+    "Post-rock-strumentale": "95-115",
+    "Reggae-dub-morbido": "65-97"
   },
   "struttura_pref": {
     "Sound-bath-rilassamento": [
@@ -39,7 +40,11 @@
       "resonant"
     ],
     "Pranayama-respiro": [
-      "breath texture"
+      "breath texture",
+      "calming",
+      "slow swells",
+      "peaceful",
+      "introspective"
     ],
     "Hatha-base": [
       "gentle slow pulse",
@@ -51,7 +56,8 @@
       "breath texture",
       "uplifting",
       "cinematic score",
-      "pulsing synth bass"
+      "pulsing synth bass",
+      "energetic"
     ],
     "Sound-bath-rilassamento": [
       "gong waves",
@@ -61,7 +67,11 @@
       "deep swell"
     ],
     "Restorative": [
-      "nurturing"
+      "nurturing",
+      "soft strings",
+      "airy reverb",
+      "gentle",
+      "serene"
     ],
     "Post-rock-strumentale": [
       "atmospheric",
@@ -90,14 +100,15 @@
   "durata_hint": {
     "Meditazione": "240-270",
     "Pranayama-respiro": "180-270",
-    "Hatha-base": "180-250",
+    "Hatha-base": "180-230",
     "Vinyasa-dinamico": "150-210",
     "Power-yoga": "120-200",
     "Yin-Savasana": "240-270",
     "Restorative": "240-270",
     "Sound-bath-rilassamento": "240-270",
-    "Post-rock-strumentale": "240-270"
+    "Post-rock-strumentale": "240-270",
+    "Reggae-dub-morbido": "180-270"
   },
-  "note": "Ho rafforzato i termini stilistici per enfatizzare il senso di quiete profonda e risonanza (Meditazione, Sound-bath) o l'aspetto emotivo/elevante (Power-yoga, Restorative), basandomi sui voti alti. Ho leggermente ampliato le durate massime per accogliere la natura spesso estesa del 'drone' e dei pro",
-  "aggiornato": "2026-11-28T10:30:04.967Z"
+  "note": "Ho ottimizzato le linee guida per 'Hatha-base' e 'Power-yoga' basandomi sul successo dei brani con voti elevati. Ho ristretto i limiti di BPM e durata per Hatha-base per riflettere il pattern più efficace (intorno agli 80 BPM). Inoltre, ho arricchito lo stile generico di Hatha-base includendo 'mello",
+  "aggiornato": "2026-11-28T14:49:23.110Z"
 }

@@ -1,5 +1,8 @@
 # Officina Sonora: istruzioni di progetto
 
+- **Prima di modificare qualunque file fai sempre un backup**: copia l'originale in
+  `state\backup\<AAAAMMGG-HHMMSS>\` mantenendo il percorso relativo, poi modifica. Vale per codice,
+  configurazione e documentazione (la cartella è fuori da Git; non copiarvi segreti).
 - **Aggiorna `README.md` a ogni modifica importante** (blocchi, comportamento della produzione, dashboard,
   comandi, configurazione, requisiti), nella stessa modifica: sezioni interessate, guida rapida e
   "Miglioramenti futuri". Se cambia la dashboard o il workflow, rigenera anche screenshot

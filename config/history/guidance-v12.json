@@ -1,0 +1,114 @@
+{
+  "versione": 12,
+  "bpm_range": {
+    "Power-yoga": "105-135",
+    "Meditazione": "30-70",
+    "Pranayama-respiro": "50-80",
+    "Hatha-base": "65-107",
+    "Yin-Savasana": "40-65",
+    "Restorative": "50-85",
+    "Sound-bath-rilassamento": "35-60",
+    "Post-rock-strumentale": "95-115",
+    "Reggae-dub-morbido": "65-97"
+  },
+  "struttura_pref": {
+    "Sound-bath-rilassamento": [
+      "piatto"
+    ],
+    "Yin-Savasana": [
+      "piatto",
+      "onda"
+    ],
+    "Meditazione": [
+      "piatto",
+      "onda"
+    ],
+    "Restorative": [
+      "onda"
+    ],
+    "Post-rock-strumentale": [
+      "crescendo"
+    ]
+  },
+  "style_extra": [],
+  "stile_generi": {
+    "Meditazione": [
+      "deep swell",
+      "sustained tones",
+      "spiritual",
+      "very slow evolution",
+      "resonant"
+    ],
+    "Pranayama-respiro": [
+      "breath texture",
+      "calming",
+      "slow swells",
+      "peaceful",
+      "introspective"
+    ],
+    "Hatha-base": [
+      "gentle slow pulse",
+      "relaxed bossa groove",
+      "acoustic guitar strumming",
+      "light relaxed groove"
+    ],
+    "Power-yoga": [
+      "breath texture",
+      "uplifting",
+      "cinematic score",
+      "pulsing synth bass",
+      "energetic"
+    ],
+    "Sound-bath-rilassamento": [
+      "gong waves",
+      "crystal bowls",
+      "long decays",
+      "meditative",
+      "deep swell"
+    ],
+    "Restorative": [
+      "nurturing",
+      "soft strings",
+      "airy reverb",
+      "gentle",
+      "serene"
+    ],
+    "Post-rock-strumentale": [
+      "atmospheric",
+      "cinematic score",
+      "sweeping strings",
+      "delayed guitars",
+      "build-up risers"
+    ],
+    "Reggae-dub-morbido": [
+      "one drop groove",
+      "relaxed bossa groove",
+      "dub echoes",
+      "sparse hats",
+      "warm low drone"
+    ],
+    "Yin-Savasana": [
+      "deep swell",
+      "sustained tones",
+      "heavy stillness",
+      "warm low drone",
+      "very slow evolution"
+    ]
+  },
+  "style_avoid": [],
+  "blocchi_generi": {},
+  "durata_hint": {
+    "Meditazione": "240-270",
+    "Pranayama-respiro": "180-270",
+    "Hatha-base": "180-250",
+    "Vinyasa-dinamico": "150-210",
+    "Power-yoga": "120-200",
+    "Yin-Savasana": "240-270",
+    "Restorative": "240-270",
+    "Sound-bath-rilassamento": "240-270",
+    "Post-rock-strumentale": "240-270",
+    "Reggae-dub-morbido": "180-270"
+  },
+  "note": "Ho aggiunto 'Reggae-dub-morbido' come genere per includere il successo del brano votato. Ho rafforzato la definizione di stile per Hatha-base aggiungendo 'mellow acoustic feel', e ho ridefinito i limiti BPM e durata per Reggae-dub-morbido, poiché questo è emerso come un pattern di successo non ancor",
+  "aggiornato": "2026-11-28T14:27:25.436Z"
+}

@@ -139,6 +139,7 @@ test('mastering: MP3 a 320 kbps con loudness uniforme', async (t) => {
 
 test('modello di testo: margine di token per il ragionamento, risposta troncata segnalata', async () => {
   const prova = (finish, content) => new AF('require', LIB + `let corpo;
+    gw = async () => { throw Object.assign(new Error('spento'), { code: 'ECONNREFUSED' }); }; log = () => {};
     req = async (m, u, o) => { corpo = o.body; return { ok: true, buf: Buffer.from(${JSON.stringify(JSON.stringify({ choices: [{ finish_reason: finish, message: { content } }] }))}) }; };
     return { j: await llmJson('s', 'u', 1500), corpo };`)(require);
   const r = await prova('stop', '```json\n{"a":1}\n```');

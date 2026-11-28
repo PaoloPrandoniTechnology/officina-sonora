@@ -1,0 +1,9 @@
+{
+  "testi": [
+    { "nome": "gemini", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "modello": "gemini-3.8-flash", "chiave": "gemini", "margine": 6000, "attivo": true },
+    { "nome": "gemini-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "modello": "gemini-3.5-flash-lite", "chiave": "gemini", "margine": 3000, "attivo": true },
+    { "nome": "groq", "url": "https://api.groq.com/openai/v1/chat/completions", "modello": "openai/gpt-oss-120b", "chiave": "groq", "margine": 2000, "attivo": true },
+    { "nome": "openrouter", "url": "https://openrouter.ai/api/v1/chat/completions", "modello": "google/gemma-4-31b-it:free", "chiave": "openrouter", "margine": 4000, "attivo": true },
+    { "nome": "openrouter-riserva", "url": "https://openrouter.ai/api/v1/chat/completions", "modello": "openrouter/free", "chiave": "openrouter", "margine": 4000, "attivo": true }
+  ]
+}

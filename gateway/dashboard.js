@@ -182,6 +182,14 @@
       + `<p><button class="link" data-vai="generi">Scegli il genere del prossimo brano</button></p>`);
   }
 
+  // Un servizio di testo in cloud: pronto, in pausa (quota o rifiuto) oppure senza chiave
+  function rigaTesti(t) {
+    const ora = (x) => new Date(x).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    const [classe, testo] = !t.attivo ? ['w', 'spento'] : !t.configurato ? ['w', 'senza chiave']
+      : t.sospesoFino ? ['ko', 'in pausa fino alle ' + ora(t.sospesoFino)] : ['ok', `pronto · ${n0(t.oggi)} oggi`];
+    return `<div class="srv"><span data-tip="${esc(t.modello + (t.errore ? ' · ultimo errore: ' + t.errore : ''))}">Testi: ${esc(t.nome)}</span><span class="pill ${classe}">${esc(testo)}</span></div>`;
+  }
+
   function disegnaStato(s) {
     statoUltimo = s;
     const g = guasti(s), pausa = inPausa(s);
@@ -196,7 +204,8 @@
     b.className = 'btn small' + (pausa ? '' : ' ghost');
 
     const servizi = servizioRiga('n8n (regia)', s.servizi.n8n) + servizioRiga('Motore musicale YuE2', s.servizi.motoreYue)
-      + servizioRiga('LM Studio', s.servizi.lmStudio, 'attivo', 'spento') + servizioRiga('Modello di testo gemma', s.servizi.gemmaCaricato, 'caricato', 'a riposo', 'w', 'Durante la creazione di un brano gemma viene tolta dalla scheda video: è normale.');
+      + servizioRiga('LM Studio', s.servizi.lmStudio, 'attivo', 'spento') + servizioRiga('Modello di testo gemma', s.servizi.gemmaCaricato, 'caricato', 'a riposo', 'w', 'Scrive i testi se i servizi cloud non rispondono. Durante la creazione di un brano viene tolta dalla scheda video: è normale.')
+      + (s.testi || []).map(rigaTesti).join('');
     imposta('#servizi', servizi);
     imposta('#servizi2', servizi);
 

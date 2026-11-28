@@ -326,11 +326,28 @@ async function engineUp() {
   }
 }
 
-// Chiamata al modello locale: ritorna il primo oggetto JSON presente nella risposta.
+// Il testo passa dal gateway: servizi cloud gratuiti in catena, poi gemma (gateway\testi.js).
+// Se il gateway è spento si chiama direttamente il modello locale.
+async function llmJson(system, user, maxTokens = 1200) {
+  let r;
+  try {
+    r = await gw('/llm/chat', { system, user, maxTokens });
+  } catch (e) {
+    if (e.code !== 'ECONNREFUSED') throw e;
+    log('gateway spento: chiedo direttamente al modello locale');
+    return llmLocale(system, user, maxTokens);
+  }
+  if (!r.ok) throw new Error(r.error || `catena dei testi HTTP ${r.status}`);
+  if (r.motivi && r.motivi.length) log(`servizi di testo non disponibili (${r.motivi.join('; ')}): ha risposto gemma`);
+  else if (r.servizio !== 'locale') log(`testo scritto da ${r.servizio}`);
+  return r.dati;
+}
+
+// Chiamata diretta al modello locale: ritorna il primo oggetto JSON presente nella risposta.
 // gemma ragiona prima di rispondere e il ragionamento consuma max_tokens (visti circa 1500 token):
 // al tetto per la risposta si aggiunge questo margine.
 const RAGIONAMENTO_TOKEN = 6000;
-async function llmJson(system, user, maxTokens = 1200) {
+async function llmLocale(system, user, maxTokens = 1200) {
   const r = await req('POST', `${CFG.llm}/chat/completions`, {
     ms: 600000,
     body: {

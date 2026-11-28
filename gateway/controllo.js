@@ -324,37 +324,18 @@ function voto(dati) {
 
 // ---- note per genere ----
 // Ogni nota viene scritta in italiano e tradotta in inglese (il motore YuE2 risponde meglio all'inglese).
-// La traduzione usa il modello di LM Studio; se non risponde, la nota resta in italiano e viene usata così.
-const http = require('http');
-const LLM = { hostname: '127.0.0.1', port: 1234, model: 'google/gemma-4-e4b' };
+// La traduzione usa la catena dei testi (cloud, poi gemma: dalla dashboard solo se è già caricata, per non far attendere); se nessuno risponde, la nota resta
+// in italiano e viene usata così.
+const testi = require('./testi').crea();
 
-function traduci(testo) {
-  return new Promise((resolve) => {
-    const corpo = JSON.stringify({
-      model: LLM.model,
-      temperature: 0.2,
-      max_tokens: 90,
-      messages: [
-        { role: 'system', content: 'You translate producer notes for an AI instrumental music generator into concise English style directions (max 20 words). Output only the English text, nothing else.' },
-        { role: 'user', content: testo },
-      ],
+async function traduci(testo, caricaLocale) {
+  try {
+    const r = await testi.chiedi({
+      system: 'You translate producer notes for an AI instrumental music generator into concise English style directions (max 20 words). Output only the English text, nothing else.',
+      user: testo, temperature: 0.2, maxTokens: 90, json: false, attesaMs: 20000, caricaLocale,
     });
-    const req = http.request({ ...LLM, path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(corpo) }, timeout: 20000 }, (res) => {
-      const ch = [];
-      res.on('data', (c) => ch.push(c));
-      res.on('end', () => {
-        try {
-          const j = JSON.parse(Buffer.concat(ch).toString('utf8'));
-          const t = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
-          resolve(t ? String(t).replace(/^["']|["']$/g, '').trim().slice(0, 240) : null);
-        } catch (e) { resolve(null); }
-      });
-    });
-    req.on('timeout', () => { req.destroy(); resolve(null); });
-    req.on('error', () => resolve(null));
-    req.write(corpo);
-    req.end();
-  });
+    return r.testo.replace(/^["']|["']$/g, '').trim().slice(0, 240) || null;
+  } catch (e) { return null; }
 }
 
 async function aggiungiNota({ nome, testo }) {
@@ -363,7 +344,7 @@ async function aggiungiNota({ nome, testo }) {
   if (t.length < 3 || t.length > 300) throw new Error('nota: tra 3 e 300 caratteri');
   if (/[<>]/.test(t)) throw new Error('nota: non usare i caratteri < o >');
   if ((((leggiJson(PARAMETRI, {}).generi || {})[nome] || {}).note || []).length >= 20) throw new Error('nota: massimo 20 note per genere');
-  const inglese = await traduci(t);
+  const inglese = await traduci(t, false);
   // lettura dopo la traduzione: nei secondi di attesa i parametri possono essere cambiati
   const salvati = daModificare(PARAMETRI);
   salvati.generi = salvati.generi || {};
@@ -376,7 +357,7 @@ async function aggiungiNota({ nome, testo }) {
   return { ok: true, nome, nota: nuova, tradotta: !!inglese };
 }
 
-// Le note salvate senza traduzione (LM Studio spento o occupato) vengono ritradotte ogni 10 minuti
+// Le note salvate senza traduzione (nessun modello disponibile) vengono ritradotte ogni 10 minuti
 async function ritraduciPendenti() {
   const pendenti = [];
   for (const [nome, corrente] of Object.entries(leggiJson(PARAMETRI, {}).generi || {})) {
@@ -385,7 +366,7 @@ async function ritraduciPendenti() {
   if (!pendenti.length) return;
   const risultati = [];
   for (const p of pendenti) {
-    const t = await traduci(p.testo);
+    const t = await traduci(p.testo, true);
     if (t) risultati.push({ ...p, inglese: t });
   }
   if (!risultati.length) return;
