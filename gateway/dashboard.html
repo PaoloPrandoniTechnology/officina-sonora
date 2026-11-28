@@ -231,6 +231,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
+    .hb .fi { width: var(--w); }
   }
 
   /* ---------- sezione Controllo ---------- */
@@ -391,6 +392,9 @@
   .ascolta:hover { border-color: var(--accent); background: rgba(94,234,212,.12); }
   .ascolta:focus-visible, .link:focus-visible, th button:focus-visible, .kpi[data-vai]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .card h2 .link { text-transform: none; letter-spacing: 0; font-weight: 500; }
+  #vVotati { max-height: 430px; overflow: auto; }
+  .srv > div { min-width: 0; color: var(--text); } .srv > div small { display: block; }
+  .srv .stars { display: inline-block; flex: none; color: var(--warn); } .srv .stars .off { display: inline; color: var(--faint); }
   .link { all: unset; cursor: pointer; color: var(--accent); font-size: 12px; } .link:hover { text-decoration: underline; }
   th button { all: unset; cursor: pointer; } th button:hover { color: var(--text); }
   .kpi[data-vai] { cursor: pointer; } .kpi[data-vai]:hover { border-color: var(--accent); }
@@ -882,7 +886,7 @@
       <span>Disco E: libero</span><span>${s.sistema.disco_E_liberoGb === null ? '—' : n0(s.sistema.disco_E_liberoGb) + ' GB'}</span></div>`;
     $('#sorv').innerHTML = sorv;
 
-    $('#esec').innerHTML = (s.esecuzioni || []).map((e) => `<div class="srv"><span>${esc(data(/Z|\+\d\d/.test(e.startedAt) ? e.startedAt : e.startedAt.replace(' ', 'T') + 'Z'))}</span><span class="pill ${e.status === 'success' ? 'ok' : e.status === 'running' ? 'w' : 'ko'}">${esc({ success: 'riuscita', error: 'errore', running: 'in corso', crashed: 'interrotta', waiting: 'in attesa', canceled: 'annullata' }[e.status] || e.status)}</span></div>`).join('') || '<div class="empty">Nessun dato</div>';
+    $('#esec').innerHTML = (s.esecuzioni || []).map((e) => `<div class="srv"><span>${esc(e.startedAt ? data(/Z|\+\d\d/.test(e.startedAt) ? e.startedAt : e.startedAt.replace(' ', 'T') + 'Z') : 'in avvio')}</span><span class="pill ${e.status === 'success' ? 'ok' : e.status === 'running' ? 'w' : 'ko'}">${esc({ success: 'riuscita', error: 'errore', running: 'in corso', crashed: 'interrotta', waiting: 'in attesa', canceled: 'annullata' }[e.status] || e.status)}</span></div>`).join('') || '<div class="empty">Nessun dato</div>';
 
     disegnaLog();
   }
@@ -953,6 +957,8 @@
     // Generi
     renderGeneri();
     if (vt.caricato) { disegnaCoda(); disegnaVotati(); }
+    // i nomi leggibili possono arrivare dopo la prima lettura dell'andamento
+    if (an.dati) { disegnaGeneriAn(); for (const x of $('#aGenere').options) if (x.value) x.textContent = nm(x.value); }
 
     // Voti
     const dv = [1, 2, 3, 4, 5].map((k, i) => ({ nome: k + ' stelle', valore: V.distribuzione[k] || 0, colore: ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399'][i] }));
@@ -961,7 +967,7 @@
     $('#vCat').innerHTML = V.perCategoria.length
       ? V.perCategoria.map((c) => `<div class="hb"><span title="${esc(nm(c.categoria))}">${esc(nm(c.categoria))}</span><div class="tr"><div class="fi" style="--w:${pct(c.media, 5).toFixed(1)}%"></div></div><em>${n1(c.media)}</em></div>`).join('')
       : '<div class="empty">Ancora nessun voto per categoria.</div>';
-    const brano = (x) => `<div class="srv"><span>${esc(x.titolo)}<br><small class="muted">${esc(nm(x.categoria))}</small></span>${stelle(x.voto)}</div>`;
+    const brano = (x) => `<div class="srv"><div>${esc(x.titolo)}<small class="muted">${esc(nm(x.categoria))}</small></div>${stelle(x.voto)}</div>`;
     $('#vMiglio').innerHTML = V.migliori.map(brano).join('') || '<div class="empty">Nessun brano con voto alto.</div>';
     $('#vPeggio').innerHTML = V.peggiori.map(brano).join('') || '<div class="empty">Nessun brano con voto basso.</div>';
     // Qualita'
@@ -2146,7 +2152,7 @@
       // si ridisegna solo se cambia, così un menu aperto non si richiude a ogni aggiornamento
       if (sel.dataset.voci === valori.join('|')) continue;
       sel.dataset.voci = valori.join('|');
-      sel.innerHTML = sel.options[0].outerHTML + valori.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+      sel.innerHTML = sel.options[0].outerHTML + valori.map((v) => `<option value="${esc(v)}">${esc(campo === 'genere' ? nm(v) : v)}</option>`).join('');
       sel.value = scelto;
     }
   }

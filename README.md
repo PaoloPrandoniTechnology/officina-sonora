@@ -1,10 +1,29 @@
 # Officina Sonora
 
-Un sistema automatico che **compone e produce musica di sottofondo** (strumentale, o vocale senza parole) in modo
-continuo, la ordina in una libreria e la pubblica su **iBroadcast** con copertine, tag e playlist.
-Gira tutto sul tuo PC: **YuE2** genera l'audio, **gemma** (LM Studio) scrive titoli e analisi, **n8n** coordina.
+**Una piccola fabbrica di musica di sottofondo che lavora da sola sul tuo computer.**
 
-![Panoramica della dashboard](docs/screenshots/01-panoramica.png)
+Inventa brani strumentali (o con voci senza parole) per yoga, studio o relax, controlla che siano riusciti, li mette
+in ordine e li carica sul tuo spazio musicale in rete (**iBroadcast**) con copertina e playlist. Tu ascolti, dai un
+voto e, se vuoi, chiedi cambiamenti: il sistema ne tiene conto per i brani successivi.
+
+![La Panoramica della dashboard](docs/screenshots/01-panoramica.png)
+
+## Le parole da conoscere
+
+| Parola | Significato |
+|---|---|
+| **Brano** | un pezzo musicale prodotto dal sistema |
+| **Genere** | il tipo di musica (ne esistono 39) |
+| **Dashboard** | la pagina web da cui controlli tutto |
+| **Render** | il momento in cui il computer crea l'audio; dura alcuni minuti |
+| **YuE2** | il programma che **crea la musica** |
+| **gemma** | il programma che **scrive** titoli, descrizioni e analisi (gira dentro *LM Studio*) |
+| **n8n** | il «direttore d'orchestra» che fa eseguire i passi nell'ordine giusto |
+| **Gateway** | il piccolo servizio che fa funzionare la dashboard |
+| **Watchdog / supervisore** | i guardiani che riavviano i programmi se si fermano |
+| **Prompt** o **stile** | la descrizione in inglese del brano data a YuE2 |
+| **Score** | lo spartito che guida la creazione di un brano |
+| **BPM** | battiti al minuto: la velocità della musica |
 
 ## Indice
 
@@ -27,32 +46,47 @@ Gira tutto sul tuo PC: **YuE2** genera l'audio, **gemma** (LM Studio) scrive tit
 
 ## 1. Guida rapida
 
-| Voglio... | Cosa fare |
+### Il primo giorno, in quattro passi
+
+1. **Accendi**: doppio clic su `E:\n8n\avvia-automazione.vbs`.
+2. **Apri la dashboard**: [http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard).
+3. **Controlla i pallini in alto**: devono essere verdi (*gemma scaricato* in giallo è normale mentre si crea un brano).
+4. **Aspetta il primo brano** (circa 5-10 minuti), ascoltalo nella pagina *Voti* e dagli un voto.
+
+Da qui in poi il sistema lavora da solo. Ogni 5 minuti un controllo automatico verifica che sia vivo e, se serve, lo
+riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza voti non può imparare i tuoi gusti.
+
+### Cosa voglio fare?
+
+| Voglio... | Dove andare |
 |---|---|
 | **Avviare** la produzione | doppio clic su `E:\n8n\avvia-automazione.vbs` |
-| **Fermare** tutto | doppio clic su `E:\n8n\ferma-automazione.vbs` (LM Studio resta acceso) |
-| **Vedere cosa succede** | apri [http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard) |
-| **Ritrovare e riascoltare** un brano | *Libreria*: cerca, filtra, ordina e premi ▶ |
-| Leggere **cosa ha fatto** il sistema | *Log e sistema*: filtro *errori* o ricerca per titolo |
-| Fare una **pausa** senza spegnere | dashboard, *Controllo → Produzione*: Metti in pausa / Riprendi |
-| Produrre **subito un genere** | dashboard, *Controllo → Produzione*: scegli il genere |
-| Avere **più o meno** di un genere | *Controllo → Generi*: peso da 0 (mai) a 5 |
-| **Scegliere i termini** dello stile | *Controllo → Linee guida*: blocchi da aggiungere o da evitare, per tutti o per genere |
-| **Chiedere un cambiamento** a un genere | *Controllo → Note per genere*, in italiano (es. *più assoli di chitarra*) |
-| **Ascoltare e votare** | scheda *Voti* (tasti 1-5), oppure `/menu` su Telegram, oppure le stelle in iBroadcast |
-| Capire **se migliora** | scheda *Andamento* |
-| Capire **perché un brano è stato scartato** | scheda *Qualità* e `state\tick.log` |
-
-**Il primo giorno.** Avvia l'automazione, apri la dashboard e controlla che i quattro servizi siano attivi
-(n8n, motore YuE2, LM Studio, modello gemma; gemma risulta *scaricato* durante i render, è normale).
-Il primo brano arriva dopo circa 5 minuti. Vota con regolarità: senza voti il sistema non impara i tuoi gusti.
-
-Una volta avviato, il sistema lavora da solo: un'attività pianificata (`OfficinaSonoraSupervisor`) controlla ogni
-5 minuti che il watchdog sia vivo e lo riavvia. Se fermi l'automazione a mano, non la riavvia.
+| **Spegnere** tutto | doppio clic su `E:\n8n\ferma-automazione.vbs` (LM Studio resta acceso) |
+| Fare una **pausa** senza spegnere | *Controllo → Produzione*: Metti in pausa / Riprendi |
+| **Vedere se funziona** | [Panoramica](#panoramica) |
+| **Ritrovare e riascoltare** un brano | [Libreria](#libreria) |
+| **Dare un voto** | [Voti](#voti), oppure `/menu` su Telegram, oppure le stelle in iBroadcast |
+| Avere **subito** un certo genere | [Generi](#generi): *Produci ora* |
+| Averne **di più o di meno** | [Controllo → Generi](#pesi-dei-generi): peso da 0 a 5 |
+| **Chiedere un cambiamento** a parole | [Note per genere](#note-per-genere), in italiano |
+| **Scegliere i termini** dello stile | [Linee guida](#linee-guida) |
+| Capire **se migliora** | [Andamento](#andamento) |
+| Capire **perché un brano è stato scartato** | [Qualità](#qualità) e [Log e sistema](#log-e-sistema) |
 
 ---
 
 ## 2. Come funziona
+
+**In parole semplici**, ogni brano passa da questi passi, uno alla volta:
+
+1. il sistema **sceglie** genere, strumenti e forma, dando precedenza a ciò che hai votato bene;
+2. **gemma** inventa titolo e descrizione;
+3. si prepara lo **spartito** e **YuE2** crea l'audio (la parte più lunga);
+4. il volume viene reso uniforme e il brano **controllato**: se non va bene viene rifatto;
+5. se è buono, viene salvato, **caricato** su iBroadcast e compare nella dashboard;
+6. i tuoi **voti** guidano le scelte successive.
+
+Lo schema seguente è per chi vuole i dettagli.
 
 ```
  watchdog (ogni minuto): tiene vivi gateway, n8n, LM Studio, motore YuE2
@@ -86,7 +120,7 @@ e scade dopo 15 minuti se qualcosa si blocca. Lo stato (coda, render in corso, c
 Ogni blocco è un file in `src\blocks\` e un nodo *Code* in n8n. `build-workflow.mjs` incolla in testa a ciascuno
 le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
-### Controllo
+### Orchestrazione
 
 | Blocco | Cosa fa |
 |---|---|
@@ -247,194 +281,323 @@ da correggere con l'ascolto.
 
 ## 5. La dashboard
 
-[http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard), **solo da questo PC**. Lo stato dei servizi si
-aggiorna ogni 5 secondi, l'analisi della libreria ogni 30.
+La **dashboard** è la pagina web da cui controlli tutto. Si apre con il browser su
+[http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard) ed è raggiungibile **solo da questo computer**.
+Non devi premere nulla per aggiornarla: lo stato si rinfresca ogni 5 secondi, i numeri della libreria ogni 30.
 
-| Scheda | A cosa serve |
+> **Le immagini** di questa guida mostrano le pagine **intere**: se una pagina è più lunga dello schermo, nel browser
+> si scorre verso il basso. Fai clic su un'immagine per ingrandirla.
+
+### Indice delle pagine
+
+| Pagina | La domanda a cui risponde |
 |---|---|
-| [Panoramica](#panoramica) | numeri chiave, produzione per giorno, render in corso, ultimi brani, servizi |
-| [Render](#render) | tempi di render, durata ottenuta contro richiesta, bpm e tipi |
-| [Generi](#generi) | scheda di ogni genere, con accesso diretto allo stile e alla produzione |
-| [Voti](#voti) | ascolto e voto dei brani |
-| [Andamento](#andamento) | il sistema sta migliorando? |
-| [Qualità](#qualità) | scarti, motivi, errori delle ultime 24 ore |
-| [Libreria](#libreria) | tutti i brani, con ricerca, filtri e ascolto |
-| [Controllo](#controllo) | tutte le impostazioni |
-| [Log e sistema](#log-e-sistema) | servizi, sorveglianza, esecuzioni n8n, log filtrabile |
+| [Panoramica](#panoramica) | Va tutto bene? Cosa è stato prodotto? |
+| [Render](#render) | Quanto ci mette a creare un brano? |
+| [Generi](#generi) | Che tipi di musica esistono? |
+| [Voti](#voti) | Mi piace questo brano? |
+| [Andamento](#andamento) | Il sistema sta migliorando? |
+| [Qualità](#qualità) | Cosa è andato storto? |
+| [Libreria](#libreria) | Dov'è quel brano? |
+| [Controllo](#controllo) | Come cambio il comportamento? |
+| [Log e sistema](#log-e-sistema) | Cosa sta facendo, passo per passo? |
+| [Dal telefono](#dal-telefono) | Come si vede su uno schermo piccolo |
 
-### Come si usa, in ogni pagina
+### Come è fatta ogni pagina
 
-| Elemento | Comportamento |
+1. **Menu a sinistra**: le nove pagine. Quella aperta è evidenziata.
+2. **Titolo in alto** e, sotto, quanti brani e generi ci sono.
+3. **Pallini colorati in alto a destra**: lo stato dei programmi che lavorano.
+
+| Colore | Significato |
 |---|---|
-| **Indirizzo** | ogni pagina e sottosezione ha il suo (`#libreria`, `#controllo/guida/tempo`, `#controllo/guida/<genere>`): si può salvare tra i preferiti; il titolo della scheda del browser segue la pagina |
-| **Nomi dei generi** | in italiano e leggibili (*Sound bath con gong*), non con il nome interno |
-| **Tasto ▶** | apre il **lettore** in basso, che resta aperto mentre cambi pagina; *Chiudi* lo ferma. Avviare un brano ferma l'altro lettore |
-| **Pillole in alto** | sistema, LM Studio e gemma, motore YuE2, pipeline, ora dell'ultimo aggiornamento |
-| **Gateway non raggiungibile** | compare un avviso rosso: i numeri a video non sono aggiornati, la pagina riprova da sola |
-| **Modifiche** | confermate da un messaggio in basso; quelle che tolgono qualcosa chiedono conferma (Esc annulla) |
-| **Tastiera e telefono** | tutti i comandi si raggiungono con Tab; sotto 880 px il menu passa in alto e scorre |
+| 🟢 verde | tutto a posto |
+| 🟡 giallo | normale ma da sapere (per esempio *gemma scaricato* mentre si crea un brano, o *pipeline in lavoro*) |
+| 🔴 rosso | un programma non risponde: di solito si riavvia da solo entro pochi minuti |
+
+Cose utili che valgono ovunque:
+
+- **▶ Ascolta**: apre un **lettore** in basso, che continua a suonare anche se cambi pagina. *Chiudi* lo ferma.
+- **Suggerimenti**: lasciando il mouse su molti elementi compare una spiegazione.
+- **Conferme**: dopo ogni modifica appare un messaggio in basso. Le azioni che tolgono qualcosa chiedono prima conferma.
+- **Avviso rosso in cima**: la pagina non riesce a collegarsi. I numeri a video sono vecchi; riprova da sola.
+- Ogni pagina ha il suo indirizzo: puoi salvarla tra i **preferiti**.
+
+---
 
 ### Panoramica
-![Panoramica](docs/screenshots/01-panoramica.png)
 
-- I quattro numeri in alto sono **cliccabili** e portano a Libreria, Andamento e Voti.
-- **Brani generati per giorno** parte dal primo giorno con produzione (almeno una settimana, al massimo 14 giorni).
-- **Render**: titolo, tempo trascorso e stima; quando è fermo mostra l'ultimo brano completato, ascoltabile.
-- **Ultimi brani**: i sei più recenti con ▶ e il collegamento a tutta la libreria.
-- In basso: servizi, quota per famiglia e i 12 generi con più brani.
+La prima pagina da guardare: dice in un colpo d'occhio se il sistema sta lavorando.
+
+![Panoramica: numeri principali, brani per giorno, brano in lavorazione, servizi, ultimi brani e brani per genere](docs/screenshots/01-panoramica.png)
+
+| Parte | Cosa ti dice | Cosa puoi fare |
+|---|---|---|
+| Quattro numeri in alto | brani in libreria, ore di musica, brani votati, voto medio | clic per aprire la pagina collegata |
+| **Brani generati per giorno** | quanta musica è stata creata negli ultimi giorni | passa il mouse su una colonna per il numero |
+| Riquadro a destra | il brano che si sta creando ora, con il tempo trascorso (la barra è una stima) | quando è fermo, ascolti l'ultimo completato |
+| **Servizi** | i quattro programmi che lavorano | |
+| **Famiglie** | come si divide la musica (meditativa, rock, jazz…) | |
+| **Ultimi brani** | i sei più recenti | ▶ per ascoltarli, *tutta la libreria* per vederli tutti |
+| **Brani per genere** | i 12 generi con più brani | |
+
+---
 
 ### Render
-![Render](docs/screenshots/02-render.png)
 
-Render in corso, tempo medio, minimo e massimo degli ultimi 40, confronto tra tempo di render e durata richiesta,
-tipi di brano e distribuzione dei bpm.
+*Render* è il momento in cui il computer **trasforma le istruzioni in musica**. Qui vedi quanto impiega.
+
+![Render: brano in corso, tempi, grafico del tempo di creazione, tipi di brano e velocità](docs/screenshots/02-render.png)
+
+- **Tempi di render**: medio, minimo e massimo degli ultimi 40 brani.
+- **Grafico**: la linea piena è il tempo impiegato, quella tratteggiata la durata del brano richiesto.
+- **Tipi** e **bpm** (battiti al minuto, cioè la velocità): come si distribuiscono i brani.
+
+---
 
 ### Generi
-![Generi](docs/screenshots/03-generi.png)
 
-- Ricerca per nome, strumento o stile; filtro per famiglia; **ordinamento** per catalogo, nome, numero di brani o voto.
-- Ogni scheda mostra se il genere è **sospeso** e ha due pulsanti: **Modifica stile** (apre le linee guida di quel
-  genere) e **Produci ora** (il prossimo brano sarà di quel genere, una sola volta).
-- *Specifiche complete* resta aperto anche quando la pagina si aggiorna.
+Un **genere** è un tipo di musica (per esempio *Drone meditativo* o *Blues shuffle strumentale*). C'è una scheda per
+ognuno dei 39 generi.
+
+![Generi: tutte le schede dei 39 generi con colore, velocità, numero di brani e voto](docs/screenshots/03-generi.png)
+
+In ogni scheda trovi velocità (BPM), numero di brani, voto medio e a quale attività serve.
+
+| Pulsante | Cosa fa |
+|---|---|
+| **Modifica stile** | apre le [linee guida](#linee-guida) di quel genere, per cambiarne il suono |
+| **Produci ora** | il prossimo brano creato sarà di quel genere (una volta sola) |
+| **+ Specifiche complete** | mostra strumenti, forme, tonalità e statistiche |
+
+In alto puoi **cercare**, filtrare per famiglia e **ordinare** per nome, numero di brani o voto. Un genere
+*sospeso* appare attenuato.
+
+---
 
 ### Voti
-![Voti](docs/screenshots/04-voti.png)
 
-| Tasto | Azione |
+Il sistema **impara dai tuoi voti**: i generi e le scelte che ti piacciono tornano più spesso.
+
+![Voti: brano da ascoltare, pulsanti delle stelle, brani già votati e riepiloghi](docs/screenshots/04-voti.png)
+
+Come si fa, in tre passi:
+
+1. Premi ▶ per **ascoltare** il brano proposto.
+2. Se vuoi, scrivi una **nota** (per esempio *troppo lento*).
+3. Premi da **una a cinque stelle**: si passa subito al brano successivo.
+
+| Tasto della tastiera | Azione |
 |---|---|
-| **1 - 5** | vota il brano e passa al successivo |
+| **1 – 5** | dà il voto |
 | **Spazio** | ascolta o mette in pausa |
-| **S** | salta al brano successivo |
+| **S** | salta il brano |
 
-Si può filtrare per genere, lasciare una nota (fino a 300 caratteri) e correggere un voto da *Votati ora*. Un brano
-si può votare anche partendo dalla Libreria. Sotto: esiti, voto medio per genere, brani più apprezzati e da rivedere.
+A destra, **Votati ora**: clic su un brano per correggere il voto. Sotto trovi quanti voti per ogni numero di stelle,
+il voto medio di ogni genere, i brani più apprezzati e quelli da rivedere.
+
+---
 
 ### Andamento
-![Andamento](docs/screenshots/14-andamento.png)
 
-**Filtri** (valgono per indici, grafici e tabella): periodo (24 ore, 48 ore, 7, 30, 90 giorni, tutto), passo,
-ambito, famiglia, genere, tipo e struttura. *Azzera filtri* torna agli ultimi 7 giorni. Gli errori seguono
-solo il periodo.
+Risponde alla domanda **«sta migliorando?»**.
 
-| Parte | Cosa mostra |
+![Andamento: filtri, giudizio, indici del periodo, grafici nel tempo e tabella per genere](docs/screenshots/14-andamento.png)
+
+| Parte (dall'alto) | Cosa mostra |
 |---|---|
-| Indici del periodo | brani, ore di musica buona, scarti, voto medio, brani votati, secondi di render per secondo buono, render medio, rigenerati, durata ottenuta sulla richiesta, caricati, ascolti, errori; ognuno con la variazione sul periodo precedente di pari durata |
-| Grafici nel tempo | brani generati (accettati e scartati), voto, scarti, resa, render medio, rigenerati, durata ottenuta, ore, errori |
-| Riepiloghi | distribuzione dei voti, motivi di scarto, errori più frequenti |
-| Dettaglio per genere | tabella ordinabile; un clic sul nome filtra quel genere |
-| In fondo | elenco delle modifiche e dati dei grafici in tabella |
+| **Filtri** | scegli il periodo (da 24 ore a tutto) e, se vuoi, ambito, famiglia, genere, tipo o struttura; *Azzera filtri* torna agli ultimi 7 giorni |
+| **Il sistema sta migliorando?** | giudizio sugli ultimi 7 giorni rispetto ai 7 precedenti |
+| **Indici del periodo** | brani, ore di musica buona, scarti, voto medio e altri numeri, con la differenza sul periodo precedente |
+| **Grafici** | come cambiano nel tempo; le righe verticali tratteggiate sono le modifiche fatte da te o dalle linee guida |
+| **Distribuzione, motivi, errori** | voti, ragioni degli scarti ed errori più frequenti |
+| **Dettaglio per genere** | tabella ordinabile; clic sul nome per vedere solo quel genere |
+| In fondo | elenco delle modifiche e dati dei grafici in forma di tabella |
 
-Passo automatico: per ora se nel periodo c'è meno di una settimana di dati, altrimenti per giorno (oltre
-7 giorni sempre per giorno, al massimo 168 ore o 366 giorni). Voto e ascolti contano nel momento in cui il
-brano è stato **generato**. Le linee tratteggiate (disattivabili) indicano le tue modifiche e le nuove linee
-guida, una per intervallo. Il giudizio confronta gli ultimi 7 giorni con i 7 precedenti, con i filtri scelti:
-
-| Giudizio su | Minimo per periodo | Soglia di cambiamento |
+| Giudizio su | Brani necessari per periodo | Cambiamento minimo per dire «migliora» o «peggiora» |
 |---|---|---|
-| Voto medio | 10 brani votati | 0,2 stelle |
-| Brani scartati | 30 brani | 5 punti percentuali |
+| Voto medio | 10 votati | 0,2 stelle |
+| Brani scartati | 30 | 5 punti percentuali |
 
-Sotto la soglia il giudizio è *stabile*, sotto il minimo *dati insufficienti*.
+Con meno dati compare *dati insufficienti*; con differenze più piccole, *stabile*.
+
+---
 
 ### Qualità
-![Qualità](docs/screenshots/05-qualita.png)
 
-Tasso di scarto, motivi (la lettera **N** sostituisce i numeri, per raggruppare i problemi uguali), generi con più
-scarti ed errori delle ultime 24 ore.
+Ogni brano viene controllato: quelli difettosi (di solito **troppo corti**) vengono **scartati** e non pubblicati.
+
+![Qualità: percentuale di scarto, motivi, generi con più scarti ed errori recenti](docs/screenshots/05-qualita.png)
+
+- **Tasso di scarto**: quanti brani su cento non superano il controllo.
+- **Motivi di scarto**: la lettera **N** sta al posto di un numero, per raggruppare problemi uguali.
+- **Scartati per categoria** ed **errori nelle ultime 24 ore**.
+
+Alcuni errori sono normali: il sistema riprova da solo.
+
+---
 
 ### Libreria
-![Libreria](docs/screenshots/06-libreria.png)
 
-Elenco di **tutti i brani**:
+L'archivio di **tutta la musica prodotta** (i brani scartati non ci sono).
 
-- ricerca per titolo, genere o tipo; filtro per genere e per voto (non votati, votati, 4-5, 1-2);
-- **ordinamento** con un clic sull'intestazione (di nuovo per invertire);
-- 25 righe alla volta, con *Mostra altri 50*;
-- **▶** ascolta; il valore nella colonna *Voto* apre il brano nella pagina Voti.
+![Libreria: riepiloghi e tabella dei brani con ricerca, filtri, ascolto e voto](docs/screenshots/06-libreria.png)
 
-In alto: brani per ambito e tipo, caricati su iBroadcast e ascolti. I brani scartati non compaiono.
+| Per… | Fai così |
+|---|---|
+| trovare un brano | scrivi titolo o genere nella casella di ricerca |
+| vedere un solo genere o solo i non votati | usa i due menu |
+| mettere in ordine | clic sul titolo di una colonna; un altro clic inverte |
+| ascoltare | ▶ a sinistra |
+| votare | clic su *vota* (o sulle stelle) nella colonna *Voto* |
+| vedere altri brani | *Mostra altri 50* in fondo |
+
+Con ▶ si apre il **lettore**, che resta in basso mentre continui a navigare:
+
+![Lettore aperto in fondo alla pagina della libreria](docs/screenshots/18-lettore.png)
+
+---
 
 ### Controllo
-Le modifiche valgono dal brano successivo e sono registrate nello **Storico** con il valore precedente.
 
-| Sezione | Cosa fa |
+Qui **cambi il comportamento** del sistema. Ha sette sezioni, nella barra in alto. Le modifiche valgono **dal brano
+successivo** e si ritrovano nello [Storico](#storico).
+
+| Sezione | In parole semplici |
 |---|---|
-| [Produzione](#produzione) | pausa e ripresa, svuota coda, produci un genere, sfondi delle copertine |
-| [Parametri](#parametri) | durata, esplorazione, peso dei voti, soglie di qualità |
-| [Generi](#generi-pesi-e-stato) | attiva o sospende, regola il peso |
-| [Linee guida](#linee-guida-a-blocchi) | stile a blocchi, tempo e struttura, note per il sistema |
-| [Note per genere](#note-per-genere) | richieste in italiano, tradotte e aggiunte allo stile |
-| [Messaggi](#messaggi) | frequenza, orari e contenuto dei messaggi Telegram |
-| [Storico](#storico) | tutte le modifiche |
+| [Produzione](#produzione) | accendere, mettere in pausa, chiedere un genere |
+| [Parametri](#parametri) | regole generali, con dei cursori |
+| [Generi](#pesi-dei-generi) | quali generi produrre e quanto spesso |
+| [Linee guida](#linee-guida) | come deve suonare la musica |
+| [Note per genere](#note-per-genere) | richieste scritte in italiano |
+| [Messaggi](#messaggi) | cosa ricevere su Telegram |
+| [Storico](#storico) | cosa è stato cambiato e quando |
 
 #### Produzione
-![Produzione](docs/screenshots/07-controllo-produzione.png)
 
-I quattro contatori (stato, coda, parametri personalizzati, generi sospesi) compaiono solo qui. *Produci ora un
-genere* elenca i generi per famiglia. **Genera gli sfondi** mette in pausa la produzione e alla fine la ripristina.
+![Produzione: pausa, coda, sfondi delle copertine, genere da produrre e comandi in attesa](docs/screenshots/07-controllo-produzione.png)
+
+- **Metti in pausa / Riprendi**: il brano in corso finisce, poi il sistema aspetta.
+- **Svuota la coda**: elimina i brani in attesa.
+- **Sfondi delle copertine**: crea le immagini; mette in pausa la produzione e poi la riprende.
+- **Produci ora un genere**: scegli dall'elenco e conferma.
 
 #### Parametri
-![Parametri](docs/screenshots/08-controllo-parametri.png)
 
-Ogni parametro ha descrizione, limiti, indicazione *predefinito* o *personalizzato* e il ritorno al predefinito.
+![Parametri: durata, tentativi, apprendimento e soglie di qualità](docs/screenshots/08-controllo-parametri.png)
 
-#### Generi: pesi e stato
-![Generi: pesi](docs/screenshots/09-controllo-generi.png)
+Ogni riga spiega a cosa serve. Sposta il cursore (o scrivi il numero) e premi **Salva**; **Predefinito** torna al
+valore iniziale. Se non sai cosa fa un valore, lascialo com'è.
 
-- Ricerca, filtro **tutti / attivi / sospesi** e ordinamento per genere, brani, stato o peso.
-- **Attiva i mostrati** e **Sospendi i mostrati** agiscono sui soli generi visibili: per esempio cerca *rock* e
-  sospendili tutti insieme (con conferma).
-- Il **peso** va da 0 (mai) a 5; *Pesi a 1* li riporta alla norma. Il collegamento *stile* apre le linee guida del genere.
+#### Pesi dei generi
 
-#### Linee guida a blocchi
-![Linee guida generali](docs/screenshots/10-controllo-guida.png)
-![Linee guida di un genere](docs/screenshots/15-controllo-guida-genere.png)
-![Tempo e struttura](docs/screenshots/16-controllo-guida-tempo.png)
+![Generi: interruttore acceso o spento e peso di frequenza per ogni genere](docs/screenshots/09-controllo-generi.png)
 
-Tre sottosezioni:
+- **Interruttore**: acceso = il genere viene prodotto, spento = sospeso.
+- **Peso**: 1 è normale, 0 non esce mai, 5 esce cinque volte più spesso.
+- In alto: ricerca, *tutti / attivi / sospesi*, **Attiva i mostrati**, **Sospendi i mostrati** (utile con la ricerca:
+  scrivi *rock* e sospendili insieme) e **Pesi a 1**.
+- *stile*, a destra, apre le linee guida di quel genere.
 
-- **Stile.** A sinistra l'elenco dei generi con ricerca (il numero indica le modifiche, i sospesi sono attenuati;
-  *Tutti i generi* contiene le regole generali). In alto, sempre visibile, il genere che stai modificando. I termini
-  del prompt sono ordinati per argomento e colorati per origine: un clic li toglie o li rimette; sotto, l'esempio di
-  prompt. Nel **Vocabolario** ogni termine ha **+** (aggiungi) e **−** (da evitare); un secondo clic annulla. Se un
-  termine non c'è, scrivilo nella ricerca. Le voci si possono aggiungere solo ai generi vocali. Passando il mouse
-  (o con il tasto Tab) un **tooltip** spiega in italiano ogni termine e cosa succede se lo applichi; i testi sono in
-  `config\spiegazioni` e sono indicativi, non misurati sul motore.
-- **Tempo e struttura.** Tabella di tutti i generi con fascia di bpm, durata e strutture usate; un campo vuoto vale
-  il predefinito.
-- **Note.** Note per il sistema, lette dalla revisione automatica.
-- **Controlli:** blocchi di 2-60 caratteri, senza virgole, negazioni, BPM o tonalità; niente voci nei generi
-  strumentali; massimo 8 aggiunte per ambito; avvisi se non resta uno strumento, se si esclude il genere o se i
-  blocchi sono più di 25.
-- **Torna al predefinito** toglie le tue scelte (per un genere anche quelle della revisione).
-- Il vocabolario è in `config\vocabolario.json`: termini del catalogo e tag del primo
-  [YuE](https://github.com/multimodal-art-projection/YuE) (Apache-2.0, `config\yue-v1`), rigenerabile con
-  `node tools/genera-vocabolario.js`.
+#### Linee guida
+
+Il motore che crea la musica riceve una **descrizione in inglese** fatta di tanti termini (*warm bass*, *slow swells*…).
+Qui scegli quei termini senza doverli scrivere. Ci sono tre sottosezioni.
+
+##### Stile di tutti i generi
+
+![Linee guida generali: termini aggiunti o evitati per tutti i generi e vocabolario](docs/screenshots/10-controllo-guida.png)
+
+Quello che metti qui vale per **ogni** brano.
+
+##### Stile di un genere
+
+![Linee guida di un genere: elenco dei generi, termini divisi per argomento, esempio di descrizione e vocabolario](docs/screenshots/15-controllo-guida-genere.png)
+
+1. **Scegli il genere** nell'elenco a sinistra (il numero indica quante modifiche ha). In alto leggi sempre quale
+   stai modificando.
+2. **Stile del genere**: i termini sono divisi per argomento. Un clic ne **toglie** uno; un altro clic lo rimette.
+3. **Esempio di prompt**: è il testo che riceve il motore.
+4. **Vocabolario**: **+** aggiunge un termine (massimo 8), **−** lo mette tra quelli *da evitare*. Un secondo clic
+   annulla. Se un termine manca, scrivilo nella ricerca e premi Invio.
+5. **Torna al predefinito** cancella le tue scelte.
+
+Lasciando il mouse su un termine leggi **cosa significa** e cosa succede se lo applichi:
+
+![Suggerimento in italiano che spiega un termine](docs/screenshots/19-tooltip.png)
+
+> Le spiegazioni descrivono il significato musicale dei termini: sono indicative, l'effetto sul motore non è stato
+> misurato. «Da evitare» **toglie** il termine dalla descrizione: il motore non riceve un divieto.
+
+##### Tempo e struttura
+
+![Tempo e struttura: velocità, durata e forma di tutti i generi](docs/screenshots/16-controllo-guida-tempo.png)
+
+Per ogni genere: **BPM** (velocità), **durata** in secondi e **strutture** (la forma del brano). In grigio il valore
+predefinito, evidenziato quello cambiato. Per tornare al predefinito svuota il campo.
+
+| Struttura | Come suona |
+|---|---|
+| piatto | energia costante |
+| onda | sale e scende |
+| arco | cresce fino al centro, poi si distende |
+| crescendo | cresce fino al finale |
+| loop | parti che ritornano |
+
+##### Note per il sistema
+
+![Note per il sistema](docs/screenshots/20-controllo-guida-note.png)
+
+Indicazioni generali, lette dalla **revisione automatica** (il controllo che il sistema fa ogni pochi brani sui tuoi
+voti). La revisione può modificare linee guida, tempi e note.
+
+Regole controllate dalla pagina: termini di 2-60 caratteri, senza virgole, negazioni, BPM o tonalità; niente voci nei
+generi strumentali. Il vocabolario è in `config\vocabolario.json` (termini del catalogo e tag del primo
+[YuE](https://github.com/multimodal-art-projection/YuE), Apache-2.0, in `config\yue-v1`); le spiegazioni in
+`config\spiegazioni`.
 
 #### Note per genere
-![Note per genere](docs/screenshots/11-controllo-note.png)
 
-Scrivi in italiano cosa vuoi sentire in un genere: la nota viene tradotta in inglese e aggiunta allo stile. Si può
-passare direttamente allo stile a blocchi dello stesso genere.
+![Note per genere: richiesta in italiano e traduzione](docs/screenshots/11-controllo-note.png)
+
+Il modo più semplice per chiedere un cambiamento: scegli il genere e scrivi in italiano, per esempio *più assoli di
+chitarra*. La richiesta viene tradotta in inglese e aggiunta allo stile.
 
 #### Messaggi
-![Messaggi](docs/screenshots/17-controllo-messaggi.png)
 
-Frequenza del riepilogo, fascia oraria e dati inclusi in ogni messaggio Telegram.
+![Messaggi: frequenza, orari e contenuto dei messaggi Telegram](docs/screenshots/17-controllo-messaggi.png)
+
+Scegli ogni quanto ricevere il riepilogo su Telegram, in quali ore e con quali informazioni, poi premi **Salva**.
 
 #### Storico
-![Storico](docs/screenshots/12-controllo-storico.png)
 
-Ultime 300 modifiche, in forma leggibile (*predefinito* quando un valore non era impostato), con filtro per sezione
-e ricerca. I testi lunghi si leggono per intero nel tooltip.
+![Storico: elenco delle modifiche con valore precedente e nuovo](docs/screenshots/12-controllo-storico.png)
+
+Il diario delle modifiche fatte dalla dashboard: quando, cosa, **prima** e **dopo** (le ultime 300). Si filtra per
+sezione e si cerca. Per annullare, rimetti il valore precedente nella sezione corrispondente.
+
+---
 
 ### Log e sistema
-![Log e sistema](docs/screenshots/13-log.png)
 
-- Servizi, battito del watchdog, ultimo **intervento** del supervisore (scrive solo quando deve riavviare
-  qualcosa: un valore alto è buon segno), coda, brani, scarti, spazio su disco, ultime esecuzioni n8n.
-- **Log di produzione**: ultime 200 righe in **ora locale**, filtro *tutto / errori / avvisi / riusciti*, ricerca e
-  *Copia*. Se scorri verso l'alto la lettura resta ferma; torna in fondo per seguire le righe nuove.
+La pagina «tecnica»: utile quando qualcosa non va.
+
+![Log e sistema: servizi, sorveglianza, ultime esecuzioni e diario della produzione](docs/screenshots/13-log.png)
+
+- **Stato dei servizi** e **sorveglianza**: il *battito del watchdog* (il guardiano che riavvia i programmi) deve
+  essere di pochi secondi. *Ultimo intervento del supervisore* indica l'ultima volta che è servito un riavvio:
+  **un valore alto è un buon segno**.
+- **Log di produzione**: il diario, in ora locale. Filtra *errori*, *avvisi* o *riusciti*, cerca il titolo di un brano,
+  **Copia** per incollarlo altrove. Se scorri verso l'alto resta fermo; torna in fondo per seguire le righe nuove.
+
+---
+
+### Dal telefono
+
+Su uno schermo stretto il menu passa in alto e scorre di lato; le pagine si leggono in una sola colonna. La dashboard
+resta comunque raggiungibile **solo dal computer che la ospita**: dal telefono vero si usa [Telegram](#6-telegram).
+
+<p align="center"><img src="docs/screenshots/21-telefono.png" alt="La Panoramica su uno schermo da telefono" width="320"></p>
 
 ---
 
@@ -598,7 +761,8 @@ node build-workflow.mjs
 n8n in esecuzione applica la nuova versione da sé; il render in corso continua. L'identificativo del workflow
 è rimasto quello originario. Se cambi file in `gateway\`, riavvia anche il gateway.
 
-**Screenshot e diagramma:** `tools\screenshot.ps1` (gateway attivo) e `node tools\diagramma.mjs`.
+**Screenshot e diagramma:** `tools\screenshot.ps1` (gateway attivo; usa `tools\screenshot.mjs`, che fotografa le
+pagine per intero) e `node tools\diagramma.mjs`.
 `tools\pubblica.ps1 -Messaggio "..."` li rigenera, committa e invia su GitHub.
 
 **Prove sul motore:** `node tools/prove/prove-motore.js` confronta score, lyrics e LoRA e crea una pagina di
