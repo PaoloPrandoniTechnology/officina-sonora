@@ -160,12 +160,30 @@ Ogni voce dell'elenco ha una **mini timeline**: la riconosci a colpo d'occhio.
 
 | Pulsante | Cosa fa |
 |---|---|
-| **Ascolta** | un sintetizzatore semplice suona la voce e accende sulla timeline la battuta in corso: per motivi e assoli su un giro di prova, per le forme un brano intero. Serve a giudicare note e ritmo, **non** il suono finale |
+| **Ascolta** | apre la [timeline di riproduzione](#la-timeline-di-riproduzione) e suona la voce: per motivi e assoli su un giro di prova, per le forme un brano intero. Serve a giudicare note e ritmo, **non** il suono finale |
 | **Modifica** | apre l'[editor guidato](#leditor-in-tre-passi) |
 | **Duplica** | parte da una copia per crearne una tua |
 | **Spegni / Accendi** | il compositore non la usa più, senza cancellarla. Se un gruppo resta tutto spento, usa le voci di serie |
 | **Ripristina** | toglie la tua modifica a una voce di serie |
 | **Elimina** | solo per le voci create da te |
+
+#### La timeline di riproduzione
+
+Mostra esattamente ciò che stai sentendo, anche se non leggi la musica.
+
+![La timeline durante l'ascolto: accordo, nota, battiti e riga che avanza](docs/screenshots/41-composizione-ascolto.png)
+
+| Parte | Cosa ti dice |
+|---|---|
+| **Accordo** e **Nota** in grande | che cosa suona in questo istante (*pausa* se la melodia tace) |
+| **1 2 3 4** | il battito: il cerchio pieno segue il tempo |
+| *Battuta 3 di 16 · giro 1 di 2* | dove sei; nelle forme anche la sezione (Strofa, Ritornello…) |
+| Le quattro battute | accordi in alto, note sotto: **più in alto = più acuta, più larga = più lunga**. La riga rossa avanza, la nota in corso è rossa, le battute passate sbiadiscono |
+| La barra in basso | tutto l'ascolto: premi un punto per **saltare** lì |
+| Pulsanti | *Pausa* / *Riprendi*, *Dall'inizio*, *Ferma*, tempo trascorso |
+
+Nello stesso momento, sulla timeline della voce (in elenco o nell'editor) si accende l'elemento in ascolto e una
+riga ne segna la posizione.
 
 #### L'editor in tre passi
 
@@ -447,7 +465,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
 | `src\compositore\` | compositore di quiete (`compositore.js`), compositore estro (`estro.js` forma, `armonia.js` accordi, `melodia.js` fraseggio, `materiale.js` richiami, forme, controlli e unione con le tue modifiche), scrittura e validazione dello score ABC (`abc.js`) |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
-| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `composizione.js`, `composizione-pagina.js` e `composizione-editor.js` (timeline ed editor a pulsanti) pagina Composizione, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
+| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `composizione.js`, `composizione-pagina.js`, `composizione-editor.js` (timeline ed editor a pulsanti) e `composizione-lettore.js` (timeline di riproduzione) pagina Composizione, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `docs\ricerche\` · `docs\report\` | [ricerca sulla composizione](docs/ricerche/2026-11-28-composizione.md) · [report sui brani creativi](docs/report/2026-11-28-brani-creativi.md) |

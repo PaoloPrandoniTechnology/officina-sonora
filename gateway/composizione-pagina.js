@@ -17,7 +17,6 @@ window.PaginaComposizione = function (app) {
   };
   // nome breve e spiegazione di ogni movimento delle note d'assolo
   const GESTI = { x: ['Arrivo', 'nota dell’accordo'], p: ['Passo', 'nota di passaggio'], n: ['Volta', 'nota vicina e ritorno'], a: ['Arpeggio', 'nota dell’accordo seguente'], s: ['Salto', 'salto verso l’alto'], c: ['Cromatica', 'semitono prima dell’arrivo'], r: ['Ripeti', 'stessa nota'] };
-  const PASSAGGI = { armonia: 4, motivo: 4, cadenza: 4, assolo: 8, richiamo: 1 }; // quante volte la prova ripete la voce
   const NUOVI = {
     armonia: (v) => ({ testo: v.modo === 'm' ? 'i | bVI | bIII | bVII | i | bVI | iv | V' : 'I | V | vi | IV | I | V | IV | V' }),
     motivo: () => ({ testo: '8 4 4 8 8 | 12 4 16' }), cadenza: () => ({ testo: '8 8 8 8 | 28 -4' }),
@@ -31,90 +30,75 @@ window.PaginaComposizione = function (app) {
   const filtro = { stile: '', modo: '', ruolo: '', andamento: '', q: '', solo: '', quanti: 40 };
   let suono = null;
 
-  // ---------- ascolto ----------
   const A = window.ScoreAbc;
+  // ---------- ascolto: la timeline di riproduzione sta in composizione-lettore.js ----------
+  const L = window.LettoreComposizione;
+  const SPIEGA = {
+    armonia: 'Primo giro: gli accordi da soli; secondo giro: con una melodia di prova sopra.',
+    motivo: 'Stai sentendo il ritmo del motivo con note di prova: in un brano le sceglie il compositore.',
+    cadenza: 'Stai sentendo il ritmo della chiusura con note di prova.',
+    assolo: 'La frase si ripete su otto accordi diversi: le note cambiano, il disegno resta.',
+    richiamo: '',
+    forma: 'È un brano intero di prova: in alto leggi la sezione che sta suonando.',
+  };
+  function spegni(linea) {
+    linea?.querySelectorAll('.tl .suona, .tl .ora').forEach((x) => x.classList.remove('suona', 'ora'));
+  }
   function ferma() {
     if (!suono) return;
-    clearTimeout(suono.fine);
-    cancelAnimationFrame(suono.quadro);
-    suono.ctx.close();
-    suono.battute.forEach((b) => b.classList.remove('suona'));
-    if (suono.tasto.isConnected) suono.tasto.textContent = 'Ascolta';
+    const s0 = suono;
     suono = null;
+    s0.lettore.ferma();
+    s0.pulisci();
   }
-  const voceSintetica = (ctx) => (midi, da, durata, forma, volume) => {
-    const o = ctx.createOscillator(), g = ctx.createGain(), a = da + durata;
-    o.type = forma; o.frequency.value = 440 * 2 ** ((midi - 69) / 12);
-    g.gain.setValueAtTime(0, da);
-    g.gain.linearRampToValueAtTime(volume, da + 0.015);
-    g.gain.setValueAtTime(volume * 0.8, Math.max(da + 0.016, a - 0.05));
-    g.gain.linearRampToValueAtTime(0, a);
-    o.connect(g).connect(ctx.destination); o.start(da); o.stop(a + 0.02);
-  };
   // un colpo breve per sentire l'accordo o la nota appena scelti
   let colpo = null;
   function assaggia(note) {
     ferma();
     colpo?.close();
     colpo = new AudioContext();
-    const nota = voceSintetica(colpo);
+    const nota = L.voce(colpo);
     note.forEach((m) => nota(m, colpo.currentTime + 0.02, 0.5, 'triangle', 0.5 / (note.length + 1)));
   }
-  // sintetizzatore minimo: melodia, accordi e basso, per giudicare note e ritmo (non il suono finale).
-  // Sulla timeline si accende la battuta che sta suonando.
-  function suona(abc, tasto, linea, passaggi) {
-    const score = A.leggiAbc(abc).score;
-    if (!score) return toast('Non riesco a leggere la prova', 'err');
-    app.pausaLettore();
-    const ctx = new AudioContext();
-    const nota = voceSintetica(ctx);
-    const unita = 60 / score.bpm / 8;
-    const inizio = ctx.currentTime + 0.1;
-    let t = inizio;
-    let legata = null;
-    const melodia = [];
-    for (const s of score.sezioni) {
-      for (const b of s.battute) {
-        let pos = 0;
-        for (const e of b.ins || []) {
-          if (e.midi !== null) {
-            if (legata && legata.midi === e.midi) legata.durata += e.durata * unita;
-            else melodia.push((legata = { midi: e.midi, da: t + pos * unita, durata: e.durata * unita }));
-            if (!e.lega) legata = null;
-          }
-          pos += e.durata;
-        }
-        const lunghezza = A.unita(s.metro || score.metro);
-        (b.accordi || []).forEach((a, i) => {
-          const c = A.noteAccordo(a.sigla);
-          const fine = i + 1 < b.accordi.length ? b.accordi[i + 1].pos : lunghezza;
-          const da = t + a.pos * unita, durata = (fine - a.pos) * unita;
-          nota(36 + c.basso, da, durata, 'triangle', 0.11);
-          for (const n of c.note) nota(48 + n, da, durata, 'sine', 0.05);
-        });
-        t += lunghezza * unita;
-      }
+  // sulla timeline della voce si accendono la battuta e l'elemento in ascolto, con la riga che avanza
+  function accendi(linea, p) {
+    const battute = linea ? linea.querySelectorAll('.tl-battuta') : [];
+    if (!battute.length) return;
+    spegni(linea);
+    const b = battute[p.battuta % battute.length];
+    b.classList.add('suona');
+    b.style.setProperty('--t', p.quota);
+    for (const corsia of b.querySelectorAll('.tl-corsia')) {
+      const blocchi = [...corsia.children];
+      const totale = blocchi.reduce((a, x) => a + (parseFloat(x.style.flexGrow) || 1), 0);
+      let somma = 0;
+      for (const x of blocchi) { somma += parseFloat(x.style.flexGrow) || 1; if (p.quota * totale < somma) { x.classList.add('ora'); break; } }
     }
-    for (const n of melodia) nota(n.midi, n.da, n.durata, 'triangle', 0.22);
-    tasto.textContent = 'Ferma';
-    const battute = linea && passaggi ? [...linea.querySelectorAll('.tl-battuta')] : [];
-    suono = { ctx, tasto, battute, fine: setTimeout(ferma, (t - ctx.currentTime + 0.3) * 1000) };
-    const segui = () => {
-      if (!suono || suono.ctx !== ctx) return;
-      const quota = Math.max(0, Math.min(0.999, (ctx.currentTime - inizio) / (t - inizio)));
-      const ora = Math.floor(((quota * passaggi) % 1) * battute.length);
-      battute.forEach((b, i) => b.classList.toggle('suona', i === ora));
-      suono.quadro = requestAnimationFrame(segui);
-    };
-    if (battute.length) segui();
   }
-  async function ascolta(voce, tasto, linea, errore) {
+  // dove: la carta o il passo 2 dell'editor; lì si apre il lettore
+  async function ascolta(voce, tasto, { box, linea, errore, aperto = () => {}, chiuso = () => {} }) {
     const era = suono && suono.tasto === tasto;
     ferma();
     if (era) return;
     try {
       const r = await invia('/api/composizione/prova', voce);
-      suona(r.abc, tasto, typeof linea === 'function' ? linea() : linea, PASSAGGI[voce.tipo]);
+      const score = A.leggiAbc(r.abc).score;
+      if (!score) throw new Error('non riesco a leggere la prova');
+      ferma();
+      app.pausaLettore();
+      const dove = box(), riga = typeof linea === 'function' ? linea() : linea;
+      const sue = riga ? riga.querySelectorAll('.tl-battuta').length : 0;
+      const pulisci = () => { spegni(riga); chiuso(); if (tasto.isConnected) tasto.textContent = 'Ascolta'; };
+      const lettore = L.apri(dove, score, {
+        giro: sue,
+        spiega: SPIEGA[voce.tipo],
+        suPosizione: (p) => accendi(riga, p),
+        suFine: (fermato) => { if (fermato) { suono = null; pulisci(); } else spegni(riga); },
+      });
+      suono = { lettore, tasto, pulisci };
+      tasto.textContent = 'Ferma';
+      aperto();
+      dove.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       if (r.genere) toast('Prova con il genere ' + r.genere);
     } catch (e) { errore ? errore(e.message) : toast(e.message, 'err'); }
   }
@@ -136,6 +120,7 @@ window.PaginaComposizione = function (app) {
   }
 
   function disegnaElenco() {
+    ferma();
     const lista = filtrate();
     const tutte = dati.voci.filter((v) => v.tipo === scheda);
     $('#cmConta').textContent = `${lista.length} di ${tutte.length} · ${tutte.filter((v) => v.attivo && !v.errore).length} in uso`;
@@ -143,6 +128,7 @@ window.PaginaComposizione = function (app) {
       <h3>${esc(titolo(v))}${v.serie ? (v.modificata ? '<span class="badge">modificata</span>' : '') : '<span class="badge">tua</span>'}${v.attivo ? '' : '<span class="badge">spenta</span>'}</h3>
       ${v.stili ? `<p class="muted">${v.stili.map(stileNome).map(esc).join(', ')}</p>` : ''}
       ${v.errore ? `<p class="err">Non usata: ${esc(v.errore)}</p>` : E.timeline(E.modelloDi(v), { tonica: tonicaDi(v), gesti: GESTI })}
+      <div class="cm-qui"></div>
       <div class="cm-tasti">
         <button type="button" class="btn small" data-cm="ascolta" data-id="${esc(v.id)}">Ascolta</button>
         <button type="button" class="btn small ghost" data-cm="modifica" data-id="${esc(v.id)}">Modifica</button>
@@ -199,7 +185,7 @@ window.PaginaComposizione = function (app) {
       <p class="muted">${esc(SCHEDE[tipo].aiuto)}</p>
       <section class="cm-passo"><h3><i>1</i> Dove si usa</h3><div id="cmDove"></div></section>
       <section class="cm-passo"><h3><i>2</i> Componi <span class="cm-storia"><button type="button" class="btn small ghost" data-e="annulla">Annulla modifica</button><button type="button" class="btn small ghost" data-e="ripeti">Ripeti</button><button type="button" class="btn small ghost" data-e="ricomincia">Ricomincia</button></span></h3>
-        <p class="cm-guida" id="cmGuida"></p><div id="cmLinea"></div><div class="cm-pannello" id="cmPannello"></div></section>
+        <p class="cm-guida" id="cmGuida"></p><div id="cmLinea"></div><div id="cmLettore"></div><div class="cm-pannello" id="cmPannello"></div></section>
       <section class="cm-passo"><h3><i>3</i> Controlla e salva</h3><ul class="cm-controlli" id="cmControlli" aria-live="polite"></ul>
         <p class="err" id="cmErrore" role="alert"></p>
         <div class="f-tasti"><span></span><button type="button" class="btn ghost" data-e="ascolta">Ascolta</button><button type="button" class="btn ghost" data-e="chiudi">Esci senza salvare</button><button class="btn" value="ok" id="cmSalva">Salva</button></div></section></form>`;
@@ -388,7 +374,7 @@ window.PaginaComposizione = function (app) {
       if (azione === 'annulla') return storia(annulla, ripeti);
       if (azione === 'ripeti') return storia(ripeti, annulla);
       if (azione === 'ricomincia') return cambia(() => { stato = JSON.parse(JSON.stringify(iniziale)); sel = [corsia(), 0, 0]; });
-      if (azione === 'ascolta') return ascolta(voce(), t, () => q('#cmLinea'), errore);
+      if (azione === 'ascolta') return ascolta(voce(), t, { box: () => q('#cmLettore'), linea: () => q('#cmLinea'), errore });
       if (azione === 'chiudi') return finestra.close();
       const [gruppo, campo] = azione.split('-');
       const fuoco = `[data-e="${azione}"][data-v="${CSS.escape(v)}"]`;
@@ -433,7 +419,16 @@ window.PaginaComposizione = function (app) {
     if (azione === 'altri') { filtro.quanti += 40; return disegnaElenco(); }
     const v = dati.voci.find((x) => x.id === b.dataset.id);
     if (!v) return;
-    if (azione === 'ascolta') return ascolta(v, b, b.closest('.cm-voce'));
+    if (azione === 'ascolta') {
+      const carta = b.closest('.cm-voce');
+      return ascolta(v, b, {
+        box: () => carta.querySelector('.cm-qui'),
+        linea: carta,
+        // la carta in ascolto prende tutta la riga, così la timeline si legge bene
+        aperto: () => carta.classList.add('in-ascolto'),
+        chiuso: () => carta.classList.remove('in-ascolto'),
+      });
+    }
     if (azione === 'modifica') return modifica(v, v.id);
     if (azione === 'duplica') { const { id, nome, ...resto } = v; return modifica({ ...resto, ...(nome ? { nome: nome + ' (copia)' } : {}) }); }
     if (azione === 'elimina' && !(await chiedi('Eliminare la voce?', `«${titolo(v)}» verrà eliminata.`, 'Elimina'))) return;

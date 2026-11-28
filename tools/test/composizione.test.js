@@ -156,3 +156,35 @@ test('editor: allungare mangia le figure dopo, accorciare lascia una pausa', () 
   assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 0, 4)]), '4 -16 4 8');
   assert.equal(Ed.scriviRitmo([Ed.cambiaDurata(bar, 3, 32)]), '4 -16 4 8', 'oltre la fine della battuta non si va');
 });
+
+// ---- timeline di riproduzione: ciò che mostra è ciò che si sente ----
+const Lt = require('../../gateway/composizione-lettore.js');
+
+test('riproduzione: accordo, nota, battuta e battito giusti istante per istante', () => {
+  const score = { bpm: 120, metro: '4/4', tonalita: 'C', sezioni: [{ nome: 'verse', battute: [
+    { accordi: [{ pos: 0, sigla: 'C' }, { pos: 16, sigla: 'G7' }], vocal: null, ins: [{ midi: 60, durata: 8 }, { midi: null, durata: 8 }, { midi: 64, durata: 16, lega: true }] },
+    { accordi: [{ pos: 0, sigla: 'Am' }], vocal: null, ins: [{ midi: 64, durata: 32 }] },
+  ] }] };
+  const ev = Lt.eventi(score);
+  assert.equal(ev.totale, 4);
+  assert.deepEqual(ev.note.map((n) => [n.midi, n.t, n.durata]), [[60, 0, 0.5], [64, 1, 3]], 'le note legate sono una sola');
+  const a = (t) => { const p = Lt.posizione(ev, t); return [p.battuta, p.battito, p.nota < 0 ? null : ev.note[p.nota].midi, ev.accordi[p.accordo].nome]; };
+  assert.deepEqual(a(0), [0, 0, 60, 'Do']);
+  assert.deepEqual(a(0.75), [0, 1, null, 'Do']);
+  assert.deepEqual(a(1.5), [0, 3, 64, 'Sol 7']);
+  assert.deepEqual(a(2.6), [1, 1, 64, 'La min']);
+  assert.deepEqual(a(3.999), [1, 3, 64, 'La min'], 'fino all’ultimo istante');
+  assert.deepEqual(['Bbm7', 'F#m7b5', 'D/F#', 'Ebmaj7'].map(Lt.nomeAccordo), ['Sib m7', 'Fa# m7♭5', 'Re / Fa#', 'Mib maj7']);
+});
+
+test('riproduzione: ogni voce di serie si lascia seguire dall\'inizio alla fine, e la pagina carica il lettore', () => {
+  for (const v of M.unisci({}).filter((_, i) => i % 7 === 0)) {
+    const ev = Lt.eventi(A.leggiAbc(G.gestisci('prova', v).abc).score);
+    assert.ok(ev.battute.length && ev.accordi.length, v.id);
+    for (let t = 0; t < ev.totale; t += ev.totale / 50) {
+      const p = Lt.posizione(ev, t);
+      assert.ok(p.battuta >= 0 && p.quota >= 0 && p.quota < 1 && p.accordo >= 0, `${v.id} ${t}`);
+    }
+  }
+  for (const f of ['dashboard.html', 'server.js']) assert.ok(fs.readFileSync(path.join(RADICE, 'gateway', f), 'utf8').includes('composizione-lettore.js'), f);
+});
