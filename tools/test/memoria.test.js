@@ -94,14 +94,14 @@ test('blocchi 5a e 5d: la memoria si salva e rende i brani coerenti e diversi', 
     assert.notEqual(a.abc, b.abc);
     assert.deepEqual(g.brani[1].parametri, b.score.parametri);
 
-    // strumenti: due fissi per il genere, gli altri cambiano
+    // strumenti: i fissi dell'organico ci sono sempre
     const scelte = [];
     for (let i = 0; i < 4; i++) {
       const r = await blocco('5a Scegli ricetta', { state: { job: null, queue: [], recent: [], experiments: [] } });
       if (!scelte.length || r.cat.name === scelte[0].genere) scelte.push({ genere: r.cat.name, strumenti: r.strumenti });
     }
     const memoria = JSON.parse(fs.readFileSync(FILE, 'utf8')).generi;
-    for (const [nome, gen] of Object.entries(memoria)) if (gen.nucleo) assert.equal(gen.nucleo.length, 2, nome);
+    for (const [nome, gen] of Object.entries(memoria)) if (gen.nucleo) assert.deepEqual(gen.nucleo, CAT.categories.find((c) => c.name === nome).organico.fissi, nome);
     for (const s of scelte) for (const x of memoria[s.genere].nucleo) assert.ok(s.strumenti.includes(x), `${s.genere}: ${x}`);
   } finally { fs.rmSync(FILE, { force: true }); }
 });

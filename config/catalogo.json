@@ -78,18 +78,28 @@
       "en": {
         "genre": "meditative drone ambient",
         "instruments": {
-          "tanpura": "tanpura drone",
-          "campane tibetane": "resonant tibetan singing bowls",
-          "pad di sintetizzatore lungo": "long evolving synth pad",
-          "drone di organo": "sustained organ drone"
+          "tanpura": "warm tanpura drone with rich overtones",
+          "campane tibetane": "soft tibetan singing bowls with long clean decay",
+          "pad di sintetizzatore lungo": "smooth analog pad slowly evolving",
+          "drone di organo": "low mellow organ drone"
         },
         "rhythm": "free time, beatless",
         "mood": "still, deep, serene",
-        "space": "wide long reverb, soft warm mix",
+        "space": "wide soft mix with long natural reverb",
         "influences": {
           "ambient": "ambient",
           "musica indiana": "indian classical"
         }
+      },
+      "organico": {
+        "fissi": [
+          "tanpura",
+          "campane tibetane",
+          "pad di sintetizzatore lungo"
+        ],
+        "scelta": [
+          "drone di organo"
+        ]
       }
     },
     {
@@ -108,10 +118,10 @@
       "genere": "Ambient del respiro",
       "stile": "breathing ambient, slow swelling pads that rise and fall like breath, soft and airy",
       "strumenti": [
-        "pad morbido",
-        "flauto di bambu",
-        "sintetizzatore a respiro",
-        "vento sintetico"
+        "pad di sintetizzatore arioso",
+        "flauto di bambù",
+        "onde di sintetizzatore",
+        "vento sintetico delicato"
       ],
       "vietati": [
         "batteria",
@@ -164,18 +174,28 @@
       "en": {
         "genre": "breathing ambient",
         "instruments": {
-          "pad morbido": "soft airy synth pad",
-          "flauto di bambu": "breathy bamboo flute",
-          "sintetizzatore a respiro": "slow swelling synthesizer",
-          "vento sintetico": "gentle synthetic wind"
+          "pad di sintetizzatore arioso": "airy soft synth pad with slow filter",
+          "flauto di bambù": "breathy bamboo flute close and warm",
+          "onde di sintetizzatore": "slow swelling synth waves",
+          "vento sintetico delicato": "gentle synthetic wind texture"
         },
         "rhythm": "free time, slow swells",
         "mood": "calm, spacious, weightless",
-        "space": "airy reverb, soft mix",
+        "space": "airy spacious mix with smooth highs",
         "influences": {
           "ambient": "ambient",
           "new age": "new age"
         }
+      },
+      "organico": {
+        "fissi": [
+          "pad di sintetizzatore arioso",
+          "flauto di bambù"
+        ],
+        "scelta": [
+          "onde di sintetizzatore",
+          "vento sintetico delicato"
+        ]
       }
     },
     {
@@ -194,10 +214,10 @@
       "genere": "Dark ambient dolce",
       "stile": "deep dark ambient, sub bass drones, very slow and heavy but warm, no melody",
       "strumenti": [
-        "sub bass",
-        "drone scuro",
-        "rumore di fondo naturale",
-        "corde basse"
+        "basso sub profondo",
+        "drone scuro e caldo",
+        "archi gravi con archetto",
+        "natura lontana"
       ],
       "vietati": [
         "batteria",
@@ -250,18 +270,28 @@
       "en": {
         "genre": "deep dark ambient",
         "instruments": {
-          "sub bass": "deep sub bass",
-          "drone scuro": "dark warm drone",
-          "rumore di fondo naturale": "distant natural ambience",
-          "corde basse": "low bowed strings"
+          "basso sub profondo": "deep round sub bass",
+          "drone scuro e caldo": "dark warm analog drone",
+          "archi gravi con archetto": "slow bowed cellos in low register",
+          "natura lontana": "distant soft night ambience"
         },
         "rhythm": "beatless, very slow",
         "mood": "heavy, warm, restful",
-        "space": "deep dark reverb, soft mix",
+        "space": "dark deep mix with rolled off highs",
         "influences": {
           "dark ambient": "dark ambient",
           "drone doom": "drone doom"
         }
+      },
+      "organico": {
+        "fissi": [
+          "basso sub profondo",
+          "drone scuro e caldo",
+          "archi gravi con archetto"
+        ],
+        "scelta": [
+          "natura lontana"
+        ]
       }
     },
     {
@@ -280,10 +310,10 @@
       "genere": "Ambient acustico",
       "stile": "acoustic ambient, warm harp and delayed guitar, gentle woodwinds, calm and nurturing",
       "strumenti": [
-        "arpa",
-        "chitarra acustica con delay",
-        "flauto traverso",
-        "archi lontani"
+        "arpa da concerto",
+        "archi lontani morbidi",
+        "flauto da concerto caldo",
+        "chitarra acustica con delay"
       ],
       "vietati": [
         "batteria",
@@ -340,19 +370,29 @@
       "en": {
         "genre": "acoustic ambient",
         "instruments": {
-          "arpa": "concert harp arpeggios",
-          "chitarra acustica con delay": "acoustic guitar with delay",
-          "flauto traverso": "warm concert flute",
-          "archi lontani": "distant soft strings"
+          "arpa da concerto": "soft concert harp arpeggios",
+          "archi lontani morbidi": "distant muted strings with slow swells",
+          "flauto da concerto caldo": "warm low register concert flute",
+          "chitarra acustica con delay": "nylon guitar with gentle tape delay"
         },
         "rhythm": "gentle slow pulse",
         "mood": "nurturing, tender, calm",
-        "space": "warm hall reverb, intimate mix",
+        "space": "warm intimate hall with soft reverb",
         "influences": {
           "ambient acustico": "acoustic ambient",
           "folk": "folk",
           "musica da camera": "chamber music"
         }
+      },
+      "organico": {
+        "fissi": [
+          "arpa da concerto",
+          "archi lontani morbidi"
+        ],
+        "scelta": [
+          "flauto da concerto caldo",
+          "chitarra acustica con delay"
+        ]
       }
     },
     {
@@ -371,10 +411,10 @@
       "genere": "Sound bath con gong",
       "stile": "sound bath, gong swells, crystal bowls, long resonant sustain, hypnotic and spacious",
       "strumenti": [
-        "gong",
+        "gong profondi",
         "campane di cristallo",
         "campane tibetane",
-        "pad di risonanza"
+        "pad risonante"
       ],
       "vietati": [
         "batteria",
@@ -428,18 +468,28 @@
       "en": {
         "genre": "sound bath",
         "instruments": {
-          "gong": "deep gong swells",
-          "campane di cristallo": "shimmering crystal bowls",
-          "campane tibetane": "tibetan singing bowls",
-          "pad di risonanza": "resonant pad"
+          "gong profondi": "deep gong swells with slow bloom",
+          "campane di cristallo": "pure crystal singing bowls shimmering",
+          "campane tibetane": "soft tibetan singing bowls with long clean decay",
+          "pad risonante": "resonant low pad underneath"
         },
         "rhythm": "free time, long decays",
         "mood": "hypnotic, spacious",
-        "space": "vast reverb, natural dynamics",
+        "space": "vast natural reverb with wide dynamics",
         "influences": {
           "sound bath": "sound bath",
           "ambient": "ambient"
         }
+      },
+      "organico": {
+        "fissi": [
+          "gong profondi",
+          "campane di cristallo",
+          "campane tibetane"
+        ],
+        "scelta": [
+          "pad risonante"
+        ]
       }
     },
     {
@@ -458,10 +508,11 @@
       "genere": "Downtempo acustico",
       "stile": "acoustic downtempo, nylon guitar and soft shaker, warm bass, gentle groove for slow movement",
       "strumenti": [
-        "chitarra classica",
-        "shaker morbido",
-        "basso acustico",
-        "kalimba"
+        "chitarra in fingerpicking",
+        "basso acustico caldo",
+        "shaker leggero",
+        "kalimba",
+        "flauto morbido"
       ],
       "vietati": [
         "batteria elettronica",
@@ -518,19 +569,31 @@
       "en": {
         "genre": "acoustic downtempo",
         "instruments": {
-          "chitarra classica": "fingerpicked nylon guitar",
-          "shaker morbido": "soft shaker",
-          "basso acustico": "warm acoustic bass",
-          "kalimba": "kalimba"
+          "chitarra in fingerpicking": "fingerpicked nylon guitar warm and close",
+          "basso acustico caldo": "round warm acoustic bass",
+          "shaker leggero": "soft brushed shaker",
+          "kalimba": "mellow wooden kalimba",
+          "flauto morbido": "soft mellow alto flute"
         },
         "rhythm": "light relaxed groove",
         "mood": "grounded, warm, gentle",
-        "space": "close organic mix",
+        "space": "close organic mix with natural room",
         "influences": {
           "downtempo": "downtempo",
           "bossa nova": "bossa nova",
           "folk": "folk"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra in fingerpicking",
+          "basso acustico caldo",
+          "shaker leggero"
+        ],
+        "scelta": [
+          "kalimba",
+          "flauto morbido"
+        ]
       }
     },
     {
@@ -550,10 +613,12 @@
       "genere": "Organic groove",
       "stile": "organic groove, tribal percussion, pulsing bass and plucked arpeggios, rhythmic and flowing",
       "strumenti": [
-        "percussioni tribali",
-        "kalimba",
-        "basso pulsante",
-        "arpeggi di sintetizzatore"
+        "kalimba pizzicata",
+        "basso caldo pulsante",
+        "percussioni a mano tribali",
+        "cassa morbida",
+        "arpeggi di sintetizzatore",
+        "marimba"
       ],
       "vietati": [
         "batteria rock",
@@ -610,19 +675,33 @@
       "en": {
         "genre": "organic house",
         "instruments": {
-          "percussioni tribali": "tribal hand percussion",
-          "kalimba": "plucked kalimba",
-          "basso pulsante": "pulsing warm bass",
-          "arpeggi di sintetizzatore": "synth arpeggios"
+          "kalimba pizzicata": "bright plucked kalimba hook",
+          "basso caldo pulsante": "warm pulsing sub bass",
+          "percussioni a mano tribali": "deep hand drums and soft djembe",
+          "cassa morbida": "soft round kick on every beat",
+          "arpeggi di sintetizzatore": "clean flowing synth arpeggios",
+          "marimba": "warm marimba patterns"
         },
         "rhythm": "steady flowing four on the floor groove",
         "mood": "uplifting, flowing",
-        "space": "wide clean mix",
+        "space": "wide clean mix with defined low end",
         "influences": {
           "organic house": "organic house",
           "tribal": "tribal",
           "world": "world"
         }
+      },
+      "organico": {
+        "fissi": [
+          "kalimba pizzicata",
+          "basso caldo pulsante",
+          "percussioni a mano tribali",
+          "cassa morbida"
+        ],
+        "scelta": [
+          "arpeggi di sintetizzatore",
+          "marimba"
+        ]
       }
     },
     {
@@ -641,10 +720,11 @@
       "genere": "Electronic workout leggero",
       "stile": "electronic workout, driving four-on-the-floor drum machine, pulsing synth bass, energetic but not aggressive",
       "strumenti": [
-        "drum machine",
-        "synth pulsante",
-        "basso sintetico",
-        "claps"
+        "sintetizzatore pulsante",
+        "basso sintetico incalzante",
+        "drum machine incisiva",
+        "pad ampio",
+        "pluck sintetico"
       ],
       "vietati": [
         "chitarra distorta",
@@ -697,18 +777,30 @@
       "en": {
         "genre": "electronic workout",
         "instruments": {
-          "drum machine": "punchy drum machine",
-          "synth pulsante": "pulsing synth lead",
-          "basso sintetico": "driving synth bass",
-          "claps": "crisp claps"
+          "sintetizzatore pulsante": "bright pulsing synth lead",
+          "basso sintetico incalzante": "tight sidechained synth bass",
+          "drum machine incisiva": "punchy electronic drums with crisp claps",
+          "pad ampio": "wide supersaw pad",
+          "pluck sintetico": "clean plucked synth"
         },
         "rhythm": "four on the floor",
         "mood": "energetic, focused, bright",
-        "space": "clean modern punchy mix",
+        "space": "punchy modern club mix with controlled bass",
         "influences": {
           "electronic dance": "electronic dance",
           "trance leggero": "melodic trance"
         }
+      },
+      "organico": {
+        "fissi": [
+          "sintetizzatore pulsante",
+          "basso sintetico incalzante",
+          "drum machine incisiva"
+        ],
+        "scelta": [
+          "pad ampio",
+          "pluck sintetico"
+        ]
       }
     },
     {
@@ -727,11 +819,12 @@
       "genere": "Funk groove leggero",
       "stile": "light funk groove, played by a band, tight rhythm section, warm and joyful, slight swing",
       "strumenti": [
-        "basso slap",
         "chitarra funk pulita",
+        "basso slap",
+        "batteria funk",
         "clavinet",
-        "batteria suonata con spazzole",
-        "ottoni morbidi"
+        "rhodes elettrico",
+        "sezione fiati"
       ],
       "vietati": [
         "synth distorto",
@@ -796,20 +889,33 @@
       "en": {
         "genre": "light funk",
         "instruments": {
-          "basso slap": "slap bass",
-          "chitarra funk pulita": "clean funk guitar with muted strums",
-          "clavinet": "clavinet",
-          "batteria suonata con spazzole": "brushed drum kit",
-          "ottoni morbidi": "soft horn section"
+          "chitarra funk pulita": "clean funk guitar with tight muted strums",
+          "basso slap": "punchy slap bass upfront",
+          "batteria funk": "dry tight funk drums with crisp ghost notes",
+          "clavinet": "percussive clavinet",
+          "rhodes elettrico": "warm rhodes electric piano",
+          "sezione fiati": "tight soft horn stabs"
         },
         "rhythm": "syncopated sixteenth note groove, slight swing",
         "mood": "warm, joyful",
-        "space": "live band, warm vintage mix",
+        "space": "warm dry 1970s analog mix",
         "influences": {
           "funk": "funk",
           "soul": "soul",
           "disco leggero": "light disco"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra funk pulita",
+          "basso slap",
+          "batteria funk"
+        ],
+        "scelta": [
+          "clavinet",
+          "rhodes elettrico",
+          "sezione fiati"
+        ]
       }
     },
     {
@@ -828,12 +934,12 @@
       "genere": "Afro-latin groove",
       "stile": "afro-latin groove, live percussion ensemble, congas and shakers, bright and flowing, human feel",
       "strumenti": [
+        "chitarra montuno",
         "congas",
-        "bongos",
-        "shaker",
-        "timbales leggeri",
-        "basso acustico",
-        "chitarra nylon ritmica"
+        "basso acustico tumbao",
+        "shaker e timbales",
+        "flauto vivace",
+        "pianoforte montuno"
       ],
       "vietati": [
         "batteria rock",
@@ -898,21 +1004,33 @@
       "en": {
         "genre": "afro-latin groove",
         "instruments": {
-          "congas": "congas",
-          "bongos": "bongos",
-          "shaker": "shakers",
-          "timbales leggeri": "light timbales",
-          "basso acustico": "acoustic bass",
-          "chitarra nylon ritmica": "rhythmic nylon guitar montuno"
+          "chitarra montuno": "bright nylon guitar montuno",
+          "congas": "open warm congas",
+          "basso acustico tumbao": "deep acoustic bass tumbao",
+          "shaker e timbales": "light shakers and timbales",
+          "flauto vivace": "agile wooden flute",
+          "pianoforte montuno": "bright piano montuno"
         },
         "rhythm": "clave driven syncopated groove",
         "mood": "sunny, flowing",
-        "space": "live percussion ensemble, natural room",
+        "space": "live percussion ensemble in a natural room",
         "influences": {
           "afro-cuban": "afro-cuban",
           "bossa nova": "bossa nova",
           "world": "world"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra montuno",
+          "congas",
+          "basso acustico tumbao",
+          "shaker e timbales"
+        ],
+        "scelta": [
+          "flauto vivace",
+          "pianoforte montuno"
+        ]
       }
     },
     {
@@ -931,11 +1049,12 @@
       "genere": "Trip-hop dolce",
       "stile": "soft trip-hop, dusty drums, rhodes piano, warm bass, relaxed and melancholic, played feel",
       "strumenti": [
-        "rhodes",
+        "rhodes elettrico",
         "basso elettrico morbido",
-        "batteria con beat spezzato",
+        "batteria spezzata polverosa",
         "vibrafono",
-        "chitarra jazz pulita"
+        "chitarra jazz pulita",
+        "violoncello"
       ],
       "vietati": [
         "synth distorto",
@@ -1000,20 +1119,33 @@
       "en": {
         "genre": "soft trip-hop",
         "instruments": {
-          "rhodes": "rhodes electric piano",
-          "basso elettrico morbido": "soft electric bass",
-          "batteria con beat spezzato": "dusty broken beat drums",
-          "vibrafono": "vibraphone",
-          "chitarra jazz pulita": "clean jazz guitar"
+          "rhodes elettrico": "dusty rhodes chords with slow tremolo",
+          "basso elettrico morbido": "deep soft electric bass",
+          "batteria spezzata polverosa": "laid back dusty breakbeat drums",
+          "vibrafono": "soft vibraphone melody",
+          "chitarra jazz pulita": "clean jazz guitar with spring reverb",
+          "violoncello": "solo cello with warm bow"
         },
         "rhythm": "laid back broken beat",
         "mood": "melancholic, relaxed",
-        "space": "warm lo-fi mix",
+        "space": "warm lo-fi mix with gentle tape saturation",
         "influences": {
           "trip-hop": "trip-hop",
           "jazz": "jazz",
           "lo-fi": "lo-fi"
         }
+      },
+      "organico": {
+        "fissi": [
+          "rhodes elettrico",
+          "basso elettrico morbido",
+          "batteria spezzata polverosa"
+        ],
+        "scelta": [
+          "vibrafono",
+          "chitarra jazz pulita",
+          "violoncello"
+        ]
       }
     },
     {
@@ -1032,11 +1164,11 @@
       "genere": "Reggae dub morbido",
       "stile": "soft reggae dub, one-drop rhythm, live bass and organ, spacious echoes, warm and loose",
       "strumenti": [
-        "basso reggae",
+        "basso reggae profondo",
+        "chitarra skank in levare",
+        "batteria one drop",
         "organo hammond",
-        "chitarra skank",
-        "rullante con eco",
-        "percussioni leggere"
+        "melodica"
       ],
       "vietati": [
         "batteria rock",
@@ -1089,19 +1221,30 @@
       "en": {
         "genre": "soft roots reggae dub",
         "instruments": {
-          "basso reggae": "deep reggae bass",
-          "organo hammond": "hammond organ",
-          "chitarra skank": "offbeat skank guitar",
-          "rullante con eco": "snare with tape echo",
-          "percussioni leggere": "light percussion"
+          "basso reggae profondo": "deep round reggae bass upfront",
+          "chitarra skank in levare": "clean offbeat skank guitar",
+          "batteria one drop": "tight one drop drums with rimshot",
+          "organo hammond": "bubbling hammond organ",
+          "melodica": "melodica lead with tape echo"
         },
         "rhythm": "one drop groove",
         "mood": "loose, warm, mellow",
-        "space": "spacious dub echoes and spring reverb",
+        "space": "spacious dub mix with tape echo and spring reverb",
         "influences": {
           "reggae": "reggae",
           "dub": "dub"
         }
+      },
+      "organico": {
+        "fissi": [
+          "basso reggae profondo",
+          "chitarra skank in levare",
+          "batteria one drop"
+        ],
+        "scelta": [
+          "organo hammond",
+          "melodica"
+        ]
       }
     },
     {
@@ -1120,11 +1263,12 @@
       "genere": "Jazz lounge",
       "stile": "jazz lounge trio, played by musicians, upright bass, brushed drums, piano, relaxed and intimate",
       "strumenti": [
-        "pianoforte",
-        "contrabbasso",
+        "pianoforte acustico",
+        "contrabbasso walking",
         "batteria con spazzole",
-        "sassofono morbido",
-        "vibrafono"
+        "sax tenore soffiato",
+        "vibrafono",
+        "tromba con sordina"
       ],
       "vietati": [
         "synth",
@@ -1181,20 +1325,33 @@
       "en": {
         "genre": "lounge jazz",
         "instruments": {
-          "pianoforte": "acoustic piano",
-          "contrabbasso": "walking upright bass",
-          "batteria con spazzole": "brushed drums",
-          "sassofono morbido": "breathy tenor saxophone",
-          "vibrafono": "vibraphone"
+          "pianoforte acustico": "warm grand piano with soft voicings",
+          "contrabbasso walking": "woody walking upright bass",
+          "batteria con spazzole": "brushed drums with soft ride cymbal",
+          "sax tenore soffiato": "breathy tenor saxophone lead",
+          "vibrafono": "mellow vibraphone lead",
+          "tromba con sordina": "muted trumpet lead"
         },
         "rhythm": "light swing",
         "mood": "intimate, relaxed",
-        "space": "small club, natural room",
+        "space": "small jazz club with natural room",
         "influences": {
           "jazz": "jazz",
           "bossa nova": "bossa nova",
           "musica da camera": "chamber music"
         }
+      },
+      "organico": {
+        "fissi": [
+          "pianoforte acustico",
+          "contrabbasso walking",
+          "batteria con spazzole"
+        ],
+        "scelta": [
+          "sax tenore soffiato",
+          "vibrafono",
+          "tromba con sordina"
+        ]
       }
     },
     {
@@ -1213,11 +1370,12 @@
       "genere": "Folk strumming",
       "stile": "acoustic folk strumming, played guitars, banjo, light percussion, warm and honest, human feel",
       "strumenti": [
-        "chitarra acustica strumming",
+        "chitarra acustica strimpellata",
+        "basso acustico",
+        "cajon e shaker",
         "banjo",
         "armonica",
-        "basso acustico",
-        "shaker e cajon"
+        "mandolino"
       ],
       "vietati": [
         "synth",
@@ -1282,20 +1440,33 @@
       "en": {
         "genre": "acoustic folk",
         "instruments": {
-          "chitarra acustica strumming": "strummed acoustic guitar",
-          "banjo": "fingerpicked banjo",
-          "armonica": "harmonica",
-          "basso acustico": "acoustic bass",
-          "shaker e cajon": "shaker and cajon"
+          "chitarra acustica strimpellata": "strummed steel string acoustic guitar",
+          "basso acustico": "warm acoustic bass",
+          "cajon e shaker": "soft cajon and shaker",
+          "banjo": "fingerpicked banjo lead",
+          "armonica": "warm harmonica lead",
+          "mandolino": "bright mandolin lead"
         },
         "rhythm": "steady eighth note strumming",
         "mood": "warm, honest, hopeful",
-        "space": "live ensemble, natural wooden room",
+        "space": "live wooden room with natural mics",
         "influences": {
           "folk": "folk",
           "country leggero": "light country",
           "americana": "americana"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra acustica strimpellata",
+          "basso acustico",
+          "cajon e shaker"
+        ],
+        "scelta": [
+          "banjo",
+          "armonica",
+          "mandolino"
+        ]
       }
     },
     {
@@ -1314,11 +1485,11 @@
       "genere": "Surf rock strumentale",
       "stile": "instrumental surf rock, reverb guitar lead, driving drums, bright and playful, played by a band",
       "strumenti": [
-        "chitarra elettrica con riverbero",
-        "batteria con piatti",
-        "basso elettrico",
+        "chitarra solista con riverbero",
         "chitarra ritmica twang",
-        "organo leggero"
+        "basso elettrico a plettro",
+        "batteria surf",
+        "organo combo"
       ],
       "vietati": [
         "voce",
@@ -1375,20 +1546,31 @@
       "en": {
         "genre": "surf rock",
         "instruments": {
-          "chitarra elettrica con riverbero": "spring reverb electric guitar lead with tremolo picking",
-          "batteria con piatti": "drums with ride cymbal and tom fills",
-          "basso elettrico": "picked electric bass",
-          "chitarra ritmica twang": "twangy rhythm guitar",
-          "organo leggero": "light combo organ"
+          "chitarra solista con riverbero": "spring reverb surf guitar lead with clean twang",
+          "chitarra ritmica twang": "crisp rhythm guitar with light tremolo",
+          "basso elettrico a plettro": "picked electric bass punchy and round",
+          "batteria surf": "tight surf drums with ride cymbal",
+          "organo combo": "vintage combo organ"
         },
         "rhythm": "driving straight beat",
         "mood": "bright, playful",
-        "space": "live band, vintage room",
+        "space": "1960s studio mix with clear separation",
         "influences": {
           "surf rock": "surf rock",
           "rock and roll": "rock and roll",
           "rockabilly": "rockabilly"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra solista con riverbero",
+          "chitarra ritmica twang",
+          "basso elettrico a plettro",
+          "batteria surf"
+        ],
+        "scelta": [
+          "organo combo"
+        ]
       }
     },
     {
@@ -1408,10 +1590,11 @@
       "stile": "instrumental post-rock, layered clean and delayed guitars, building drums, cinematic and expansive, played by a band",
       "strumenti": [
         "chitarra elettrica con delay",
-        "chitarra clean arpeggiata",
-        "batteria con crescendo",
+        "chitarra arpeggiata pulita",
         "basso profondo",
-        "glockenspiel"
+        "batteria in crescendo",
+        "glockenspiel",
+        "archi"
       ],
       "vietati": [
         "voce",
@@ -1476,20 +1659,33 @@
       "en": {
         "genre": "post-rock",
         "instruments": {
-          "chitarra elettrica con delay": "delayed electric guitar",
-          "chitarra clean arpeggiata": "arpeggiated clean guitar",
-          "batteria con crescendo": "building drums",
-          "basso profondo": "deep bass",
-          "glockenspiel": "glockenspiel"
+          "chitarra elettrica con delay": "clean electric guitar with dotted delay",
+          "chitarra arpeggiata pulita": "chiming arpeggiated guitar",
+          "basso profondo": "deep warm electric bass",
+          "batteria in crescendo": "big roomy drums building slowly",
+          "glockenspiel": "soft glockenspiel",
+          "archi": "wide cinematic strings"
         },
         "rhythm": "slow build to a full beat",
         "mood": "cinematic, expansive, emotional",
-        "space": "wide layered mix, long reverb",
+        "space": "wide layered mix with long reverb and headroom",
         "influences": {
           "post-rock": "post-rock",
           "shoegaze": "shoegaze",
           "ambient rock": "ambient rock"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra elettrica con delay",
+          "chitarra arpeggiata pulita",
+          "basso profondo",
+          "batteria in crescendo"
+        ],
+        "scelta": [
+          "glockenspiel",
+          "archi"
+        ]
       }
     },
     {
@@ -1508,11 +1704,12 @@
       "genere": "Blues shuffle strumentale",
       "stile": "instrumental blues shuffle, slide guitar, drums with swing shuffle, warm organ, played by a band, lively",
       "strumenti": [
-        "chitarra slide",
-        "batteria con shuffle",
+        "chitarra blues solista",
         "basso walking",
+        "batteria shuffle",
         "organo hammond",
-        "chitarra ritmica elettrica"
+        "armonica blues",
+        "pianoforte boogie"
       ],
       "vietati": [
         "voce",
@@ -1569,20 +1766,33 @@
       "en": {
         "genre": "blues shuffle",
         "instruments": {
-          "chitarra slide": "slide guitar lead",
-          "batteria con shuffle": "shuffle drums",
+          "chitarra blues solista": "warm tube amp blues guitar lead",
           "basso walking": "walking bass",
-          "organo hammond": "hammond organ",
-          "chitarra ritmica elettrica": "electric rhythm guitar"
+          "batteria shuffle": "dry swinging shuffle drums",
+          "organo hammond": "hammond organ with leslie speaker",
+          "armonica blues": "gritty blues harmonica",
+          "pianoforte boogie": "boogie woogie upright piano"
         },
         "rhythm": "swinging shuffle",
         "mood": "lively, soulful",
-        "space": "live band, warm tube amps",
+        "space": "live blues band with warm vintage amps",
         "influences": {
           "blues": "blues",
           "rock": "rock",
           "boogie": "boogie"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra blues solista",
+          "basso walking",
+          "batteria shuffle"
+        ],
+        "scelta": [
+          "organo hammond",
+          "armonica blues",
+          "pianoforte boogie"
+        ]
       }
     },
     {
@@ -1602,9 +1812,9 @@
       "stile": "instrumental indie rock, jangly guitars, driving drums, bright and energetic, played by a band",
       "strumenti": [
         "chitarra elettrica jangle",
-        "batteria rock",
+        "chitarra ritmica crunch",
         "basso elettrico",
-        "chitarra ritmica con power chord",
+        "batteria rock",
         "tastiera vintage"
       ],
       "vietati": [
@@ -1670,20 +1880,31 @@
       "en": {
         "genre": "indie rock",
         "instruments": {
-          "chitarra elettrica jangle": "jangly electric guitar",
-          "batteria rock": "driving rock drums",
-          "basso elettrico": "electric bass",
-          "chitarra ritmica con power chord": "power chord rhythm guitar",
-          "tastiera vintage": "vintage keyboard"
+          "chitarra elettrica jangle": "bright jangly electric guitar lead",
+          "chitarra ritmica crunch": "light crunch rhythm guitar",
+          "basso elettrico": "melodic electric bass",
+          "batteria rock": "crisp indie rock drums",
+          "tastiera vintage": "vintage electric organ"
         },
         "rhythm": "driving beat with backbeat",
         "mood": "bright, energetic",
-        "space": "live band, crisp mix",
+        "space": "crisp modern indie mix with natural drums",
         "influences": {
           "indie rock": "indie rock",
           "power pop": "power pop",
           "new wave": "new wave"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra elettrica jangle",
+          "chitarra ritmica crunch",
+          "basso elettrico",
+          "batteria rock"
+        ],
+        "scelta": [
+          "tastiera vintage"
+        ]
       }
     },
     {
@@ -1702,11 +1923,11 @@
       "genere": "Rockabilly strumentale",
       "stile": "instrumental rockabilly, fast slap bass, twangy electric guitar, swinging drums, lively and joyful, played by a band",
       "strumenti": [
+        "chitarra solista hollowbody",
         "contrabbasso slap",
-        "chitarra elettrica twang",
         "batteria rockabilly",
-        "chitarra solista con bending",
-        "claps"
+        "pianoforte boogie",
+        "sax tenore ruvido"
       ],
       "vietati": [
         "voce",
@@ -1763,20 +1984,31 @@
       "en": {
         "genre": "rockabilly",
         "instruments": {
-          "contrabbasso slap": "slap upright bass",
-          "chitarra elettrica twang": "twangy electric guitar",
-          "batteria rockabilly": "swinging drums",
-          "chitarra solista con bending": "lead guitar with string bends",
-          "claps": "handclaps"
+          "chitarra solista hollowbody": "hollowbody guitar lead with slapback echo",
+          "contrabbasso slap": "slapped upright bass",
+          "batteria rockabilly": "snappy snare and brushes shuffle",
+          "pianoforte boogie": "boogie woogie upright piano",
+          "sax tenore ruvido": "raspy tenor saxophone"
         },
         "rhythm": "fast swinging beat",
         "mood": "lively, joyful",
-        "space": "vintage slapback echo, live room",
+        "space": "vintage 1950s mono warmth with slapback echo",
         "influences": {
           "rockabilly": "rockabilly",
           "rock and roll": "rock and roll",
           "country": "country"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra solista hollowbody",
+          "contrabbasso slap",
+          "batteria rockabilly"
+        ],
+        "scelta": [
+          "pianoforte boogie",
+          "sax tenore ruvido"
+        ]
       }
     },
     {
@@ -1795,11 +2027,11 @@
       "genere": "Techno minimale",
       "stile": "minimal techno, hypnotic four-on-the-floor kick, sparse hi-hats, filtered bass, clean and precise, electronic production",
       "strumenti": [
-        "drum machine kick",
-        "hi-hat sintetico",
-        "basso filtrato",
-        "stab di sintetizzatore",
-        "rumore percussivo"
+        "cassa profonda",
+        "basso sintetico filtrato",
+        "hi-hat sintetici",
+        "stab dub",
+        "plucco analogico"
       ],
       "vietati": [
         "voce",
@@ -1864,20 +2096,31 @@
       "en": {
         "genre": "minimal techno",
         "instruments": {
-          "drum machine kick": "deep drum machine kick",
-          "hi-hat sintetico": "crisp synthetic hi-hats",
-          "basso filtrato": "filtered synth bass",
-          "stab di sintetizzatore": "short dub synth stabs",
-          "rumore percussivo": "percussive noise"
+          "cassa profonda": "deep clean drum machine kick",
+          "basso sintetico filtrato": "filtered rolling synth bass",
+          "hi-hat sintetici": "crisp tight synthetic hi-hats",
+          "stab dub": "short dub chord stabs with echo",
+          "plucco analogico": "dry analog pluck sequence"
         },
         "rhythm": "steady four on the floor",
         "mood": "hypnotic, precise",
-        "space": "clean deep club mix",
+        "space": "deep clean club mix with solid low end",
         "influences": {
           "minimal techno": "minimal techno",
           "deep house": "deep house",
           "dub techno": "dub techno"
         }
+      },
+      "organico": {
+        "fissi": [
+          "cassa profonda",
+          "basso sintetico filtrato",
+          "hi-hat sintetici"
+        ],
+        "scelta": [
+          "stab dub",
+          "plucco analogico"
+        ]
       }
     },
     {
@@ -1896,10 +2139,10 @@
       "genere": "Piano minimalista",
       "stile": "minimalist piano, repeating short patterns, gentle and precise, played by a pianist, quiet dynamics",
       "strumenti": [
-        "pianoforte acustico",
-        "pianoforte preparato leggero",
+        "pianoforte con feltro",
         "violoncello lontano",
-        "celesta"
+        "celesta",
+        "archi sommessi"
       ],
       "vietati": [
         "batteria",
@@ -1956,19 +2199,29 @@
       "en": {
         "genre": "minimalist piano",
         "instruments": {
-          "pianoforte acustico": "felt acoustic piano",
-          "pianoforte preparato leggero": "lightly prepared piano",
-          "violoncello lontano": "distant cello",
-          "celesta": "celesta"
+          "pianoforte con feltro": "intimate felt piano with soft hammers",
+          "violoncello lontano": "distant solo cello with long bows",
+          "celesta": "delicate celesta",
+          "archi sommessi": "hushed string quartet"
         },
         "rhythm": "steady quiet pulse, repeating cells",
         "mood": "delicate, contemplative",
-        "space": "close piano, soft hall reverb",
+        "space": "close miked piano in a soft hall",
         "influences": {
           "minimalismo": "minimalism",
           "musica da camera": "chamber music",
           "neoclassica": "neoclassical"
         }
+      },
+      "organico": {
+        "fissi": [
+          "pianoforte con feltro"
+        ],
+        "scelta": [
+          "violoncello lontano",
+          "celesta",
+          "archi sommessi"
+        ]
       }
     },
     {
@@ -1988,10 +2241,12 @@
       "stile": "cinematic orchestral score, strings and horns, timpani and soft brass, sweeping and emotional, played by an orchestra",
       "strumenti": [
         "archi sinfonici",
-        "corni",
+        "corni francesi",
         "timpani",
         "arpa",
-        "ottoni morbidi"
+        "violoncello solista",
+        "oboe solista",
+        "legni"
       ],
       "vietati": [
         "batteria rock",
@@ -2056,20 +2311,35 @@
       "en": {
         "genre": "cinematic orchestral score",
         "instruments": {
-          "archi sinfonici": "symphonic strings",
-          "corni": "french horns",
-          "timpani": "timpani",
-          "arpa": "harp",
-          "ottoni morbidi": "soft brass"
+          "archi sinfonici": "lush symphonic strings",
+          "corni francesi": "noble french horns lead",
+          "timpani": "deep timpani",
+          "arpa": "orchestral harp",
+          "violoncello solista": "expressive solo cello",
+          "oboe solista": "lyrical solo oboe",
+          "legni": "soft woodwind section"
         },
         "rhythm": "slow broad build",
         "mood": "sweeping, emotional",
-        "space": "wide concert hall",
+        "space": "concert hall orchestral recording with depth",
         "influences": {
           "colonna sonora": "film score",
           "musica sinfonica": "symphonic",
           "epic": "epic"
         }
+      },
+      "organico": {
+        "fissi": [
+          "archi sinfonici",
+          "corni francesi",
+          "timpani",
+          "arpa"
+        ],
+        "scelta": [
+          "violoncello solista",
+          "oboe solista",
+          "legni"
+        ]
       }
     },
     {
@@ -2088,11 +2358,12 @@
       "genere": "Folk balcanico strumentale",
       "stile": "balkan instrumental folk, accordion and clarinet, fast drums, lively and festive, played by a folk ensemble",
       "strumenti": [
+        "clarinetto virtuoso",
         "fisarmonica",
-        "clarinetto",
+        "contrabbasso",
         "tamburo a cornice",
         "violino",
-        "basso acustico"
+        "tromba balcanica"
       ],
       "vietati": [
         "synth",
@@ -2149,20 +2420,33 @@
       "en": {
         "genre": "balkan folk dance",
         "instruments": {
-          "fisarmonica": "accordion",
-          "clarinetto": "virtuosic clarinet",
-          "tamburo a cornice": "frame drum",
-          "violino": "fiddle",
-          "basso acustico": "acoustic bass"
+          "clarinetto virtuoso": "agile balkan clarinet lead",
+          "fisarmonica": "lively accordion",
+          "contrabbasso": "plucked double bass",
+          "tamburo a cornice": "frame drum and tapan",
+          "violino": "fiery balkan violin",
+          "tromba balcanica": "bright balkan trumpet"
         },
         "rhythm": "fast dance rhythm in odd meter",
         "mood": "festive, lively",
-        "space": "live folk ensemble, natural room",
+        "space": "live folk ensemble in a natural room",
         "influences": {
           "musica balcanica": "balkan brass",
           "klezmer": "klezmer",
           "folk": "folk"
         }
+      },
+      "organico": {
+        "fissi": [
+          "clarinetto virtuoso",
+          "fisarmonica",
+          "contrabbasso",
+          "tamburo a cornice"
+        ],
+        "scelta": [
+          "violino",
+          "tromba balcanica"
+        ]
       }
     },
     {
@@ -2181,11 +2465,12 @@
       "genere": "Beat hip-hop strumentale",
       "stile": "instrumental hip-hop beat, boom-bap drums, vinyl crackle, warm sampled keys, head-nodding groove",
       "strumenti": [
-        "batteria boom-bap",
-        "campione di piano",
-        "basso sub",
-        "giradischi con crackle",
-        "vibrafono campionato"
+        "pianoforte campionato",
+        "batteria boom bap",
+        "basso sub caldo",
+        "vibrafono campionato",
+        "sax campionato",
+        "chitarra jazz campionata"
       ],
       "vietati": [
         "voce",
@@ -2250,20 +2535,33 @@
       "en": {
         "genre": "boom bap hip-hop beat",
         "instruments": {
-          "batteria boom-bap": "boom bap drums",
-          "campione di piano": "sampled piano",
-          "basso sub": "warm sub bass",
-          "giradischi con crackle": "vinyl crackle",
-          "vibrafono campionato": "sampled vibraphone"
+          "pianoforte campionato": "dusty sampled jazz piano loop",
+          "batteria boom bap": "hard hitting boom bap drums",
+          "basso sub caldo": "warm deep sub bass",
+          "vibrafono campionato": "sampled vibraphone melody",
+          "sax campionato": "sampled soft saxophone phrase",
+          "chitarra jazz campionata": "sampled jazz guitar lick"
         },
         "rhythm": "head nodding swung groove",
         "mood": "dusty, relaxed",
-        "space": "warm sampled lo-fi mix",
+        "space": "warm sampled mix with subtle vinyl crackle",
         "influences": {
           "boom-bap": "boom-bap",
           "jazz hop": "jazz hop",
           "lo-fi": "lo-fi"
         }
+      },
+      "organico": {
+        "fissi": [
+          "pianoforte campionato",
+          "batteria boom bap",
+          "basso sub caldo"
+        ],
+        "scelta": [
+          "vibrafono campionato",
+          "sax campionato",
+          "chitarra jazz campionata"
+        ]
       }
     },
     {
@@ -2282,11 +2580,12 @@
       "genere": "Manouche swing strumentale",
       "stile": "gypsy jazz manouche swing, rhythm guitars, lead violin and guitar, fast and joyful, played by a quintet",
       "strumenti": [
-        "chitarra manouche ritmica",
-        "chitarra solista",
-        "violino jazz",
+        "chitarra solista manouche",
+        "chitarra ritmica pompe",
         "contrabbasso",
-        "chitarra acustica pizzicata"
+        "violino swing",
+        "clarinetto swing",
+        "fisarmonica musette"
       ],
       "vietati": [
         "batteria elettronica",
@@ -2343,20 +2642,33 @@
       "en": {
         "genre": "gypsy jazz manouche swing",
         "instruments": {
-          "chitarra manouche ritmica": "pumping manouche rhythm guitar",
-          "chitarra solista": "virtuosic acoustic lead guitar",
-          "violino jazz": "swing violin",
-          "contrabbasso": "upright bass",
-          "chitarra acustica pizzicata": "plucked acoustic guitar"
+          "chitarra solista manouche": "virtuosic selmer style acoustic guitar lead",
+          "chitarra ritmica pompe": "dry la pompe rhythm guitar",
+          "contrabbasso": "walking upright bass",
+          "violino swing": "elegant swing violin",
+          "clarinetto swing": "warm swing clarinet",
+          "fisarmonica musette": "musette accordion"
         },
         "rhythm": "fast la pompe swing",
         "mood": "joyful, agile",
-        "space": "acoustic quintet, intimate room",
+        "space": "acoustic gypsy jazz ensemble close and dry",
         "influences": {
           "gypsy jazz": "gypsy jazz",
           "swing": "swing",
           "musette": "musette"
         }
+      },
+      "organico": {
+        "fissi": [
+          "chitarra solista manouche",
+          "chitarra ritmica pompe",
+          "contrabbasso"
+        ],
+        "scelta": [
+          "violino swing",
+          "clarinetto swing",
+          "fisarmonica musette"
+        ]
       }
     },
     {
@@ -2405,11 +2717,12 @@
       "genere": "Synthwave strumentale",
       "stile": "instrumental synthwave, retro analog synths, gated reverb drums, arpeggiated bass, nostalgic and bright",
       "strumenti": [
-        "synth analogico",
-        "arpeggiatore",
+        "sintetizzatore solista analogico",
+        "basso sintetico a ottave",
         "batteria elettronica con reverb",
-        "basso sintetico",
-        "pad analogico"
+        "pad analogici",
+        "arpeggiatore",
+        "chitarra con chorus"
       ],
       "colori": [
         "#1a0b2e",
@@ -2422,27 +2735,32 @@
         "font": "Bahnschrift",
         "corsivo": true
       },
-      "lora": [
-        {
-          "name": "yue2-keygen-music",
-          "scale": 1,
-          "ar_scale": 0.3,
-          "nar_scale": 0.35
-        }
-      ],
       "en": {
         "genre": "synthwave",
         "instruments": {
-          "synth analogico": "analog synth lead",
-          "arpeggiatore": "sequenced arpeggiator",
-          "batteria elettronica con reverb": "gated reverb drum machine",
-          "basso sintetico": "synth bass",
-          "pad analogico": "lush analog pads"
+          "sintetizzatore solista analogico": "warm analog synth lead with portamento",
+          "basso sintetico a ottave": "pulsing octave synth bass",
+          "batteria elettronica con reverb": "gated reverb 1980s drum machine",
+          "pad analogici": "lush analog polysynth pads",
+          "arpeggiatore": "sparkling sequenced arpeggios",
+          "chitarra con chorus": "clean guitar with 1980s chorus"
         },
         "rhythm": "steady retro drive",
         "mood": "nostalgic, bright, neon",
-        "space": "wide 1980s production",
+        "space": "wide polished 1980s production",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "sintetizzatore solista analogico",
+          "basso sintetico a ottave",
+          "batteria elettronica con reverb",
+          "pad analogici"
+        ],
+        "scelta": [
+          "arpeggiatore",
+          "chitarra con chorus"
+        ]
       }
     },
     {
@@ -2494,7 +2812,7 @@
         "chitarra flamenca",
         "palmas",
         "cajon",
-        "basso acustico"
+        "contrabbasso"
       ],
       "colori": [
         "#3d0c02",
@@ -2510,15 +2828,25 @@
       "en": {
         "genre": "flamenco",
         "instruments": {
-          "chitarra flamenca": "flamenco guitar with rasgueado",
-          "palmas": "palmas handclaps",
-          "cajon": "cajon",
-          "basso acustico": "acoustic bass"
+          "chitarra flamenca": "flamenco guitar with rasgueado and picado",
+          "palmas": "crisp palmas handclaps",
+          "cajon": "dry flamenco cajon",
+          "contrabbasso": "plucked double bass"
         },
         "rhythm": "bulerias inspired compas",
         "mood": "passionate, fiery",
-        "space": "dry close acoustic mix",
+        "space": "dry close acoustic recording",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "chitarra flamenca",
+          "palmas",
+          "cajon"
+        ],
+        "scelta": [
+          "contrabbasso"
+        ]
       }
     },
     {
@@ -2567,10 +2895,11 @@
       "genere": "Celtic arpa e whistle",
       "stile": "instrumental celtic folk, harp arpeggios, tin whistle melody, soft bodhran, gentle and storytelling",
       "strumenti": [
-        "arpa celtica",
         "tin whistle",
-        "bodhran leggero",
-        "violino celtico"
+        "arpa celtica",
+        "bodhran",
+        "violino celtico",
+        "cornamusa irlandese"
       ],
       "colori": [
         "#1f3d2b",
@@ -2594,15 +2923,27 @@
       "en": {
         "genre": "celtic folk",
         "instruments": {
-          "arpa celtica": "celtic harp arpeggios",
-          "tin whistle": "tin whistle melody",
-          "bodhran leggero": "soft bodhran",
-          "violino celtico": "celtic fiddle"
+          "tin whistle": "expressive tin whistle lead",
+          "arpa celtica": "ringing celtic harp arpeggios",
+          "bodhran": "soft bodhran frame drum",
+          "violino celtico": "warm celtic fiddle",
+          "cornamusa irlandese": "mellow uilleann pipes"
         },
         "rhythm": "gentle lilting triple feel",
         "mood": "storytelling, pastoral",
-        "space": "airy natural hall",
+        "space": "airy natural stone hall",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "tin whistle",
+          "arpa celtica",
+          "bodhran"
+        ],
+        "scelta": [
+          "violino celtico",
+          "cornamusa irlandese"
+        ]
       }
     },
     {
@@ -2651,11 +2992,12 @@
       "genere": "Drum and bass morbido",
       "stile": "soft drum and bass, fast breakbeat, deep sub bass, airy pads, energetic but smooth",
       "strumenti": [
-        "breakbeat",
-        "basso sub",
-        "pad aereo",
-        "hi-hat veloci",
-        "stab di sintetizzatore"
+        "breakbeat nitido",
+        "basso sub profondo",
+        "pad ariosi",
+        "rhodes elettrico",
+        "pianoforte etereo",
+        "sax soprano morbido"
       ],
       "colori": [
         "#0d1b2a",
@@ -2671,16 +3013,29 @@
       "en": {
         "genre": "liquid drum and bass",
         "instruments": {
-          "breakbeat": "crisp breakbeat",
-          "basso sub": "deep sub bass",
-          "pad aereo": "airy pads",
-          "hi-hat veloci": "fast shuffled hi-hats",
-          "stab di sintetizzatore": "soft synth stabs"
+          "breakbeat nitido": "crisp rolling breakbeat",
+          "basso sub profondo": "smooth deep sub bass",
+          "pad ariosi": "airy warm pads",
+          "rhodes elettrico": "liquid rhodes chords",
+          "pianoforte etereo": "ethereal piano motif",
+          "sax soprano morbido": "smooth soprano saxophone"
         },
         "rhythm": "fast rolling breakbeat",
         "mood": "smooth, uplifting",
-        "space": "clean deep wide mix",
+        "space": "clean deep liquid mix with soft highs",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "breakbeat nitido",
+          "basso sub profondo",
+          "pad ariosi"
+        ],
+        "scelta": [
+          "rhodes elettrico",
+          "pianoforte etereo",
+          "sax soprano morbido"
+        ]
       }
     },
     {
@@ -2731,8 +3086,8 @@
       "strumenti": [
         "metallofoni gamelan",
         "gong sospeso",
-        "bambu",
-        "drone leggero"
+        "drone morbido",
+        "flauto di bambù"
       ],
       "colori": [
         "#2e1a05",
@@ -2748,15 +3103,25 @@
       "en": {
         "genre": "gamelan ambient",
         "instruments": {
-          "metallofoni gamelan": "interlocking gamelan metallophones",
-          "gong sospeso": "suspended gong",
-          "bambu": "bamboo flute",
-          "drone leggero": "soft drone"
+          "metallofoni gamelan": "interlocking bronze gamelan metallophones",
+          "gong sospeso": "deep suspended gong",
+          "drone morbido": "soft low drone",
+          "flauto di bambù": "breathy bamboo flute close and warm"
         },
         "rhythm": "slow cyclical interlocking pulse",
         "mood": "shimmering, meditative",
-        "space": "resonant open space",
+        "space": "resonant open space with clear metal tones",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "metallofoni gamelan",
+          "gong sospeso",
+          "drone morbido"
+        ],
+        "scelta": [
+          "flauto di bambù"
+        ]
       }
     },
     {
@@ -2807,8 +3172,10 @@
       "strumenti": [
         "chitarra classica",
         "basso acustico",
-        "shaker",
-        "flauto morbido"
+        "shaker e spazzole",
+        "flauto morbido",
+        "sax tenore soffiato",
+        "pianoforte leggero"
       ],
       "colori": [
         "#2b3a2e",
@@ -2824,15 +3191,29 @@
       "en": {
         "genre": "bossa nova",
         "instruments": {
-          "chitarra classica": "syncopated nylon guitar",
-          "basso acustico": "soft acoustic bass",
-          "shaker": "shaker",
-          "flauto morbido": "mellow flute"
+          "chitarra classica": "syncopated nylon guitar close miked",
+          "basso acustico": "soft round acoustic bass",
+          "shaker e spazzole": "shaker and brushed snare",
+          "flauto morbido": "mellow flute lead",
+          "sax tenore soffiato": "breathy tenor saxophone lead",
+          "pianoforte leggero": "light bossa piano"
         },
         "rhythm": "relaxed bossa groove",
         "mood": "warm, airy",
-        "space": "intimate acoustic mix",
+        "space": "intimate acoustic mix with air",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "chitarra classica",
+          "basso acustico",
+          "shaker e spazzole"
+        ],
+        "scelta": [
+          "flauto morbido",
+          "sax tenore soffiato",
+          "pianoforte leggero"
+        ]
       }
     },
     {
@@ -2881,8 +3262,8 @@
       "genere": "Vocalise coro",
       "stile": "wordless choral vocalise, ah and oh vowels, soft choir, no lyrics, no words, sacred and calm",
       "strumenti": [
-        "coro di voci su vocali",
-        "pad morbido",
+        "coro su vocali",
+        "pad caldo",
         "campane leggere"
       ],
       "colori": [
@@ -2900,14 +3281,23 @@
       "en": {
         "genre": "sacred choral vocalise",
         "instruments": {
-          "coro di voci su vocali": "soft choir singing ah and oh vowels",
-          "pad morbido": "warm pad",
-          "campane leggere": "light bells"
+          "coro su vocali": "soft choir singing ah and oh vowels",
+          "pad caldo": "warm sustained pad",
+          "campane leggere": "light distant bells"
         },
         "rhythm": "free time, sustained",
         "mood": "sacred, calm",
-        "space": "cathedral reverb",
+        "space": "cathedral reverb with clear voices",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "coro su vocali",
+          "pad caldo"
+        ],
+        "scelta": [
+          "campane leggere"
+        ]
       }
     },
     {
@@ -2975,13 +3365,22 @@
         "genre": "overtone throat singing",
         "instruments": {
           "voce armonica": "harmonic overtone voice",
-          "drone di tanpura": "tanpura drone",
-          "campane": "bells"
+          "drone di tanpura": "warm tanpura drone with rich overtones",
+          "campane": "soft distant bells"
         },
         "rhythm": "free time, sustained tones",
         "mood": "hypnotic, deep",
         "space": "resonant stone space",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "voce armonica",
+          "drone di tanpura"
+        ],
+        "scelta": [
+          "campane"
+        ]
       }
     },
     {
@@ -3030,10 +3429,10 @@
       "genere": "Canto monodico moderno",
       "stile": "modern monodic chant, male and female voices on vowels, church bells and soft pads, no words, reverent",
       "strumenti": [
-        "voci monodiche su vocali",
-        "campane",
-        "organo",
-        "pad"
+        "voci all unisono",
+        "pad morbido",
+        "organo a canne",
+        "campane di chiesa"
       ],
       "colori": [
         "#1e1b16",
@@ -3050,15 +3449,25 @@
       "en": {
         "genre": "modern monodic chant",
         "instruments": {
-          "voci monodiche su vocali": "male and female voices singing vowels in unison",
-          "campane": "church bells",
-          "organo": "pipe organ",
-          "pad": "soft pad"
+          "voci all unisono": "male and female voices singing vowels in unison",
+          "pad morbido": "soft low pad",
+          "organo a canne": "quiet pipe organ",
+          "campane di chiesa": "distant church bells"
         },
         "rhythm": "free chant rhythm",
         "mood": "reverent, still",
-        "space": "cathedral reverb",
+        "space": "cathedral reverb with clear voices",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "voci all unisono",
+          "pad morbido"
+        ],
+        "scelta": [
+          "organo a canne",
+          "campane di chiesa"
+        ]
       }
     },
     {
@@ -3107,11 +3516,12 @@
       "genere": "Soul vocalise",
       "stile": "soul vocalise, improvised wordless vocals on vowels, warm bass and drums, groove, no lyrics",
       "strumenti": [
-        "voce soul su vocali",
-        "basso groove",
+        "voce soul",
+        "basso elettrico groove",
         "batteria soul",
-        "rhodes",
-        "fiati leggeri"
+        "rhodes elettrico",
+        "fiati leggeri",
+        "chitarra soul"
       ],
       "colori": [
         "#3b1d2a",
@@ -3128,16 +3538,29 @@
       "en": {
         "genre": "neo soul vocalise",
         "instruments": {
-          "voce soul su vocali": "soulful voice improvising on vowels",
-          "basso groove": "groovy electric bass",
-          "batteria soul": "soul drum kit",
-          "rhodes": "rhodes electric piano",
-          "fiati leggeri": "light horns"
+          "voce soul": "soulful voice improvising on vowels",
+          "basso elettrico groove": "groovy electric bass",
+          "batteria soul": "tight soul drum kit",
+          "rhodes elettrico": "warm rhodes electric piano",
+          "fiati leggeri": "light horn section",
+          "chitarra soul": "clean soul guitar licks"
         },
         "rhythm": "laid back soul groove",
         "mood": "warm, expressive",
-        "space": "live band, warm mix",
+        "space": "warm live soul mix",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "voce soul",
+          "basso elettrico groove",
+          "batteria soul",
+          "rhodes elettrico"
+        ],
+        "scelta": [
+          "fiati leggeri",
+          "chitarra soul"
+        ]
       }
     },
     {
@@ -3186,11 +3609,11 @@
       "genere": "Metal strumentale",
       "stile": "instrumental heavy metal, distorted guitars, double bass drums, aggressive riffs, played by a band",
       "strumenti": [
-        "chitarra distorta",
-        "batteria a doppio pedale",
+        "chitarra solista metal",
+        "chitarre ritmiche distorte",
         "basso distorto",
-        "chitarra solista",
-        "tastiera di sfondo"
+        "doppia cassa",
+        "tastiera di sottofondo"
       ],
       "colori": [
         "#050505",
@@ -3214,16 +3637,27 @@
       "en": {
         "genre": "heavy metal",
         "instruments": {
-          "chitarra distorta": "distorted rhythm guitars with palm muted riffs",
-          "batteria a doppio pedale": "double bass drums",
-          "basso distorto": "distorted bass",
-          "chitarra solista": "melodic lead guitar solos",
-          "tastiera di sfondo": "background keyboard"
+          "chitarra solista metal": "singing lead guitar with sustain",
+          "chitarre ritmiche distorte": "tight palm muted high gain rhythm guitars",
+          "basso distorto": "gritty picked bass",
+          "doppia cassa": "powerful double bass drums",
+          "tastiera di sottofondo": "dark orchestral keyboard pad"
         },
         "rhythm": "driving heavy beat",
         "mood": "powerful, aggressive",
-        "space": "tight modern metal mix",
+        "space": "tight modern metal mix with separated guitars",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "chitarra solista metal",
+          "chitarre ritmiche distorte",
+          "basso distorto",
+          "doppia cassa"
+        ],
+        "scelta": [
+          "tastiera di sottofondo"
+        ]
       }
     },
     {
@@ -3272,11 +3706,11 @@
       "genere": "Industrial techno",
       "stile": "industrial techno, heavy kick, metallic percussion, distorted synths, dark and driving",
       "strumenti": [
-        "kick potente",
-        "percussione metallica",
-        "synth distorto",
+        "cassa distorta",
+        "percussioni metalliche",
         "basso industriale",
-        "rumore"
+        "sintetizzatore distorto",
+        "rumori e texture"
       ],
       "colori": [
         "#0b0b0b",
@@ -3289,27 +3723,30 @@
         "font": "Impact",
         "corsivo": false
       },
-      "lora": [
-        {
-          "name": "yue2-industrial-rock",
-          "scale": 1,
-          "ar_scale": 0.5,
-          "nar_scale": 0.5
-        }
-      ],
       "en": {
         "genre": "industrial techno",
         "instruments": {
-          "kick potente": "heavy distorted kick",
-          "percussione metallica": "metallic percussion",
-          "synth distorto": "distorted synths",
-          "basso industriale": "industrial bass",
-          "rumore": "noise textures"
+          "cassa distorta": "heavy distorted kick",
+          "percussioni metalliche": "metallic industrial percussion",
+          "basso industriale": "growling industrial synth bass",
+          "sintetizzatore distorto": "abrasive distorted synth stab",
+          "rumori e texture": "dark noise textures"
         },
         "rhythm": "relentless four on the floor",
         "mood": "dark, driving",
-        "space": "raw warehouse mix",
+        "space": "raw warehouse mix with controlled distortion",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "cassa distorta",
+          "percussioni metalliche",
+          "basso industriale"
+        ],
+        "scelta": [
+          "sintetizzatore distorto",
+          "rumori e texture"
+        ]
       }
     },
     {
@@ -3358,11 +3795,12 @@
       "genere": "Trap strumentale",
       "stile": "instrumental trap beat, rolling hi-hats, booming 808 bass, dark melodies, modern and punchy",
       "strumenti": [
-        "808",
-        "hi-hat rapidi",
-        "kick",
+        "basso 808",
+        "hi-hat rullati",
+        "cassa e clap",
         "campana melodica",
-        "pad scuro"
+        "pianoforte scuro",
+        "flauto trap"
       ],
       "colori": [
         "#121212",
@@ -3378,16 +3816,29 @@
       "en": {
         "genre": "trap beat",
         "instruments": {
-          "808": "booming 808 bass",
-          "hi-hat rapidi": "rolling hi-hats",
-          "kick": "punchy kick",
-          "campana melodica": "melodic bell",
-          "pad scuro": "dark pad"
+          "basso 808": "booming tuned 808 bass",
+          "hi-hat rullati": "crisp rolling hi-hats",
+          "cassa e clap": "punchy kick and sharp clap",
+          "campana melodica": "dark melodic bell",
+          "pianoforte scuro": "moody sparse piano",
+          "flauto trap": "airy flute motif"
         },
         "rhythm": "half time trap groove",
         "mood": "dark, modern",
-        "space": "punchy low end, wide mix",
+        "space": "modern trap mix with wide space and deep sub",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "basso 808",
+          "hi-hat rullati",
+          "cassa e clap"
+        ],
+        "scelta": [
+          "campana melodica",
+          "pianoforte scuro",
+          "flauto trap"
+        ]
       }
     },
     {
@@ -3436,11 +3887,11 @@
       "genere": "Hard rock strumentale",
       "stile": "instrumental hard rock, overdriven guitars, powerful drums, big riffs and solos, played by a band",
       "strumenti": [
-        "chitarra overdrive",
-        "batteria potente",
+        "chitarra solista overdrive",
+        "chitarra ritmica overdrive",
         "basso rock",
-        "chitarra solista",
-        "organo"
+        "batteria potente",
+        "organo hammond"
       ],
       "colori": [
         "#2a0a0a",
@@ -3464,16 +3915,27 @@
       "en": {
         "genre": "hard rock",
         "instruments": {
-          "chitarra overdrive": "overdriven rhythm guitar riffs",
-          "batteria potente": "powerful drums",
-          "basso rock": "driving rock bass",
-          "chitarra solista": "soaring lead guitar solos",
-          "organo": "hammond organ"
+          "chitarra solista overdrive": "singing overdriven lead guitar",
+          "chitarra ritmica overdrive": "crunchy tube amp rhythm guitar",
+          "basso rock": "solid picked rock bass",
+          "batteria potente": "big punchy rock drums",
+          "organo hammond": "hammond organ with leslie speaker"
         },
         "rhythm": "solid driving rock beat",
         "mood": "bold, anthemic",
-        "space": "big live band mix",
+        "space": "big live rock mix with clear drums and guitars",
         "influences": {}
+      },
+      "organico": {
+        "fissi": [
+          "chitarra solista overdrive",
+          "chitarra ritmica overdrive",
+          "basso rock",
+          "batteria potente"
+        ],
+        "scelta": [
+          "organo hammond"
+        ]
       }
     }
   ],

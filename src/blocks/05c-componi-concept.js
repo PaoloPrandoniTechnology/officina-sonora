@@ -11,10 +11,6 @@ if (!c.titolo) {
 }
 const durata = Math.min(inp.dmax, Math.max(inp.dmin, clampDur(c.durata_s)));
 
-const livello = cat.estro ?? (cat.ambito === 'musica' ? 2 : 0);
-let style = componiStile(cat, variante, strumenti, influenza, guidance, { bpm, tonalita });
-if (livello && c.trovata) style = inserisciTocchi(style, [c.trovata], cat, guidance, livello);
-
 const concept = {
   titolo: String(c.titolo).trim(),
   modello_testo: inp.modello_testo,
@@ -29,7 +25,7 @@ const concept = {
   variante: variante ? variante.nome : '',
   strumenti,
   influenza: influenza || '',
-  style,
+  style: componiStile(cat, variante, strumenti, influenza, guidance, { bpm, tonalita }),
   avoid: divietiDi(cat, guidance),
   sezioni: slot.sezioni,
   lyrics: slot.sezioni.join('\n\n'),

@@ -259,8 +259,17 @@ function votiPerSeed(nomeCategoria) {
   return out;
 }
 
-// Due strumenti fissi danno l'identita' al genere; gli altri (1 o 2) cambiano da un brano al successivo
+// Con l'organico del catalogo: i fissi sempre (il primo guida) piu' uno a scelta, mai lo stesso di seguito.
+// Senza (generi creati da Telegram): due fissi scelti una volta e 1 o 2 che cambiano.
 function strumentiDelGruppo(cat, g) {
+  if (cat.organico) {
+    const { fissi, scelta = [] } = cat.organico;
+    const nuove = scelta.filter((x) => x !== g.ultimiExtra);
+    const extra = (nuove.length ? nuove : scelta)[Math.floor(Math.random() * (nuove.length || scelta.length))];
+    g.nucleo = [...fissi];
+    g.ultimiExtra = extra || '';
+    return extra ? [...fissi, extra] : [...fissi];
+  }
   const tutti = [...new Set(cat.strumenti || [])];
   const caso = (v) => v.splice(Math.floor(Math.random() * v.length), 1)[0];
   if (!g.nucleo || !g.nucleo.every((x) => tutti.includes(x))) {
@@ -316,7 +325,8 @@ function blocchiStile(cat, variante, strumenti, influenza, guidance, { bpm, tona
   const note = direttive || (((typeof CFG !== 'undefined' && CFG.generiOverride) || {})[cat.name] || {}).direttive || [];
   const en = cat.en || { genre: cat.stile };
   // le varianti segnaposto ripetono per intero la descrizione del genere: si saltano
-  const colore = variante && !(cat.en && variante.keywords === cat.stile) ? variante.keywords : '';
+  // con un organico definito le varianti non si aggiungono: nominano altri strumenti e confondono il mix
+  const colore = variante && !cat.organico && !(cat.en && variante.keywords === cat.stile) ? variante.keywords : '';
   const mio = (guidance.blocchi_generi || {})[cat.name] || {};
   const esclusi = new Set([...(guidance.style_avoid || []), ...(mio.esclusi || [])].map((s) => String(s).trim().toLowerCase()));
   // [origine, termini, argomento]: l'argomento serve solo alla pagina Linee guida
@@ -353,34 +363,6 @@ function blocchiStile(cat, variante, strumenti, influenza, guidance, { bpm, tona
 
 function componiStile(...argomenti) {
   return blocchiStile(...argomenti).filter((b) => !b.escluso).map((b) => b.testo).join(', ');
-}
-
-// Suoni e trovate di un singolo brano: entrano nello stile prima di bpm e tonalità, con le stesse regole dei blocchi.
-// Nei generi di estro pieno si tolgono le parole che chiedono immobilità.
-function inserisciTocchi(style, tocchi, cat, guidance, livello = 2) {
-  const mio = ((guidance || {}).blocchi_generi || {})[cat.name] || {};
-  const via = new Set([...((guidance || {}).style_avoid || []), ...(mio.esclusi || [])].map((s) => String(s).trim().toLowerCase()));
-  let parti = String(style).split(', ');
-  if (livello >= 2) parti = parti.filter((p) => !/repetitive|hypnotic|\bloop|sustained tones|very slow evolution|stillness/i.test(p));
-  const viste = new Set(parti.map((p) => p.toLowerCase()));
-  const nuovi = (tocchi || []).map((t) => String(t).trim()).filter((t) => !erroreBlocco(t, { strumentale: !cat.vocale_senza_parole }) && !via.has(t.toLowerCase()) && !viste.has(t.toLowerCase()));
-  const coda = parti.findIndex((p) => /^\d+ BPM$|^no (vocals|lyrics)$/.test(p));
-  parti.splice(coda < 0 ? parti.length : coda, 0, ...new Set(nuovi));
-  return parti.join(', ');
-}
-
-// Suoni e trovate di un singolo brano: entrano nello stile prima di bpm e tonalità, con le stesse regole dei blocchi.
-// Nei generi di estro pieno si tolgono le parole che chiedono immobilità.
-function inserisciTocchi(style, tocchi, cat, guidance, livello = 2) {
-  const mio = ((guidance || {}).blocchi_generi || {})[cat.name] || {};
-  const via = new Set([...((guidance || {}).style_avoid || []), ...(mio.esclusi || [])].map((s) => String(s).trim().toLowerCase()));
-  let parti = String(style).split(', ');
-  if (livello >= 2) parti = parti.filter((p) => !/repetitive|hypnotic|\bloop|sustained tones|very slow evolution|stillness/i.test(p));
-  const viste = new Set(parti.map((p) => p.toLowerCase()));
-  const nuovi = (tocchi || []).map((t) => String(t).trim()).filter((t) => !erroreBlocco(t, { strumentale: !cat.vocale_senza_parole }) && !via.has(t.toLowerCase()) && !viste.has(t.toLowerCase()));
-  const coda = parti.findIndex((p) => /^\d+ BPM$|^no (vocals|lyrics)$/.test(p));
-  parti.splice(coda < 0 ? parti.length : coda, 0, ...new Set(nuovi));
-  return parti.join(', ');
 }
 
 // Divieti del genere, quelli generali e quelli scelti per il genere (solo nella scheda del brano)

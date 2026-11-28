@@ -5,11 +5,7 @@ if (inp.skip) return [{ json: inp }];
 
 const cat = inp.cat;
 const [lo, hi] = cat.bpm;
-// nei generi creativi il modello è un produttore: propone anche una trovata sonora per il singolo brano
-const creativo = (cat.estro ?? (cat.ambito === 'musica' ? 2 : 0)) > 0;
-const system = creativo
-  ? 'Sei un produttore musicale visionario: ogni brano deve avere una personalita\' propria e sorprendere. Rispondi solo con JSON valido.'
-  : 'Sei un compositore di musica di sottofondo. Rispondi solo con JSON valido.';
+const system = 'Sei un compositore di musica di sottofondo. Rispondi solo con JSON valido.';
 // le prime parole dei titoli recenti: senza questo elenco il modello ripete sempre le stesse ("Eco di...")
 const usate = [...new Set((inp.state.recent || []).map((r) => String(r.titolo).split(/[\s'’]+/)[0]).filter((p) => p.length > 2))];
 const user = `Proponi titolo e descrizione per un brano STRUMENTALE (nessuna voce) di genere "${cat.genere || cat.name}".
@@ -19,8 +15,7 @@ Rispondi SOLO con un oggetto JSON con questi campi:
 - "titolo": titolo breve in italiano, originale e diverso dai titoli comuni, coerente con il genere
 - "descrizione": una frase in italiano che spiega a quale attivita' serve
 - "bpm": intero tra ${lo} e ${hi}
-- "durata_s": intero in secondi tra ${inp.dmin} e ${inp.dmax}${creativo ? `
-- "trovata": in INGLESE, massimo 6 parole senza virgole, un suono insolito o un colpo di scena strumentale solo per questo brano (per esempio "bowed saw answering the lead"); niente voci, artisti o canzoni` : ''}
+- "durata_s": intero in secondi tra ${inp.dmin} e ${inp.dmax}
 Niente nomi di artisti, marchi o citazioni.${usate.length ? `
 Non iniziare il titolo con: ${usate.join(', ')}.` : ''}`;
 

@@ -43,13 +43,13 @@ Fonti: guide di composizione (motivo, frase, periodo, note dell'accordo) e MeloF
 
 - Perché: negli score del modello la ripetizione mediana era 0,87-0,9, spesso con un solo interlude di oltre
   cento battute e 1-3 accordi.
-- Forma per ruoli (gancio, strofa, pre, ritornello, assolo, duello, rottura, ponte, finale), un giro armonico per
-  ruolo, motivi trasformati a ogni ripresa, chiusure di frase, modulazioni (`K:` di sezione), ponte in 3/4 o 7/8.
+- Dopo il primo ascolto («troppo complicato») è stato semplificato: forme per ruoli con poche sezioni speciali,
+  tre giri armonici con un accordo per battuta, celle di poche note, frase A B A e chiusura, metro sempre 4/4,
+  al massimo un cambio di tonalità sull'ultimo ritornello (`K:` di sezione).
 - Richiami di pubblico dominio trascritti a memoria in forma ridotta (4/4, 2-4 battute): sono allusioni, non edizioni.
-- Revisore: accordo sui tempi forti 20, varietà 25, ritmi 15, gancio che torna 15, contrasto 10, salti 10, climax 5;
-  85% qualità e 15% novità. Forma e richiamo si scelgono prima, escludendo i recenti.
-- Misure su 208 brani di prova: ripetizione mediana 0,11 (massimo 0,28), 104 cambi di accordo mediani,
-  durata entro il 3%.
+- Revisore: accordo sui tempi forti 25, varietà 20 (ideale due battute diverse su tre), gancio che torna 25,
+  salti 15, contrasto 10, climax 5; 85% qualità e 15% novità. Forma e richiamo si scelgono prima, escludendo i recenti.
+- Misure su 208 brani di prova: ripetizione mediana 0,43 (tra 0,32 e 0,62), durata entro il 3%.
 
 ## Da verificare
 - Quanto fedelmente YuE2 segue uno score scritto da regole, in particolare con metri diversi dal 4/4.

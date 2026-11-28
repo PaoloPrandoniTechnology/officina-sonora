@@ -25,5 +25,16 @@ ricercati, richiami a brani famosi. Yoga e meditazione restano come prima. Richi
 3. Blocchi 5b, 5c, 5d, 6 e gateway; stile con suoni per brano.
 4. Test, README, import e publish del workflow, brano di prova in produzione.
 
+## Revisione dopo il primo ascolto
+Giudizio: brano troppo complicato, suoni non calibrati, strumenti da scegliere meglio.
+
+| Causa trovata | Correzione |
+|---|---|
+| Troppe sezioni speciali, assoli fitti, sostituzioni, metri diversi | compositore semplificato |
+| Gli strumenti erano estratti a caso: due fissi qualsiasi, anche senza batteria o basso | organico curato per i 39 generi |
+| 3-5 timbri casuali e la trovata del modello affollavano lo stile | rimossi |
+| Le varianti e le parole della revisione nominavano strumenti di altri generi | escluse; la revisione usa solo l'atmosfera |
+| LoRA chiptune sul synthwave e rock sulla techno industriale | rimosse |
+
 ## Non fatto
 Citazioni di canzoni protette; nuove LoRA (scale non validate a orecchio); modifiche al campionamento audio.

@@ -18,10 +18,8 @@ try {
   const richiesta = { cat, bpm: c.bpm, tonalita: c.tonalita, durata_s: c.durata_s, seed, preferenze, precedenti: g.brani.map((b) => b.firma), candidati: imp.candidati, metri: imp.metri };
   let r;
   if (imp.livello) {
-    // generi creativi: forma, assoli e richiami li decide il compositore estro, brano per brano
+    // generi creativi: forma, assolo e richiami li decide il compositore estro, brano per brano
     r = Estro.componi({ ...richiesta, estro: imp.livello });
-    // un brano rigenerato ha già i suoi suoni nello stile
-    if (!c.tentativi_render) c.style = inserisciTocchi(c.style, r.tocchi, cat, readGuidance(), imp.livello);
     if (r.cameo) c.descrizione = `${String(c.descrizione || '').replace(/ Richiamo nascosto: .*$/, '')} Richiamo nascosto: ${r.cameo.nome}.`.trim();
     c.sezioni = r.lyrics.split('\n\n');
   } else {

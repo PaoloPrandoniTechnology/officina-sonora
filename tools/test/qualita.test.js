@@ -182,7 +182,7 @@ test('parole di stile: quelle della revisione valgono solo per il loro genere', 
     const vocab = Object.values(JSON.parse(leggi('config', 'vocabolario.json')).famiglie).flat();
     assert.deepEqual(g.stile_generi['Blues-shuffle-strumentale'], ['gritty']);
     assert.equal(g.stile_generi['Power-yoga'], undefined);
-    assert.ok(g.stile_generi.Meditazione.length >= 3 && g.stile_generi.Meditazione.length <= 5);
+    assert.ok(g.stile_generi.Meditazione.length >= 1 && g.stile_generi.Meditazione.length <= 2);
     for (const t of g.stile_generi.Meditazione) assert.ok(vocab.includes(t) && t !== 'airy', t);
     assert.deepEqual(g.blocchi_generi, { Meditazione: { aggiunti: [], esclusi: ['airy'] } }, 'la revisione non tocca i tuoi blocchi');
     const stile = (name) => L.componiStile(CAT.categories.find((c) => c.name === name), null, [], '', g);

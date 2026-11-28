@@ -142,10 +142,10 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
 | Blocco | Cosa fa |
 |---|---|
-| **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, strumenti (due fissi del genere più 1-2 che cambiano, dalla [memoria](#la-memoria-di-composizione)), un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
-| **5b Titolo** | Chiede ai [servizi di testo](#servizi-di-testo) titolo, descrizione, bpm e durata, entro i limiti del genere; nei [generi creativi](#quiete-o-estro) chiede anche una *trovata* sonora per quel brano. Gli indica le prime parole dei titoli recenti da non ripetere. Se nessun modello risponde, riprova al giro successivo. |
+| **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, [strumenti](#strumenti-e-suono) (quelli fissi del genere più uno a scelta), un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
+| **5b Titolo** | Chiede ai [servizi di testo](#servizi-di-testo) titolo, descrizione, bpm e durata, entro i limiti del genere; Gli indica le prime parole dei titoli recenti da non ripetere. Se nessun modello risponde, riprova al giro successivo. |
 | **5c Componi concept** | Compone il testo di **stile** in inglese e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
-| **5d Componi score** | Compone lo score (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere). Nei [generi creativi](#quiete-o-estro) è lo score del brano, con forma, assoli e richiami decisi dal compositore *estro*, che aggiunge anche i suoni allo stile. Nei generi di quiete è il **ripiego**, usato solo se il modello non ne scrive uno valido. |
+| **5d Componi score** | Compone lo score (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere). Nei [generi creativi](#quiete-o-estro) è lo score del brano, con forma, assolo e richiami decisi dal compositore *estro*. Nei generi di quiete è il **ripiego**, usato solo se il modello non ne scrive uno valido. |
 | **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali di quiete) oppure direttamente l'audio (generi creativi, voci, ripieghi e [score scelti da te](#da-produrre)). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
 
 ### Audio e pubblicazione
@@ -164,7 +164,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
 | Blocco | Cosa fa |
 |---|---|
-| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, un modello di testo rivede gli ultimi 30 brani votati e propone nuove linee guida. I termini di stile che propone sono presi dal vocabolario e valgono solo per i generi dei brani votati (`stile_generi` in `config\guidance.json`, visibili in *Controllo → Linee guida* e su Telegram); non modifica i blocchi scelti da te. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
+| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, un modello di testo rivede gli ultimi 30 brani votati e propone nuove linee guida. I termini di stile che propone sono parole di **atmosfera** prese dal vocabolario (massimo due) e valgono solo per i generi dei brani votati (`stile_generi` in `config\guidance.json`, visibili in *Controllo → Linee guida* e su Telegram); non modifica i blocchi scelti da te. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
 | **8a Comandi Telegram** | Risponde ai comandi, raccoglie voti e interpreta richieste in italiano, applicandole solo dopo il tuo **Conferma**. |
 | **8b Avvisi** | Un errore ripetuto 3 volte in un'ora genera un avviso (al massimo uno ogni 30 minuti per tipo). |
 | **9 Rapporto giornaliero** | Una volta al giorno: brani, voti, errori, salute del sistema, ricette migliori e peggiori, commento del modello di testo. |
@@ -247,29 +247,44 @@ Ogni genere ha un livello di **estro** (campo `estro` del catalogo, modificabile
 | Livello | Generi | Come suonano |
 |---|---|---|
 | **Quiete** (0) | meditazione, pranayama, yin, restorative, sound bath, Hatha, Vinyasa, Power yoga, Gamelan, voci meditative | la ripetizione è voluta: lo score lo scrive il modello YuE2 |
-| **Vivo** (1) | Funk, Afro-latin, Trip-hop, Reggae dub, Jazz lounge, Folk strumming, Bossa nova, Celtic, Piano minimalista, Soul vocalise | variazioni, chiusure di frase, un assolo; qualche richiamo; niente strappi |
-| **Pieno** (2) | rock, metal, blues, elettronica, hip-hop, trap, swing, balcanico, flamenco, orchestrale | tutto: assoli, botta e risposta, rotture, cambi di metro e di tonalità, richiami frequenti |
+| **Vivo** (1) | Funk, Afro-latin, Trip-hop, Reggae dub, Jazz lounge, Folk strumming, Bossa nova, Celtic, Piano minimalista, Soul vocalise | un tema che torna, variazioni leggere, un assolo; richiami rari |
+| **Pieno** (2) | rock, metal, blues, elettronica, hip-hop, trap, swing, balcanico, flamenco, orchestrale | come sopra, un po' più ardito: a volte l'ultimo ritornello sale di tonalità; richiami circa un brano su tre |
 
 Nei livelli 1 e 2 lo score è del compositore **estro** (`src\compositore\estro.js`), perché gli score del modello
-ripetono in media 87 battute su 100 con due o tre accordi; i suoi ne ripetono circa 11 su 100.
+ripetono in media 87 battute su 100 con due o tre accordi; i suoi ne ripetono circa 43 su 100: abbastanza perché il tema si riconosca,
+senza diventare un ciclo.
 
 | Ingrediente | Cosa fa |
 |---|---|
-| **Forme** | 4 per il livello vivo e 5 per il pieno (*arena, corsa, suite, jam, montagne*); non si ripete la forma dei due brani precedenti del genere |
-| **Armonie** | un giro diverso per strofa, ritornello, ponte e assolo; sostituzioni nelle riprese |
-| **Fraseggi** | il gancio del ritornello torna riconoscibile, tutto il resto si trasforma a ogni ripresa |
-| **Chiusure** | corse, colpi con silenzio, spinte sincopate alla fine delle frasi |
-| **Assoli, duelli, rotture** | assolo che sale e cita il gancio; domanda e risposta tra registri; la banda si ferma e riparte |
-| **Metro e tonalità** (pieno) | ponte in 3/4 o 7/8 o in un'altra tonalità; ultimo ritornello più in alto |
-| **Richiami** | 2-4 battute di un tema di **pubblico dominio** (Bach, Beethoven, Mozart, Grieg, Rossini, Bizet, Offenbach, canti tradizionali) adatto al genere, mai uno degli ultimi quattro. La descrizione del brano dice quale: *Richiamo nascosto: …* |
-| **Suoni** | 3-5 timbri e trovate diversi a ogni brano aggiunti allo stile (per esempio *theremin lead*, *talk box lead*), più la trovata proposta dal modello di testo |
+| **Forme** | semplici, con una sola sezione speciale (assolo o ponte) o due al massimo; non si ripete la forma dei due brani precedenti del genere |
+| **Armonie** | tre giri (strofa, ritornello, ponte), un accordo per battuta; l'assolo suona sul giro della strofa |
+| **Fraseggi** | poche note e respiri; frase domanda, risposta, domanda, chiusura; la strofa che ritorna cambia solo la risposta |
+| **Chiusure** | una piccola corsa a fine sezione |
+| **Assolo** | sale poco a poco, si muove soprattutto per grado e richiama il ritornello |
+| **Tonalità** (pieno) | circa un brano su tre alza l'ultimo ritornello; il metro resta sempre 4/4 |
+| **Richiami** | 2-4 battute di un tema di **pubblico dominio** (Bach, Beethoven, Mozart, Grieg, Rossini, Bizet, Offenbach, canti tradizionali) in apertura o in chiusura, mai uno degli ultimi quattro. La descrizione del brano dice quale: *Richiamo nascosto: …* |
 
 I richiami sono limitati al pubblico dominio: citare canzoni recenti esporrebbe a rivendicazioni di copyright.
 Quanto fedelmente YuE2 renda ogni dettaglio dello score e dello stile va giudicato **ascoltando**.
 
+### Strumenti e suono
+Ogni genere ha un **organico** curato (campo `organico` del catalogo):
+
+| Parte | Cosa è |
+|---|---|
+| **fissi** | gli strumenti che definiscono il genere, sempre presenti; il primo guida |
+| **scelta** | uno solo, a turno, dà colore al brano |
+| **suono** | il mix del genere (campo `en.space`), per esempio *big live rock mix with clear drums and guitars* |
+
+Ogni strumento è descritto con timbro e tecnica (per esempio *crunchy tube amp rhythm guitar*) nel campo
+`en.instruments`. Nei generi con organico le parole delle **varianti non entrano nello stile**, perché nominavano
+altri strumenti. Le parole aggiunte dalla revisione automatica sono solo di **atmosfera**, al massimo due per genere.
+Per cambiare un organico modifica `strumenti`, `en.instruments` e `organico`, poi `node tools\genera-vocabolario.js`
+e aggiungi le spiegazioni in `config\spiegazioni` (quelle dei suoni sono in `suoni.txt`).
+
 ### Stile (prompt)
 È in **inglese**, fatto di soli descrittori e sempre nello stesso ordine: `Instrumental`, genere, strumenti con
-timbro e tecnica, variante, ritmo, atmosfera, influenza, note del produttore, linee guida, spazio e mix,
+timbro e tecnica, variante (solo nei generi senza organico), ritmo, atmosfera, influenza, note del produttore, linee guida, spazio e mix,
 **BPM**, **tonalità**, `no vocals`. I descrittori di ogni genere sono nel campo `en` di `config\catalogo.json`
 (`genre`, `instruments`, `rhythm`, `mood`, `space`, `influences`). Ogni termine è un **blocco**:
 dalla dashboard puoi aggiungerne o escluderne, per tutti i generi o per uno solo (fissi: tipo, BPM, tonalità e
@@ -320,7 +335,7 @@ l'MP3, senza mastering.
 | Cosa | A cosa serve |
 |---|---|
 | **identità**: 3 progressioni, 4 celle ritmiche per livello di energia, 3 modi di variare il tema, registro, metro del bridge | brani dello stesso genere **riconoscibili** |
-| **strumenti fissi** (2) e ultima combinazione degli altri | stesso colore, abbinamenti che cambiano |
+| **ultimo strumento a scelta** | non si ripete due volte di seguito (vedi [Strumenti e suono](#strumenti-e-suono)) |
 | **brani composti** (ultimi 200): seed, parametri e impronta di tema, ritmi e armonie | brani **mai uguali**: un tema già usato viene escluso e il revisore premia la novità |
 | **voti** (letti dalle schede dei brani) | miglioramento continuo |
 
@@ -344,10 +359,8 @@ I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una prop
 | Generi | LoRA di genere |
 |---|---|
 | Metal, Hard rock | slider metal |
-| Industrial techno | industrial rock |
 | Indie rock, Post-rock | slider indie rock |
 | Techno minimale | slider house |
-| Synthwave | keygen music |
 | Hip-hop, Trip-hop | slider lo-fi |
 | Funk | slider disco funk |
 | Afro-latin | slider afrobeats |
@@ -985,7 +998,7 @@ I brani prodotti prima del salvataggio dello score non hanno il file `.abc`.
 
 **Aggiungere un genere:** in `config\catalogo.json` aggiungi il campo `en` (descrittori inglesi per ogni strumento), `name`, `ambito`, `famiglia`, `energia` (1-5),
 `bpm`, `attivita`, `strutture`, `genere`, `stile`, `strumenti`, `vietati`, `influenze`, `enfasi`, `melodia`,
-`accordi`, `ritmica`, `tonalita`, `varianti`, `colori`; facoltativi `lora`, `copertina` e
+`accordi`, `ritmica`, `tonalita`, `varianti`, `colori`; facoltativi `estro` (0-2), `organico`, `lora`, `copertina` e
 `vocale_senza_parole`. Poi ricostruisci e pubblica il workflow.
 
 ---
@@ -1107,7 +1120,7 @@ In ordine di priorità. Il disegno completo è in
 
 | # | Miglioramento | Perché |
 |---|---|---|
-| 0 | **Ascoltare i brani creativi** e votarli: correggere forme, richiami e suoni che non convincono; valutare LoRA anche per i generi che non ne hanno | l'effetto sull'audio non è misurabile dai test; i voti pesano già su forme e richiami |
+| 0 | **Ascoltare i brani creativi** e votarli: correggere forme, richiami e organici che non convincono; valutare LoRA anche per i generi che non ne hanno | l'effetto sull'audio non è misurabile dai test; i voti pesano già su forme e richiami |
 | 1 | **Selezione sull'audio**: 2-3 versioni per brano e pubblicazione della migliore, giudicata da un modello (per esempio Meta Audiobox Aesthetics o SongEval) | richiede di scaricare pacchetto e pesi, e di verificarli sugli strumentali |
 | 2 | **Ascoltare e votare** i brani del nuovo percorso, poi correggere i descrittori `en` e le soglie dello score | la qualità musicale non è verificabile dai test |
 | 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |

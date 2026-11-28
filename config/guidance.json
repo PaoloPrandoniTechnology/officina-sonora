@@ -1,12 +1,12 @@
 {
-  "versione": 14,
+  "versione": 17,
   "bpm_range": {
     "Power-yoga": "115-140",
     "Meditazione": "30-70",
-    "Pranayama-respiro": "50-80",
+    "Pranayama-respiro": "55-75",
     "Hatha-base": "70-95",
     "Yin-Savasana": "40-65",
-    "Restorative": "50-85",
+    "Restorative": "52-82",
     "Sound-bath-rilassamento": "35-60",
     "Post-rock-strumentale": "95-115",
     "Reggae-dub-morbido": "65-97"
@@ -33,74 +33,35 @@
   "style_extra": [],
   "stile_generi": {
     "Meditazione": [
-      "deep swell",
-      "sustained tones",
-      "spiritual",
-      "very slow evolution",
-      "resonant"
+      "spiritual"
     ],
     "Pranayama-respiro": [
-      "breath texture",
-      "introspective",
-      "slow swells",
       "peaceful",
       "calming"
     ],
     "Hatha-base": [
-      "light relaxed groove",
-      "relaxed bossa groove",
-      "acoustic guitar strumming",
-      "gentle slow pulse",
       "mellow"
     ],
     "Power-yoga": [
-      "breath texture",
       "uplifting",
-      "cinematic score",
-      "pulsing synth bass",
       "energetic"
     ],
     "Sound-bath-rilassamento": [
-      "gong waves",
-      "crystal bowls",
-      "long decays",
-      "meditative",
-      "deep swell"
+      "meditative"
     ],
     "Restorative": [
       "nurturing",
-      "soft strings",
-      "gentle",
-      "serene",
-      "warm"
+      "gentle"
     ],
     "Post-rock-strumentale": [
-      "atmospheric",
-      "cinematic score",
-      "sweeping strings",
-      "delayed guitars",
-      "build-up risers"
-    ],
-    "Reggae-dub-morbido": [
-      "one drop groove",
-      "relaxed bossa groove",
-      "dub echoes",
-      "sparse hats",
-      "warm low drone"
-    ],
-    "Yin-Savasana": [
-      "deep swell",
-      "sustained tones",
-      "heavy stillness",
-      "warm low drone",
-      "very slow evolution"
+      "atmospheric"
     ]
   },
   "style_avoid": [],
   "blocchi_generi": {},
   "durata_hint": {
     "Meditazione": "240-270",
-    "Pranayama-respiro": "180-270",
+    "Pranayama-respiro": "180-240",
     "Hatha-base": "180-230",
     "Vinyasa-dinamico": "150-210",
     "Power-yoga": "120-200",
@@ -110,6 +71,6 @@
     "Post-rock-strumentale": "240-270",
     "Reggae-dub-morbido": "180-270"
   },
-  "note": "Ho aggiunto termini descrittivi coerenti ed estratti dall'elenco autorizzato per arricchire lo stile dei generi che hanno ricevuto le valutazioni più alte dagli utenti.",
-  "aggiornato": "2026-11-28T15:25:40.030Z"
+  "note": "Pulizia: tolte dalle parole di stile quelle che nominavano strumenti, generi o ritmi estranei.",
+  "aggiornato": "2026-11-28T15:55:37.311Z"
 }

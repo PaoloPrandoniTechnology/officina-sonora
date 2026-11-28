@@ -42,7 +42,8 @@ try {
   const current = readGuidance();
   const recent = voted;
   const famiglie = readJsonSafe(path.join(CFG.dir, 'config', 'vocabolario.json'), { famiglie: {} }).famiglie;
-  const ammessi = new Set(['ritmo', 'atmosfera', 'timbro', 'produzione'].flatMap((f) => famiglie[f] || []));
+  // solo atmosfera e timbro: ritmo e produzione contengono generi e strumenti, che sporcano il suono
+  const ammessi = new Set(famiglie.atmosfera || []);
   const system = 'Sei il revisore artistico di un generatore di musica di sottofondo. Rispondi solo con JSON valido.';
   const user = `Brani votati dall'utente (voto da 1 a 5, le note sono indicazioni dirette; ogni voto utente pesa come 100 dati automatici):
 ${JSON.stringify(recent)}
@@ -51,7 +52,7 @@ Linee guida attuali:
 ${JSON.stringify(current, null, 1)}
 
 Proponi linee guida aggiornate SOLO se servono miglioramenti chiari. Rispondi con un JSON con:
-- "stile_generi": oggetto categoria -> array di max 5 termini da aggiungere al prompt di stile di quel genere, solo per le categorie dei brani votati, coerenti con il genere e copiati ESATTAMENTE da questo elenco: ${[...ammessi].join('; ')}
+- "stile_generi": oggetto categoria -> array di max 2 termini da aggiungere al prompt di stile di quel genere, solo per le categorie dei brani votati, coerenti con il genere e copiati ESATTAMENTE da questo elenco: ${[...ammessi].join('; ')}
 - "durata_hint": oggetto categoria -> "min-max" in secondi (tra 120 e 270), solo per le categorie da cambiare
 - "bpm_range": oggetto categoria -> "min-max" bpm, solo per le categorie da cambiare (resta nella fascia della loro energia, +/- 15 bpm al massimo)
 - "struttura_pref": oggetto categoria -> array di strutture preferite tra piatto, onda, arco, crescendo, loop (solo tra quelle gia' previste per la categoria)
@@ -94,7 +95,7 @@ Niente nomi di artisti o marchi.`;
     if (!names.includes(cat) || !voted.some((t) => t.categoria === cat) || !Array.isArray(list)) continue;
     const mio = (base.blocchi_generi || {})[cat] || {};
     const esclusi = new Set([...(base.style_avoid || []), ...(mio.esclusi || [])]);
-    stileGeneri[cat] = [...new Set(list.map((s) => String(s).trim().toLowerCase()))].filter((s) => ammessi.has(s) && !esclusi.has(s)).slice(0, 5);
+    stileGeneri[cat] = [...new Set(list.map((s) => String(s).trim().toLowerCase()))].filter((s) => ammessi.has(s) && !esclusi.has(s)).slice(0, 2);
   }
   const next = {
     versione: (base.versione || 1) + 1,

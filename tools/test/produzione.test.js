@@ -110,12 +110,12 @@ const conceptSurf = () => ({ titolo: 't', categoria: 'Surf-rock-strumentale', bp
 
 const conceptQuiete = () => ({ ...conceptSurf(), categoria: 'Hatha-base', bpm: 84 });
 
-test('blocco 5d: genere creativo, forma e suoni li decide il compositore estro', async () => {
+test('blocco 5d: genere creativo, forma e score li decide il compositore estro, lo stile resta', async () => {
   const c = await componiScore({ ...conceptSurf(), style: 'Instrumental, surf rock, 130 BPM, E minor, no vocals', descrizione: 'd' });
   assert.match(c.abc, /^X:1\n/);
   assert.ok(c.score.parametri.forma && c.score.parametri.trovate.includes('solo'));
   assert.deepEqual(c.sezioni, c.lyrics.split('\n\n'));
-  assert.match(c.style, /^Instrumental, surf rock, .+, 130 BPM, E minor, no vocals$/);
+  assert.equal(c.style, 'Instrumental, surf rock, 130 BPM, E minor, no vocals');
   assert.equal(/Richiamo nascosto/.test(c.descrizione), Boolean(c.score.parametri.cameo));
 });
 
