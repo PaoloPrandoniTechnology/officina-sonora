@@ -186,6 +186,11 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/api/stato') return rispondi(200, await leggiStato());
     if (req.method === 'GET' && req.url === '/api/dati') return rispondi(200, datiAnalisi());
     if (req.method === 'GET' && req.url === '/api/controllo') return rispondi(200, controllo.lettura());
+    if (req.method === 'GET' && req.url.startsWith('/api/controllo/stile?')) {
+      const q = new URL(req.url, 'http://localhost').searchParams;
+      try { return rispondi(200, controllo.stile(q.get('genere'), Number(q.get('variante')) || 0)); }
+      catch (e) { return rispondi(400, { error: e.message }); }
+    }
     if (req.method === 'GET' && req.url === '/api/voti') return rispondi(200, voti.elenco(Date.now()));
     if (req.method === 'GET' && req.url.startsWith('/audio/brano?')) {
       const n = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('n');

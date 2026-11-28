@@ -1,0 +1,94 @@
+{
+  "versione": 4,
+  "bpm_range": {
+    "Power-yoga": "103-125",
+    "Meditazione": "40-65",
+    "Pranayama-respiro": "50-75",
+    "Hatha-base": "75-105",
+    "Yin-Savasana": "40-60",
+    "Restorative": "50-80",
+    "Sound-bath-rilassamento": "35-55"
+  },
+  "struttura_pref": {
+    "Sound-bath-rilassamento": [
+      "piatto"
+    ],
+    "Yin-Savasana": [
+      "piatto",
+      "onda"
+    ],
+    "Meditazione": [
+      "piatto",
+      "onda"
+    ],
+    "Restorative": [
+      "onda"
+    ]
+  },
+  "style_extra": [],
+  "stile_generi": {
+    "Meditazione": [
+      "drone",
+      "minimalist",
+      "resonant",
+      "ambient pad",
+      "ethereal"
+    ],
+    "Pranayama-respiro": [
+      "breath texture",
+      "swelling pads",
+      "gentle flow",
+      "sustained notes",
+      "airy soundscape"
+    ],
+    "Hatha-base": [
+      "acoustic arpeggios",
+      "warm tones",
+      "fingerpicking",
+      "delicate sustain",
+      "rhythmic groove"
+    ],
+    "Power-yoga": [
+      "uplifting pads",
+      "pulsing resonance",
+      "sweeping synth",
+      "moderate rhythm",
+      "atmospheric soundscape"
+    ],
+    "Sound-bath-rilassamento": [
+      "gong swells",
+      "crystal bowls",
+      "deep decay",
+      "harmonic wash",
+      "resonant sustain"
+    ],
+    "Restorative": [
+      "acoustic arpeggios",
+      "gentle woodwinds",
+      "warm tones",
+      "delicate texture",
+      "soft ambiance"
+    ]
+  },
+  "style_avoid": [
+    "vocals",
+    "drums",
+    "sudden changes",
+    "aggressive rhythm",
+    "climax",
+    "percussion buildup",
+    "sharp transients"
+  ],
+  "durata_hint": {
+    "Meditazione": "240-270",
+    "Pranayama-respiro": "180-270",
+    "Hatha-base": "180-240",
+    "Vinyasa-dinamico": "150-210",
+    "Power-yoga": "120-200",
+    "Yin-Savasana": "240-270",
+    "Restorative": "240-270",
+    "Sound-bath-rilassamento": "240-270"
+  },
+  "note": "Le modifiche mirano a raffinare i parametri di velocità e durata per enfatizzare la natura estremamente rilassante, fluida e non dinamica delle tracce più votate, eliminando elementi troppo drammatici o ritmicamente marcati.",
+  "aggiornato": "2026-11-28T07:55:34.202Z"
+}

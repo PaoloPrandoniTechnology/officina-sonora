@@ -61,7 +61,7 @@ Rispondi con un oggetto JSON con i campi:
 - "azione": una tra "linee_guida", "nuova_categoria", "modifica_categoria", "nuova_struttura", "tag_extra", "domanda"
 - "riassunto": frase in italiano che descrive la modifica che applicherai
 - "dati": oggetto con i valori della modifica:
-  * linee_guida: style_extra (max 5 keyword inglesi), style_avoid (max 6), durata_hint / bpm_range / struttura_pref (oggetto categoria -> valore), note (italiano)
+  * linee_guida: style_extra (max 8 keyword inglesi, senza negazioni), style_avoid (termini inglesi da togliere dallo stile, max 6), durata_hint / bpm_range / struttura_pref (oggetto categoria -> valore), note (italiano)
   * nuova_categoria: name (senza spazi), energia (1-5), bpm ([min,max] tra 30 e 150), attivita (italiano), strutture (array di strutture disponibili), genere (nome del genere, italiano), strumenti (italiano), stile_base (keyword inglesi che definiscono l'identita' sonora)
   * modifica_categoria: name (esistente), campi con energia, bpm, attivita, strutture
   * nuova_struttura: nome (senza spazi), sezioni (array di sezioni valide, minimo 3)
@@ -114,8 +114,9 @@ function applica(p) {
   if (p.azione === 'linee_guida') {
     const cur = readGuidance();
     const next = { ...cur, versione: cur.versione + 1, aggiornato: new Date().toISOString() };
-    if (d.style_extra) next.style_extra = [...new Set(d.style_extra.map(String))].slice(0, 5);
-    if (d.style_avoid) next.style_avoid = [...new Set([...(cur.style_avoid || []), ...d.style_avoid.map(String)])].slice(0, 9);
+    // stessi limiti della pagina Linee guida: niente negazioni o voci tra le aggiunte, fino a 40 esclusi
+    if (d.style_extra) next.style_extra = [...new Set(d.style_extra.map((s) => String(s).trim().toLowerCase()))].filter((s) => !erroreBlocco(s, { strumentale: true })).slice(0, 8);
+    if (d.style_avoid) next.style_avoid = [...new Set([...(cur.style_avoid || []), ...d.style_avoid.map((s) => String(s).trim().toLowerCase())])].slice(0, 40);
     if (d.durata_hint) next.durata_hint = { ...(cur.durata_hint || {}), ...d.durata_hint };
     if (d.bpm_range) next.bpm_range = { ...(cur.bpm_range || {}), ...d.bpm_range };
     if (d.struttura_pref) next.struttura_pref = { ...(cur.struttura_pref || {}), ...d.struttura_pref };

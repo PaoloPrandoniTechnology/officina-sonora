@@ -31,7 +31,10 @@ test('controllo: comandi e linee guida non validi vengono rifiutati', async () =
   assert.equal((await controllo.gestisci('/api/controllo/comando', { azione: 'cancella_tutto' })).codice, 400);
   assert.equal((await controllo.gestisci('/api/controllo/comando', { azione: 'produci', genere: 'Inventato' })).codice, 400);
   assert.equal((await controllo.gestisci('/api/controllo/guida', { campo: 'bpm_range', categoria: 'Meditazione', valore: '90-40' })).codice, 400);
-  assert.equal((await controllo.gestisci('/api/controllo/guida', { campo: 'style_extra', valori: ['<script>x</script>'] })).codice, 400);
+  const prova = async (corpo) => (await controllo.gestisci('/api/controllo/guida', { campo: 'blocchi', ambito: 'Meditazione', aggiunti: [], esclusi: [], ...corpo })).codice;
+  for (const corpo of [{ ambito: 'Inventato' }, { aggiunti: ['<script>x</script>'] }, { aggiunti: ['female vocals'] }, { ambito: 'generale', aggiunti: ['choir'] },
+    { aggiunti: ['no drums'] }, { aggiunti: ['warm', 'Warm'] }, { aggiunti: ['warm'], esclusi: ['warm'] }, { esclusi: ['no vocals'] }, { aggiunti: 'warm' },
+    { aggiunti: ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9'] }]) assert.equal(await prova(corpo), 400, JSON.stringify(corpo));
   assert.equal((await controllo.gestisci('/api/controllo/percorso-inesistente', {})).codice, 404);
 });
 
@@ -45,4 +48,14 @@ test('controllo: le linee guida arrivano alla pagina con le note in elenco e le 
   const g = controllo.lettura().guida;
   assert.ok(Array.isArray(g.note), 'la pagina scorre le note come elenco, anche se il file le ha come testo');
   assert.equal(typeof g.stile_generi, 'object');
+});
+
+test('controllo: anteprima dello stile di un genere', () => {
+  const s = controllo.stile('Blues-shuffle-strumentale', 1);
+  assert.equal(s.varianti.length > 1, true);
+  assert.equal(s.variante, s.varianti[1]);
+  assert.equal(s.blocchi[0].testo, 'Instrumental');
+  assert.ok(s.blocchi.length > s.conteggio, 'la pagina mostra anche strumenti e influenze non usati nell\'esempio');
+  assert.match(s.esempio, /^Instrumental, .*BPM.*no vocals$/);
+  assert.throws(() => controllo.stile('Inventato'), /sconosciuto/);
 });

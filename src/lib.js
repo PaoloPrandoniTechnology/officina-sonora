@@ -139,7 +139,8 @@ const DEFAULT_GUIDANCE = {
   versione: 1,
   style_extra: [], // parole per tutti i generi
   stile_generi: {}, // categoria -> parole solo per quel genere
-  style_avoid: ['vocals', 'drums', 'sudden changes'],
+  style_avoid: [], // blocchi tolti dallo stile di tutti i generi
+  blocchi_generi: {}, // categoria -> { aggiunti, esclusi } scelti dalla dashboard
   durata_hint: {
     'Meditazione': '240-270',
     'Pranayama-respiro': '180-240',

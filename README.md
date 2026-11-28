@@ -35,6 +35,7 @@ Gira tutto sul tuo PC: **YuE2** genera l'audio, **gemma** (LM Studio) scrive tit
 | Fare una **pausa** senza spegnere | dashboard, *Controllo → Produzione*: Metti in pausa / Riprendi |
 | Produrre **subito un genere** | dashboard, *Controllo → Produzione*: scegli il genere |
 | Avere **più o meno** di un genere | *Controllo → Generi*: peso da 0 (mai) a 5 |
+| **Scegliere i termini** dello stile | *Controllo → Linee guida*: blocchi da aggiungere o da evitare, per tutti o per genere |
 | **Chiedere un cambiamento** a un genere | *Controllo → Note per genere*, in italiano (es. *più assoli di chitarra*) |
 | **Ascoltare e votare** | scheda *Voti* (tasti 1-5), oppure `/menu` su Telegram, oppure le stelle in iBroadcast |
 | Capire **se migliora** | scheda *Andamento* |
@@ -117,7 +118,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
 | Blocco | Cosa fa |
 |---|---|
-| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, il blocco carica gemma, che rivede gli ultimi 30 brani votati e propone nuove linee guida. Le parole di stile che propone valgono solo per i generi dei brani votati (`stile_generi` in `configguidance.json`, visibili in *Controllo → Linee guida* e su Telegram); l'elenco generale lo cambi solo tu. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
+| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, il blocco carica gemma, che rivede gli ultimi 30 brani votati e propone nuove linee guida. I termini di stile che propone sono presi dal vocabolario e valgono solo per i generi dei brani votati (`stile_generi` in `configguidance.json`, visibili in *Controllo → Linee guida* e su Telegram); non modifica i blocchi scelti da te. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
 | **8a Comandi Telegram** | Risponde ai comandi, raccoglie voti e interpreta richieste in italiano, applicandole solo dopo il tuo **Conferma**. |
 | **8b Avvisi** | Un errore ripetuto 3 volte in un'ora genera un avviso (al massimo uno ogni 30 minuti per tipo). |
 | **9 Rapporto giornaliero** | Una volta al giorno: brani, voti, errori, salute del sistema, ricette migliori e peggiori, commento di gemma. |
@@ -141,8 +142,10 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 È in **inglese**, fatto di soli descrittori e sempre nello stesso ordine: `Instrumental`, genere, strumenti con
 timbro e tecnica, variante, ritmo, atmosfera, influenza, note del produttore, linee guida, spazio e mix,
 **BPM**, **tonalità**, `no vocals`. I descrittori di ogni genere sono nel campo `en` di `config\catalogo.json`
-(`genre`, `instruments`, `rhythm`, `mood`, `space`, `influences`). Il motore non ha un prompt negativo:
-i campi `vietati` e "stile da evitare" restano solo informativi.
+(`genre`, `instruments`, `rhythm`, `mood`, `space`, `influences`). Ogni termine è un **blocco**:
+dalla dashboard puoi aggiungerne o escluderne, per tutti i generi o per uno solo (fissi: tipo, BPM, tonalità e
+`no vocals`). YuE2 non ha un prompt negativo (la documentazione ufficiale non prevede `negative_prompt`), quindi
+un blocco "da evitare" viene **tolto dallo stile**; il campo `vietati` del catalogo resta informativo.
 
 ### Lyrics: la mappa del brano
 Anche nei brani strumentali il campo è sempre compilato, con i soli tag che la LoRA strumentale conosce:
@@ -290,7 +293,7 @@ Le modifiche valgono dal brano successivo e sono registrate nello **Storico** co
 | Produzione | pausa e ripresa, svuota coda, produci un genere, genera gli sfondi delle copertine |
 | Parametri | durata, esplorazione, peso dei voti, soglie di qualità (ognuno con limiti) |
 | Generi | attiva o sospende, regola il peso |
-| Linee guida | stile da aggiungere o evitare, bpm per genere |
+| Linee guida | blocchi di stile generali e per genere, anteprima del prompt, note, bpm |
 | Note per genere | richieste in italiano, tradotte e aggiunte allo stile |
 | Messaggi | frequenza, orari e contenuto dei messaggi Telegram |
 | Storico | tutte le modifiche |
@@ -301,6 +304,19 @@ Le modifiche valgono dal brano successivo e sono registrate nello **Storico** co
 ![Linee guida](docs/screenshots/10-controllo-guida.png)
 ![Note per genere](docs/screenshots/11-controllo-note.png)
 ![Storico](docs/screenshots/12-controllo-storico.png)
+
+#### Linee guida a blocchi
+- **Ambito:** *Generale* vale per tutti i generi; scegliendo un genere vedi il suo prompt a blocchi, colorati per
+  origine (catalogo, tuoi, generali, revisione, note). Un clic toglie o rimette un blocco.
+- **Scegli i blocchi:** per famiglia o con la ricerca, in modalità *Aggiungi* o *Da evitare*; c'è anche il termine
+  libero (bordo tratteggiato). Le voci si propongono solo ai generi vocali.
+- **Controlli:** blocchi di 2-60 caratteri, senza virgole, negazioni, BPM o tonalità; niente voci nei generi
+  strumentali; massimo 8 aggiunte per ambito; avvisi se non resta uno strumento, se si esclude il genere o se i
+  blocchi sono più di 25.
+- **Torna al predefinito** toglie le tue scelte (per un genere anche quelle della revisione).
+- Il vocabolario è in `config\vocabolario.json`: termini del catalogo e tag del primo
+  [YuE](https://github.com/multimodal-art-projection/YuE) (Apache-2.0, `config\yue-v1`), rigenerabile con
+  `node tools/genera-vocabolario.js`.
 
 ### Log e sistema
 ![Log e sistema](docs/screenshots/13-log.png)
@@ -440,7 +456,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\blocks\` | i blocchi del workflow |
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
 | `src\compositore\` | compositore, revisore, scrittura e validazione dello score ABC |
-| `config\` | catalogo, linee guida e storico, parametri |
+| `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
 | `gateway\` | servizio locale e dashboard |
 | `tools\` | manutenzione, prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
@@ -450,7 +466,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 node --test tools/test/*.test.js
 ```
 
-Il test `rotazione` si basa sul caso e ogni tanto va ripetuto.
+Il test `rotazione` si basa sul caso (su una libreria finta) e di rado può andare ripetuto.
 
 **Pubblicare una modifica** (da `E:\n8n\officina-sonora`, poi da `E:\n8n` con `N8N_USER_FOLDER=E:\n8n\data`):
 

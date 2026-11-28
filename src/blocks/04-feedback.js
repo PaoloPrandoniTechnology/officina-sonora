@@ -41,16 +41,17 @@ try {
   }
   const current = readGuidance();
   const recent = voted;
+  const famiglie = readJsonSafe(path.join(CFG.dir, 'config', 'vocabolario.json'), { famiglie: {} }).famiglie;
+  const ammessi = new Set(['ritmo', 'atmosfera', 'timbro', 'produzione'].flatMap((f) => famiglie[f] || []));
   const system = 'Sei il revisore artistico di un generatore di musica di sottofondo. Rispondi solo con JSON valido.';
   const user = `Brani votati dall'utente (voto da 1 a 5, le note sono indicazioni dirette; ogni voto utente pesa come 100 dati automatici):
-${JSON.stringify(recent, null, 1)}
+${JSON.stringify(recent)}
 
 Linee guida attuali:
 ${JSON.stringify(current, null, 1)}
 
 Proponi linee guida aggiornate SOLO se servono miglioramenti chiari. Rispondi con un JSON con:
-- "stile_generi": oggetto categoria -> array di max 5 keyword INGLESI da aggiungere al prompt di stile di quel genere, solo per le categorie dei brani votati e coerenti con il genere
-- "style_avoid": array di max 6 keyword INGLESI da evitare
+- "stile_generi": oggetto categoria -> array di max 5 termini da aggiungere al prompt di stile di quel genere, solo per le categorie dei brani votati, coerenti con il genere e copiati ESATTAMENTE da questo elenco: ${[...ammessi].join('; ')}
 - "durata_hint": oggetto categoria -> "min-max" in secondi (tra 120 e 270), solo per le categorie da cambiare
 - "bpm_range": oggetto categoria -> "min-max" bpm, solo per le categorie da cambiare (resta nella fascia della loro energia, +/- 15 bpm al massimo)
 - "struttura_pref": oggetto categoria -> array di strutture preferite tra piatto, onda, arco, crescendo, loop (solo tra quelle gia' previste per la categoria)
@@ -91,7 +92,9 @@ Niente nomi di artisti o marchi.`;
   const stileGeneri = { ...(current.stile_generi || {}) };
   for (const [cat, list] of Object.entries(j.stile_generi || {})) {
     if (!names.includes(cat) || !voted.some((t) => t.categoria === cat) || !Array.isArray(list)) continue;
-    stileGeneri[cat] = [...new Set(list.map((s) => String(s).trim()).filter(Boolean))].slice(0, 5);
+    const mio = (current.blocchi_generi || {})[cat] || {};
+    const esclusi = new Set([...(current.style_avoid || []), ...(mio.esclusi || [])]);
+    stileGeneri[cat] = [...new Set(list.map((s) => String(s).trim().toLowerCase()))].filter((s) => ammessi.has(s) && !esclusi.has(s)).slice(0, 5);
   }
   const next = {
     versione: current.versione + 1,
@@ -99,7 +102,8 @@ Niente nomi di artisti o marchi.`;
     struttura_pref: strutturaPref,
     style_extra: current.style_extra || [], // generali: li cambi solo tu
     stile_generi: stileGeneri,
-    style_avoid: [...new Set([...(DEFAULT_GUIDANCE.style_avoid), ...(j.style_avoid || []).map(String)])].slice(0, 9),
+    style_avoid: current.style_avoid || [],
+    blocchi_generi: current.blocchi_generi || {},
     durata_hint: hint,
     note: String(j.note || '').slice(0, 300),
     aggiornato: new Date().toISOString(),

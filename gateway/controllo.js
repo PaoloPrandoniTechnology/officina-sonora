@@ -19,6 +19,12 @@ const HISTORY = path.join(DIR, 'config', 'history');
 const M = new Function(fs.readFileSync(path.join(DIR, 'src', 'lib-messaggi.js'), 'utf8')
   + '\nreturn { MESSAGGI_DEF, MESSAGGI_FREQUENZE, orariValidi, impostazioniMessaggi };')();
 
+// Composizione dello stile: le stesse funzioni usate dai blocchi n8n
+const STILE = new Function('CFG', 'path', fs.readFileSync(path.join(DIR, 'src', 'lib-apprendimento.js'), 'utf8')
+  + '\nreturn { blocchiStile, erroreBlocco };')({ dir: DIR }, path);
+const VOCABOLARIO = path.join(DIR, 'config', 'vocabolario.json');
+const BLOCCO_FISSO = /^(instrumental|wordless vocals|no vocals|no lyrics)$/i;
+
 // Catalogo dei parametri: etichetta, gruppo, valore di default, limiti e spiegazione
 const PARAMETRI_DEF = [
   { chiave: 'durDefault', gruppo: 'Durata', etichetta: 'Durata di riferimento', unita: 's', def: 180, min: 60, max: 600, passo: 5, descrizione: 'Durata usata quando un brano non ne dichiara una.' },
@@ -93,8 +99,10 @@ function lettura() {
       style_avoid: guida.style_avoid || [],
       note: [].concat(guida.note || []), // la revisione la scrive come testo, la pagina vuole un elenco
       stile_generi: guida.stile_generi || {},
+      blocchi_generi: guida.blocchi_generi || {},
       bpm_range: guida.bpm_range || {},
     },
+    vocabolario: leggiJson(VOCABOLARIO, { famiglie: {} }).famiglie,
     storico: righe.slice(-80).map((r) => JSON.parse(r)).reverse(),
   };
 }
@@ -177,15 +185,77 @@ function comando({ azione, genere }) {
 
 const SOLO_TESTO = /^[^<>]{2,160}$/;
 
-function guida({ campo, valori, categoria, valore }) {
+function categoria_(nome) {
+  const c = (leggiJson(CATALOGO, { categories: [] }).categories || []).find((x) => x.name === nome);
+  if (!c) throw new Error(`genere sconosciuto: ${nome}`);
+  return c;
+}
+
+// Blocchi aggiunti ed esclusi, generali o di un genere
+function salvaBlocchi(salvata, { ambito, aggiunti, esclusi, azzera }) {
+  const generale = ambito === 'generale';
+  const cat = generale ? null : categoria_(ambito);
+  const prima = generale ? { aggiunti: salvata.style_extra || [], esclusi: salvata.style_avoid || [] }
+    : { ...(salvata.blocchi_generi || {})[ambito], revisione: (salvata.stile_generi || {})[ambito] };
+  const pulisci = (lista, nome, massimo, controllo) => {
+    if (!Array.isArray(lista) || lista.length > massimo) throw new Error(`${nome}: massimo ${massimo} blocchi`);
+    const puliti = lista.map((v) => String(v).trim().toLowerCase());
+    if (new Set(puliti).size !== puliti.length) throw new Error(`${nome}: blocco ripetuto`);
+    for (const v of puliti) { const e = controllo(v); if (e) throw new Error(`"${v.slice(0, 60)}": ${e}`); }
+    return puliti;
+  };
+  // le aggiunte generali valgono anche per i generi strumentali
+  const piu = azzera ? [] : pulisci(aggiunti, 'aggiunti', 8, (v) => STILE.erroreBlocco(v, { strumentale: !(cat && cat.vocale_senza_parole) }));
+  const meno = azzera ? [] : pulisci(esclusi, 'esclusi', 40, (v) => (BLOCCO_FISSO.test(v) ? 'e\' un blocco fisso'
+    : v.length < 2 || v.length > 120 || /[,<>]/.test(v) ? 'blocco non valido' : ''));
+  const doppio = piu.find((v) => meno.includes(v));
+  if (doppio) throw new Error(`"${doppio}": non puo' essere insieme aggiunto ed escluso`);
+  if (generale) {
+    salvata.style_extra = piu;
+    salvata.style_avoid = meno;
+  } else {
+    salvata.blocchi_generi = salvata.blocchi_generi || {};
+    if (piu.length || meno.length) salvata.blocchi_generi[ambito] = { aggiunti: piu, esclusi: meno };
+    else delete salvata.blocchi_generi[ambito];
+    // "torna al predefinito" toglie anche le parole scritte dalla revisione
+    if (azzera && salvata.stile_generi) delete salvata.stile_generi[ambito];
+  }
+  registra('linee guida', `blocchi ${ambito}`, prima, { aggiunti: piu, esclusi: meno });
+}
+
+// Anteprima per la pagina: tutti i blocchi del genere, un esempio di prompt finale e gli avvisi
+function stile(genere, indiceVariante) {
+  const cat = categoria_(genere);
+  const guida = leggiJson(GUIDA, {});
+  const note = ((leggiJson(PARAMETRI, {}).generi || {})[genere] || {}).note || [];
+  const direttive = note.map((n) => String(n.inglese || n.testo || '').trim()).filter(Boolean).slice(0, 10);
+  const varianti = cat.varianti || [];
+  const variante = varianti[indiceVariante] || varianti[0] || null;
+  const strumenti = cat.strumenti || [];
+  const influenze = (cat.influenze || []).map((i) => i.genere);
+  const [min, max] = /^(\d+)-(\d+)$/.exec((guida.bpm_range || {})[genere] || '')?.slice(1).map(Number) || cat.bpm;
+  const opzioni = { bpm: Math.round((min + max) / 2), tonalita: (cat.tonalita || [])[0], direttive };
+  const blocchi = STILE.blocchiStile(cat, variante, strumenti, influenze, guida, opzioni);
+  const esempio = STILE.blocchiStile(cat, variante, strumenti.slice(0, 3), influenze.slice(0, 1), guida, opzioni).filter((b) => !b.escluso);
+  const avvisi = [];
+  const escluso = (testo) => blocchi.some((b) => b.escluso && b.testo.toLowerCase() === String(testo).toLowerCase());
+  const en = cat.en || {};
+  if (en.genre && en.genre.split(',').some((g) => escluso(g.trim()))) avvisi.push('Il termine del genere e\' escluso: il brano potrebbe uscire di un altro stile.');
+  const famiglia = leggiJson(VOCABOLARIO, { famiglie: {} }).famiglie.strumenti || [];
+  const suoi = Object.values(en.instruments || {});
+  if (suoi.length && suoi.every(escluso) && !esempio.some((b) => b.origine !== 'catalogo' && famiglia.includes(b.testo))) avvisi.push('Nessuno strumento rimasto nello stile.');
+  if (esempio.length > 25) avvisi.push(`${esempio.length} blocchi: oltre 25 il motore pesa poco ogni termine.`);
+  for (const b of blocchi) if (b.escluso && b.origine === 'tuo') avvisi.push(`"${b.testo}" e' tra i tuoi blocchi ma escluso a livello generale.`);
+  return {
+    genere, variante: variante ? variante.nome : '', varianti: varianti.map((v) => v.nome), vocale: !!cat.vocale_senza_parole,
+    blocchi, esempio: esempio.map((b) => b.testo).join(', '), conteggio: esempio.length, avvisi, bpm: `${min}-${max}`,
+  };
+}
+
+function guida({ campo, valori, categoria, valore, ...blocchi }) {
   const salvata = leggiJson(GUIDA, {});
-  if (campo === 'style_extra' || campo === 'style_avoid') {
-    if (!Array.isArray(valori) || valori.length > 30) throw new Error(`${campo}: elenco non valido (massimo 30 voci)`);
-    const puliti = valori.map((v) => String(v).trim());
-    for (const v of puliti) if (!SOLO_TESTO.test(v)) throw new Error(`${campo}: voce non valida "${v}" (2-160 caratteri, senza < o >)`);
-    const prima = salvata[campo] || [];
-    salvata[campo] = [...new Set(puliti)];
-    registra('linee guida', campo, prima, salvata[campo]);
+  if (campo === 'blocchi') {
+    salvaBlocchi(salvata, blocchi);
   } else if (campo === 'note') {
     if (!Array.isArray(valori) || valori.length > 20) throw new Error('note: massimo 20 voci');
     const puliti = valori.map((v) => String(v).trim()).filter(Boolean);
@@ -321,4 +391,4 @@ async function gestisci(url, dati) {
   }
 }
 
-module.exports = { lettura, gestisci, PARAMETRI_DEF };
+module.exports = { stile, lettura, gestisci, PARAMETRI_DEF };

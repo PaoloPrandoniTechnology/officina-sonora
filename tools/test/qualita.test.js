@@ -167,8 +167,8 @@ test('revisione: i bpm proposti restano entro 15 dalla fascia del genere', async
 test('parole di stile: quelle della revisione valgono solo per il loro genere', async () => {
   const dir = fs.mkdtempSync(path.join(RADICE, 'state', 'prova-guida-'));
   const guida = path.join(dir, 'guidance.json');
-  fs.writeFileSync(guida, JSON.stringify({ versione: 2, style_extra: ['calm'], style_avoid: [], durata_hint: {}, stile_generi: { 'Blues-shuffle-strumentale': ['gritty'] } }));
-  const proposta = { style_extra: ['ambient wash'], stile_generi: { Meditazione: ['ethereal', ' ', 'a', 'b', 'c', 'd', 'e'], 'Power-yoga': ['sustained'] } };
+  fs.writeFileSync(guida, JSON.stringify({ versione: 2, style_extra: ['calm'], style_avoid: [], durata_hint: {}, stile_generi: { 'Blues-shuffle-strumentale': ['gritty'] }, blocchi_generi: { Meditazione: { aggiunti: [], esclusi: ['airy'] } } }));
+  const proposta = { style_extra: ['ambient wash'], stile_generi: { Meditazione: ['Ethereal', ' ', 'inventato', 'ambient wash', 'airy', 'warm', 'dreamy', 'dark', 'soft'], 'Power-yoga': ['warm'] } };
   const finta = `log = () => {}; gw = async () => ({ ok: true }); libraryTracks = () => [{ meta: { voto: 5, titolo: 't', categoria: 'Meditazione' } }];
     CFG.guidanceFile = ${JSON.stringify(guida)}; CFG.historyDir = ${JSON.stringify(dir)};
     llmJson = async () => (${JSON.stringify(proposta)});`;
@@ -178,9 +178,14 @@ test('parole di stile: quelle della revisione valgono solo per il loro genere', 
     const g = JSON.parse(fs.readFileSync(guida, 'utf8'));
     assert.deepEqual(g.style_extra, ['calm'], 'le parole generali restano quelle scelte da te');
     // Power-yoga non ha brani votati: la proposta si ignora; il blues conserva le sue
-    assert.deepEqual(g.stile_generi, { 'Blues-shuffle-strumentale': ['gritty'], Meditazione: ['ethereal', 'a', 'b', 'c', 'd'] });
+    const vocab = Object.values(JSON.parse(leggi('config', 'vocabolario.json')).famiglie).flat();
+    assert.deepEqual(g.stile_generi['Blues-shuffle-strumentale'], ['gritty']);
+    assert.equal(g.stile_generi['Power-yoga'], undefined);
+    assert.ok(g.stile_generi.Meditazione.length >= 3 && g.stile_generi.Meditazione.length <= 5);
+    for (const t of g.stile_generi.Meditazione) assert.ok(vocab.includes(t) && t !== 'airy', t);
+    assert.deepEqual(g.blocchi_generi, { Meditazione: { aggiunti: [], esclusi: ['airy'] } }, 'la revisione non tocca i tuoi blocchi');
     const stile = (name) => L.componiStile(CAT.categories.find((c) => c.name === name), null, [], '', g);
-    assert.match(stile('Meditazione'), /calm.*ethereal|ethereal/);
+    assert.match(stile('Meditazione'), /calm/);
     assert.doesNotMatch(stile('Blues-shuffle-strumentale'), /ethereal/);
     assert.match(stile('Blues-shuffle-strumentale'), /gritty/);
   } finally {

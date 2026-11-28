@@ -292,35 +292,67 @@ function tonalitaInglese(nome) {
   return `${nota}${alterazione} ${m[3] === 'minore' ? 'minor' : 'major'}`;
 }
 
-// Stile per YuE2: soli descrittori inglesi, nell'ordine tipo, genere, strumenti, ritmo, atmosfera, mix, bpm, tonalità.
-// I descrittori di ogni genere sono nel campo "en" del catalogo; il motore non ha un prompt negativo.
-function componiStile(cat, variante, strumenti, influenza, guidance, { bpm, tonalita } = {}) {
-  const direttive = ((CFG.generiOverride || {})[cat.name] || {}).direttive || [];
+// ---- Blocchi di stile (usati anche dal gateway per la pagina Linee guida: funzioni senza effetti) ----
+// Perche' un termine non puo' essere un blocco di stile; stringa vuota se va bene
+function erroreBlocco(testo, { strumentale = false } = {}) {
+  const t = String(testo ?? '').trim();
+  if (t.length < 2 || t.length > 60) return 'tra 2 e 60 caratteri';
+  if (/[,<>]/.test(t)) return 'senza virgole, < o >';
+  if (/^no\s/i.test(t)) return 'niente negazioni: escludi il termine';
+  if (/\bbpm\b/i.test(t) || /\b[a-g](#|b)?\s+(major|minor)\b/i.test(t)) return 'bpm e tonalita\' li mette il sistema';
+  if (/^(instrumental|wordless vocals)$/i.test(t)) return 'e\' un blocco fisso';
+  // "singing bowls" e' uno strumento
+  if (strumentale && /\b(vocals?|vocalist|vocalise|voice|choir|singer|female|male|child|soprano|lyrics|rap|rapping)\b|\bsinging\b(?!\s+bowl)/i.test(t)) return 'le voci non vanno in un genere strumentale';
+  return '';
+}
+
+// Stile per YuE2 a blocchi: soli descrittori inglesi, nell'ordine tipo, genere, strumenti, ritmo, atmosfera,
+// aggiunte, mix, bpm, tonalità. I descrittori di ogni genere sono nel campo "en" del catalogo.
+// Il motore non ha un prompt negativo: un blocco escluso viene semplicemente tolto.
+function blocchiStile(cat, variante, strumenti, influenza, guidance, { bpm, tonalita, direttive } = {}) {
+  const note = direttive || (((typeof CFG !== 'undefined' && CFG.generiOverride) || {})[cat.name] || {}).direttive || [];
   const en = cat.en || { genre: cat.stile };
   // le varianti segnaposto ripetono per intero la descrizione del genere: si saltano
   const colore = variante && !(cat.en && variante.keywords === cat.stile) ? variante.keywords : '';
-  const parti = [
-    cat.vocale_senza_parole ? 'Wordless vocals' : 'Instrumental',
-    en.genre,
-    ...strumenti.map((s) => (en.instruments || {})[s] || ''),
-    colore,
-    en.rhythm,
-    en.mood,
-    (en.influences || {})[influenza] || '',
-    direttive.map((d) => d.replace(/\.$/, '')).join(', '),
-    (guidance.style_extra || []).join(', '),
-    ((guidance.stile_generi || {})[cat.name] || []).join(', '),
-    en.space,
-    bpm ? `${bpm} BPM` : '',
-    tonalitaInglese(tonalita),
-    cat.vocale_senza_parole ? 'no lyrics' : 'no vocals',
-  ].filter(Boolean);
+  const mio = (guidance.blocchi_generi || {})[cat.name] || {};
+  const esclusi = new Set([...(guidance.style_avoid || []), ...(mio.esclusi || [])].map((s) => String(s).trim().toLowerCase()));
+  const gruppi = [
+    ['fisso', cat.vocale_senza_parole ? 'Wordless vocals' : 'Instrumental'],
+    ['catalogo', en.genre],
+    ...strumenti.map((s) => ['catalogo', (en.instruments || {})[s]]),
+    ['catalogo', colore],
+    ['catalogo', en.rhythm],
+    ['catalogo', en.mood],
+    ...[].concat(influenza || []).map((i) => ['catalogo', (en.influences || {})[i]]),
+    ['nota', note.map((d) => d.replace(/\.$/, '')).join(', ')],
+    ['generale', (guidance.style_extra || []).join(', ')],
+    ['tuo', (mio.aggiunti || []).join(', ')],
+    ['revisione', ((guidance.stile_generi || {})[cat.name] || []).join(', ')],
+    ['catalogo', en.space],
+    ['fisso', bpm ? `${bpm} BPM` : ''],
+    ['fisso', tonalitaInglese(tonalita)],
+    ['fisso', cat.vocale_senza_parole ? 'no lyrics' : 'no vocals'],
+  ];
   // il motore pesa le parole: ogni frase compare una volta sola
   const viste = new Set();
-  return parti.join(', ').split(', ').filter((p) => !viste.has(p.toLowerCase()) && viste.add(p.toLowerCase())).join(', ');
+  const blocchi = [];
+  for (const [origine, valore] of gruppi) {
+    for (const testo of String(valore || '').split(',').map((s) => s.trim()).filter(Boolean)) {
+      const chiave = testo.toLowerCase();
+      if (viste.has(chiave)) continue;
+      viste.add(chiave);
+      blocchi.push({ testo, origine, escluso: origine !== 'fisso' && esclusi.has(chiave) });
+    }
+  }
+  return blocchi;
 }
 
-// Divieti del genere e quelli generali
+function componiStile(...argomenti) {
+  return blocchiStile(...argomenti).filter((b) => !b.escluso).map((b) => b.testo).join(', ');
+}
+
+// Divieti del genere, quelli generali e quelli scelti per il genere (solo nella scheda del brano)
 function divietiDi(cat, guidance) {
-  return [...(cat.vietati || []), ...(guidance.style_avoid || [])].join(', ');
+  const mio = (guidance.blocchi_generi || {})[cat.name] || {};
+  return [...(cat.vietati || []), ...(guidance.style_avoid || []), ...(mio.esclusi || [])].join(', ');
 }

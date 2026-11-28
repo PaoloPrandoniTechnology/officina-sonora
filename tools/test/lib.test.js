@@ -90,16 +90,24 @@ test('numerazione: il progressivo cresce e non si ripete', () => {
 test('rotazione: i generi senza brani vengono scelti', () => {
   L.CFG.generiOverride = {}; // pesi e generi sospesi della produzione non contano
   const guidance = L.readGuidance();
-  const conta = {};
-  for (const t of L.libraryTracks()) conta[t.meta.categoria] = (conta[t.meta.categoria] || 0) + 1;
-  const senza = L.CFG.categories.map((c) => c.name).filter((n) => !conta[n]);
-  const scelte = {};
-  for (let i = 0; i < 200; i++) {
-    const slot = L.pickSlot({ recent: [], experiments: [], queue: [] }, guidance);
-    scelte[slot.category.name] = (scelte[slot.category.name] || 0) + 1;
+  const nomi = L.CFG.categories.map((c) => c.name);
+  const senza = nomi.slice(0, 3);
+  // libreria finta: un brano per ogni genere tranne tre
+  const radice = L.CFG.root;
+  const dir = fs.mkdtempSync(path.join(RADICE, 'state', 'prova-libreria-'));
+  try {
+    nomi.slice(3).forEach((categoria, i) => fs.writeFileSync(path.join(dir, `${i}.json`), JSON.stringify({ titolo: 't', categoria })));
+    L.CFG.root = dir;
+    const scelte = {};
+    for (let i = 0; i < 200; i++) {
+      const slot = L.pickSlot({ recent: [], experiments: [], queue: [] }, guidance);
+      scelte[slot.category.name] = (scelte[slot.category.name] || 0) + 1;
+    }
+    for (const n of senza) assert.ok(scelte[n] > 0, `genere senza brani mai scelto: ${n}`);
+  } finally {
+    L.CFG.root = radice;
+    fs.rmSync(dir, { recursive: true, force: true });
   }
-  assert.ok(senza.length > 0, 'ci devono essere generi senza brani');
-  for (const n of senza) assert.ok(scelte[n] > 0, `genere senza brani mai scelto: ${n}`);
 });
 
 test('note: le direttive del produttore entrano nello stile del genere', () => {
