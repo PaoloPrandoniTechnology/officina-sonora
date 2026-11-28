@@ -49,7 +49,7 @@ Linee guida attuali:
 ${JSON.stringify(current, null, 1)}
 
 Proponi linee guida aggiornate SOLO se servono miglioramenti chiari. Rispondi con un JSON con:
-- "style_extra": array di max 5 keyword INGLESI da aggiungere al prompt di stile
+- "stile_generi": oggetto categoria -> array di max 5 keyword INGLESI da aggiungere al prompt di stile di quel genere, solo per le categorie dei brani votati e coerenti con il genere
 - "style_avoid": array di max 6 keyword INGLESI da evitare
 - "durata_hint": oggetto categoria -> "min-max" in secondi (tra 120 e 270), solo per le categorie da cambiare
 - "bpm_range": oggetto categoria -> "min-max" bpm, solo per le categorie da cambiare (resta nella fascia della loro energia, +/- 15 bpm al massimo)
@@ -87,11 +87,18 @@ Niente nomi di artisti o marchi.`;
       if (ok.length) strutturaPref[cat] = [...new Set(ok)];
     }
   }
+  // parole di stile per genere: solo per i generi con brani votati; gli altri conservano le loro
+  const stileGeneri = { ...(current.stile_generi || {}) };
+  for (const [cat, list] of Object.entries(j.stile_generi || {})) {
+    if (!names.includes(cat) || !voted.some((t) => t.categoria === cat) || !Array.isArray(list)) continue;
+    stileGeneri[cat] = [...new Set(list.map((s) => String(s).trim()).filter(Boolean))].slice(0, 5);
+  }
   const next = {
     versione: current.versione + 1,
     bpm_range: bpmRange,
     struttura_pref: strutturaPref,
-    style_extra: [...new Set((j.style_extra || []).map(String).map((s) => s.trim()).filter(Boolean))].slice(0, 5),
+    style_extra: current.style_extra || [], // generali: li cambi solo tu
+    stile_generi: stileGeneri,
     style_avoid: [...new Set([...(DEFAULT_GUIDANCE.style_avoid), ...(j.style_avoid || []).map(String)])].slice(0, 9),
     durata_hint: hint,
     note: String(j.note || '').slice(0, 300),

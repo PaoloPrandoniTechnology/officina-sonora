@@ -163,3 +163,27 @@ test('revisione: i bpm proposti restano entro 15 dalla fascia del genere', async
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('parole di stile: quelle della revisione valgono solo per il loro genere', async () => {
+  const dir = fs.mkdtempSync(path.join(RADICE, 'state', 'prova-guida-'));
+  const guida = path.join(dir, 'guidance.json');
+  fs.writeFileSync(guida, JSON.stringify({ versione: 2, style_extra: ['calm'], style_avoid: [], durata_hint: {}, stile_generi: { 'Blues-shuffle-strumentale': ['gritty'] } }));
+  const proposta = { style_extra: ['ambient wash'], stile_generi: { Meditazione: ['ethereal', ' ', 'a', 'b', 'c', 'd', 'e'], 'Power-yoga': ['sustained'] } };
+  const finta = `log = () => {}; gw = async () => ({ ok: true }); libraryTracks = () => [{ meta: { voto: 5, titolo: 't', categoria: 'Meditazione' } }];
+    CFG.guidanceFile = ${JSON.stringify(guida)}; CFG.historyDir = ${JSON.stringify(dir)};
+    llmJson = async () => (${JSON.stringify(proposta)});`;
+  const input = { first: () => ({ json: { outcome: 'saved', state: { done: 1, lastVoteMark: 'x' } } }) };
+  try {
+    await new AF('require', '$input', LIB + finta + '\n' + leggi('src', 'blocks', '04-feedback.js'))(require, input);
+    const g = JSON.parse(fs.readFileSync(guida, 'utf8'));
+    assert.deepEqual(g.style_extra, ['calm'], 'le parole generali restano quelle scelte da te');
+    // Power-yoga non ha brani votati: la proposta si ignora; il blues conserva le sue
+    assert.deepEqual(g.stile_generi, { 'Blues-shuffle-strumentale': ['gritty'], Meditazione: ['ethereal', 'a', 'b', 'c', 'd'] });
+    const stile = (name) => L.componiStile(CAT.categories.find((c) => c.name === name), null, [], '', g);
+    assert.match(stile('Meditazione'), /calm.*ethereal|ethereal/);
+    assert.doesNotMatch(stile('Blues-shuffle-strumentale'), /ethereal/);
+    assert.match(stile('Blues-shuffle-strumentale'), /gritty/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

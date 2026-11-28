@@ -1,0 +1,42 @@
+{
+  "versione": 2,
+  "bpm_range": {
+    "Power-yoga": "103-135"
+  },
+  "struttura_pref": {
+    "Sound-bath-rilassamento": [
+      "piatto"
+    ],
+    "Yin-Savasana": [
+      "piatto",
+      "onda"
+    ]
+  },
+  "style_extra": [
+    "atmospheric",
+    "sustained",
+    "ethereal",
+    "ambient wash",
+    "organic textures"
+  ],
+  "style_avoid": [
+    "vocals",
+    "drums",
+    "sudden changes",
+    "aggressive rhythm",
+    "climax",
+    "percussion buildup"
+  ],
+  "durata_hint": {
+    "Meditazione": "240-270",
+    "Pranayama-respiro": "180-240",
+    "Hatha-base": "180-240",
+    "Vinyasa-dinamico": "150-210",
+    "Power-yoga": "120-180",
+    "Yin-Savasana": "240-270",
+    "Restorative": "240-270",
+    "Sound-bath-rilassamento": "240-270"
+  },
+  "note": "Ho ristretto le strutture e ho eliminato elementi di alta energia o cambiamenti drammatici per favorire atmosfere più costanti, in linea con i brani a votazione più alta.",
+  "aggiornato": "2026-11-28T07:01:14.401Z"
+}

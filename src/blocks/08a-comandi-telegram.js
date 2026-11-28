@@ -193,6 +193,7 @@ async function sezione(nome) {
   if (nome === 'linee') {
     const g = readGuidance();
     return say([`Linee guida v${g.versione}: ${g.note}`, `Stile extra: ${(g.style_extra || []).join(', ') || 'nessuno'}`,
+      ...Object.entries(g.stile_generi || {}).filter(([, p]) => p.length).map(([c, p]) => `Stile ${c}: ${p.join(', ')}`),
       `Da evitare: ${(g.style_avoid || []).join(', ')}`].join('\n'), [
       [{ text: '✍ Scrivi una modifica', callback_data: 'n:linee' }],
     ]);

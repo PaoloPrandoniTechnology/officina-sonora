@@ -309,6 +309,7 @@ function componiStile(cat, variante, strumenti, influenza, guidance, { bpm, tona
     (en.influences || {})[influenza] || '',
     direttive.map((d) => d.replace(/\.$/, '')).join(', '),
     (guidance.style_extra || []).join(', '),
+    ((guidance.stile_generi || {})[cat.name] || []).join(', '),
     en.space,
     bpm ? `${bpm} BPM` : '',
     tonalitaInglese(tonalita),

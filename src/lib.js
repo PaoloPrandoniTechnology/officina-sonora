@@ -137,7 +137,8 @@ function aggiornaComandi(patch) {
 
 const DEFAULT_GUIDANCE = {
   versione: 1,
-  style_extra: [],
+  style_extra: [], // parole per tutti i generi
+  stile_generi: {}, // categoria -> parole solo per quel genere
   style_avoid: ['vocals', 'drums', 'sudden changes'],
   durata_hint: {
     'Meditazione': '240-270',

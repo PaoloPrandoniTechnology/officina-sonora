@@ -117,7 +117,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 
 | Blocco | Cosa fa |
 |---|---|
-| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, il blocco carica gemma, che rivede gli ultimi 30 brani votati e propone nuove linee guida. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
+| **4 Feedback** | Ogni 5 brani, o quando cambiano i voti, il blocco carica gemma, che rivede gli ultimi 30 brani votati e propone nuove linee guida. Le parole di stile che propone valgono solo per i generi dei brani votati (`stile_generi` in `configguidance.json`, visibili anche tra le linee guida su Telegram, non ancora in dashboard); l'elenco generale della dashboard lo cambi solo tu. Il codice accetta solo valori nei limiti e archivia la versione precedente. |
 | **8a Comandi Telegram** | Risponde ai comandi, raccoglie voti e interpreta richieste in italiano, applicandole solo dopo il tuo **Conferma**. |
 | **8b Avvisi** | Un errore ripetuto 3 volte in un'ora genera un avviso (al massimo uno ogni 30 minuti per tipo). |
 | **9 Rapporto giornaliero** | Una volta al giorno: brani, voti, errori, salute del sistema, ricette migliori e peggiori, commento di gemma. |

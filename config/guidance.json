@@ -1,10 +1,25 @@
 {
-  "versione": 1,
+  "versione": 3,
+  "bpm_range": {
+    "Power-yoga": "103-135"
+  },
+  "struttura_pref": {
+    "Sound-bath-rilassamento": [
+      "piatto"
+    ],
+    "Yin-Savasana": [
+      "piatto",
+      "onda"
+    ]
+  },
   "style_extra": [],
   "style_avoid": [
     "vocals",
     "drums",
-    "sudden changes"
+    "sudden changes",
+    "aggressive rhythm",
+    "climax",
+    "percussion buildup"
   ],
   "durata_hint": {
     "Meditazione": "240-270",
@@ -16,8 +31,7 @@
     "Restorative": "240-270",
     "Sound-bath-rilassamento": "240-270"
   },
-  "note": "linee guida iniziali",
-  "aggiornato": null,
-  "bpm_range": {},
-  "struttura_pref": {}
+  "note": "Tolte le parole di stile generali della v2: le prossime revisioni le assegnano ai singoli generi.",
+  "aggiornato": "2026-11-28T07:06:54.963Z",
+  "stile_generi": {}
 }

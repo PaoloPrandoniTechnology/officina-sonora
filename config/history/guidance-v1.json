@@ -1,0 +1,23 @@
+{
+  "versione": 1,
+  "style_extra": [],
+  "style_avoid": [
+    "vocals",
+    "drums",
+    "sudden changes"
+  ],
+  "durata_hint": {
+    "Meditazione": "240-270",
+    "Pranayama-respiro": "180-240",
+    "Hatha-base": "180-240",
+    "Vinyasa-dinamico": "150-210",
+    "Power-yoga": "120-180",
+    "Yin-Savasana": "240-270",
+    "Restorative": "240-270",
+    "Sound-bath-rilassamento": "240-270"
+  },
+  "note": "linee guida iniziali",
+  "aggiornato": null,
+  "bpm_range": {},
+  "struttura_pref": {}
+}
