@@ -35,6 +35,8 @@ const meta = {
   lora: job.adapters || [],
   score: job.abcNostro ? c.score : undefined, // assente = score scritto dal motore
   score_fonte: job.scoreFonte || (job.abcNostro ? 'compositore' : 'motore'),
+  score_riparato: job.scoreRiparato || undefined,
+  score_manuale: c.scoreManuale,
   seed: job.seed,
   job_id: job.id,
   bytes_audio: inp.bytes,

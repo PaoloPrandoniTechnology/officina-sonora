@@ -95,7 +95,7 @@ function scheda(numero) {
     qualita: m.qualita ? { esito: m.qualita.esito, problemi: m.qualita.problemi || [], bitrate: m.qualita.bitrate_medio_kbps ?? null, audio: m.qualita.audio || null } : null,
     voto: votoValido(m.voto) ? m.voto : null, nota: m.nota_utente ?? null, voto_fonte: m.voto_fonte || null,
     caricato: !!ib.track_id, ascolti: ib.ascolti ?? m.ascolti ?? 0,
-    file: file ? path.relative(LIBRERIA, file) : null,
+    file: file ? path.relative(LIBRERIA, file) : null, score: fs.existsSync(s.file.replace(/json$/, 'abc')),
   };
 }
 

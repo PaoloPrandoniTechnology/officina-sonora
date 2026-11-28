@@ -12,6 +12,7 @@
 </script>
 <link rel="stylesheet" href="/dashboard.css">
 <link rel="stylesheet" href="/lettore.css">
+<link rel="stylesheet" href="/score.css">
 </head>
 <body>
 <a class="salta" href="#principale">Vai al contenuto</a>
@@ -43,6 +44,7 @@
   <symbol id="i-piccolo" viewBox="0 0 16 16"><path d="M3.5 6 8 10.5 12.5 6"/></symbol>
   <symbol id="i-schermo" viewBox="0 0 16 16"><path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/></symbol>
   <symbol id="i-trascina" viewBox="0 0 16 16"><path d="M6 4h.01M10 4h.01M6 8h.01M10 8h.01M6 12h.01M10 12h.01" stroke-width="2.4"/></symbol>
+  <symbol id="i-score" viewBox="0 0 16 16"><path d="M2 3h12M2 6.5h5M2 10h4M2 13.5h12M11.5 11V5l2.5 1.5"/><circle cx="10" cy="11" r="1.6"/></symbol>
   <symbol id="i-menu" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11zM6 2.5v11M11.5 6 9.5 8l2 2"/></symbol>
   <symbol id="i-tema" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.500"/><path d="M8 2.500a5.500 5.500 0 0 1 0 11z" fill="currentColor"/></symbol>
 </svg>
@@ -58,6 +60,7 @@
       <button data-tab="voti"><svg class="ic"><use href="#i-voti"/></svg>Voti<span class="conta" id="navVoti" hidden></span></button>
       <p>Produzione</p>
       <button data-tab="generi"><svg class="ic"><use href="#i-generi"/></svg>Generi</button>
+      <button data-tab="score"><svg class="ic"><use href="#i-score"/></svg>Score</button>
       <button data-tab="controllo"><svg class="ic"><use href="#i-controllo"/></svg>Controllo</button>
       <p>Analisi</p>
       <button data-tab="andamento"><svg class="ic"><use href="#i-andamento"/></svg>Andamento</button>
@@ -195,6 +198,17 @@
       <div id="c-generi" hidden></div>
     </section>
 
+    <!-- SCORE: disegnato da score-pagina.js -->
+    <section class="tab" id="t-score">
+      <div class="sub-nav" id="scSub" role="group" aria-label="Sezioni degli score">
+        <button data-vista="archivio" aria-pressed="true">Archivio</button>
+        <button data-vista="editor" aria-pressed="false">Editor</button>
+        <button data-vista="produzione" aria-pressed="false">Da produrre</button>
+        <button data-vista="regole" aria-pressed="false">Come nascono</button>
+      </div>
+      <div id="scPagina"></div>
+    </section>
+
     <!-- ANDAMENTO -->
     <section class="tab" id="t-andamento">
       <div class="toolbar an-filtri">
@@ -326,6 +340,8 @@
 </div>
 <script src="/coda.js"></script>
 <script src="/lettore.js"></script>
+<script src="/abc.js"></script>
+<script src="/score-pagina.js"></script>
 <script src="/dashboard.js"></script>
 </body>
 </html>

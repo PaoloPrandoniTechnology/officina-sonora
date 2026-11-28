@@ -1,7 +1,7 @@
 # Come si scrive uno score per YuE2
 
 Regole applicate da `src/compositore/abc.js` (scrittura e controllo) e `compositore.js` (musica).
-Aggiornato il 27/11/2026.
+Aggiornato il 28/11/2026. Analisi e misure: [analisi-score-2026-11-28.md](analisi-score-2026-11-28.md).
 
 ## Formato (obbligatorio)
 Fonte principale: il validatore ufficiale `abc_tools.py` e le guide del repository YuE.
@@ -18,6 +18,13 @@ Fonte principale: il validatore ufficiale `abc_tools.py` e le guide del reposito
 - `Ins` è una sola linea melodica. Niente accordi di note, gruppi irregolari, abbellimenti, ritornelli.
 - Alterazioni relative all'armatura, valide fino a fine battuta per tutte le ottave. Le legature uniscono la stessa altezza.
 - Strumentali: `Vocal` ha pause e sigle, il tema sta in `Ins`. Nelle lyrics solo i sei tag, senza note.
+
+## Recupero, impostazioni e scelta a mano
+- `ripara`: taglia a un confine valido (preferendo la fine di una sezione) il più vicino alla durata richiesta,
+  chiude le legature rimaste aperte e chiama `outro` l'ultima sezione.
+- `analizza`: durata, estensione, battute ripetute, note dell'accordo sul primo battito.
+- Impostazioni in `config\score.json` (generali e per genere); score scelti a mano in `state\score.json`,
+  consumati dal blocco 6; score rifiutati in `state\score-scartati` (ultimi 30).
 
 ## Scelte musicali del compositore
 Fonti: guide di composizione (motivo, frase, periodo, note dell'accordo) e MeloForm.

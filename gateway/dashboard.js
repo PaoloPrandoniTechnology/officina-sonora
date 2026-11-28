@@ -1321,6 +1321,12 @@
     inLibreria: () => lib.ordinati,
     ridisegna: () => { disegnaLibreria(); if (schedaAperta && $('#scheda').open) disegnaScheda(); },
   });
+  // ---------- score (score-pagina.js) ----------
+  const score = window.PaginaScore({
+    $, esc, ic, imposta, nm, toast, chiedi, invia, leggi, data, n0, stelle, vai,
+    popover: lettore.popover, pausaLettore: () => { lettore.pausa(); $('#vAudio').pause(); },
+  });
+  $('#scSub').addEventListener('click', (e) => { const b = e.target.closest('[data-vista]'); if (b) vai(b.dataset.vista === 'archivio' ? 'score' : 'score/' + b.dataset.vista); });
   // voto dal lettore o dalla scheda
   async function votaDa(b, voto) {
     try { await invia('/api/controllo/voto', { numero: b.numero, voto }, AbortSignal.timeout(15000)); }
@@ -1339,7 +1345,7 @@
 
   // ---------- scheda del brano ----------
   let schedaAperta = null;
-  const FONTE_SPARTITO = { modello: 'il modello musicale', compositore: 'il compositore del progetto', motore: 'il motore, durante il render' };
+  const FONTE_SPARTITO = { modello: 'il modello musicale', compositore: 'il compositore del progetto', motore: 'il motore, durante il render', manuale: 'te, nell\'editor' };
   async function apriScheda(n) {
     const d = $('#scheda');
     d.innerHTML = '<div class="s-corpo"><div class="empty">Caricamento…</div></div>';
@@ -1364,7 +1370,8 @@
       <div class="s-azioni"><button class="btn" data-ascolta="${b.numero}">${ic('play')} Ascolta</button>${lettore.azioni(b.numero)}
         ${b.file ? `<a class="btn ghost" href="/audio/brano?n=${b.numero}&amp;scarica=1" download>Scarica il file</a>` : ''}
         <button class="btn ghost" data-produci="${esc(b.categoria)}">Un altro così</button>
-        <button class="btn ghost" data-stile="${esc(b.categoria)}">Stile del genere</button></div>
+        <button class="btn ghost" data-stile="${esc(b.categoria)}">Stile del genere</button>
+        ${b.score ? `<button class="btn ghost" data-score="${b.numero}">Apri lo score</button>` : ''}</div>
       <h3>Musica</h3><div class="kv">${riga('Durata', sec(b.durata_s))}${riga('Velocità', b.bpm ? b.bpm + ' bpm' : '')}${riga('Tonalità', b.tonalita)}${riga('Energia', b.energia ? b.energia + ' su 5' : '')}
         ${riga('Struttura', b.struttura)}${riga('Strumenti', b.strumenti.join(', '))}${riga('Influenza', b.influenza)}${riga('Adatto a', b.attivita)}</div>
       ${b.sezioni.length ? `<h3>Sezioni</h3><div>${b.sezioni.map((x) => `<span class="tag">${esc(x.replace(/[\[\]]/g, ''))}</span>`).join('')}</div>` : ''}
@@ -1587,7 +1594,7 @@
   setInterval(() => { if ($('#t-andamento').classList.contains('on')) caricaAndamento(); }, 30000);
 
   // ---------- navigazione ----------
-  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', playlist: 'Playlist', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
+  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', playlist: 'Playlist', score: 'Score', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
   function vai(indirizzo) {
     const parti = String(indirizzo || '').split('/');
     let tab = parti[0];
@@ -1604,7 +1611,7 @@
     const corrente = document.querySelector('#nav button[aria-current="page"]');
     const nav = $('#nav');
     if (corrente && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = corrente.offsetLeft - nav.clientWidth / 2;
-    const hash = tab === 'controllo' ? (ctrlSub === 'guida' ? indirizzoGuida() : '#controllo/' + ctrlSub) : tab === 'generi' && parti[1] === 'pesi' ? '#generi/pesi' : tab === 'playlist' && parti[1] ? '#playlist/' + parti[1] : '#' + tab;
+    const hash = tab === 'controllo' ? (ctrlSub === 'guida' ? indirizzoGuida() : '#controllo/' + ctrlSub) : tab === 'generi' && parti[1] === 'pesi' ? '#generi/pesi' : (tab === 'playlist' || tab === 'score') && parti[1] ? '#' + tab + '/' + parti[1] : '#' + tab;
     if (location.hash !== hash) history.replaceState(null, '', hash);
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (tab === 'controllo') caricaControllo();
@@ -1612,6 +1619,7 @@
     if (tab === 'voti') caricaVoti(); else $('#vAudio').pause();
     if (tab === 'andamento') caricaAndamento();
     if (tab === 'playlist') lettore.pagina(parti[1]);
+    if (tab === 'score') score.pagina(parti[1]); else score.ferma();
     lettore.navigato();
   }
   document.getElementById('nav').addEventListener('click', (e) => {
@@ -1635,13 +1643,14 @@
   }
   $('#bProd').onclick = () => cambiaPausa(!(statoUltimo && inPausa(statoUltimo)));
   document.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-vai], [data-ascolta], [data-info], [data-vota], [data-stile], [data-produci], [data-brani], [data-riprendi]');
+    const b = e.target.closest('[data-vai], [data-ascolta], [data-info], [data-vota], [data-stile], [data-produci], [data-brani], [data-riprendi], [data-score]');
     if (!$('#sistema').contains(e.target)) $('#sistema').open = false;
     if (!b) return;
     if (b.dataset.ascolta) return lettore.ascolta(b);
     if (b.dataset.info) return apriScheda(Number(b.dataset.info));
     if (b.closest('#scheda')) $('#scheda').close();
     if (b.dataset.vai) return vai(b.dataset.vai);
+    if (b.dataset.score) return score.apriBrano(Number(b.dataset.score));
     if (b.dataset.vota) { vt.richiesto = Number(b.dataset.vota); vt.filtro = ''; return vai('voti'); }
     if (b.dataset.stile) { apriGuida(encodeURIComponent(b.dataset.stile)); return vai('controllo/guida/' + encodeURIComponent(b.dataset.stile)); }
     if (b.dataset.brani) { lib.genere = b.dataset.brani; lib.ambito = lib.voto = lib.q = ''; $('#lQ').value = $('#lVotoF').value = ''; disegnaLibreria(); return vai('libreria'); }

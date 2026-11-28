@@ -118,7 +118,10 @@ if (esito.problemi.length) {
       energia: meta.energia, attivita: meta.attivita, struttura: meta.struttura, style: meta.style, avoid: meta.avoid,
       sezioni: meta.sezioni, lyrics: (meta.sezioni || []).join('\n\n'), categoria: meta.categoria, tipo: meta.tipo,
       genere: meta.genere, variante: meta.variante, strumenti: meta.strumenti, influenza: meta.influenza, guida_versione: meta.guida_versione, ricetta: meta.ricetta, esperimento: meta.esperimento,
-      // senza score: il blocco 5d ne compone uno nuovo (uno score del motore troppo corto non si ripete)
+      // senza score: il blocco 5d ne compone uno nuovo (uno score del motore troppo corto non si ripete).
+      // Uno score scelto a mano invece si riusa
+      ...(meta.score_manuale && fs.existsSync(path.join(dest, path.basename(file).replace(/\.[^.]+$/, '.abc')))
+        ? { abc: fs.readFileSync(path.join(dest, path.basename(file).replace(/\.[^.]+$/, '.abc')), 'utf8'), scoreManuale: meta.score_manuale, lyrics: meta.lyrics } : {}),
       attempts: 0, tentativi_render: tentativi,
       vocale: !!((CFG.categories || []).find((x) => x.name === meta.categoria) || {}).vocale_senza_parole,
     });

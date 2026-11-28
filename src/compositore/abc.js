@@ -311,4 +311,197 @@ function strumentale(testo) {
   return { abc: scriviAbc(score), secondi: Math.round(durataSecondi(score)), lyrics: lyricsDaScore(perLyrics, { forma: 'semplice' }) };
 }
 
-module.exports = { strumentale, scriviAbc, leggiAbc, durataSecondi, lyricsDaScore, unita, TAG };
+// ---- Analisi, riparazione e modifiche (usate dalla produzione, dal gateway e dall'editor della dashboard) ----
+const SEZIONI = ['intro', 'verse', 'pre-chorus', 'chorus', 'bridge', 'interlude', 'outro', 'instrumental'];
+const TIPI_ACCORDO = { '': [0, 4, 7], m: [0, 3, 7], dim: [0, 3, 6], aug: [0, 4, 8], 7: [0, 4, 7, 10], maj7: [0, 4, 7, 11], m7: [0, 3, 7, 10], dim7: [0, 3, 6, 9], m7b5: [0, 3, 6, 10], sus4: [0, 5, 7], sus2: [0, 2, 7], 6: [0, 4, 7, 9], m6: [0, 3, 7, 9], '7sus4': [0, 5, 7, 10], 'm(maj7)': [0, 3, 7, 11] };
+const DIESIS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const BEMOLLI = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+const classe = (nome) => (BASE[nome[0]] + (nome[1] === '#' ? 1 : nome[1] === 'b' ? -1 : 0) + 12) % 12;
+
+// Sigla di un accordo -> note (classi 0-11) e basso
+function noteAccordo(sigla) {
+  const m = /^([A-G][#b]?)([^/]*)(?:\/([A-G][#b]?))?$/.exec(sigla || '');
+  if (!m || !TIPI_ACCORDO[m[2]]) return null;
+  const radice = classe(m[1]);
+  return { radice, note: TIPI_ACCORDO[m[2]].map((x) => (radice + x) % 12), basso: m[3] ? classe(m[3]) : radice };
+}
+
+function trasponiTonalita(tonalita, semitoni) {
+  const minore = tonalita.endsWith('m');
+  const pc = (classe(tonalita) + semitoni + 120) % 12;
+  return Object.keys(QUINTE).filter((k) => k.endsWith('m') === minore && classe(k) === pc)
+    .sort((a, b) => Math.abs(QUINTE[a]) - Math.abs(QUINTE[b]))[0];
+}
+
+function trasponi(score, semitoni) {
+  const tonalita = trasponiTonalita(score.tonalita, semitoni);
+  const accordo = (sigla, k) => {
+    const nomi = QUINTE[k] < 0 ? BEMOLLI : DIESIS;
+    return sigla.replace(/(^|\/)([A-G][#b]?)/g, (_, p, n) => p + nomi[(classe(n) + semitoni + 120) % 12]);
+  };
+  const eventi = (e) => e && e.map((n) => {
+    if (n.midi === null) return { ...n };
+    if (n.midi + semitoni < 24 || n.midi + semitoni > 100) throw new Error('trasposizione fuori dall\'estensione suonabile');
+    return { ...n, midi: n.midi + semitoni };
+  });
+  return {
+    ...score, tonalita,
+    sezioni: score.sezioni.map((s) => {
+      const k = s.tonalita ? trasponiTonalita(s.tonalita, semitoni) : tonalita;
+      return { ...s, ...(s.tonalita ? { tonalita: k } : {}), battute: s.battute.map((b) => ({ accordi: (b.accordi || []).map((a) => ({ ...a, sigla: accordo(a.sigla, k) })), vocal: eventi(b.vocal), ins: eventi(b.ins) })) };
+    }),
+  };
+}
+
+// Toglie le legature rimaste senza la nota successiva alla stessa altezza (dopo un taglio o una modifica)
+function sistemaLegature(score) {
+  for (const voce of ['vocal', 'ins']) {
+    const eventi = score.sezioni.flatMap((s) => s.battute.flatMap((b) => b[voce] || [{ midi: null }]));
+    eventi.forEach((e, i) => { if (e.lega && (!eventi[i + 1] || eventi[i + 1].midi !== e.midi)) delete e.lega; });
+  }
+  return score;
+}
+
+// Misure di uno score: servono alla dashboard e ai controlli della produzione
+function analizza(testo) {
+  const { errori, score } = leggiAbc(testo);
+  if (!score) return { errori, score: null };
+  const durate = durateSezioni(score);
+  const battute = score.sezioni.flatMap((s) => s.battute);
+  const note = battute.flatMap((b) => [...(b.ins || []), ...(b.vocal || [])]).filter((n) => n.midi !== null);
+  const piene = battute.filter((b) => b.ins && b.ins.some((n) => n.midi !== null));
+  let forti = 0, buone = 0, accordo = null, cambi = 0;
+  for (const b of battute) {
+    const primo = (b.accordi || []).find((a) => a.pos === 0);
+    cambi += (b.accordi || []).filter((a) => { const nuovo = a.sigla !== accordo; accordo = a.sigla; return nuovo; }).length;
+    const sigla = primo ? primo.sigla : accordo;
+    const prima = b.ins && b.ins[0];
+    if (!sigla || !prima || prima.midi === null) continue;
+    const c = noteAccordo(sigla);
+    if (!c) continue;
+    forti++;
+    if (c.note.includes(prima.midi % 12)) buone++;
+  }
+  return {
+    errori, score,
+    secondi: Math.round(durate.reduce((a, b) => a + b, 0)),
+    bpm: score.bpm, metro: score.metro, tonalita: score.tonalita,
+    battute: battute.length,
+    sezioni: score.sezioni.map((s, i) => ({ nome: s.nome, battute: s.battute.length, secondi: Math.round(durate[i]) })),
+    note: note.length,
+    estensione: note.length ? [Math.min(...note.map((n) => n.midi)), Math.max(...note.map((n) => n.midi))] : null,
+    accordi: cambi,
+    // quota di battute melodiche che ripetono una battuta già sentita
+    ripetizione: piene.length ? Math.round((1 - new Set(piene.map((b) => JSON.stringify(b.ins))).size / piene.length) * 100) / 100 : 0,
+    // quota di battute che iniziano con una nota dell'accordo
+    accordoSulBattere: forti ? Math.round((buone / forti) * 100) / 100 : null,
+    voce: battute.some((b) => b.vocal && b.vocal.some((n) => n.midi !== null)),
+  };
+}
+
+// Recupera uno score troncato, con una riga rovinata o troppo lungo: tiene l'inizio fino a un confine
+// valido (meglio la fine di una sezione) il più vicino possibile alla durata richiesta. null se non basta.
+function ripara(testo, { obiettivo = 0, minimo = 0, massimo = 330 } = {}) {
+  const righe = String(testo).split(/\r?\n/).map((r) => r.trim()).filter(Boolean);
+  const k = righe.findIndex((r) => r.startsWith('K:'));
+  if (k < 0) return null;
+  const confine = (r) => r === undefined || r.startsWith('%') || /^V:\s*Vocal$/.test(r);
+  const buoni = [];
+  for (let taglio = righe.length; taglio > k + 1; taglio--) {
+    if (!confine(righe[taglio])) continue;
+    const parte = righe.slice(0, taglio);
+    // una legatura rimasta aperta sul taglio si chiude: ultima riga di musica di ogni voce
+    let aperte = 2;
+    for (let i = parte.length - 1; i > k && aperte; i--) if (parte[i].endsWith('|')) { parte[i] = parte[i].replace(/-\|$/, '|'); aperte--; }
+    const { score } = leggiAbc(parte.join('\n'));
+    if (!score) continue;
+    score.sezioni = score.sezioni.filter((s) => s.battute.length);
+    const secondi = durataSecondi(score);
+    if (secondi > massimo || secondi < minimo) continue;
+    buoni.push({ score, secondi, sezioneIntera: righe[taglio] === undefined || righe[taglio].startsWith('%'), intero: taglio === righe.length });
+  }
+  if (!buoni.length) return null;
+  const meta = obiettivo || massimo;
+  const distanza = (b) => Math.abs(b.secondi - meta);
+  const interi = buoni.filter((b) => b.sezioneIntera && distanza(b) <= meta * 0.2);
+  const scelto = buoni.find((b) => b.intero && (!obiettivo || distanza(b) <= meta * 0.2))
+    || (interi.length ? interi : buoni).reduce((a, b) => (distanza(b) < distanza(a) ? b : a));
+  const prima = righe.filter((r) => r.endsWith('|')).length;
+  const score = sistemaLegature(scelto.score);
+  // dopo un taglio l'ultima sezione fa da chiusura: il motore riceve il segnale di finire
+  if (!scelto.intero) score.sezioni[score.sezioni.length - 1].nome = 'outro';
+  const abc = scriviAbc(score);
+  return { abc, secondi: Math.round(scelto.secondi), tagliato: !scelto.intero || abc.split('\n').filter((r) => r.endsWith('|')).length < prima };
+}
+
+const tagDi = (nome) => (nome === 'interlude' ? 'bridge' : TAG.includes(nome) ? nome : 'verse');
+const lyricsDi = (score) => lyricsDaScore({ ...score, sezioni: score.sezioni.map((s) => ({ ...s, nome: tagDi(s.nome) })) }, { forma: 'semplice' });
+
+// ---- Impostazioni: come nascono gli score dei brani nuovi (config\score.json) ----
+const IMPOSTAZIONI = [
+  { chiave: 'fonte', gruppo: 'Chi scrive', etichetta: 'Chi scrive lo score', scelte: [['modello', 'Modello YuE2, compositore di riserva'], ['compositore', 'Compositore del progetto'], ['motore', 'Motore durante il render']], def: 'modello', descrizione: 'Vale per i brani strumentali. I generi con voci usano sempre il motore.' },
+  { chiave: 'tentativi', gruppo: 'Modello YuE2', etichetta: 'Tentativi del modello', min: 1, max: 5, passo: 1, def: 3, descrizione: 'Quanti score si chiedono prima di passare al compositore. Ogni tentativo costa circa due minuti.' },
+  { chiave: 'ripara', gruppo: 'Modello YuE2', etichetta: 'Recupera gli score troncati o troppo lunghi', si: true, def: true, descrizione: 'Taglia lo score a un confine di sezione vicino alla durata richiesta invece di buttarlo.' },
+  { chiave: 'durataMinima', gruppo: 'Modello YuE2', etichetta: 'Durata minima accettata', min: 0.5, max: 1, passo: 0.05, def: 0.75, descrizione: 'Frazione della durata richiesta sotto cui lo score si rifiuta.' },
+  { chiave: 'ripetizioneMax', gruppo: 'Modello YuE2', etichetta: 'Ripetizione massima', min: 0.5, max: 1, passo: 0.05, def: 1, descrizione: 'Quota di battute melodiche ripetute oltre cui lo score si rifiuta. 1 = nessun limite.' },
+  { chiave: 'temperature', gruppo: 'Campionamento', etichetta: 'Temperatura', min: 0.1, max: 1.5, passo: 0.05, def: 0.7, descrizione: 'Più alta: melodie più imprevedibili e più errori di scrittura.' },
+  { chiave: 'top_p', gruppo: 'Campionamento', etichetta: 'Top-p', min: 0.5, max: 1, passo: 0.01, def: 0.9, descrizione: 'Quanta parte delle scelte probabili resta in gioco.' },
+  { chiave: 'top_k', gruppo: 'Campionamento', etichetta: 'Top-k', min: 1, max: 200, passo: 1, def: 30, descrizione: 'Numero massimo di scelte considerate a ogni passo.' },
+  { chiave: 'repetition_penalty', gruppo: 'Campionamento', etichetta: 'Penalità di ripetizione', min: 1, max: 1.2, passo: 0.005, def: 1.005, descrizione: 'Scoraggia il modello dal ripetersi. Valori alti rompono la notazione.' },
+  { chiave: 'penalty_window', gruppo: 'Campionamento', etichetta: 'Finestra della penalità', min: 0, max: 500, passo: 10, def: 100, descrizione: 'Quanti simboli indietro guarda la penalità.' },
+  { chiave: 'max_tokens', gruppo: 'Campionamento', etichetta: 'Lunghezza massima dello score', min: 1000, max: 12000, passo: 500, def: 6000, descrizione: 'Simboli oltre cui lo score si interrompe: circa 6000 per sei minuti.' },
+  { chiave: 'armonia', gruppo: 'Campionamento', etichetta: 'Varietà armonica', min: 0, max: 10, passo: 1, def: 0, descrizione: 'Spinge il modello a non ripetere lo stesso giro di accordi. 0 = spenta; sperimentale.' },
+  { chiave: 'candidati', gruppo: 'Compositore', etichetta: 'Score provati per brano', min: 5, max: 200, passo: 5, def: 30, descrizione: 'Il compositore ne scrive tanti e il revisore tiene il migliore.' },
+  { chiave: 'metri', gruppo: 'Compositore', etichetta: 'Cambi di metro nel ponte', si: true, def: true, descrizione: 'Permette 3/4 o 7/8 nei generi che li sopportano.' },
+];
+
+function valoreValido(def, v) {
+  if (def.scelte) return def.scelte.some(([x]) => x === v);
+  if (def.si) return typeof v === 'boolean';
+  return typeof v === 'number' && v >= def.min && v <= def.max && (def.passo !== 1 || Number.isInteger(v));
+}
+
+// Valori in vigore per un genere: predefiniti, poi generali, poi del genere. I valori non validi si ignorano.
+function impostazioni(conf, categoria) {
+  const strati = [(conf || {}).generale, ((conf || {}).generi || {})[categoria]];
+  return Object.fromEntries(IMPOSTAZIONI.map((d) => {
+    let v = d.def;
+    for (const s of strati) if (s && valoreValido(d, s[d.chiave])) v = s[d.chiave];
+    return [d.chiave, v];
+  }));
+}
+
+// Parte della richiesta al motore che riguarda la scrittura dello score
+function campionamento(imp) {
+  const abc = { max_tokens: imp.max_tokens };
+  for (const d of IMPOSTAZIONI) if (['temperature', 'top_p', 'top_k', 'repetition_penalty', 'penalty_window'].includes(d.chiave) && imp[d.chiave] !== d.def) abc[d.chiave] = imp[d.chiave];
+  return { abc_sampling: abc, ...(imp.armonia ? { harmony: { strength: imp.armonia } } : {}) };
+}
+
+// ---- Score scelti a mano per i brani da produrre ----
+const SECONDI_MANUALE = [30, 330];
+const NOMI = { C: 'Do', D: 'Re', E: 'Mi', F: 'Fa', G: 'Sol', A: 'La', B: 'Si' };
+const nomeTonalita = (k) => `${NOMI[k[0]]}${k[1] === 'b' ? ' bemolle' : k[1] === '#' ? ' diesis' : ''} ${k.endsWith('m') ? 'minore' : 'maggiore'}`;
+
+// La richiesta in attesa per un brano: prima quelle fatte per quel titolo, poi quelle per il genere
+function richiestaPer(richieste, usati, concept) {
+  const libere = (richieste || []).filter((r) => !(usati || {})[r.id] && r.categoria === concept.categoria);
+  return libere.find((r) => r.titolo === concept.titolo) || libere.find((r) => !r.titolo) || null;
+}
+
+// Il brano prende dallo score velocità, tonalità, durata e sezioni; lo stile si allinea
+function applica(concept, richiesta) {
+  const a = analizza(richiesta.abc);
+  if (!a.score) throw new Error(`score non valido: ${a.errori.slice(0, 3).join('; ')}`);
+  const inglese = `${a.tonalita.replace(/m$/, '')} ${a.tonalita.endsWith('m') ? 'minor' : 'major'}`;
+  const lyrics = lyricsDi(a.score);
+  const out = {
+    ...concept, abc: richiesta.abc, scoreManuale: richiesta.id, lyrics, sezioni: lyrics.split('\n\n'),
+    bpm: a.bpm, tonalita: nomeTonalita(a.tonalita), durata_s: a.secondi,
+    style: String(concept.style || '').replace(/\b\d+ BPM\b/, `${a.bpm} BPM`).replace(/\b[A-G][#b]? (major|minor)\b/, inglese),
+  };
+  delete out.score;
+  return out;
+}
+
+module.exports = { strumentale, scriviAbc, leggiAbc, durataSecondi, lyricsDaScore, unita, TAG, SEZIONI, noteAccordo, trasponi, sistemaLegature, analizza, ripara, lyricsDi, IMPOSTAZIONI, valoreValido, impostazioni, campionamento, SECONDI_MANUALE, nomeTonalita, richiestaPer, applica };

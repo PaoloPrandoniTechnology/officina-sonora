@@ -48,7 +48,8 @@ if (ext === 'wav') {
     return [{ json: { state, outcome: 'waiting' } }];
   }
 }
-const abc = extractAbc(r.buf, r.headers['content-type']);
+// se la risposta non lo riporta, resta quello che abbiamo inviato noi
+const abc = extractAbc(r.buf, r.headers['content-type']) || (job.abcNostro || job.scoreFonte ? job.concept.abc : null);
 if (abc) fs.writeFileSync(file.replace(/\.[^.]+$/, '.abc'), abc);
 log(`audio scritto: ${file}`);
 return [{ json: { state, outcome: 'audio', file, bytes } }];

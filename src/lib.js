@@ -414,14 +414,19 @@ function richiestaBase(concept, adapters, seed) {
   };
 }
 
+// Come nascono gli score (config\score.json, dalla dashboard) e score scelti a mano (state\score.json)
+function confScore() { return readJsonSafe(path.join(CFG.dir, 'config', 'score.json'), {}); }
+function archivioScore() { return readJsonSafe(path.join(CFG.dir, 'state', 'score.json'), {}); }
+
 // Solo lo score, senza LoRA (agiscono sul render): un secondo di audio e un passo, il resto si butta
-function corpoPiano(concept, seed) {
+function corpoPiano(concept, seed, scrittura) {
   return {
     ...richiestaBase(concept, [], seed),
     duration: 1,
     steps: 1,
     semantic_sampling: { min_tokens: 1, max_tokens: 25 },
-    abc_sampling: { max_tokens: 6000 }, // circa 6 minuti: oltre, il modello sta girando a vuoto
+    // predefinito 6000 simboli, circa 6 minuti: oltre, il modello sta girando a vuoto
+    ...(scrittura || { abc_sampling: { max_tokens: 6000 } }),
     output_format: 'mp3',
   };
 }

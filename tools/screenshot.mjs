@@ -31,6 +31,10 @@ const PAGINE = [
   { nome: '28-lettore-grande', pagina: 'libreria', dopo: ascolta('#pGrande'), fissa: 900 },
   { nome: '29-menu-brano', pagina: 'libreria', dopo: clic('#recenti tbody tr:nth-child(3) [data-azioni]'), fissa: 900 },
   { nome: '30-opzioni-ascolto', pagina: 'libreria', dopo: ascolta('#pOpzioni'), fissa: 900 },
+  { nome: '31-score-archivio', pagina: 'score' },
+  { nome: '32-score-editor', pagina: 'score', dopo: clic('#scTabella tbody tr:nth-child(5) [data-score]') },
+  { nome: '33-score-da-produrre', pagina: 'score/produzione' },
+  { nome: '34-score-come-nascono', pagina: 'score/regole' },
   { nome: '22-scheda', pagina: 'libreria', dopo: clic('#recenti [data-info]'), fissa: 900 },
   { nome: '23-tema-scuro', pagina: 'panoramica', fissa: 900, scuro: true },
   { nome: '07-controllo-produzione', pagina: 'controllo/produzione' },
@@ -100,6 +104,8 @@ try {
       await attesa(800);
     }
     if (p.dopo) { await valuta(p.dopo); await attesa(1200); }
+    // una pagina aperta da un clic si fotografa per intero
+    if (p.dopo && !p.fissa) { await misura(larghezza, 900); await attesa(500); await misura(larghezza, Math.min(MAX_ALTEZZA, Math.max(900, await valuta('document.documentElement.scrollHeight')))); await attesa(800); }
     const { data } = await cdp('Page.captureScreenshot', { format: 'png' });
     writeFileSync(join(CARTELLA, p.nome + '.png'), Buffer.from(data, 'base64'));
     console.log(p.nome);

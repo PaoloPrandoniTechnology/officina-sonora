@@ -192,7 +192,7 @@ function somiglianza(a, b) {
   return (a.tema === b.tema ? 0.15 : 0) + (a.mosse === b.mosse ? 0.5 : 0) + (a.ritornello === b.ritornello ? 0.15 : 0) + (a.progressioni === b.progressioni ? 0.2 : 0);
 }
 
-function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }, id, pref) {
+function candidato(r, { cat, bpm, tonalita, durata_s, sezioni, metri = true }, id, pref) {
   const t = tonica(tonalita);
   const p = profilo(cat, t);
   const nomi = sezioni.map((s) => s.replace(/[[\]]/g, ''));
@@ -239,7 +239,7 @@ function candidato(r, { cat, bpm, tonalita, durata_s, sezioni }, id, pref) {
 
   const scoreSezioni = nomi.map((nome, s) => {
     const volta = (volte[nome] = (volte[nome] || 0) + 1) - 1;
-    const metro = nome === 'bridge' && id.metroBridge && p.metroBridge ? p.metroBridge : undefined;
+    const metro = metri && nome === 'bridge' && id.metroBridge && p.metroBridge ? p.metroBridge : undefined;
     const lunghezza = Abc.unita(metro || '4/4');
     // con un metro diverso si ricalcola il numero di battute per conservare la durata
     const n = Math.max(2, 2 * Math.round((quante[s] * 32) / lunghezza / 2));

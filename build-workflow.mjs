@@ -61,7 +61,7 @@ const nodes = {
   titolo: { name: '5b Titolo (modello)', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('05b-') }, position: pos(750, 600) },
   componi: { name: '5c Componi concept', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('05c-') }, position: pos(750, 750) },
   score: { name: '5d Componi score', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: lib + '\n' + compositoreJs + '\n' + blockFile('05d-') }, position: pos(750, 900) },
-  invia: { name: '6 Invia render', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('06-') }, position: pos(1000, 450) },
+  invia: { name: '6 Invia render', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: lib + '\n' + abcJs + '\n' + blockFile('06-') }, position: pos(1000, 450) },
   scrivi: { name: '7 Scrivi stato', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('07-') }, position: pos(1750, 300) },
   riflessione: { name: '9 Riflessione giornaliera', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('09-') }, position: pos(250, -200) },
   riepilogo: { name: '11 Riepilogo Telegram', type: 'n8n-nodes-base.code', typeVersion: 2, parameters: { jsCode: code('11-') }, position: pos(250, -600) },

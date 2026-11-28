@@ -1,0 +1,57 @@
+/* Pagina Score: archivio, editor a piano roll, brani da produrre, impostazioni. Colori da dashboard.css. */
+.sc-testa #scNome { flex: 1 1 220px; }
+.sc-testa label.btn { cursor: pointer; }
+.sc-note { margin: -4px 0 10px; font-size: 12.5px; min-height: 18px; }
+.sc-note #scStato.da-salvare { color: var(--warn); }
+.sc-campo .field.num { height: 28px; width: 76px; }
+.sc-carta { margin-bottom: 14px; }
+.sc-campo { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.sc-zoom { margin-left: auto; }
+.sc-zoom input { width: 100px; }
+.sc-piano { display: flex; border: 1px solid var(--line-2); border-radius: 4px; background: var(--panel-2); max-height: min(60vh, 620px); overflow-y: auto; min-height: 120px; }
+#scTasti { flex: none; width: 30px; border-right: 1px solid var(--line); }
+#scTasti svg, #scRoll svg { display: block; }
+#scRoll { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; height: max-content; min-height: 100%; user-select: none; }
+#scRoll.vecchio { opacity: .45; }
+#scRoll .empty { padding: 40px 16px; }
+.r-nero { fill: var(--ink); opacity: .045; }
+.r-sezione { fill: var(--accent-soft); }
+.r-sezione.pari { fill: var(--line); }
+.r-nome { fill: var(--ink); font-size: 11px; font-weight: 600; }
+.r-accordo { fill: var(--muted); font: 600 11px var(--testo); pointer-events: none; }
+.r-battuta { stroke: var(--line-2); }
+.r-quarto { stroke: var(--line); }
+.r-nota { fill: var(--s1); cursor: pointer; }
+.r-nota.vocal { fill: var(--s2); }
+.r-nota:hover { filter: brightness(1.25); }
+.r-nota.scelta { stroke: var(--ink); stroke-width: 2; }
+.r-pausa { fill: var(--accent); opacity: .14; pointer-events: none; }
+.r-testa { stroke: var(--danger); stroke-width: 1.5; pointer-events: none; }
+.sc-nota { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 40px; padding-top: 10px; font-size: 13px; }
+.legenda i.r-lg { width: 12px; height: 8px; border-radius: 2px; background: var(--s1); }
+.legenda i.r-lg.vocal { background: var(--s2); }
+.sc-sezioni td { padding: 4px 8px; }
+.sc-sezioni td:first-child { width: 30px; color: var(--faint); }
+.sc-sezioni .field { height: 28px; }
+.sc-sezioni .tasto-riga:disabled { opacity: .25; cursor: default; }
+.sc-errori { margin: 0 0 10px; padding-left: 18px; font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.sc-testo { width: 100%; margin-top: 10px; font: 12px/1.6 var(--mono); white-space: pre; resize: vertical; }
+#menuAccordo form { display: grid; gap: 6px; padding: 6px 8px; }
+#menuAccordo label { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); }
+#menuAccordo button { width: auto; justify-self: start; background: var(--accent); color: var(--accent-ink); text-align: center; }
+.sc-riepilogo { margin-bottom: 14px; padding: 4px 6px; }
+.sc-sotto { margin-top: 14px; }
+.sc-sotto .srv > div:first-child { display: block; }
+.sc-tasti { display: flex; align-items: center; gap: 6px; flex: none; }
+.sc-brano { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.sc-brano > div { min-width: 0; }
+.sc-brano b, .sc-brano small { display: block; }
+.sc-brano small { font-size: 12px; }
+.sc-flusso { margin-bottom: 14px; }
+.sc-flusso ol { margin: 0; padding-left: 20px; font-size: 13px; color: var(--muted); }
+.sc-flusso li { margin: 3px 0; }
+.sc-flusso b { color: var(--ink); }
+#t-score .prow .ctl .field { width: 100%; max-width: 340px; }
+.sc-salva { position: sticky; bottom: 0; display: flex; gap: 8px; padding: 12px 0; background: var(--bg); }
+body.suona .sc-salva { bottom: 86px; }
+@media (max-width: 880px) { .sc-zoom { margin-left: 0; } }

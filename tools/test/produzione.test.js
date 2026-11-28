@@ -7,6 +7,9 @@ const path = require('path');
 const RADICE = path.join(__dirname, '..', '..');
 const leggi = (...p) => fs.readFileSync(path.join(RADICE, ...p), 'utf8');
 const LIB = leggi('src', 'lib.js') + '\n' + leggi('src', 'lib-apprendimento.js');
+const SCORE = `const ScoreAbc = (() => { const module = { exports: {} };
+${leggi('src', 'compositore', 'abc.js')}
+return module.exports; })();`;
 const AF = Object.getPrototypeOf(async function () {}).constructor;
 const L = new Function('require', LIB + '\nreturn { CFG, extractAbc, componiStile };')(require);
 const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'];
@@ -14,6 +17,7 @@ const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[out
 // Esegue il blocco 6 con un motore finto; ritorna il corpo inviato a /synth e lo stato
 async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0, pianoFallito = true } = {}) {
   const finta = `
+    confScore = () => ({}); archivioScore = () => ({});
     CFG.comandi = {}; log = () => {}; engineUp = async () => true; saveState = () => {}; gw = async () => ({});
     req = async (m, url, o) => {
       if (url.endsWith('/props')) { if (!$env.props) throw new Error('no'); return { ok: true, status: 200, buf: Buffer.from(JSON.stringify($env.props)) }; }
@@ -22,7 +26,7 @@ async function invia(categoria, { props, vocale = false, attempts = 0, abc, cort
   const env = { props };
   const concept = { titolo: 't', categoria, durata_s: 300, style: 's', lyrics: '[verse]', vocale, attempts, abc, tentativi_render: corti, pianoFallito };
   const input = { first: () => ({ json: { state: { job: null, queue: [concept] } } }) };
-  const [r] = await new AF('require', '$input', '$env', LIB + finta + '\n' + leggi('src', 'blocks', '06-invia-render.js'))(require, input, env);
+  const [r] = await new AF('require', '$input', '$env', LIB + SCORE + finta + '\n' + leggi('src', 'blocks', '06-invia-render.js'))(require, input, env);
   return { corpo: env.corpo, job: r.json.state.job };
 }
 const elenco = (...nomi) => ({ adapters: nomi.map((name) => ({ name, ok: true })) });

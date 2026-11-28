@@ -160,6 +160,12 @@ function pickSlot(state, guidance) {
   const tutti = [...new Set(pool.map((c) => c.cat.name))];
   let nomi = tutti.filter((n) => ov(n).attivo);
   if (CFG.comandi && CFG.comandi.produciGenere && tutti.includes(CFG.comandi.produciGenere)) nomi = [CFG.comandi.produciGenere];
+  else {
+    // uno score scelto a mano per un brano nuovo porta avanti il suo genere
+    const archivio = readJsonSafe(path.join(CFG.dir, 'state', 'score.json'), {});
+    const attesa = (archivio.richieste || []).find((r) => !r.titolo && !(state.scoreUsati || {})[r.id] && CFG.categories.some((c) => c.name === r.categoria));
+    if (attesa) { nomi = [attesa.categoria]; pool = candidati; }
+  }
   if (!nomi.length) nomi = tutti; // tutti sospesi: la produzione non si ferma
   const pesi = nomi.map((n) => ov(n).peso / Math.pow(1 + (conta[n] || 0), 2));
   let r = Math.random() * pesi.reduce((a, b) => a + b, 0);

@@ -10,6 +10,7 @@ const { datiAnalisi } = require('./analisi');
 const controllo = require('./controllo');
 const voti = require('./voti');
 const playlist = require('./playlist');
+const score = require('./score');
 const andamento = require('./andamento');
 const { ammessa } = require('./protezione');
 const { scriviAtomico } = require('./disco');
@@ -21,7 +22,8 @@ process.on('uncaughtException', (e) => {
   process.exit(1);
 });
 const STATICI = { '/dashboard': ['dashboard.html', 'text/html'], '/dashboard.css': ['dashboard.css', 'text/css'], '/dashboard.js': ['dashboard.js', 'text/javascript'],
-  '/coda.js': ['coda.js', 'text/javascript'], '/lettore.js': ['lettore.js', 'text/javascript'], '/lettore.css': ['lettore.css', 'text/css'] };
+  '/coda.js': ['coda.js', 'text/javascript'], '/lettore.js': ['lettore.js', 'text/javascript'], '/lettore.css': ['lettore.css', 'text/css'],
+  '/score-pagina.js': ['score-pagina.js', 'text/javascript'], '/score.css': ['score.css', 'text/css'] };
 const MAX_CORPO = 300 * 1024 * 1024;
 
 const PORT = process.env.OFS_PORTA || 5790;
@@ -225,6 +227,17 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': img.mime, 'Cache-Control': 'private, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
       return res.end(img.dati);
     }
+    if (req.method === 'GET' && pagina === '/abc.js') {
+      res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'no-store' });
+      return res.end(score.perBrowser());
+    }
+    if (req.method === 'GET' && req.url === '/api/score') return rispondi(200, score.lettura());
+    if (req.method === 'GET' && req.url === '/api/score/brani') return rispondi(200, score.brani());
+    if (req.method === 'GET' && (pagina === '/api/score/brano' || pagina === '/api/score/scartato')) {
+      const q = new URLSearchParams(req.url.slice(req.url.indexOf('?')));
+      const d = pagina.endsWith('brano') ? score.brano(Number(q.get('n'))) : score.scartato(q.get('id'));
+      return d ? rispondi(200, d) : rispondi(404, { ok: false, error: 'score non trovato' });
+    }
     if (req.method === 'GET' && req.url === '/api/playlist') return rispondi(200, playlist.leggi());
     if (req.method === 'GET' && req.url.startsWith('/api/playlist/m3u?')) {
       const id = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('id');
@@ -250,9 +263,10 @@ const server = http.createServer(async (req, res) => {
       const r = await controllo.gestisci(daTelegram ? '/api/controllo/voto' : req.url, dati);
       return rispondi(r.codice, r.corpo);
     }
-    if (req.url.startsWith('/api/playlist/')) {
+    const archivio = req.url.startsWith('/api/playlist/') ? [playlist, '/api/playlist/'] : req.url.startsWith('/api/score/') ? [score, '/api/score/'] : null;
+    if (archivio) {
       if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
-      try { return rispondi(200, playlist.gestisci(req.url.slice('/api/playlist/'.length), JSON.parse(corpo.toString('utf8') || '{}'))); }
+      try { return rispondi(200, archivio[0].gestisci(req.url.slice(archivio[1].length), JSON.parse(corpo.toString('utf8') || '{}'))); }
       catch (e) { return rispondi(400, { ok: false, error: e.message }); }
     }
     if (req.url === '/tg') {

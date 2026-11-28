@@ -737,7 +737,7 @@ window.Lettore = function (app) {
   leggiPlaylist();
 
   return {
-    ascolta, azioni, preferito, tasto: scorciatoia,
+    ascolta, azioni, preferito, tasto: scorciatoia, popover: apriPopover,
     pausa: () => attivo().pause(),
     votato(n, voto) {
       if (cache.has(n)) cache.get(n).voto = voto;

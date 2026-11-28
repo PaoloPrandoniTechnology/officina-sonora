@@ -68,6 +68,8 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 | **Ascoltare** di seguito, in ordine o a caso | *Riproduci* o *Casuale* in [Libreria](#libreria) e [Playlist](#playlist); vedi [Il lettore](#il-lettore) |
 | **Preparare la musica per una lezione** | una [playlist](#playlist), con [dissolvenza e timer di spegnimento](#timer-dissolvenza-e-scorciatoie) |
 | **Dare un voto** | stelle nel [lettore](#il-lettore), pagina [Voti](#voti), `/menu` su Telegram o stelle in iBroadcast |
+| **Vedere, ascoltare e modificare uno score** | pagina [Score](#score) |
+| **Decidere come nascono gli score** nuovi | [Score → Come nascono](#come-nascono) |
 | **Scaricare** un brano o vedere come è stato fatto | clic sul titolo: [scheda del brano](#la-scheda-del-brano) |
 | Avere **subito** un certo genere | [Generi](#generi): *Produci ora* |
 | **Sospendere** un genere o farlo uscire di più | [Generi](#generi): interruttore sulla scheda, peso in *Attivazione e frequenza* |
@@ -128,7 +130,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | Blocco | Cosa fa |
 |---|---|
 | **1 Leggi stato** | Carica lo stato, prende il lock, esegue il comando "svuota coda" della dashboard e dice se c'è un render in corso. |
-| **2 Controlla render** | Chiede al motore lo stato del job. Quando è pronto lo **score**, lo rende strumentale, ne ricava durata e lyrics e avvia il render dell'audio; se lo score non va bene ne chiede un altro (3 in tutto). Un render fallito, sparito o fermo da oltre 4 ore torna in coda; dopo 3 tentativi lo abbandona. |
+| **2 Controlla render** | Chiede al motore lo stato del job. Quando è pronto lo **score**, lo rende strumentale, ne ricava durata e lyrics e avvia il render dell'audio; se lo score non va bene prova a **recuperarlo** (troncato o troppo lungo) e altrimenti ne chiede un altro (3 in tutto, [regolabili](#come-nascono)). Un render fallito, sparito o fermo da oltre 4 ore torna in coda; dopo 3 tentativi lo abbandona. |
 | **7 Scrivi stato** | Salva lo stato in modo atomico e rilascia il lock. Ci passano tutti i rami. Se lo stato risulta illeggibile ne viene tenuta una copia (`.corrotto`). |
 
 ### Composizione
@@ -138,8 +140,8 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | **5a Scegli ricetta** | Sceglie il genere (vedi [apprendimento](#come-impara)), poi struttura, tipo, fascia di bpm, variante, strumenti (due fissi del genere più 1-2 che cambiano, dalla [memoria](#la-memoria-di-composizione)), un'influenza, tonalità e durata. Non lavora se la produzione è in pausa o c'è già un brano in coda. |
 | **5b Titolo** | Chiede a gemma titolo, descrizione, bpm e durata, entro i limiti del genere. Gli indica le prime parole dei titoli recenti da non ripetere. Se il modello non è caricato, riprova al giro successivo. |
 | **5c Componi concept** | Compone il testo di **stile** in inglese e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
-| **5d Componi score** | Prepara lo score di **ripiego** del compositore (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere): si usa solo se il modello non ne scrive uno valido. |
-| **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali) oppure direttamente l'audio (voci e ripieghi). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
+| **5d Componi score** | Prepara lo score di **ripiego** del compositore (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere): di norma si usa solo se il modello non ne scrive uno valido; nelle [impostazioni degli score](#come-nascono) può diventare la prima scelta. |
+| **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali) oppure direttamente l'audio (voci, ripieghi e [score scelti da te](#da-produrre)). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
 
 ### Audio e pubblicazione
 
@@ -206,11 +208,13 @@ Per gli strumentali segue la procedura ufficiale di YuE, in due passi:
    la sintassi (`src\compositore\abc.js`);
 3. il motore rende l'audio seguendo quello score, con le LoRA.
 
-Uno score illeggibile, troncato o di durata inadatta (meno del 75% di quella richiesta, meno di 2 minuti o più di
-5 minuti e mezzo) viene richiesto di nuovo. Nei ritenti lo score si chiede senza `Instrumental` e `no vocals` (con quelle parole il modello a volte
+Uno score troncato, con righe rovinate o troppo lungo viene prima **recuperato**: si tiene l'inizio fino a un confine
+di sezione vicino alla durata richiesta, e l'ultima sezione diventa il finale. Se non basta, o se lo score è troppo
+breve (meno del 75% della durata richiesta o meno di 2 minuti), viene richiesto di nuovo. Nei ritenti lo score si chiede senza `Instrumental` e `no vocals` (con quelle parole il modello a volte
 ripete un interlude senza fine). Dopo 3 tentativi si usa lo score del **compositore** del progetto
 (ripiego), e dopo un render fallito quello che il motore scrive da sé. La scheda del brano dice chi l'ha scritto
-(`score_fonte`: `modello`, `compositore` o `motore`). Le regole di scrittura sono in [`docs/score-abc.md`](docs/score-abc.md).
+(`score_fonte`: `modello`, `compositore`, `motore` o `manuale`; `score_riparato` se è stato recuperato).
+Questi sono i comportamenti predefiniti: si cambiano, anche genere per genere, in [Score → Come nascono](#come-nascono). Le regole di scrittura sono in [`docs/score-abc.md`](docs/score-abc.md).
 
 ### Durata
 La decide lo score. Il render chiede il 15% in più e impone un minimo (`min_tokens`, 90% dello score) sotto il
@@ -300,6 +304,7 @@ Non devi premere nulla per aggiornarla: lo stato si rinfresca ogni 5 secondi, i 
 | Ascolto | [Playlist](#playlist) | Cosa voglio ascoltare, e in che ordine? |
 | Ascolto | [Voti](#voti) | Mi piace questo brano? |
 | Produzione | [Generi](#generi) | Che tipi di musica produrre? |
+| Produzione | [Score](#score) | Che musica scritta c'è dietro un brano, e come la voglio? |
 | Produzione | [Controllo](#controllo) | Come cambio il comportamento? |
 | Analisi | [Andamento](#andamento) | Il sistema sta migliorando? |
 | Analisi | [Qualità e tempi](#qualità-e-tempi) | Cosa è andato storto? Quanto ci mette? |
@@ -639,6 +644,73 @@ sezione e si cerca. Per annullare, rimetti il valore precedente nella sezione co
 
 ---
 
+### Score
+
+Lo **score** è lo spartito di un brano: note, accordi, sezioni, velocità e tonalità, scritto nel formato di testo ABC.
+Qui li vedi, li ascolti, li modifichi e decidi come nascono. L'analisi che ha portato a questa pagina è in
+[`docs/analisi-score-2026-11-28.md`](docs/analisi-score-2026-11-28.md).
+
+#### Archivio
+
+![L'archivio degli score](docs/screenshots/31-score-archivio.png)
+
+In alto il confronto fra chi scrive (brani, voto medio, battute ripetute, score recuperati): con pochi voti prendilo
+come un indizio. Sotto, tutti gli score salvati (*Apri* li porta nell'editor; si apre anche dalla scheda del brano),
+le **bozze** e gli **score rifiutati** dal controllo, con il motivo. I brani più vecchi non hanno uno score salvato.
+
+#### Editor
+
+![L'editor con il piano roll](docs/screenshots/32-score-editor.png)
+
+| Per… | Fai così |
+|---|---|
+| partire da zero | *Componi nuovo* (genere, velocità, tonalità, durata, forma) o *Importa file* |
+| ascoltare | *Ascolta*: un sintetizzatore semplice, per controllare note e accordi, **non** il suono finale. Con una nota scelta parte dalla sua sezione |
+| cambiare una nota | clic, poi i pulsanti o i tasti **↑ ↓** (con Maiusc un'ottava), **← →** per spostarti, **Canc** per toglierla |
+| aggiungere una nota | doppio clic su uno spazio vuoto, oppure scegli una pausa e *Trasforma in nota* |
+| cambiare un accordo | clic sulla riga degli accordi (vuoto per toglierlo) |
+| riorganizzare il brano | tabella *Sezioni*: rinomina, sposta, duplica, elimina |
+| cambiare tutto insieme | *Velocità*, *Trasponi*, *Voce agli strumenti* |
+| lavorare sul testo | riquadro *Testo ABC*: si controlla mentre scrivi |
+| tornare indietro | *Annulla* e *Ripeti* (Ctrl+Z, Ctrl+Y); Ctrl+S salva la bozza |
+| conservare | *Salva bozza* oppure *Scarica .abc* |
+
+Il riquadro **Controllo** applica le stesse regole della produzione: quello che qui è valido viene accettato dal motore.
+Segnala anche durata non ammessa, voci in un genere strumentale, velocità fuori dal genere e troppe ripetizioni. Se il
+testo è rotto, *Recupera la parte valida* tiene l'inizio. Modificare lo score di un brano **non** cambia il suo audio.
+
+#### Da produrre
+
+![Brani in arrivo e score scelti](docs/screenshots/33-score-da-produrre.png)
+
+*Usa in produzione* (nell'editor) affida lo score al **prossimo brano nuovo di un genere** oppure a un brano **già in
+coda**. Velocità, tonalità, durata e sezioni vengono dallo score; titolo, strumenti e stile restano al sistema. Ha la
+precedenza su ogni impostazione, vale **una volta** e deve durare da 30 secondi a 5 minuti e mezzo. Se il brano
+risulta troppo corto viene rigenerato con lo stesso score. A sinistra vedi i brani in lavorazione e in coda, con lo
+score previsto: aprilo, modificalo e rimettilo in produzione prima che parta.
+
+#### Come nascono
+
+![Impostazioni di scrittura degli score](docs/screenshots/34-score-come-nascono.png)
+
+Valgono per **tutti i generi** o per **uno solo**; un campo vuoto eredita. I valori sono in `config\score.json`, le
+modifiche nello [Storico](#storico) e si applicano ai brani successivi.
+
+| Impostazione | Predefinito | Effetto |
+|---|---|---|
+| Chi scrive lo score | modello, poi compositore | oppure subito il compositore, o il motore durante il render |
+| Tentativi del modello | 3 | ognuno costa circa 2 minuti |
+| Recupera gli score troncati o troppo lunghi | sì | meno tentativi buttati |
+| Durata minima accettata | 75% | |
+| Ripetizione massima | nessun limite | rifiuta gli score con troppe battute uguali |
+| Temperatura, top-p, top-k, penalità, finestra, lunghezza | quelli di sempre | campionamento del modello. **Cambiali uno alla volta**: l'effetto non è stato misurato |
+| Varietà armonica | spenta | sperimentale |
+| Score provati dal compositore, cambi di metro | 30, sì | |
+
+I generi **con voci** usano sempre lo score del motore (resta possibile affidargli uno score scelto da te).
+
+---
+
 ### Andamento
 
 Risponde alla domanda **«sta migliorando?»**.
@@ -817,6 +889,7 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 | Nessun brano da molto | controlla i servizi in dashboard e che la produzione non sia in pausa |
 | Il motore non risponde | il watchdog lo riavvia; vedi `state\watchdog.log` |
 | "riaccodo ... failed" nel log | il motore non ha completato il render: il ripiego è automatico |
+| Uno score scelto da me non parte | in *Score → Da produrre* si vede lo stato; il genere in attesa viene prodotto quando la coda si libera |
 | "score del modello non riuscito" | il brano passa al ripiego da solo; se è frequente per un genere, controlla il suo campo `en` |
 | "mastering fallito" | verifica ffmpeg e riavvia il gateway; dopo 5 tentativi il motore consegna l'MP3 |
 | Molti brani "troppo corti" | limite noto (vedi miglioramenti); le soglie sono in *Controllo → Parametri* |
@@ -839,7 +912,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
 | `src\compositore\` | compositore, revisore, scrittura e validazione dello score ABC |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
-| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
+| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione, prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `officina-sonora-workflow.json` | workflow generato |
@@ -887,7 +960,7 @@ In ordine di priorità. Il disegno completo è in
 | 1 | **Selezione sull'audio**: 2-3 versioni per brano e pubblicazione della migliore, giudicata da un modello (per esempio Meta Audiobox Aesthetics o SongEval) | richiede di scaricare pacchetto e pesi, e di verificarli sugli strumentali |
 | 2 | **Ascoltare e votare** i brani del nuovo percorso, poi correggere i descrittori `en` e le soglie dello score | la qualità musicale non è verificabile dai test |
 | 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |
-| 4 | **Dashboard**: mostrare lo score ABC nella scheda del brano | oggi si vedono chi l'ha scritto e le sezioni, non le note |
+| 4 | **Score**: pentagramma oltre al piano roll, e confronto fra due versioni | il piano roll non è una partitura |
 | 5 | **Lettore**: equalizzatore, playlist inviate a iBroadcast, cronologia comune a più browser | oggi restano su questo PC e nel browser |
 | 6 | **Schede artistiche** più ricche per i generi attivi: forme e varianti vere al posto di quelle segnaposto | generi più distinti |
 | 7 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |

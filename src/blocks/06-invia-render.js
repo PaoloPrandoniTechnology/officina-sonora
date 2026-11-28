@@ -8,8 +8,18 @@ if (!(await engineUp())) {
   return [{ json: { state } }];
 }
 
-const concept = state.queue.shift();
+let concept = state.queue.shift();
 concept.durata_s = concept.durata_s || CFG.durDefault;
+// uno score scelto a mano dalla dashboard ha la precedenza su tutto
+const consumato = (id, esito) => { state.scoreUsati = Object.fromEntries([...Object.entries(state.scoreUsati || {}).filter(([k]) => k !== id), [id, { ...esito, at: new Date().toISOString() }]].slice(-100)); };
+const scelto = concept.scoreManuale ? null : ScoreAbc.richiestaPer(archivioScore().richieste, state.scoreUsati, concept);
+if (scelto) {
+  try { concept = ScoreAbc.applica(concept, scelto); log(`score scelto a mano per "${concept.titolo}" (${concept.durata_s}s)`); }
+  // una richiesta inutilizzabile non deve restare in attesa per sempre
+  catch (e) { consumato(scelto.id, { titolo: concept.titolo, errore: e.message }); log(`score scelto a mano non usato per "${concept.titolo}": ${e.message}`); }
+}
+const manuale = Boolean(concept.scoreManuale);
+const imp = ScoreAbc.impostazioni(confScore(), concept.categoria);
 const seed = nuovoSeed();
 // LoRA: la strumentale KTO piu' quella del genere, solo se il motore le ha davvero.
 // Non si usa yue2-instrumental: in produzione il motore chiudeva i brani a 30 secondi.
@@ -36,21 +46,24 @@ try { await gw('/llm/scarica'); } catch (e) { log(`gemma non scaricato: ${e.mess
 
 // Strumentale al primo tentativo: prima il solo score, poi il blocco 2 avvia il render.
 // Altrimenti render in un passo, con lo score del compositore (ripiego) o scritto dal motore.
-const piano = !concept.vocale && !concept.attempts && !concept.pianoFallito;
-const nostro = !piano && Boolean(concept.abc) && !concept.attempts;
-const body = piano ? corpoPiano(concept, seed)
+const piano = !manuale && imp.fonte === 'modello' && !concept.vocale && !concept.attempts && !concept.pianoFallito;
+const nostro = !piano && Boolean(concept.abc) && (manuale || (!concept.attempts && imp.fonte !== 'motore'));
+const body = piano ? corpoPiano(concept, seed, ScoreAbc.campionamento(imp))
   : corpoRender(concept, adapters, seed, nostro ? concept.abc : null, nostro ? concept.durata_s : 0);
 const id = await inviaSynth(body);
 if (!id) {
   // un rifiuto della richiesta (4xx) si ripete identico: dopo 5 volte il brano si abbandona
   if (inviaSynth.ultimoStato >= 400 && inviaSynth.ultimoStato < 500) concept.rifiuti = (concept.rifiuti || 0) + 1;
   if (concept.rifiuti >= 5) {
+    if (manuale) consumato(concept.scoreManuale, { titolo: concept.titolo, errore: 'rifiutato dal motore' });
     state.failed.push({ titolo: concept.titolo, categoria: concept.categoria, tipo: concept.tipo, motivo: `rifiutato dal motore (HTTP ${inviaSynth.ultimoStato})`, at: new Date().toISOString() });
     log(`scartato "${concept.titolo}": il motore rifiuta la richiesta (HTTP ${inviaSynth.ultimoStato})`);
   } else state.queue.unshift(concept);
   return [{ json: { state } }];
 }
-state.job = { id, seed, submittedAt: Date.now(), concept, adapters, abcNostro: nostro, ...(piano ? { fase: 'piano', pianoN: 1 } : {}) };
+state.job = { id, seed, submittedAt: Date.now(), concept, adapters, abcNostro: nostro, ...(manuale && nostro ? { scoreFonte: 'manuale' } : {}), ...(piano ? { fase: 'piano', pianoN: 1 } : {}) };
+// la richiesta è consumata: la dashboard la mostra come usata
+if (manuale) consumato(concept.scoreManuale, { titolo: concept.titolo });
 saveState(state); // subito: il watchdog non deve ricaricare gemma mentre il resto del giro prosegue
 log(`job ${id} inviato per "${concept.titolo}" (${piano ? 'score' : `${concept.durata_s}s`})`);
 return [{ json: { state } }];
