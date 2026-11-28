@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const libreria = require('./libreria');
+const testi = require('./testi').crea();
 
 const LIBRERIA = process.env.OFS_LIBRERIA || 'E:\\Musica di sottofondo';
 const STATE = 'E:\\n8n\\officina-sonora\\state';
@@ -11,7 +12,7 @@ const CONFIG = path.join(__dirname, '..', 'config');
 const ORA_MS = 3600000;
 const GIORNO_MS = 86400000;
 const MAX_PUNTI = { ora: 168, giorno: 366 };
-const FILTRI = ['ambito', 'famiglia', 'genere', 'tipo', 'struttura'];
+const FILTRI = ['ambito', 'famiglia', 'genere', 'tipo', 'struttura', 'modello'];
 
 const arrotonda = (x, cifre) => Math.round(x * 10 ** cifre) / 10 ** cifre;
 const mediaDi = (v) => (v.length ? v.reduce((a, b) => a + b, 0) / v.length : null);
@@ -124,6 +125,14 @@ function calcola({ brani, errori, modifiche, passo, periodo, ora, ...filtri }) {
     scarti: giudizio(prima, dopo, 30, pctScarti, 5, false),
   };
 
+  // il confronto fra modelli segue periodo e filtri, tranne quello per modello
+  const perModello = new Map();
+  for (const b of tutti.filter((x) => FILTRI.every((f) => f === 'modello' || !filtri[f] || valoreDi(x, f) === filtri[f]) && nelPeriodo(quando(x, 'generato_il')))) {
+    if (!b.modello) continue;
+    if (!perModello.has(b.modello)) perModello.set(b.modello, []);
+    perModello.get(b.modello).push(b);
+  }
+
   const perGenere = new Map();
   for (const b of periodoBrani) {
     if (!b.categoria) continue;
@@ -143,6 +152,10 @@ function calcola({ brani, errori, modifiche, passo, periodo, ora, ...filtri }) {
   return {
     passo, troncato, punti, riepilogo, precedente, esito, distribuzione, motivi, erroriTop,
     perGenere: [...perGenere].map(([genere, lista]) => ({ genere, ...indici(lista) })).sort((a, b) => b.brani - a.brani),
+    perModello: [...perModello].map(([modello, lista]) => {
+      const i = indici(lista), ms = mediaDi(lista.map((b) => b.testo_ms).filter((x) => typeof x === 'number'));
+      return { modello, ...i, testoMs: ms === null ? null : Math.round(ms), ascoltiMedi: i.accettati ? arrotonda(i.ascolti / i.accettati, 2) : null };
+    }).sort((a, b) => b.brani - a.brani),
     modifiche: mod,
   };
 }
@@ -159,6 +172,8 @@ function schede() {
       generato_il: m.generato_il || null,
       scartato,
       categoria: m.categoria || null,
+      modello: libreria.modelloTesto(m),
+      testo_ms: numero(m.modello_testo && m.modello_testo.ms),
       tipo: typeof m.tipo === 'string' ? m.tipo : null,
       struttura: m.struttura || null,
       voto: Number.isInteger(m.voto) && m.voto >= 1 && m.voto <= 5 ? m.voto : null,
@@ -210,7 +225,7 @@ function leggi(query) {
     if (query[f] && (f === 'ambito' || f === 'famiglia')) restanti = restanti.filter((b) => valoreDi(b, f) === query[f]);
   }
   const scelta = Object.fromEntries([...FILTRI, 'periodo', 'passo'].map((k) => [k, query[k] || '']));
-  return { ...calcola({ ...scelta, brani, errori, modifiche, ora: Date.now() }), opzioni };
+  return { ...calcola({ ...scelta, brani, errori, modifiche, ora: Date.now() }), opzioni, servizi: testi.prestazioni() };
 }
 
 module.exports = { calcola, leggi, aggiungiGuide };

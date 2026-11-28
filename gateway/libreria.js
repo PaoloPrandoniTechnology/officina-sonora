@@ -38,4 +38,7 @@ function schede(radice) {
   return out;
 }
 
-module.exports = { schede };
+// Il modello che ha scritto titolo e descrizione; null nei brani senza il dato
+const modelloTesto = (meta) => (meta.modello_testo && meta.modello_testo.modello) || null;
+
+module.exports = { schede, modelloTesto };

@@ -84,7 +84,23 @@ function crea({
     try { scriviAtomico(stato, JSON.stringify(d, null, 1)); } catch (e) { /* si riprova alla prossima */ }
   }
 
+  // Totali di sempre (le prove delle chiavi non contano): servono a confrontare i servizi
+  function conta(v, ms) {
+    if (ms === undefined) v.fallite = (v.fallite || 0) + 1;
+    else { v.riuscite = (v.riuscite || 0) + 1; v.msTotali = (v.msTotali || 0) + ms; }
+  }
+
+  function prestazioni() {
+    const d = leggi(stato, {});
+    return [...servizi(), { nome: 'locale', modello: locale.modello }].flatMap((s) => {
+      const v = (d.servizi || {})[s.nome] || {};
+      const riuscite = v.riuscite || 0, fallite = v.fallite || 0;
+      return riuscite + fallite ? [{ servizio: s.nome, modello: s.modello, riuscite, fallite, msMedio: riuscite ? Math.round(v.msTotali / riuscite) : null }] : [];
+    });
+  }
+
   async function domanda(s, chiave, { system, user, maxTokens, temperature, json }, attesa) {
+    const inizio = Date.now();
     const r = await fetch(s.url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(chiave ? { Authorization: `Bearer ${chiave}` } : {}) },
@@ -96,14 +112,17 @@ function crea({
       signal: AbortSignal.timeout(attesa),
     });
     if (!r.ok) throw Object.assign(new Error(`HTTP ${r.status}`), { codice: r.status, riprovaTra: Number(r.headers.get('retry-after')) });
-    const scelta = (await r.json()).choices[0];
+    const risposta = await r.json();
+    const scelta = risposta.choices[0];
+    // il modello che ha risposto davvero: alcuni servizi ne scelgono uno loro
+    const chi = () => ({ modello: String(risposta.model || s.modello).replace(/^models\//, ''), ms: Date.now() - inizio });
     if (scelta.finish_reason === 'length') throw new Error('risposta del modello troncata (max_tokens)');
     const testo = String(scelta.message.content || '').trim();
-    if (!json) { if (!testo) throw new Error('risposta vuota'); return { testo }; }
+    if (!json) { if (!testo) throw new Error('risposta vuota'); return { testo, ...chi() }; }
     const a = testo.indexOf('{');
     const b = testo.lastIndexOf('}');
     if (a === -1 || b === -1) throw new Error('nessun JSON nella risposta del modello');
-    return { testo, dati: JSON.parse(testo.slice(a, b + 1)) };
+    return { testo, dati: JSON.parse(testo.slice(a, b + 1)), ...chi() };
   }
 
   // solo = nome di un servizio da provare senza ripiego; attesaMs vale per ogni tentativo
@@ -117,21 +136,26 @@ function crea({
       if (!solo && sospeso && Date.parse(sospeso) > adesso()) continue;
       try {
         const r = await domanda(s, await chiaveDi(s), richiesta, attesaMs || 60000);
-        annota(s.nome, (v) => { v.oggi++; v.ultimo = new Date(adesso()).toISOString(); delete v.sospesoFino; delete v.errore; });
+        annota(s.nome, (v) => { if (!solo) conta(v, r.ms); v.oggi++; v.ultimo = new Date(adesso()).toISOString(); delete v.sospesoFino; delete v.errore; });
         return { servizio: s.nome, ...r };
       } catch (e) {
         const pausa = e.codice === 429 ? (e.riprovaTra > 0 ? e.riprovaTra * 1000 : SOSPESO_QUOTA_MS) : [401, 403, 404].includes(e.codice) ? SOSPESO_RIFIUTO_MS : e.name === 'TimeoutError' ? SOSPESO_LENTO_MS : 0;
         const errore = e.codice === 429 ? 'quota esaurita' : e.name === 'TimeoutError' ? 'nessuna risposta in tempo' : e.codice ? `HTTP ${e.codice}` : e.message.slice(0, 120);
-        annota(s.nome, (v) => { v.errori++; v.errore = errore; if (pausa) v.sospesoFino = new Date(adesso() + pausa).toISOString(); });
+        annota(s.nome, (v) => { if (!solo) conta(v); v.errori++; v.errore = errore; if (pausa) v.sospesoFino = new Date(adesso() + pausa).toISOString(); });
         motivi.push(`${s.nome}: ${errore}`);
       }
     }
     if (solo) throw new Error(motivi.join('; ') || `servizio sconosciuto: ${solo}`);
     // gemma si carica solo adesso e mai durante un render: sulla scheda video non stanno insieme
-    if (caricaLocale && !renderInCorso()) await carica();
+    const occupata = renderInCorso();
+    if (caricaLocale && !occupata) await carica();
     try {
-      return { servizio: 'locale', motivi, ...(await domanda(locale, '', richiesta, attesaMs || 600000)) };
+      const r = await domanda(locale, '', richiesta, attesaMs || 600000);
+      annota('locale', (v) => { conta(v, r.ms); v.oggi++; });
+      return { servizio: 'locale', motivi, ...r };
     } catch (e) {
+      // durante un render gemma non c'è per scelta: non è un suo guasto
+      if (!occupata) annota('locale', (v) => { conta(v); v.errori++; });
       throw new Error(e.codice ? `LLM HTTP ${e.codice}` : e.message);
     }
   }
@@ -179,7 +203,7 @@ function crea({
     });
   }
 
-  return { chiedi, riepilogo, gestisci };
+  return { chiedi, riepilogo, gestisci, prestazioni };
 }
 
 function leggi(file, vuoto) {

@@ -21,7 +21,7 @@ Non iniziare il titolo con: ${usate.join(', ')}.` : ''}`;
 
 try {
   const c = await llmJson(system, user, 800);
-  return [{ json: { ...inp, c } }];
+  return [{ json: { ...inp, c, modello_testo: llmJson.ultimo } }];
 } catch (e) {
   // Il modello non e' caricato (il watchdog lo carica nel prossimo minuto): non e' un errore da segnalare
   if (/HTTP 400/.test(e.message)) log('in attesa del modello di testo: riprovo al prossimo giro');

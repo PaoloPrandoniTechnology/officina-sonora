@@ -27,7 +27,10 @@ const seed = nuovoSeed();
 let presenti = [];
 try {
   const p = await req('GET', `${CFG.yue}/props`, { ms: 10000 });
-  presenti = (JSON.parse(p.buf.toString('utf8')).adapters || []).filter((a) => a.ok !== false).map((a) => a.name);
+  const motore = JSON.parse(p.buf.toString('utf8'));
+  presenti = (motore.adapters || []).filter((a) => a.ok !== false).map((a) => a.name);
+  // nome del modello musicale, senza percorso ed estensione
+  if (motore.model) concept.modello_musica = String(motore.model).split(/[\\/]/).pop().replace(/\.gguf$/i, '');
 } catch (e) {
   log(`elenco LoRA non disponibile: ${e.message}`);
 }

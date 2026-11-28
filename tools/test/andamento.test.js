@@ -151,3 +151,17 @@ test('andamento: filtro periodo, confronto con il periodo precedente e filtri co
   // oltre 7 giorni il passo e' per giorno anche se richiesto per ora
   assert.equal(andamento.calcola({ ...base, periodo: '30', passo: 'ora' }).passo, 'giorno');
 });
+
+test('andamento: confronto fra modelli dei testi, filtro per modello', () => {
+  const lista = [
+    ...brani(1, 4, (i) => ({ modello: 'gemma', testo_ms: null, voto: i < 2 ? 3 : null, ascolti: 1 })),
+    ...brani(1, 2, (i) => ({ modello: 'gemini', testo_ms: 1000 + i * 1000, voto: 5, ascolti: 4, scartato: i === 1 })),
+    ...brani(1, 1),
+  ];
+  const calcola = (extra) => andamento.calcola({ brani: lista, errori: [], modifiche: [], passo: '', ora: ORA, ...extra });
+  const m = calcola({}).perModello;
+  assert.deepEqual(m.map((x) => [x.modello, x.brani, x.voto, x.testoMs, x.ascoltiMedi]), [['gemma', 4, 3, null, 1], ['gemini', 2, 5, 1500, 4]]);
+  const filtrato = calcola({ modello: 'gemini' });
+  assert.equal(filtrato.riepilogo.brani, 2);
+  assert.equal(filtrato.perModello.length, 2, 'il confronto resta completo anche con il filtro per modello');
+});

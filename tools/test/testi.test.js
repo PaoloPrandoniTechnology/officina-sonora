@@ -18,7 +18,7 @@ async function banco(risposte, extra = {}) {
       chiamate.push({ nome, auth: req.headers.authorization, corpo: JSON.parse(corpo) });
       const r = risposte[nome] || { codice: 500 };
       res.writeHead(r.codice || 200, r.intestazioni || {});
-      res.end(JSON.stringify({ choices: [{ finish_reason: r.fine || 'stop', message: { content: r.testo || '' } }] }));
+      res.end(JSON.stringify({ model: r.effettivo, choices: [{ finish_reason: r.fine || 'stop', message: { content: r.testo || '' } }] }));
     });
   });
   await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
@@ -127,5 +127,29 @@ test('chiavi dalla dashboard: nomi non previsti e valori strani si rifiutano', a
     for (const valore of ['', 'corta', 'con spazio dentro 123', 'a'.repeat(400), 'à'.repeat(20)]) await assert.rejects(b.t.gestisci('chiave', { chiave: 'primo', valore }), /non valida/);
     await assert.rejects(b.t.gestisci('altro', { chiave: 'primo' }), /non previst/);
     assert.equal(fs.readFileSync(path.join(b.dir, 'primo.dpapi'), 'utf8'), 'cifrato', 'la chiave precedente resta');
+  } finally { b.fine(); }
+});
+
+test('modello: si riporta quello che ha risposto davvero, con il tempo; le prestazioni si sommano', async () => {
+  const b = await banco({ primo: { codice: 500 }, secondo: { testo: '{"a":1}', effettivo: 'models/vero-modello' }, locale: { testo: '{"b":2}' } });
+  try {
+    const r = await b.t.chiedi(domanda);
+    assert.equal(r.modello, 'vero-modello');
+    assert.ok(r.ms >= 0);
+    await b.t.chiedi({ ...domanda, solo: 'secondo' }); // le prove delle chiavi non contano
+    b.avanti(86400000); // i totali non si azzerano col giorno
+    await b.t.chiedi(domanda);
+    const p = b.t.prestazioni();
+    assert.deepEqual(p.map((x) => [x.servizio, x.riuscite, x.fallite]), [['primo', 0, 2], ['secondo', 2, 0]]);
+    assert.equal(typeof p[1].msMedio, 'number');
+    assert.equal(p[1].modello, 'm-secondo');
+  } finally { b.fine(); }
+});
+
+test('modello locale: nome e tempo anche nel ripiego', async () => {
+  const b = await banco({ locale: { testo: '{"b":2}' } });
+  try {
+    assert.equal((await b.t.chiedi(domanda)).modello, 'gemma');
+    assert.deepEqual(b.t.prestazioni().find((x) => x.servizio === 'locale').riuscite, 1);
   } finally { b.fine(); }
 });

@@ -78,6 +78,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 | **Chiedere un cambiamento** a parole | [Note per genere](#note-per-genere), in italiano |
 | **Scegliere i termini** dello stile | [Linee guida](#linee-guida) |
 | Capire **se migliora** | [Andamento](#andamento) |
+| Capire **quale modello di testo rende di più** | [Andamento → Modelli a confronto](#modelli-a-confronto) |
 | Capire **perché un brano è stato scartato** | [Qualità e tempi](#qualità-e-tempi) e [Log e sistema](#log-e-sistema) |
 
 ---
@@ -151,7 +152,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | Blocco | Cosa fa |
 |---|---|
 | **3a Scarica audio** | Scarica il WAV, lo fa passare dal [mastering](#mastering) (MP3 a 320 kbps) e salva accanto lo **score** (`.abc`) seguito dal motore. |
-| **3b Scrivi metadati** | Scrive la scheda `.json` (numero progressivo, genere, ricetta, sezioni, lyrics, LoRA, seed, tempo di render) e chiude il job. |
+| **3b Scrivi metadati** | Scrive la scheda `.json` (numero progressivo, genere, ricetta, sezioni, lyrics, LoRA, seed, tempo di render, [modello dei testi e modello musicale](#il-modello-di-ogni-brano)) e chiude il job. |
 | **3c Controllo qualità** | Verifica integrità, bitrate, durata (tra 85% e 125% di quella richiesta), livello e silenzi. Gli scartati vanno in `_scartati`; se il brano è troppo corto viene rigenerato fino a 2 volte, con uno score nuovo. Il clipping dà solo un avviso. |
 | **3d1 Prepara caricamento** | Mette in coda i brani da caricare, esclude i duplicati audio, compone la copertina e scrive i tag ID3. |
 | **3d2 Carica** | Invia i file a iBroadcast tramite il gateway. Vale come caricato solo ciò che iBroadcast conferma; i falliti si ritentano 3 volte e poi di nuovo ogni ora. |
@@ -217,6 +218,23 @@ ultimo errore.
 token al giorno, OpenRouter 50 richieste al giorno sui modelli gratuiti; i limiti di Gemini si leggono in AI Studio.
 Per cambiare modello, ordine o spegnere un servizio (`"attivo": false`) modifica `config\servizi.json`: vale dalla
 richiesta successiva.
+
+---
+
+### Il modello di ogni brano
+
+La scheda `.json` di ogni brano ricorda **chi lo ha elaborato**:
+
+| Campo | Contenuto |
+|---|---|
+| `modello_testo` | chi ha scritto titolo, descrizione, bpm e durata: `servizio`, `modello` (quello che ha risposto davvero, anche quando il servizio ne sceglie uno da sé) e `ms` (tempo di risposta) |
+| `modello_musica` | il modello che ha creato l'audio (il nome del file caricato nel motore) |
+
+Il modello dei testi compare nella Libreria (colonna e filtro), nella Panoramica, nella scheda e in Andamento.
+**Non compare nella pagina Voti**: lì giudichi il brano senza sapere chi l'ha scritto e il confronto è più onesto.
+
+I brani nati prima di questa funzione sono stati completati con `tools\modelli-brani.js`, che ricava il modello dal
+log (nella scheda: *ricostruito dal log*); di questi non si conoscono tempo di risposta e modello musicale.
 
 ---
 
@@ -461,6 +479,9 @@ La **scheda** (clic sul titolo) raccoglie tutto sul brano: descrizione, durata, 
 descrizione inviata al motore (*Copia*), esito del controllo, file. Da lì puoi ascoltare, mettere il cuore, aggiungerlo
 a coda o playlist, votare, **scaricare il file**, chiedere **un altro così** o aprire lo stile del genere.
 
+In *Produzione* trovi anche [chi ha scritto titolo e descrizione](#il-modello-di-ogni-brano), in quanto tempo, e il
+modello musicale.
+
 ![La scheda di un brano](docs/screenshots/22-scheda.png)
 
 ---
@@ -489,7 +510,7 @@ L'archivio di **tutta la musica prodotta** (i brani scartati non ci sono).
 | Per… | Fai così |
 |---|---|
 | trovare un brano | tasto **/** oppure la casella di ricerca (titolo, genere, tipo) |
-| filtrare | per genere, ambito (yoga o sottofondo), voto o *Che ti piacciono* |
+| filtrare | per genere, ambito (yoga o sottofondo), [modello dei testi](#il-modello-di-ogni-brano), voto o *Che ti piacciono* |
 | ascoltare tutto ciò che hai filtrato | *Riproduci* o *Casuale* sopra la tabella; *Salva come playlist* lo conserva |
 | cuore, coda, playlist | cuore e **⋯** in fondo a ogni riga |
 | mettere in ordine | clic sul titolo di una colonna; un altro clic inverte |
@@ -776,8 +797,9 @@ Risponde alla domanda **«sta migliorando?»**.
 
 | Parte (dall'alto) | Cosa mostra |
 |---|---|
-| **Filtri** | scegli il periodo (da 24 ore a tutto) e, se vuoi, ambito, famiglia, genere, tipo o struttura; *Azzera filtri* torna agli ultimi 7 giorni |
+| **Filtri** | scegli il periodo (da 24 ore a tutto) e, se vuoi, ambito, famiglia, genere, tipo, struttura o modello dei testi; *Azzera filtri* torna agli ultimi 7 giorni |
 | **Il sistema sta migliorando?** | giudizio sugli ultimi 7 giorni rispetto ai 7 precedenti |
+| **Modelli a confronto** e **Affidabilità** | quale modello di testo rende di più (vedi sotto) |
 | **Indici del periodo** | brani, ore di musica buona, scarti, voto medio e altri numeri, con la differenza sul periodo precedente |
 | **Grafici** | come cambiano nel tempo; le righe verticali tratteggiate sono le modifiche fatte da te o dalle linee guida |
 | **Distribuzione, motivi, errori** | voti, ragioni degli scarti ed errori più frequenti |
@@ -792,6 +814,20 @@ Risponde alla domanda **«sta migliorando?»**.
 Con meno dati compare *dati insufficienti*; con differenze più piccole, *stabile*.
 
 ---
+
+#### Modelli a confronto
+
+![Modelli a confronto: brani, voto, scarti, ascolti e tempo di scrittura per modello](docs/screenshots/36-andamento-modelli.png)
+
+- **Modelli a confronto** segue il periodo e i filtri: brani, voto medio, numero di voti, scarti, rigenerati, ascolti
+  per brano e tempo di scrittura. Il clic sul nome filtra tutta la pagina su quel modello.
+- Il sistema indica il modello col voto più alto solo quando **almeno due modelli hanno 10 voti** ciascuno.
+- **Affidabilità dei servizi di testo** conta tutte le richieste (non solo i titoli): riuscite, non riuscite,
+  percentuale e tempo medio. Le prove delle chiavi non contano.
+
+> Come leggerlo: il modello dei testi incide su titolo, descrizione, bpm e durata, mentre l'audio nasce sempre da
+> YuE2. Differenze piccole di voto o di scarti possono dipendere dal caso o dai generi toccati a ciascun modello:
+> tempi e affidabilità dicono qualcosa subito, i voti solo quando sono molti.
 
 ### Qualità e tempi
 
@@ -978,7 +1014,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\compositore\` | compositore, revisore, scrittura e validazione dello score ABC |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
 | `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `score-pagina.js`, `score.css` e `score.js` pagina Score; `testi.js` catena dei modelli di testo, `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
-| `tools\` | manutenzione, prove sul motore (`prove\`), test (`test\`) |
+| `tools\` | manutenzione (per esempio `modelli-brani.js`, che segna il modello sui brani vecchi), prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `officina-sonora-workflow.json` | workflow generato |
 

@@ -1,5 +1,5 @@
 {
-  "versione": 13,
+  "versione": 14,
   "bpm_range": {
     "Power-yoga": "115-140",
     "Meditazione": "30-70",
@@ -41,16 +41,17 @@
     ],
     "Pranayama-respiro": [
       "breath texture",
-      "calming",
+      "introspective",
       "slow swells",
       "peaceful",
-      "introspective"
+      "calming"
     ],
     "Hatha-base": [
-      "gentle slow pulse",
+      "light relaxed groove",
       "relaxed bossa groove",
       "acoustic guitar strumming",
-      "light relaxed groove"
+      "gentle slow pulse",
+      "mellow"
     ],
     "Power-yoga": [
       "breath texture",
@@ -69,9 +70,9 @@
     "Restorative": [
       "nurturing",
       "soft strings",
-      "airy reverb",
       "gentle",
-      "serene"
+      "serene",
+      "warm"
     ],
     "Post-rock-strumentale": [
       "atmospheric",
@@ -109,6 +110,6 @@
     "Post-rock-strumentale": "240-270",
     "Reggae-dub-morbido": "180-270"
   },
-  "note": "Ho ottimizzato le linee guida per 'Hatha-base' e 'Power-yoga' basandomi sul successo dei brani con voti elevati. Ho ristretto i limiti di BPM e durata per Hatha-base per riflettere il pattern più efficace (intorno agli 80 BPM). Inoltre, ho arricchito lo stile generico di Hatha-base includendo 'mello",
-  "aggiornato": "2026-11-28T14:49:23.110Z"
+  "note": "Ho aggiunto termini descrittivi coerenti ed estratti dall'elenco autorizzato per arricchire lo stile dei generi che hanno ricevuto le valutazioni più alte dagli utenti.",
+  "aggiornato": "2026-11-28T15:25:40.030Z"
 }

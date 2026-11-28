@@ -11,6 +11,8 @@ const renderS = Math.round((Date.now() - job.submittedAt) / 1000);
 const meta = {
   titolo: c.titolo,
   descrizione: c.descrizione,
+  modello_testo: c.modello_testo,
+  modello_musica: c.modello_musica,
   categoria: c.categoria,
   tipo: c.tipo,
   energia: c.energia,

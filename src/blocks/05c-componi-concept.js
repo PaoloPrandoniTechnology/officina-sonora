@@ -13,6 +13,7 @@ const durata = Math.min(inp.dmax, Math.max(inp.dmin, clampDur(c.durata_s)));
 
 const concept = {
   titolo: String(c.titolo).trim(),
+  modello_testo: inp.modello_testo,
   descrizione: String(c.descrizione || '').trim(),
   bpm,
   tonalita,

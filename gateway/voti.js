@@ -91,6 +91,7 @@ function scheda(numero) {
     strumenti: [].concat(m.strumenti || []), influenza: m.influenza || null, bpm: m.bpm ?? null, tonalita: m.tonalita || null,
     energia: m.energia ?? null, attivita: m.attivita || '', durata_s: (m.qualita && m.qualita.durata_reale_s) || m.durata_s || null,
     richiesta_s: m.durata_s ?? null, render_s: m.render_s ?? null, generato_il: m.generato_il || null, stile: m.style || '',
+    modello_testo: m.modello_testo || null, modello_musica: m.modello_musica || null,
     score_fonte: m.score_fonte || null, lora: (m.lora || []).map((l) => (typeof l === 'string' ? l : l.name)),
     qualita: m.qualita ? { esito: m.qualita.esito, problemi: m.qualita.problemi || [], bitrate: m.qualita.bitrate_medio_kbps ?? null, audio: m.qualita.audio || null } : null,
     voto: votoValido(m.voto) ? m.voto : null, nota: m.nota_utente ?? null, voto_fonte: m.voto_fonte || null,

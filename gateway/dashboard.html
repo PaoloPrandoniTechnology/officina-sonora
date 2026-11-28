@@ -127,6 +127,7 @@
         <input class="search" id="lQ" type="search" placeholder="Cerca per titolo, genere o tipo (tasto /)" aria-label="Cerca un brano">
         <select class="field" id="lGen" aria-label="Filtra per genere"><option value="">Tutti i generi</option></select>
         <select class="field" id="lAmbitoF" aria-label="Filtra per ambito"><option value="">Yoga e sottofondo</option></select>
+        <select class="field" id="lModF" aria-label="Filtra per modello dei testi"><option value="">Tutti i modelli</option></select>
         <select class="field" id="lVotoF" aria-label="Filtra per voto"><option value="">Tutti i voti</option><option value="no">Non votati</option><option value="si">Votati</option><option value="alti">4 e 5 stelle</option><option value="bassi">1 e 2 stelle</option><option value="cuore">Che ti piacciono</option></select>
         <span class="conteggio" id="lConta"></span>
       </div>
@@ -219,6 +220,7 @@
         <label>Genere<select class="field" id="aGenere"><option value="">Tutti i generi</option></select></label>
         <label>Tipo<select class="field" id="aTipo"><option value="">Tutti</option></select></label>
         <label>Struttura<select class="field" id="aStruttura"><option value="">Tutte</option></select></label>
+        <label>Modello dei testi<select class="field" id="aModello"><option value="">Tutti</option></select></label>
         <label class="riga"><input type="checkbox" id="aModifiche" checked> Segna le modifiche nei grafici</label>
         <button type="button" class="btn ghost small" id="aAzzera">Azzera filtri</button>
       </div>
@@ -229,6 +231,8 @@
           <div class="esiti" id="aEsito"><div class="empty">Caricamento…</div></div>
         </div>
         <div class="card c12"><h2>Indici del periodo <small id="aConfronto"></small></h2><div class="an-kpi" id="aKpi"></div></div>
+        <div class="card c12"><h2>Modelli a confronto <small>chi ha scritto titolo, descrizione, bpm e durata · clic sul nome per filtrare</small></h2><p class="muted" id="aModEsito"></p><div class="scroll" id="aModelli"></div></div>
+        <div class="card c12"><h2>Affidabilità dei servizi di testo <small>tutte le richieste dal 28/11/2026, senza filtri</small></h2><div class="scroll" id="aServizi"></div></div>
         <div class="card c12"><h2>Brani generati <small>accettati e scartati</small></h2><div id="aProduzione"></div></div>
         <div class="card c6"><h2>Voto medio <small>punti vuoti: meno di 5 voti</small></h2><div id="aVoto"></div></div>
         <div class="card c6"><h2>Brani scartati (%)</h2><div id="aScarti"></div></div>

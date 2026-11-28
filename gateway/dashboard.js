@@ -268,7 +268,7 @@
     }));
 
     imposta('#donut', barreOrizz(Object.entries(L.perFamiglia).sort((a, b) => b[1] - a[1]).map(([nome, valore]) => ({ nome, valore }))));
-    imposta('#ultimiBrani', L.recenti.slice(0, 8).map((t) => `<div class="disco">${tastoAscolta(t, 'grande')}${titoloBrano(t, 'nome')}<small>${esc(nm(t.categoria))}</small><small>${data(t.generato_il)}</small></div>`).join('') || '<div class="empty">Il primo brano arriva in circa dieci minuti.</div>');
+    imposta('#ultimiBrani', L.recenti.slice(0, 8).map((t) => `<div class="disco">${tastoAscolta(t, 'grande')}${titoloBrano(t, 'nome')}<small>${esc(nm(t.categoria))}</small><small>${data(t.generato_il)}</small>${t.modello ? `<small>${etichettaModello(t.modello)}</small>` : ''}</div>`).join('') || '<div class="empty">Il primo brano arriva in circa dieci minuti.</div>');
     // stessa regola della pagina Voti: i brani degli ultimi 15 minuti sono ancora in lavorazione
     const daVotare = L.recenti.filter((t) => t.voto === null && t.numero !== null && Date.now() - Date.parse(t.generato_il) >= 15 * 60000).length;
     $('#navVoti').hidden = !daVotare;
@@ -313,8 +313,12 @@
     lettore.aggiorna();
   }
 
-  const lib = { q: '', genere: '', ambito: '', voto: '', ordine: 'generato_il', verso: -1, quanti: 50, ordinati: [] };
-  const COL_LIB = [['titolo', 'Titolo'], ['categoria', 'Genere'], ['durata_s', 'Durata', 'num'], ['bpm', 'BPM', 'num extra'], ['voto', 'Voto'], ['ascolti', 'Ascolti', 'num extra'], ['generato_il', 'Creato', 'extra']];
+  // Nome breve di un modello di testo; quelli sul computer sono segnati "locale"
+  const nomeModello = (m) => (!m ? 'non registrato' : m === 'openrouter/free' ? 'OpenRouter, a scelta' : m.split('/').pop().replace(/:free$/, '') + (m === 'google/gemma-4-e4b' ? ' (locale)' : ''));
+  const etichettaModello = (m) => (m ? `<span class="tag${m === 'google/gemma-4-e4b' ? '' : ' acc'}" data-tip="Titolo e descrizione scritti da ${esc(m)}">${esc(nomeModello(m))}</span>` : '<span class="muted">—</span>');
+
+  const lib = { modello: '', q: '', genere: '', ambito: '', voto: '', ordine: 'generato_il', verso: -1, quanti: 50, ordinati: [] };
+  const COL_LIB = [['titolo', 'Titolo'], ['categoria', 'Genere'], ['modello', 'Testi', 'extra'], ['durata_s', 'Durata', 'num'], ['bpm', 'BPM', 'num extra'], ['voto', 'Voto'], ['ascolti', 'Ascolti', 'num extra'], ['generato_il', 'Creato', 'extra']];
   const durata = (s) => (s ? Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0') : '—');
   function disegnaLibreria() {
     if (!dati) return;
@@ -322,12 +326,15 @@
     const generi = [...new Set(tutti.map((t) => t.categoria).filter(Boolean))].sort((a, b) => nm(a).localeCompare(nm(b)));
     imposta('#lGen', '<option value="">Tutti i generi</option>' + generi.map((g) => `<option value="${esc(g)}">${esc(nm(g))}</option>`).join(''));
     imposta('#lAmbitoF', '<option value="">Yoga e sottofondo</option>' + Object.keys(dati.libreria.perAmbito).sort().map((a) => `<option value="${esc(a)}">Solo ${esc(a)}</option>`).join(''));
+    const modelli = [...new Set(tutti.map((t) => t.modello).filter(Boolean))].sort();
+    imposta('#lModF', '<option value="">Tutti i modelli</option>' + modelli.map((m) => `<option value="${esc(m)}">Testi: ${esc(nomeModello(m))}</option>`).join(''));
+    $('#lModF').value = lib.modello;
     $('#lGen').value = lib.genere;
     $('#lAmbitoF').value = lib.ambito;
     const q = lib.q.trim().toLowerCase();
     const voti = { no: (v) => v === null, si: (v) => v !== null, alti: (v) => v >= 4, bassi: (v) => v !== null && v <= 2, cuore: (v, t) => lettore.preferito(t.numero) };
-    const lista = tutti.filter((t) => (!lib.genere || t.categoria === lib.genere) && (!lib.ambito || t.ambito === lib.ambito) && (!lib.voto || voti[lib.voto](t.voto, t))
-      && (!q || [t.titolo, nm(t.categoria), t.categoria, t.tipo, t.famiglia].join(' ').toLowerCase().includes(q)));
+    const lista = tutti.filter((t) => (!lib.genere || t.categoria === lib.genere) && (!lib.ambito || t.ambito === lib.ambito) && (!lib.modello || t.modello === lib.modello) && (!lib.voto || voti[lib.voto](t.voto, t))
+      && (!q || [t.titolo, nm(t.categoria), t.categoria, t.tipo, t.famiglia, t.modello].join(' ').toLowerCase().includes(q)));
     const chiave = (t) => (lib.ordine === 'categoria' ? nm(t.categoria) : t[lib.ordine]);
     lista.sort((a, b) => {
       const x = chiave(a), y = chiave(b);
@@ -338,11 +345,11 @@
     $('#lConta').textContent = n0(lista.length) + ' di ' + n0(tutti.length) + ' brani';
     $('#lAltri').hidden = lista.length <= lib.quanti;
     imposta('#recenti', `<thead><tr><th><span class="muted">Ascolta</span></th>${COL_LIB.map(([c, nome, cl]) => `<th class="${cl || ''}"${lib.ordine === c ? ` aria-sort="${lib.verso > 0 ? 'ascending' : 'descending'}"` : ''}><button type="button" data-lord="${c}">${nome}${lib.ordine === c ? (lib.verso > 0 ? ' ↑' : ' ↓') : ''}</button></th>`).join('')}<th><span class="solo-lettore">Azioni</span></th></tr></thead><tbody>${
-      lista.slice(0, lib.quanti).map((t) => `<tr${t.numero === null ? '' : ` data-brano="${t.numero}"`}><td>${tastoAscolta(t)}</td><td class="nome">${titoloBrano(t)}${t.caricato ? '' : '<small>non ancora su iBroadcast</small>'}</td><td>${esc(nm(t.categoria))}</td>
+      lista.slice(0, lib.quanti).map((t) => `<tr${t.numero === null ? '' : ` data-brano="${t.numero}"`}><td>${tastoAscolta(t)}</td><td class="nome">${titoloBrano(t)}${t.caricato ? '' : '<small>non ancora su iBroadcast</small>'}</td><td>${esc(nm(t.categoria))}</td><td class="extra">${etichettaModello(t.modello)}</td>
         <td class="num">${durata(t.durata_s)}</td><td class="num extra">${n0(t.bpm)}</td>
         <td>${t.numero === null ? stelle(t.voto) : `<button class="link" data-vota="${t.numero}" data-tip="Apre il brano nella pagina Voti">${t.voto === null ? 'Vota' : stelle(t.voto)}</button>`}</td>
         <td class="num extra">${n0(t.ascolti)}</td><td class="muted extra">${data(t.generato_il)}</td><td class="azioni-riga">${lettore.azioni(t.numero)}</td></tr>`).join('')
-      || '<tr><td colspan="9" class="empty">Nessun brano corrisponde: togli un filtro o cambia la ricerca.</td></tr>'}</tbody>`);
+      || '<tr><td colspan="10" class="empty">Nessun brano corrisponde: togli un filtro o cambia la ricerca.</td></tr>'}</tbody>`);
   }
 
   function lineaRender(ult) {
@@ -1477,7 +1484,7 @@
         ${riga('Struttura', b.struttura)}${riga('Strumenti', b.strumenti.join(', '))}${riga('Influenza', b.influenza)}${riga('Adatto a', b.attivita)}</div>
       ${b.sezioni.length ? `<h3>Sezioni</h3><div>${b.sezioni.map((x) => `<span class="tag">${esc(x.replace(/[\[\]]/g, ''))}</span>`).join('')}</div>` : ''}
       ${b.stile ? `<h3>Descrizione inviata al motore <button class="link" data-copia>Copia</button></h3><div class="prompt">${esc(b.stile)}</div>` : ''}
-      <h3>Produzione</h3><div class="kv">${riga('Numero', b.numero)}${riga('Creato', data(b.generato_il))}${riga('Tempo di render', b.render_s ? sec(b.render_s) : '')}
+      <h3>Produzione</h3><div class="kv">${riga('Titolo e descrizione', b.modello_testo ? nomeModello(b.modello_testo.modello) + (b.modello_testo.ms ? ', in ' + virgola(Math.round(b.modello_testo.ms / 100) / 10) + ' s' : '') + (b.modello_testo.ricostruito ? ' (ricostruito dal log)' : '') : '')}${riga('Modello musicale', b.modello_musica)}${riga('Numero', b.numero)}${riga('Creato', data(b.generato_il))}${riga('Tempo di render', b.render_s ? sec(b.render_s) : '')}
         ${riga('Spartito scritto da', FONTE_SPARTITO[b.score_fonte])}${riga('Controllo qualità', q ? (q.esito === 'ok' ? 'superato' : q.problemi.join('; ')) : '')}
         ${riga('Bitrate', q && q.bitrate ? q.bitrate + ' kbps' : '')}${riga('iBroadcast', b.caricato ? 'caricato' : 'non ancora caricato')}${riga('Ascolti', b.ascolti)}${riga('LoRA', b.lora.join(', '))}</div>
       ${b.file ? `<h3>File</h3><div class="s-percorso">${esc(b.file)}</div>` : ''}</div>`;
@@ -1591,7 +1598,7 @@
 
   const COL_GENERI = [['genere', 'Genere', String], ['brani', 'Brani', n0], ['scartoPct', 'Scartati', conUnita('%')], ['voto', 'Voto', virgola], ['votati', 'Voti', n0], ['resa', 'Resa', virgola], ['renderMedio', 'Render (s)', virgola], ['rigeneratiPct', 'Rigenerati', conUnita('%')], ['ore', 'Ore', virgola], ['ascolti', 'Ascolti', n0]];
   const ESITI = { migliora: ['↑', 'var(--ok)'], stabile: ['→', 'var(--muted)'], peggiora: ['↓', 'var(--danger)'], 'dati insufficienti': ['–', 'var(--faint)'] };
-  const AN_FILTRI = { ambito: 'aAmbito', famiglia: 'aFamiglia', genere: 'aGenere', tipo: 'aTipo', struttura: 'aStruttura' };
+  const AN_FILTRI = { ambito: 'aAmbito', famiglia: 'aFamiglia', genere: 'aGenere', tipo: 'aTipo', struttura: 'aStruttura', modello: 'aModello' };
   const an = { richiesta: 0, dati: null, ordine: 'brani', verso: -1 };
 
   function disegnaGeneriAn() {
@@ -1608,6 +1615,33 @@
         : `<td class="num">${esc(formato(r[c]))}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
   }
 
+  const VOTI_MINIMI = 10; // sotto, il voto medio di un modello cambia troppo con un voto in più
+  const secondi = (ms) => (ms === null || ms === undefined ? '—' : virgola(Math.round(ms / 100) / 10) + ' s');
+  const tabella = (colonne, righe) => '<table class="an-gen"><thead><tr>' + colonne.map(([nome], i) => `<th class="${i ? 'num' : ''}">${nome}</th>`).join('') + '</tr></thead><tbody>'
+    + righe.map((r) => '<tr>' + colonne.map(([, f], i) => `<td class="${i ? 'num' : ''}">${f(r)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+
+  function disegnaModelli() {
+    const m = an.dati.perModello || [];
+    const giudicabili = m.filter((x) => x.votati >= VOTI_MINIMI).sort((a, b) => b.voto - a.voto);
+    $('#aModEsito').textContent = !m.length ? ''
+      : giudicabili.length < 2 ? `Per un confronto servono almeno due modelli con ${VOTI_MINIMI} voti ciascuno nel periodo: vota i brani nella pagina Voti, dove il modello non si vede.`
+        : `Voto medio più alto: ${nomeModello(giudicabili[0].modello)} (${virgola(giudicabili[0].voto)} su ${giudicabili[0].votati} voti). La musica nasce dallo stesso motore: differenze piccole possono dipendere dal caso o dai generi toccati a ciascuno.`;
+    $('#aModelli').innerHTML = !m.length ? '<div class="empty">Nessun brano con il modello registrato nel periodo</div>' : tabella([
+      ['Modello', (r) => `<button type="button" data-modello="${esc(r.modello)}">${esc(nomeModello(r.modello))}</button>`],
+      ['Brani', (r) => n0(r.brani)], ['Voto', (r) => esc(virgola(r.voto)) + (r.votati && r.votati < VOTI_MINIMI ? ' <span class="muted">(pochi)</span>' : '')], ['Voti', (r) => n0(r.votati)],
+      ['Scartati', (r) => esc(conUnita('%')(r.scartoPct))], ['Rigenerati', (r) => esc(conUnita('%')(r.rigeneratiPct))], ['Ascolti per brano', (r) => esc(virgola(r.ascoltiMedi))], ['Tempo di scrittura', (r) => secondi(r.testoMs)],
+    ], m);
+    const s = an.dati.servizi || [];
+    $('#aServizi').innerHTML = !s.length ? '<div class="empty">Ancora nessuna richiesta conteggiata</div>' : tabella([
+      ['Servizio', (r) => `<span data-tip="${esc(r.modello)}">${esc(r.servizio === 'locale' ? 'gemma (locale)' : r.servizio)}</span>`],
+      ['Riuscite', (r) => n0(r.riuscite)], ['Non riuscite', (r) => n0(r.fallite)], ['Riuscita', (r) => esc(virgola(Math.round((r.riuscite / (r.riuscite + r.fallite)) * 100))) + '%'], ['Tempo medio', (r) => secondi(r.msMedio)],
+    ], s);
+  }
+  $('#aModelli').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-modello]');
+    if (b) { $('#aModello').value = b.dataset.modello; caricaAndamento(); }
+  });
+
   function disegnaAndamento() {
     const r = an.dati;
     const voce = (nome, esito) => { const [segno, c] = ESITI[esito] || ESITI['dati insufficienti']; return `<div><i style="color:${c}" aria-hidden="true">${segno}</i>${nome}: <b>${esc(esito)}</b></div>`; };
@@ -1616,7 +1650,7 @@
     $('#aNota').textContent = 'Passo ' + (r.passo === 'ora' ? 'per ora' : 'per giorno') +
       ($('#aPasso').value && $('#aPasso').value !== r.passo ? ' (oltre 7 giorni i punti per ora non sono disponibili)' : '') +
       (r.troncato ? ' · i grafici mostrano solo gli intervalli più recenti, gli indici coprono tutto il periodo' : '') +
-      (filtrato ? ' · i filtri su ambito, famiglia, genere, tipo e struttura non si applicano agli errori' : '');
+      (filtrato ? ' · i filtri su ambito, famiglia, genere, tipo, struttura e modello non si applicano agli errori' : '');
     $('#aConfronto').textContent = r.precedente ? 'variazione sul periodo precedente di pari durata' : $('#aPeriodo').value ? 'nessun dato nel periodo precedente per il confronto' : 'tutto lo storico';
     $('#aKpi').innerHTML = indiciHtml(r.riepilogo, r.precedente);
 
@@ -1638,6 +1672,7 @@
     $('#aMotivi').innerHTML = barreOrizz(r.motivi);
     $('#aErroriTop').innerHTML = barreOrizz(r.erroriTop);
     disegnaGeneriAn();
+    disegnaModelli();
 
     $('#aModTitolo').textContent = 'Modifiche nel periodo (' + r.modifiche.length + ')';
     $('#aModElenco').innerHTML = r.modifiche.length ? '<table><tbody>' + [...r.modifiche].reverse().map((x) => `<tr><td>${esc(data(x.ts))}</td><td>${esc(x.sezione)}</td><td>${esc(x.chiave)}</td></tr>`).join('') + '</tbody></table>' : '<div class="empty">Nessuna modifica</div>';
@@ -1654,7 +1689,7 @@
       // si ridisegna solo se cambia, così un menu aperto non si richiude a ogni aggiornamento
       if (sel.dataset.voci === valori.join('|')) continue;
       sel.dataset.voci = valori.join('|');
-      sel.innerHTML = sel.options[0].outerHTML + valori.map((v) => `<option value="${esc(v)}">${esc(campo === 'genere' ? nm(v) : v)}</option>`).join('');
+      sel.innerHTML = sel.options[0].outerHTML + valori.map((v) => `<option value="${esc(v)}">${esc(campo === 'genere' ? nm(v) : campo === 'modello' ? nomeModello(v) : v)}</option>`).join('');
       sel.value = scelto;
     }
   }
@@ -1672,7 +1707,7 @@
     menuAndamento(r.opzioni);
     disegnaAndamento();
   }
-  for (const id of ['aPeriodo', 'aPasso', 'aGenere', 'aTipo', 'aStruttura']) $('#' + id).addEventListener('change', caricaAndamento);
+  for (const id of ['aPeriodo', 'aPasso', 'aGenere', 'aTipo', 'aStruttura', 'aModello']) $('#' + id).addEventListener('change', caricaAndamento);
   // cambiando ambito o famiglia le scelte più strette non valgono più
   $('#aAmbito').addEventListener('change', () => { $('#aFamiglia').value = $('#aGenere').value = ''; caricaAndamento(); });
   $('#aFamiglia').addEventListener('change', () => { $('#aGenere').value = ''; caricaAndamento(); });
@@ -1754,7 +1789,7 @@
     if (b.dataset.score) return score.apriBrano(Number(b.dataset.score));
     if (b.dataset.vota) { vt.richiesto = Number(b.dataset.vota); vt.filtro = ''; return vai('voti'); }
     if (b.dataset.stile) { apriGuida(encodeURIComponent(b.dataset.stile)); return vai('controllo/guida/' + encodeURIComponent(b.dataset.stile)); }
-    if (b.dataset.brani) { lib.genere = b.dataset.brani; lib.ambito = lib.voto = lib.q = ''; $('#lQ').value = $('#lVotoF').value = ''; disegnaLibreria(); return vai('libreria'); }
+    if (b.dataset.brani) { lib.genere = b.dataset.brani; lib.ambito = lib.voto = lib.q = lib.modello = ''; $('#lQ').value = $('#lVotoF').value = ''; disegnaLibreria(); return vai('libreria'); }
     if ('riprendi' in b.dataset) return cambiaPausa(false);
     return produci(b.dataset.produci);
   });
@@ -1791,12 +1826,13 @@
   $('#lQ').oninput = (e) => { lib.q = e.target.value; aggiornaLibreria(); };
   $('#lGen').onchange = (e) => { lib.genere = e.target.value; aggiornaLibreria(); };
   $('#lVotoF').onchange = (e) => { lib.voto = e.target.value; aggiornaLibreria(); };
+  $('#lModF').onchange = (e) => { lib.modello = e.target.value; aggiornaLibreria(); };
   $('#lAmbitoF').onchange = (e) => { lib.ambito = e.target.value; aggiornaLibreria(); };
   $('#lAltri').onclick = () => { lib.quanti += 50; disegnaLibreria(); };
   $('#recenti').addEventListener('click', (e) => {
     const b = e.target.closest('[data-lord]');
     if (!b) return;
-    lib.verso = lib.ordine === b.dataset.lord ? -lib.verso : (['titolo', 'categoria', 'tipo'].includes(b.dataset.lord) ? 1 : -1);
+    lib.verso = lib.ordine === b.dataset.lord ? -lib.verso : (['titolo', 'categoria', 'tipo', 'modello'].includes(b.dataset.lord) ? 1 : -1);
     lib.ordine = b.dataset.lord;
     disegnaLibreria();
   });

@@ -67,6 +67,7 @@ function calcola() {
     const parti = path.relative(ROOT, f).split(path.sep);
     const rec = {
       titolo: meta.titolo,
+      modello: libreria.modelloTesto(meta),
       ambito: fuori ? null : parti[0],
       famiglia: fuori ? null : parti[1],
       categoria: meta.categoria || null,

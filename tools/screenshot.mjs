@@ -22,6 +22,7 @@ const PAGINE = [
   { nome: '03-generi', pagina: 'generi' },
   { nome: '04-voti', pagina: 'voti' },
   { nome: '14-andamento', pagina: 'andamento' },
+  { nome: '36-andamento-modelli', pagina: 'andamento', dopo: "document.querySelector('#aModelli').closest('.card').scrollIntoView({block:'start'}); scrollBy(0,-100)", fissa: 620 },
   { nome: '05-qualita', pagina: 'qualita' },
   { nome: '06-libreria', pagina: 'libreria' },
   { nome: '18-lettore', pagina: 'libreria', dopo: clic('#recenti [data-ascolta]'), fissa: 900 },

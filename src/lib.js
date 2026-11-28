@@ -335,11 +335,13 @@ async function llmJson(system, user, maxTokens = 1200) {
   } catch (e) {
     if (e.code !== 'ECONNREFUSED') throw e;
     log('gateway spento: chiedo direttamente al modello locale');
+    llmJson.ultimo = { servizio: 'locale', modello: CFG.llmModel };
     return llmLocale(system, user, maxTokens);
   }
   if (!r.ok) throw new Error(r.error || `catena dei testi HTTP ${r.status}`);
   if (r.motivi && r.motivi.length) log(`servizi di testo non disponibili (${r.motivi.join('; ')}): ha risposto gemma`);
   else if (r.servizio !== 'locale') log(`testo scritto da ${r.servizio}`);
+  llmJson.ultimo = { servizio: r.servizio, modello: r.modello, ms: r.ms }; // chi ha scritto: finisce nella scheda del brano
   return r.dati;
 }
 
