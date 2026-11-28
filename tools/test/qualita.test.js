@@ -136,3 +136,30 @@ test('mastering: MP3 a 320 kbps con loudness uniforme', async (t) => {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('modello di testo: margine di token per il ragionamento, risposta troncata segnalata', async () => {
+  const prova = (finish, content) => new AF('require', LIB + `let corpo;
+    req = async (m, u, o) => { corpo = o.body; return { ok: true, buf: Buffer.from(${JSON.stringify(JSON.stringify({ choices: [{ finish_reason: finish, message: { content } }] }))}) }; };
+    return { j: await llmJson('s', 'u', 1500), corpo };`)(require);
+  const r = await prova('stop', '```json\n{"a":1}\n```');
+  assert.deepEqual(r.j, { a: 1 });
+  assert.equal(r.corpo.max_tokens, 7500);
+  await assert.rejects(prova('length', '{"a":{"b":1}, "c'), /troncata/);
+});
+
+test('revisione: i bpm proposti restano entro 15 dalla fascia del genere', async () => {
+  const dir = fs.mkdtempSync(path.join(RADICE, 'state', 'prova-guida-'));
+  const proposta = { bpm_range: { 'Vinyasa-dinamico': '90-180', Meditazione: '20-55', 'Power-yoga': '60-70' } };
+  const finta = `log = () => {}; gw = async () => ({ ok: true }); libraryTracks = () => [{ meta: { voto: 5, titolo: 't' } }];
+    CFG.guidanceFile = ${JSON.stringify(path.join(dir, 'guidance.json'))}; CFG.historyDir = ${JSON.stringify(dir)};
+    llmJson = async () => (${JSON.stringify(proposta)});`;
+  const input = { first: () => ({ json: { outcome: 'saved', state: { done: 1, lastVoteMark: 'x' } } }) };
+  try {
+    await new AF('require', '$input', LIB + finta + '\n' + leggi('src', 'blocks', '04-feedback.js'))(require, input);
+    const g = JSON.parse(fs.readFileSync(path.join(dir, 'guidance.json'), 'utf8'));
+    // Vinyasa 96-112, Meditazione 45-62, Power-yoga 118-130: una proposta tutta fuori fascia si ignora
+    assert.deepEqual(g.bpm_range, { 'Vinyasa-dinamico': '90-127', Meditazione: '30-55' });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

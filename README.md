@@ -424,6 +424,7 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 | Molti brani "troppo corti" | limite noto (vedi miglioramenti); le soglie sono in *Controllo → Parametri* |
 | Voci in un brano strumentale | vota 1 con una nota; la LoRA in uso è registrata nella scheda |
 | "revisione non riuscita: LLM HTTP 400" | gemma non era caricato: le linee guida restano invariate |
+| "risposta del modello troncata (max_tokens)" | il ragionamento di gemma ha esaurito il margine (`RAGIONAMENTO_TOKEN` in `src/lib.js`) |
 | "token non valido" | rinnova il token (vedi Sicurezza) |
 | Un brano manca su iBroadcast | cerca in `state\tick.log` e `state\errori.jsonl` |
 

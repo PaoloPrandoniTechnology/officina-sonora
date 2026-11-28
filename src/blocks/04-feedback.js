@@ -72,8 +72,9 @@ Niente nomi di artisti o marchi.`;
     const c = CFG.categories.find((x) => x.name === cat);
     const m = /^(\d+)\s*-\s*(\d+)$/.exec(String(range));
     if (c && m) {
-      const lo = Math.max(30, Math.min(Number(m[1]), c.bpm[1] + 15));
-      const hi = Math.min(150, Math.max(Number(m[2]), c.bpm[0] - 15));
+      const entro = (n) => Math.max(30, c.bpm[0] - 15, Math.min(150, c.bpm[1] + 15, Number(n)));
+      const lo = entro(m[1]);
+      const hi = entro(m[2]);
       if (lo < hi) bpmRange[cat] = `${lo}-${hi}`;
     }
   }

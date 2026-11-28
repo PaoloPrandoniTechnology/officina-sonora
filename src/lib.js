@@ -307,6 +307,9 @@ async function engineUp() {
 }
 
 // Chiamata al modello locale: ritorna il primo oggetto JSON presente nella risposta.
+// gemma ragiona prima di rispondere e il ragionamento consuma max_tokens (visti circa 1500 token):
+// al tetto per la risposta si aggiunge questo margine.
+const RAGIONAMENTO_TOKEN = 6000;
 async function llmJson(system, user, maxTokens = 1200) {
   const r = await req('POST', `${CFG.llm}/chat/completions`, {
     ms: 600000,
@@ -317,11 +320,13 @@ async function llmJson(system, user, maxTokens = 1200) {
         { role: 'user', content: user },
       ],
       temperature: 0.8,
-      max_tokens: maxTokens,
+      max_tokens: maxTokens + RAGIONAMENTO_TOKEN,
     },
   });
   if (!r.ok) throw new Error(`LLM HTTP ${r.status}`);
-  const text = JSON.parse(r.buf.toString('utf8')).choices[0].message.content || '';
+  const scelta = JSON.parse(r.buf.toString('utf8')).choices[0];
+  if (scelta.finish_reason === 'length') throw new Error('risposta del modello troncata (max_tokens)');
+  const text = scelta.message.content || '';
   const a = text.indexOf('{');
   const b = text.lastIndexOf('}');
   if (a === -1 || b === -1) throw new Error('nessun JSON nella risposta del modello');
