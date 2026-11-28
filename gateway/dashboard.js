@@ -1712,6 +1712,22 @@
     if (e.key === ' ' && !e.target.closest('button, summary, a')) { e.preventDefault(); $('#pPlay').click(); }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); const au = $('#pAudio'); au.currentTime = Math.max(0, au.currentTime + (e.key === 'ArrowLeft' ? -10 : 10)); }
   });
+  // menu laterale: intero o a sole icone (con il nome nel suggerimento)
+  function menu(stretto) {
+    if (stretto) document.documentElement.dataset.menu = 'stretto'; else delete document.documentElement.dataset.menu;
+    document.querySelectorAll('#nav button').forEach((b) => { if (stretto) b.dataset.tip = b.firstChild.nextSibling.textContent.trim(); else delete b.dataset.tip; });
+    const b = $('#bMenu'), testo = stretto ? 'Allarga il menu' : 'Riduci il menu';
+    b.setAttribute('aria-expanded', String(!stretto));
+    b.querySelector('span').textContent = testo;
+    if (stretto) b.dataset.tip = testo; else delete b.dataset.tip;
+  }
+  $('#bMenu').onclick = () => {
+    const stretto = !document.documentElement.dataset.menu;
+    nascondiTip();
+    menu(stretto);
+    try { localStorage.setItem('menu', stretto ? 'stretto' : 'intero'); } catch (e) { /* resta per questa visita */ }
+  };
+  menu(document.documentElement.dataset.menu === 'stretto');
   $('#bTema').onclick = () => {
     const scuro = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
     const nuovo = scuro ? 'light' : 'dark';

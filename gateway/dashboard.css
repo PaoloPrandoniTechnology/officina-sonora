@@ -50,7 +50,8 @@ kbd { font: 11px var(--mono); border: 1px solid var(--line-2); border-bottom-wid
 .salta:focus { left: 8px; top: 8px; z-index: 100; background: var(--panel); padding: 8px 12px; border-radius: 4px; }
 
 /* struttura */
-.app { display: grid; grid-template-columns: 216px minmax(0, 1fr); min-height: 100vh; }
+:root { --lato: 216px; }
+.app { display: grid; grid-template-columns: var(--lato) minmax(0, 1fr); min-height: 100vh; }
 .lato { background: var(--side); color: var(--side-ink); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 16px 10px; overflow-y: auto; }
 .marchio { display: flex; align-items: center; gap: 10px; padding: 2px 8px 14px; font-family: var(--titoli); font-size: 17px; }
 .logo { display: flex; align-items: center; gap: 2px; height: 20px; }
@@ -63,7 +64,9 @@ nav button { display: flex; align-items: center; gap: 10px; padding: 7px 10px; b
 nav button:hover { color: var(--side-ink); background: rgba(255, 255, 255, .04); }
 nav button[aria-current="page"] { background: var(--side-sel); color: #fff; }
 nav .conta { margin-left: auto; font-size: 11px; background: rgba(255, 255, 255, .1); border-radius: 8px; padding: 0 7px; }
-.lato-piede { margin-top: auto; padding: 16px 10px 0; font-size: 11.5px; color: var(--side-muted); }
+#bMenu { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 0; border-radius: 5px; background: none; color: var(--side-muted); text-align: left; white-space: nowrap; }
+#bMenu:hover { color: var(--side-ink); background: rgba(255, 255, 255, .04); }
+.lato-piede { padding: 10px 10px 0; font-size: 11.5px; color: var(--side-muted); }
 main { padding: 0 28px 48px; min-width: 0; outline: none; }
 body.suona main { padding-bottom: 130px; }
 
@@ -426,7 +429,7 @@ body.suona .toasts { bottom: 100px; }
 .s-percorso { font: 12px var(--mono); overflow-wrap: anywhere; color: var(--muted); }
 
 /* lettore */
-#player { position: fixed; left: 216px; right: 0; bottom: 0; z-index: 40; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: center; height: 82px; padding: 0 20px; background: var(--panel); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(10, 14, 24, .08); }
+#player { position: fixed; left: var(--lato); right: 0; bottom: 0; z-index: 40; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: center; height: 82px; padding: 0 20px; background: var(--panel); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(10, 14, 24, .08); }
 #player button { background: none; border: 0; padding: 0; }
 .p-brano { display: flex; align-items: center; gap: 12px; min-width: 0; text-align: left; }
 .p-brano .cop { width: 54px; height: 54px; }
@@ -449,7 +452,19 @@ body.suona .toasts { bottom: 100px; }
 .stelle-mini:hover button { color: var(--star); }
 .stelle-mini button:hover ~ button { color: var(--line-2); }
 
+/* menu ridotto: solo le icone. Il testo resta per i lettori di schermo; sugli schermi stretti il menu è già in alto */
+@media (min-width: 881px) {
+  :root[data-menu="stretto"] { --lato: 60px; }
+  [data-menu="stretto"] .marchio { justify-content: center; padding-inline: 0; }
+  [data-menu="stretto"] .marchio b, [data-menu="stretto"] .lato-piede, [data-menu="stretto"] nav .conta { display: none; }
+  [data-menu="stretto"] nav p { margin: 8px 8px; height: 1px; overflow: hidden; font-size: 0; background: var(--side-sel); }
+  [data-menu="stretto"] nav button, [data-menu="stretto"] #bMenu { justify-content: center; gap: 0; padding: 10px 0; font-size: 0; }
+  [data-menu="stretto"] #bMenu span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  [data-menu="stretto"] #bMenu .ic { transform: scaleX(-1); }
+}
+
 @media (max-width: 880px) {
+  #bMenu { display: none; }
   .app { grid-template-columns: minmax(0, 1fr); }
   .lato { position: static; height: auto; padding: 10px 12px; overflow: visible; }
   .marchio { padding-bottom: 8px; }

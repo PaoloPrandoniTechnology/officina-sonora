@@ -310,6 +310,11 @@ Non devi premere nulla per aggiornarla: lo stato si rinfresca ogni 5 secondi, i 
 | **In produzione** + *Metti in pausa* | ferma o riavvia la produzione da qualsiasi pagina; il brano in corso finisce |
 | ◑ | passa dal tema chiaro a quello scuro (all'inizio segue Windows) |
 
+In fondo al menu a sinistra, **Riduci il menu** lascia solo le icone (il nome compare al passaggio del mouse) e dà
+più spazio alla pagina; **Allarga il menu** lo riporta intero. La scelta resta memorizzata nel browser.
+
+![Menu ridotto alle sole icone](docs/screenshots/24-menu-ridotto.png)
+
 - **Copertina con ▶**: ascolta il brano. **Titolo**: apre la scheda.
 - **Suggerimenti**: lasciando il mouse su molti elementi compare una spiegazione.
 - **Conferme**: dopo ogni modifica appare un messaggio in basso. Le azioni che tolgono qualcosa chiedono prima conferma.

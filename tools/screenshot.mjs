@@ -35,6 +35,7 @@ const PAGINE = [
   { nome: '17-controllo-messaggi', pagina: 'controllo/messaggi' },
   { nome: '12-controllo-storico', pagina: 'controllo/storico' },
   { nome: '13-log', pagina: 'log' },
+  { nome: '24-menu-ridotto', pagina: 'libreria', dopo: clic('#bMenu'), fissa: 900 },
   { nome: '21-telefono', pagina: 'panoramica', larghezza: 390, fissa: 844 },
 ];
 
