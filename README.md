@@ -189,8 +189,8 @@ una catena di servizi gratuiti. Il gateway li prova nell'ordine di `config\servi
 
 | Ordine | Servizio | Modello | Dove si crea la chiave |
 |---|---|---|---|
-| 1 | `gemini` | `gemini-3.8-flash` | [Google AI Studio](https://aistudio.google.com/apikey) |
-| 2 | `gemini-lite` | `gemini-3.5-flash-lite` (stessa chiave) | |
+| 1 | `gemini-lite` | `gemini-3.5-flash-lite` | [Google AI Studio](https://aistudio.google.com/apikey) |
+| 2 | `gemini` | `gemini-3.8-flash` (stessa chiave) | |
 | 3 | `groq` | `openai/gpt-oss-120b` | [Groq](https://console.groq.com/keys) |
 | 4 | `openrouter` | `google/gemma-4-31b-it:free` | [OpenRouter](https://openrouter.ai/keys) |
 | 5 | `openrouter-riserva` | `openrouter/free` (stessa chiave) | |
