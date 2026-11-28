@@ -119,7 +119,7 @@ function lettura() {
     },
     vocabolario: leggiJson(VOCABOLARIO, { famiglie: {} }).famiglie,
     spiegazioni: spiegazioni(),
-    storico: righe.slice(-80).map((r) => JSON.parse(r)).reverse(),
+    storico: righe.slice(-300).map((r) => JSON.parse(r)).reverse(),
   };
 }
 

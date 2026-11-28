@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Officina Sonora · Controllo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%235eead4'/%3E%3Cpath d='M4 11V6l8-2v5' stroke='%23072019' stroke-width='1.6' fill='none'/%3E%3Ccircle cx='4' cy='11' r='1.8' fill='%23072019'/%3E%3Ccircle cx='12' cy='9' r='1.8' fill='%23072019'/%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0a0d13;
@@ -14,7 +15,7 @@
     --line2: rgba(148, 163, 184, .2);
     --text: #e6eaf2;
     --muted: #8a94a8;
-    --faint: #5b6478;
+    --faint: #7b869c;
     --accent: #5eead4;
     --accent2: #818cf8;
     --ok: #34d399;
@@ -377,6 +378,32 @@
   .tempo .strutture .fchip { font-size: 11.5px; padding: 2px 9px; }
   .tempo .strutture.predefinito .fchip[aria-pressed="true"] { background: rgba(94,234,212,.12); border-color: rgba(94,234,212,.3); color: var(--text); }
   @media (max-width: 900px) { .guida { grid-template-columns: minmax(0, 1fr); } .guida-lato { position: static; max-height: 260px; } .guida-testa { position: static; } .termini, .argomenti { grid-template-columns: minmax(0, 1fr); } .termini-famiglie { flex-direction: row; flex-wrap: wrap; } .termini-famiglie .gvoce { width: auto; } .argomenti dt { border-top: 0; padding-bottom: 0; } .argomenti dd { border-top: 0; } }
+  /* connessione persa */
+  #offline { margin-bottom: 14px; padding: 11px 14px; border-radius: 10px; border: 1px solid rgba(248,113,113,.4); background: rgba(248,113,113,.12); color: var(--text); font-size: 13px; }
+  /* lettore comune */
+  #player { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 60; width: min(760px, calc(100vw - 24px)); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; border-radius: 14px; background: var(--surface-solid); border: 1px solid var(--line2); box-shadow: 0 24px 60px -20px rgba(0,0,0,.85); }
+  #player[hidden], #offline[hidden] { display: none; }
+  #player .pt { flex: 1 1 180px; min-width: 0; } #player .pt b { display: block; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } #player .pt small { color: var(--muted); font-size: 11.5px; }
+  #player audio { flex: 2 1 280px; height: 36px; }
+  #pAudio, #vAudio { color-scheme: dark; }
+  body.suona footer { padding-bottom: 90px; }
+  .ascolta { all: unset; cursor: pointer; width: 26px; height: 26px; display: inline-grid; place-items: center; border-radius: 50%; border: 1px solid var(--line2); color: var(--accent); font-size: 10px; flex: none; }
+  .ascolta:hover { border-color: var(--accent); background: rgba(94,234,212,.12); }
+  .ascolta:focus-visible, .link:focus-visible, th button:focus-visible, .kpi[data-vai]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .card h2 .link { text-transform: none; letter-spacing: 0; font-weight: 500; }
+  .link { all: unset; cursor: pointer; color: var(--accent); font-size: 12px; } .link:hover { text-decoration: underline; }
+  th button { all: unset; cursor: pointer; } th button:hover { color: var(--text); }
+  .kpi[data-vai] { cursor: pointer; } .kpi[data-vai]:hover { border-color: var(--accent); }
+  .conteggio { color: var(--muted); font-size: 12px; margin-left: auto; }
+  #qMotivi .hb { grid-template-columns: minmax(0, 1.4fr) minmax(60px, 1fr) 44px; } #qMotivi .hb span { white-space: normal; }
+  .brano-riga { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+  .brano-riga:last-child { border-bottom: 0; }
+  .brano-riga div { flex: 1; min-width: 0; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .brano-riga small { display: block; color: var(--muted); }
+  .gc .azioni { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .gc.sospeso { opacity: .65; }
+  .log { max-height: min(62vh, 640px); }
+  .storico td { vertical-align: top; } .storico .valore { font-size: 12px; overflow-wrap: anywhere; max-width: 340px; }
+  @media (max-width: 880px) { nav { scrollbar-width: none; } nav::-webkit-scrollbar { display: none; } }
 </style>
 </head>
 <body>
@@ -401,6 +428,7 @@
   </aside>
 
   <main>
+    <div id="offline" role="alert" hidden>Il gateway non risponde: i dati mostrati non sono aggiornati. Riprovo ogni 5 secondi.</div>
     <div class="topbar">
       <div>
         <h1 id="titolo">Panoramica</h1>
@@ -418,12 +446,12 @@
     <!-- PANORAMICA -->
     <section class="tab on" id="t-panoramica">
       <div class="grid">
-        <div class="card kpi c3"><div class="v" data-count="0" id="k-tot">0</div><div class="l">brani in libreria</div><svg class="spark" id="sp-tot"></svg></div>
-        <div class="card kpi c3"><div class="v" id="k-ore">0</div><div class="l">ore di musica</div><svg class="spark" id="sp-ore"></svg></div>
-        <div class="card kpi c3"><div class="v" id="k-voti">0</div><div class="l">brani votati</div><svg class="spark" id="sp-voti"></svg></div>
-        <div class="card kpi c3"><div class="v" id="k-media">—</div><div class="l">voto medio</div></div>
+        <div class="card kpi c3" data-vai="libreria" role="button" tabindex="0" data-tip="Apre la libreria"><div class="v" data-count="0" id="k-tot">0</div><div class="l">brani in libreria</div><svg class="spark" id="sp-tot"></svg></div>
+        <div class="card kpi c3" data-vai="andamento" role="button" tabindex="0" data-tip="Apre l'andamento"><div class="v" id="k-ore">0</div><div class="l">ore di musica</div><svg class="spark" id="sp-ore"></svg></div>
+        <div class="card kpi c3" data-vai="voti" role="button" tabindex="0" data-tip="Apre i voti"><div class="v" id="k-voti">0</div><div class="l">brani votati</div><svg class="spark" id="sp-voti"></svg></div>
+        <div class="card kpi c3" data-vai="voti" role="button" tabindex="0" data-tip="Apre i voti"><div class="v" id="k-media">—</div><div class="l">voto medio</div></div>
         <div class="card c8">
-          <h2>Brani generati, ultimi 14 giorni <small id="tl-tot"></small></h2>
+          <h2>Brani generati per giorno <small id="tl-tot"></small></h2>
           <div id="timeline"></div>
         </div>
         <div class="card c4 now" id="cardRender"></div>
@@ -435,8 +463,12 @@
           <h2>Famiglie <small>quota della libreria</small></h2>
           <div id="donut"></div>
         </div>
-        <div class="card c8">
-          <h2>Brani per categoria <small>prime 12</small></h2>
+        <div class="card c4">
+          <h2>Ultimi brani <button class="link" data-vai="libreria">tutta la libreria</button></h2>
+          <div id="ultimiBrani"></div>
+        </div>
+        <div class="card c12">
+          <h2>Brani per genere <small>primi 12</small></h2>
           <div id="topCat"></div>
         </div>
       </div>
@@ -470,6 +502,8 @@
       <div class="toolbar">
         <input class="search" id="q" type="search" placeholder="Cerca un genere, uno strumento, uno stile…" aria-label="Cerca genere">
         <div id="fam" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+        <label class="muted" style="font-size:12px">Ordina <select class="field" id="gOrd"><option value="">come da catalogo</option><option value="genere">per nome</option><option value="brani">più brani</option><option value="voto">voto migliore</option></select></label>
+        <span class="conteggio" id="gConta"></span>
       </div>
       <div class="gcards" id="gcards"></div>
     </section>
@@ -478,7 +512,7 @@
     <section class="tab" id="t-voti">
       <div class="grid">
         <div class="card c8">
-          <h2><span id="vCodaTit">Da votare (0)</span> <small>tasti 1-5 per votare</small></h2>
+          <h2><span id="vCodaTit">Da votare (0)</span> <small>1-5 vota · Spazio ascolta · S salta</small></h2>
           <div class="toolbar">
             <select class="field" id="vFiltro" aria-label="Filtra per genere"><option value="">Tutti i generi</option></select>
           </div>
@@ -515,10 +549,6 @@
         <div class="card c6">
           <h2>Brani da rivedere</h2>
           <div id="vPeggio"></div>
-        </div>
-        <div class="card c12">
-          <h2>Linee guida correnti <small id="gNota"></small></h2>
-          <div id="guida"></div>
         </div>
       </div>
     </section>
@@ -602,8 +632,15 @@
           <div id="lCar"></div>
         </div>
         <div class="card c12">
-          <h2>Brani recenti <small>ultimi 25</small></h2>
+          <h2>Tutti i brani <small>clic sulle intestazioni per ordinare</small></h2>
+          <div class="toolbar">
+            <input class="search" id="lQ" type="search" placeholder="Cerca per titolo, genere o tipo" aria-label="Cerca un brano">
+            <select class="field" id="lGen" aria-label="Filtra per genere"><option value="">Tutti i generi</option></select>
+            <select class="field" id="lVotoF" aria-label="Filtra per voto"><option value="">Tutti i voti</option><option value="no">Non votati</option><option value="si">Votati</option><option value="alti">4 e 5 stelle</option><option value="bassi">1 e 2 stelle</option></select>
+            <span class="conteggio" id="lConta"></span>
+          </div>
           <div class="scroll"><table id="recenti"></table></div>
+          <div style="margin-top:12px"><button class="btn small ghost" id="lAltri">Mostra altri 50</button></div>
         </div>
       </div>
     </section>
@@ -645,13 +682,25 @@
           <div id="esec"></div>
         </div>
         <div class="card c12">
-          <h2>Log di produzione <small>ultime righe</small></h2>
-          <div class="log" id="logBox"></div>
+          <h2>Log di produzione <small>ultime 200 righe, ora locale</small></h2>
+          <div class="toolbar">
+            <div id="logTipi" style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="tipo di riga">
+              <button class="fchip" data-l="tutto" aria-pressed="true">tutto</button><button class="fchip" data-l="e" aria-pressed="false">errori</button><button class="fchip" data-l="w" aria-pressed="false">avvisi</button><button class="fchip" data-l="o" aria-pressed="false">riusciti</button></div>
+            <input class="search" id="logQ" type="search" placeholder="Cerca nel log, per esempio il titolo di un brano" aria-label="Cerca nel log">
+            <span class="conteggio" id="logConta"></span>
+            <button class="btn small ghost" id="logCopia">Copia</button>
+          </div>
+          <div class="log" id="logBox" tabindex="0" aria-label="log di produzione"></div>
         </div>
       </div>
     </section>
 
     <div class="toasts" id="toasts" aria-live="polite"></div>
+    <div id="player" hidden role="region" aria-label="Lettore">
+      <div class="pt"><b id="pTit"></b><small id="pSub"></small></div>
+      <audio id="pAudio" controls preload="none"></audio>
+      <button class="btn small ghost" id="pChiudi" aria-label="Chiudi il lettore">Chiudi</button>
+    </div>
     <div class="modal-bg" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTit">
       <div class="modal"><h3 id="mTit"></h3><p id="mTesto"></p>
         <div class="acts"><button class="btn ghost" id="mNo">Annulla</button><button class="btn danger" id="mSi">Conferma</button></div></div>
@@ -701,6 +750,23 @@
       if (k < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
+  }
+
+  // nome leggibile di un genere
+  function nm(nome) {
+    const g = ((dati && dati.generi) || []).find((x) => x.nome === nome) || ((ctrl && ctrl.generi) || []).find((x) => x.nome === nome);
+    return g ? (g.etichetta || g.genere || nome) : (nome || '');
+  }
+  const tastoAscolta = (t) => (t.numero === null || t.numero === undefined ? '' : `<button type="button" class="ascolta" data-ascolta="${t.numero}" data-titolo="${esc(t.titolo)}" data-sotto="${esc(nm(t.categoria))}" aria-label="Ascolta ${esc(t.titolo)}">▶</button>`);
+  function ascolta(b) {
+    const au = $('#pAudio');
+    $('#vAudio').pause();
+    $('#pTit').textContent = b.dataset.titolo;
+    $('#pSub').textContent = b.dataset.sotto;
+    $('#player').hidden = false;
+    document.body.classList.add('suona');
+    au.src = '/audio/brano?n=' + encodeURIComponent(b.dataset.ascolta);
+    au.play().catch(() => {});
   }
 
   // mini grafico a linea per le card KPI
@@ -774,8 +840,9 @@
     return `<span class="stars">${s}</span>`;
   }
 
-  function servizioRiga(nome, attivo, on = 'attivo', off = 'non risponde') {
-    return `<div class="srv"><span><i class="dot ${attivo ? 'ok' : 'ko'}"></i>${esc(nome)}</span><span class="pill ${attivo ? 'ok' : 'ko'}">${attivo ? on : off}</span></div>`;
+  function servizioRiga(nome, attivo, on = 'attivo', off = 'non risponde', fermo = 'ko', spiegazione = '') {
+    const c = attivo ? 'ok' : fermo;
+    return `<div class="srv"${spiegazione ? ` data-tip="${esc(spiegazione)}"` : ''}><span><i class="dot ${c === 'w' ? 'warn' : c}"></i>${esc(nome)}</span><span class="pill ${c}">${attivo ? on : off}</span></div>`;
   }
 
   // ---------- stato in tempo reale (ogni 5 s) ----------
@@ -794,34 +861,49 @@
 
     const r = s.render;
     const html = r
-      ? `<div class="now"><h3>${esc(r.titolo || '(senza titolo)')}</h3><div class="sub">${esc([r.genere, r.categoria].filter(Boolean).join(' · '))}</div>
+      ? `<div class="now"><h3>${esc(r.titolo || '(senza titolo)')}</h3><div class="sub">${esc(r.genere || nm(r.categoria))}</div>
          <div class="bigbar"><i style="width:${Math.min(99, r.renderMedio_s ? Math.round(r.trascorsi_s / r.renderMedio_s * 100) : 0)}%"></i></div>
          <div class="kv"><span>Trascorsi</span><span>${sec(r.trascorsi_s)}</span><span>Render medio recente</span><span>${sec(r.renderMedio_s)}</span>
-         <span>Durata richiesta</span><span>${sec(r.durataRichiesta_s)}</span><span>Stato motore</span><span>${esc(r.statoMotore)}</span></div>
+         <span>Durata richiesta</span><span>${sec(r.durataRichiesta_s)}</span><span>Stato motore</span><span>${esc({ running: 'in lavorazione', queued: 'in coda', pending: 'in coda', done: 'finito', failed: 'fallito' }[r.statoMotore] || r.statoMotore)}</span></div>
          <div class="sub" style="margin-top:10px">La barra è una stima sul render medio: il motore non espone la percentuale.</div></div>`
-      : `<h2>Render</h2><div class="now"><h3>Nessun render in corso</h3><div class="sub">In attesa del prossimo brano.</div></div>`;
+      : `<h2>Render</h2><div class="now"><h3>Nessun render in corso</h3><div class="sub">${s.pipeline.occupata ? 'Il sistema sta preparando il prossimo brano.' : 'In attesa del prossimo brano.'}</div>
+         ${dati && dati.libreria.recenti[0] ? `<div class="brano-riga" style="margin-top:14px">${tastoAscolta(dati.libreria.recenti[0])}<div>${esc(dati.libreria.recenti[0].titolo)}<small>ultimo completato · ${data(dati.libreria.recenti[0].generato_il)}</small></div></div>` : ''}</div>`;
     $('#cardRender').innerHTML = html;
     $('#cardRender2').innerHTML = html.replace('<h2>Render</h2>', '');
 
     $('#servizi').innerHTML = servizioRiga('n8n', s.servizi.n8n) + servizioRiga('Motore YuE2', s.servizi.motoreYue)
-      + servizioRiga('LM Studio', s.servizi.lmStudio, 'attivo', 'spento') + servizioRiga('Modello gemma', s.servizi.gemmaCaricato, 'caricato', 'scaricato');
+      + servizioRiga('LM Studio', s.servizi.lmStudio, 'attivo', 'spento') + servizioRiga('Modello gemma', s.servizi.gemmaCaricato, 'caricato', 'scaricato', 'w', 'Durante un render gemma viene scaricata per liberare la scheda video: è normale.');
     $('#servizi2').innerHTML = $('#servizi').innerHTML;
 
     const sorv = `<div class="kv"><span>Battito watchdog</span><span>${ago(s.watchdog.battito_s)}</span>
-      <span>Ultimo controllo supervisore</span><span>${ago(s.supervisore.ultimoRun_s)}</span>
+      <span data-tip="Il supervisore controlla ogni 5 minuti e scrive solo quando deve riavviare qualcosa.">Ultimo intervento del supervisore</span><span>${ago(s.supervisore.ultimoRun_s)}</span>
       <span>Coda</span><span>${n0(s.pipeline.coda)}</span><span>Brani generati</span><span>${n0(s.pipeline.brani)}</span>
       <span>Scartati dal controllo</span><span>${n0(s.pipeline.scartati)}</span>
       <span>Disco E: libero</span><span>${s.sistema.disco_E_liberoGb === null ? '—' : n0(s.sistema.disco_E_liberoGb) + ' GB'}</span></div>`;
     $('#sorv').innerHTML = sorv;
 
-    $('#esec').innerHTML = (s.esecuzioni || []).map((e) => `<div class="srv"><span>${esc(e.startedAt.slice(5, 16))}</span><span class="pill ${e.status === 'success' ? 'ok' : 'ko'}">${esc(e.status)}</span></div>`).join('') || '<div class="empty">Nessun dato</div>';
+    $('#esec').innerHTML = (s.esecuzioni || []).map((e) => `<div class="srv"><span>${esc(data(/Z|\+\d\d/.test(e.startedAt) ? e.startedAt : e.startedAt.replace(' ', 'T') + 'Z'))}</span><span class="pill ${e.status === 'success' ? 'ok' : e.status === 'running' ? 'w' : 'ko'}">${esc({ success: 'riuscita', error: 'errore', running: 'in corso', crashed: 'interrotta', waiting: 'in attesa', canceled: 'annullata' }[e.status] || e.status)}</span></div>`).join('') || '<div class="empty">Nessun dato</div>';
 
+    disegnaLog();
+  }
+
+  // ---------- log: filtri, ricerca, orario locale ----------
+  const vistaLog = { tipo: 'tutto', q: '' };
+  const classeLog = (l) => (/errore|fallit|non riuscit|scartat/i.test(l) ? 'e' : /salvato|caricat|applicati|inviat|\bok\b/i.test(l) ? 'o' : /attenzione|troppo|rigener|occupat|non usato|riprovo/i.test(l) ? 'w' : '');
+  const rigaLocale = (l) => {
+    const m = /^(\d{4}-\d\d-\d\dT[\d:.]+Z) (.*)$/.exec(l);
+    return m ? new Date(m[1]).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '  ' + m[2] : l;
+  };
+  const righeLog = () => ((statoUltimo && statoUltimo.logProduzione) || []).filter((l) => (vistaLog.tipo === 'tutto' || classeLog(l) === vistaLog.tipo) && l.toLowerCase().includes(vistaLog.q.toLowerCase()));
+  function disegnaLog() {
     const box = $('#logBox');
-    box.innerHTML = (s.logProduzione || []).map((l) => {
-      const cls = /errore|fallit|non riuscit|scartat/i.test(l) ? 'e' : /salvato|caricat|applicati|inviat|ok/i.test(l) ? 'o' : /attenzione|troppo|rigener|occupat/i.test(l) ? 'w' : '';
-      return `<div class="${cls}">${esc(l)}</div>`;
-    }).join('');
-    box.scrollTop = box.scrollHeight;
+    if (window.getSelection && box.contains(window.getSelection().anchorNode) && String(window.getSelection())) return; // non cancellare una selezione
+    const inFondo = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+    const prima = box.scrollTop;
+    const righe = righeLog();
+    box.innerHTML = righe.map((l) => `<div class="${classeLog(l)}">${esc(rigaLocale(l))}</div>`).join('') || '<div>Nessuna riga corrisponde.</div>';
+    box.scrollTop = inFondo ? box.scrollHeight : prima;
+    $('#logConta').textContent = righe.length + ' righe';
   }
 
   // ---------- analisi (ogni 30 s) ----------
@@ -841,8 +923,11 @@
     sparkline($('#sp-ore'), L.timeline.map((x) => x.ore), '#818cf8');
     sparkline($('#sp-voti'), L.timeline.map((x) => x.voti), '#f0abfc');
 
-    $('#tl-tot').textContent = n0(L.timeline.reduce((a, x) => a + x.brani, 0)) + ' nel periodo';
-    $('#timeline').innerHTML = barre(L.timeline, {
+    // i giorni iniziali senza brani non si mostrano (resta almeno una settimana)
+    const primo = L.timeline.findIndex((x) => x.brani > 0);
+    const giorni = L.timeline.slice(Math.max(0, Math.min(primo < 0 ? 0 : primo, L.timeline.length - 7)));
+    $('#tl-tot').textContent = n0(giorni.reduce((a, x) => a + x.brani, 0)) + ' negli ultimi ' + giorni.length + ' giorni';
+    $('#timeline').innerHTML = barre(giorni, {
       h: 190, colore: '#5eead4',
       etichetta: (x) => x.giorno.slice(8, 10) + '/' + x.giorno.slice(5, 7),
       valore: (x) => x.brani, titolo: (x) => x.giorno + ': ' + x.brani + ' brani',
@@ -851,7 +936,8 @@
     const famColori = { meditativo: '#5eead4', ritmico: '#fbbf24', rock: '#f87171', elettronico: '#818cf8', orchestrale: '#f0abfc', world: '#34d399', jazz: '#60a5fa' };
     const fam = Object.entries(L.perFamiglia).sort((a, b) => b[1] - a[1]).map(([nome, valore], i) => ({ nome, valore, colore: famColori[nome] || colore(i) }));
     $('#donut').innerHTML = ciambella(fam, 'brani');
-    $('#topCat').innerHTML = barreOrizz(d.generi.filter((g) => g.brani > 0).sort((a, b) => b.brani - a.brani).slice(0, 12).map((g) => ({ nome: g.nome, valore: g.brani })));
+    $('#topCat').innerHTML = barreOrizz(d.generi.filter((g) => g.brani > 0).sort((a, b) => b.brani - a.brani).slice(0, 12).map((g) => ({ nome: g.genere, valore: g.brani })));
+    $('#ultimiBrani').innerHTML = L.recenti.slice(0, 6).map((t) => `<div class="brano-riga">${tastoAscolta(t)}<div>${esc(t.titolo)}<small>${esc(nm(t.categoria))} · ${data(t.generato_il)}</small></div></div>`).join('') || '<div class="empty">Nessun brano.</div>';
 
     // Render
     const ult = R.ultimi || [];
@@ -866,27 +952,18 @@
 
     // Generi
     renderGeneri();
+    if (vt.caricato) { disegnaCoda(); disegnaVotati(); }
 
     // Voti
     const dv = [1, 2, 3, 4, 5].map((k, i) => ({ nome: k + ' stelle', valore: V.distribuzione[k] || 0, colore: ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399'][i] }));
     $('#vDonut').innerHTML = V.totale ? ciambella(dv, 'voti') : '<div class="empty">Nessun brano ancora votato. I voti arrivano da iBroadcast e da Telegram.</div>';
     $('#vNota').textContent = V.totale ? V.totale + ' brani votati su ' + V.su : '';
     $('#vCat').innerHTML = V.perCategoria.length
-      ? V.perCategoria.map((c) => `<div class="hb"><span>${esc(c.categoria)}</span><div class="tr"><div class="fi" style="--w:${pct(c.media, 5).toFixed(1)}%"></div></div><em>${n1(c.media)}</em></div>`).join('')
+      ? V.perCategoria.map((c) => `<div class="hb"><span title="${esc(nm(c.categoria))}">${esc(nm(c.categoria))}</span><div class="tr"><div class="fi" style="--w:${pct(c.media, 5).toFixed(1)}%"></div></div><em>${n1(c.media)}</em></div>`).join('')
       : '<div class="empty">Ancora nessun voto per categoria.</div>';
-    const brano = (x) => `<div class="srv"><span>${esc(x.titolo)}<br><small class="muted">${esc(x.categoria || '')}</small></span>${stelle(x.voto)}</div>`;
+    const brano = (x) => `<div class="srv"><span>${esc(x.titolo)}<br><small class="muted">${esc(nm(x.categoria))}</small></span>${stelle(x.voto)}</div>`;
     $('#vMiglio').innerHTML = V.migliori.map(brano).join('') || '<div class="empty">Nessun brano con voto alto.</div>';
     $('#vPeggio').innerHTML = V.peggiori.map(brano).join('') || '<div class="empty">Nessun brano con voto basso.</div>';
-    $('#guida').innerHTML = `<div class="kv" style="margin-bottom:12px"><span>Versione</span><span>${esc(d.guida.versione ?? '—')}</span>
-      <span>Aggiornata</span><span>${data(d.guida.aggiornato)}</span></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
-        <div><div class="muted" style="font-size:12px;margin-bottom:6px">Stile da aggiungere</div>${(d.guida.styleExtra || []).map((t) => `<span class="tag acc">${esc(t)}</span>`).join('') || '<span class="muted">—</span>'}</div>
-        <div><div class="muted" style="font-size:12px;margin-bottom:6px">Da evitare</div>${(d.guida.styleAvoid || []).map((t) => `<span class="tag">${esc(t)}</span>`).join('') || '<span class="muted">—</span>'}</div>
-        <div><div class="muted" style="font-size:12px;margin-bottom:6px">Fasce di bpm</div>${Object.entries(d.guida.bpmRange || {}).slice(0, 14).map(([k, v]) => `<div class="kv" style="grid-template-columns:1fr auto;margin-bottom:3px"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('') || '<span class="muted">—</span>'}</div>
-      </div>
-      ${(d.guida.note || []).length ? '<div class="muted" style="margin-top:12px;font-size:12.5px">' + d.guida.note.map((n) => '<p style="margin:4px 0">' + esc(n) + '</p>').join('') + '</div>' : ''}`;
-    $('#gNota').textContent = d.guida.note && d.guida.note.length ? '' : '';
-
     // Qualita'
     const tasso = Q.tassoScarto || 0;
     $('#qRing').innerHTML = `<div style="display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center">
@@ -898,8 +975,8 @@
       </svg>
       <div class="kv"><span>Accettati</span><span>${n0(Q.accettati)}</span><span>Scartati</span><span>${n0(Q.scartati)}</span>
       <span>Rigenerazioni</span><span>${n0(Q.rigenerazioni)}</span></div></div>`;
-    $('#qMotivi').innerHTML = barreOrizz(Q.motivi.map((m) => ({ nome: m.motivo, valore: m.n }))) || '<div class="empty">Nessuno scarto registrato.</div>';
-    $('#qCat').innerHTML = barreOrizz(Q.perCategoria.map((c) => ({ nome: c.categoria, valore: c.n }))) || '<div class="empty">Nessuno scarto.</div>';
+    $('#qMotivi').innerHTML = barreOrizz(Q.motivi.map((m) => ({ nome: m.motivo.replace(/#/g, 'N'), valore: m.n }))) || '<div class="empty">Nessuno scarto registrato.</div>';
+    $('#qCat').innerHTML = barreOrizz(Q.perCategoria.map((c) => ({ nome: nm(c.categoria), valore: c.n }))) || '<div class="empty">Nessuno scarto.</div>';
     $('#eTot').textContent = n0(d.errori.totale24h) + ' nelle ultime 24 h';
     $('#eTop').innerHTML = d.errori.top.map((e) => `<div class="srv"><span style="font-size:12px">${esc(e.errore)}</span><span class="pill n">${n0(e.n)}</span></div>`).join('') || '<div class="empty">Nessun errore.</div>';
 
@@ -908,12 +985,34 @@
     $('#lTipo').innerHTML = barreOrizz(Object.entries(L.perTipo).map(([nome, valore]) => ({ nome, valore })));
     $('#lCar').innerHTML = `<div class="kv"><span>Caricati su iBroadcast</span><span>${n0(L.caricati)} di ${n0(L.totale)}</span>
       <span>Ascolti totali</span><span>${n0(L.ascoltiTot)}</span><span>Caricamenti nelle ultime 24 h</span><span>${n0(R.caricati24h)}</span></div>`;
-    $('#recenti').innerHTML = `<thead><tr><th>Titolo</th><th>Categoria</th><th>Tipo</th><th class="num">Durata</th><th class="num">BPM</th><th>Voto</th><th>Esito</th><th>iBroadcast</th><th>Generato</th></tr></thead><tbody>${
-      L.recenti.map((t) => `<tr><td>${esc(t.titolo)}</td><td>${esc(t.categoria || '')}</td><td><span class="tag">${esc(t.tipo || '')}</span></td>
-        <td class="num">${sec(t.durata_s)}</td><td class="num">${n0(t.bpm)}</td><td>${stelle(t.voto)}</td>
-        <td><span class="pill ${t.esito === 'ok' ? 'ok' : t.esito ? 'ko' : 'n'}">${esc(t.esito || '—')}</span></td>
-        <td>${t.caricato ? '<span class="pill ok">sì</span>' : '<span class="pill n">no</span>'}</td><td class="muted">${data(t.generato_il)}</td></tr>`).join('')
-    }</tbody>`;
+    disegnaLibreria();
+  }
+
+  const lib = { q: '', genere: '', voto: '', ordine: 'generato_il', verso: -1, quanti: 25 };
+  const COL_LIB = [['titolo', 'Titolo'], ['categoria', 'Genere'], ['tipo', 'Tipo'], ['durata_s', 'Durata', 'num'], ['bpm', 'BPM', 'num'], ['voto', 'Voto'], ['ascolti', 'Ascolti', 'num'], ['caricato', 'iBroadcast'], ['generato_il', 'Generato']];
+  function disegnaLibreria() {
+    if (!dati) return;
+    const tutti = dati.libreria.recenti;
+    const generi = [...new Set(tutti.map((t) => t.categoria).filter(Boolean))].sort((a, b) => nm(a).localeCompare(nm(b)));
+    $('#lGen').innerHTML = '<option value="">Tutti i generi</option>' + generi.map((g) => `<option value="${esc(g)}"${g === lib.genere ? ' selected' : ''}>${esc(nm(g))}</option>`).join('');
+    const q = lib.q.trim().toLowerCase();
+    const voti = { no: (v) => v === null, si: (v) => v !== null, alti: (v) => v >= 4, bassi: (v) => v !== null && v <= 2 };
+    const lista = tutti.filter((t) => (!lib.genere || t.categoria === lib.genere) && (!lib.voto || voti[lib.voto](t.voto))
+      && (!q || [t.titolo, nm(t.categoria), t.categoria, t.tipo].join(' ').toLowerCase().includes(q)));
+    const chiave = (t) => (lib.ordine === 'categoria' ? nm(t.categoria) : t[lib.ordine]);
+    lista.sort((a, b) => {
+      const x = chiave(a), y = chiave(b);
+      if (x === null || x === undefined || y === null || y === undefined) return (x === null || x === undefined) - (y === null || y === undefined);
+      return (typeof x === 'string' ? x.localeCompare(y) : x - y) * lib.verso;
+    });
+    $('#lConta').textContent = n0(lista.length) + ' di ' + n0(tutti.length) + ' brani';
+    $('#lAltri').hidden = lista.length <= lib.quanti;
+    $('#recenti').innerHTML = `<thead><tr><th><span class="muted">Ascolta</span></th>${COL_LIB.map(([c, nome, cl]) => `<th class="${cl || ''}"${lib.ordine === c ? ` aria-sort="${lib.verso > 0 ? 'ascending' : 'descending'}"` : ''}><button type="button" data-lord="${c}">${nome}${lib.ordine === c ? (lib.verso > 0 ? ' ↑' : ' ↓') : ''}</button></th>`).join('')}</tr></thead><tbody>${
+      lista.slice(0, lib.quanti).map((t) => `<tr><td>${tastoAscolta(t)}</td><td>${esc(t.titolo)}</td><td>${esc(nm(t.categoria))}</td><td><span class="tag">${esc(t.tipo || '')}</span></td>
+        <td class="num">${sec(t.durata_s)}</td><td class="num">${n0(t.bpm)}</td>
+        <td>${t.numero === null ? stelle(t.voto) : `<button class="link" data-vota="${t.numero}" data-tip="Apre il brano nella pagina Voti">${t.voto === null ? 'vota' : stelle(t.voto)}</button>`}</td>
+        <td class="num">${n0(t.ascolti)}</td><td>${t.caricato ? '<span class="pill ok">sì</span>' : '<span class="pill n">no</span>'}</td><td class="muted">${data(t.generato_il)}</td></tr>`).join('')
+      || '<tr><td colspan="10" class="empty">Nessun brano corrisponde.</td></tr>'}</tbody>`;
   }
 
   function lineaRender(ult) {
@@ -954,15 +1053,22 @@
       if (!q) return true;
       return [g.nome, g.genere, g.stile, g.attivita, ...(g.strumenti || []), ...(g.varianti || []), ...(g.influenze || [])].join(' ').toLowerCase().includes(q);
     });
+    const ordine = $('#gOrd').value;
+    if (ordine === 'genere') lista.sort((a, b) => a.genere.localeCompare(b.genere));
+    if (ordine === 'brani') lista.sort((a, b) => b.brani - a.brani);
+    if (ordine === 'voto') lista.sort((a, b) => (b.votoMedio || 0) - (a.votoMedio || 0));
+    $('#gConta').textContent = lista.length + ' di ' + dati.generi.length;
+    // le schede aperte restano aperte dopo l'aggiornamento
+    const aperte = new Set([...document.querySelectorAll('#gcards details[open]')].map((d) => d.dataset.g));
     $('#gcards').innerHTML = lista.map((g, i) => {
       const c = g.colori && g.colori.length ? g.colori : ['#1e293b', '#334155', '#64748b'];
       const energia = [1, 2, 3, 4, 5].map((k) => `<i class="${k <= g.energia ? 'on' : ''}"></i>`).join('');
-      return `<article class="gc" style="animation-delay:${Math.min(i, 12) * 0.03}s">
+      return `<article class="gc${g.attivo ? '' : ' sospeso'}" style="animation-delay:${Math.min(i, 12) * 0.03}s">
         <div class="hd" style="background:linear-gradient(135deg, ${c[0]}, ${c[1] || c[0]} 60%, ${c[2] || c[1] || c[0]})">
-          <div class="nm">${esc(g.nome)}</div></div>
+          <div class="nm">${esc(g.genere)}</div></div>
         <div class="bd">
-          <div class="gn">${esc(g.genere)} · ${esc(g.famiglia || '')}</div>
-          <div>${g.vocale ? '<span class="tag vox">voci senza parole</span>' : '<span class="tag acc">strumentale</span>'}<span class="tag">${esc(g.ambito || '')}</span></div>
+          <div class="gn">${esc(g.famiglia || '')} · ${esc(g.nome)}</div>
+          <div>${g.vocale ? '<span class="tag vox">voci senza parole</span>' : '<span class="tag acc">strumentale</span>'}<span class="tag">${esc(g.ambito || '')}</span>${g.attivo ? '' : '<span class="tag">sospeso</span>'}</div>
           <div class="row">
             <div><small>BPM</small><b>${g.bpm[0]}–${g.bpm[1]}</b></div>
             <div><small>Brani</small><b>${n0(g.brani)}</b></div>
@@ -970,7 +1076,8 @@
           </div>
           <div class="energy" title="energia ${g.energia}/5">${energia}</div>
           <div class="muted" style="font-size:12px;margin-top:8px">${esc(g.attivita)}</div>
-          <details><summary>Specifiche complete</summary>
+          <div class="azioni"><button class="btn small" data-stile="${esc(g.nome)}">Modifica stile</button><button class="btn small ghost" data-produci="${esc(g.nome)}" data-tip="Il prossimo brano sarà di questo genere">Produci ora</button></div>
+          <details data-g="${esc(g.nome)}"${aperte.has(g.nome) ? ' open' : ''}><summary>Specifiche complete</summary>
             <div class="det">
               <p><b>Stile</b><br>${esc(g.stile)}</p>
               <p><b>Strumenti</b><br>${(g.strumenti || []).map((s) => `<span class="tag">${esc(s)}</span>`).join('')}</p>
@@ -1009,9 +1116,12 @@
       $('#mTit').textContent = titolo;
       $('#mTesto').textContent = testo;
       $('#mSi').textContent = etichetta;
+      const prima = document.activeElement;
       m.hidden = false;
+      m.onkeydown = (e) => { if (e.key !== 'Tab') return; e.preventDefault(); (document.activeElement === $('#mSi') ? $('#mNo') : $('#mSi')).focus(); };
       const chiudi = (esito) => {
         m.hidden = true;
+        if (prima && prima.isConnected) prima.focus();
         $('#mSi').onclick = null; $('#mNo').onclick = null; m.onclick = null;
         ok(esito);
       };
@@ -1066,7 +1176,7 @@
       <div class="card kpi c3"><div class="kpi-mini"><b>${n0(statoUltimo ? statoUltimo.pipeline.coda : 0)}</b><span>brani in coda</span></div></div>
       <div class="card kpi c3"><div class="kpi-mini"><b>${n0(personalizzati)}</b><span>parametri personalizzati</span></div></div>
       <div class="card kpi c3"><div class="kpi-mini"><b>${n0(sospesi)}</b><span>generi sospesi</span></div></div>`;
-    $('#cRiepilogo').style.display = ctrlSub === 'guida' ? 'none' : ''; // la pagina a blocchi ha la sua intestazione
+    $('#cRiepilogo').style.display = ctrlSub === 'produzione' ? '' : 'none'; // i contatori servono solo in Produzione
     document.querySelectorAll('#csub button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.s === ctrlSub ? 'true' : 'false'));
     CTRL_SEZIONI.forEach((s) => { $('#c-' + s).hidden = s !== ctrlSub; });
     if (ctrlSub === 'produzione') disegnaProduzione();
@@ -1082,10 +1192,10 @@
     const pausa = ctrl.comandi.pausa === true;
     const pendenti = [];
     if (ctrl.comandi.svuotaCoda) pendenti.push('svuotamento della coda');
-    if (ctrl.comandi.produciGenere) pendenti.push('genere forzato: ' + ctrl.comandi.produciGenere);
+    if (ctrl.comandi.produciGenere) pendenti.push('genere forzato: ' + nm(ctrl.comandi.produciGenere));
     const sf = ctrl.sfondi || { fatti: 0, totale: 0 };
     const scelto = $('#selGen') && $('#selGen').value;
-    const opzioni = ctrl.generi.map((g) => `<option value="${esc(g.nome)}">${esc(g.nome)}</option>`).join('');
+    const opzioni = perFamiglia(ctrl.generi).map(([titolo, lista]) => `<optgroup label="${esc(titolo)}">${lista.map((g) => `<option value="${esc(g.nome)}">${esc(g.etichetta)}${g.attivo ? '' : ' (sospeso)'}</option>`).join('')}</optgroup>`).join('');
     $('#c-produzione').innerHTML = `
       <div class="grid">
         <div class="card c6">
@@ -1142,7 +1252,7 @@
     if ($('#bSfondiStop')) $('#bSfondiStop').onclick = () => esegui(() => invia('/api/controllo/comando', { azione: 'sfondi_ferma' }), 'Fermo la generazione');
     $('#bGen').onclick = () => {
       const g = $('#selGen').value;
-      esegui(() => invia('/api/controllo/comando', { azione: 'produci', genere: g }), 'Genere in produzione: ' + g);
+      esegui(() => invia('/api/controllo/comando', { azione: 'produci', genere: g }), 'Genere in produzione: ' + nm(g));
     };
   }
 
@@ -1236,27 +1346,47 @@
     };
   }
 
+  const vistaGeneri = { stato: '', ordine: '', verso: 1 };
+  function generiMostrati() {
+    const q = $('#cGenQ').value.trim().toLowerCase();
+    const lista = ctrl.generi.filter((g) => (!vistaGeneri.stato || g.attivo === (vistaGeneri.stato === 'si')) && [g.etichetta, g.nome, g.famiglia, g.ambito].join(' ').toLowerCase().includes(q));
+    const k = vistaGeneri.ordine;
+    if (k) lista.sort((a, b) => (typeof a[k] === 'string' ? a[k].localeCompare(b[k]) : a[k] - b[k]) * vistaGeneri.verso);
+    return lista;
+  }
   function disegnaGeneri() {
     // La struttura (barra di ricerca e tabella) si crea una sola volta; a ogni modifica si aggiorna solo il corpo
     if (!$('#gTbody')) {
       $('#c-generi').innerHTML = `
       <div class="toolbar">
         <input class="search" id="cGenQ" type="search" placeholder="Cerca un genere…" aria-label="Cerca genere">
-        <button class="btn small" id="bAttTutti">Attiva tutti</button>
+        <div id="cGenFil" style="display:flex;gap:8px" role="group" aria-label="stato"><button class="fchip" data-st="" aria-pressed="true">tutti</button><button class="fchip" data-st="si" aria-pressed="false">attivi</button><button class="fchip" data-st="no" aria-pressed="false">sospesi</button></div>
+        <button class="btn small" id="bAttMostrati" data-tip="Attiva tutti i generi che vedi nell'elenco">Attiva i mostrati</button>
+        <button class="btn small warn" id="bSospMostrati" data-tip="Sospende tutti i generi che vedi nell'elenco">Sospendi i mostrati</button>
         <button class="btn small ghost" id="bPesiUno">Pesi a 1</button>
       </div>
       <div class="card" style="padding:0;overflow:hidden">
         <div class="scroll"><table class="gtable">
-          <thead><tr><th>Genere</th><th class="num">Brani</th><th>Attivo</th><th>Peso di frequenza</th></tr></thead>
+          <thead><tr><th><button type="button" data-gord="etichetta">Genere</button></th><th class="num"><button type="button" data-gord="brani">Brani</button></th><th><button type="button" data-gord="attivo">Attivo</button></th><th><button type="button" data-gord="peso">Peso di frequenza</button></th><th></th></tr></thead>
           <tbody id="gTbody"></tbody>
         </table></div>
       </div>
       <p class="muted" style="font-size:12.5px;margin-top:10px">Il peso indica quanto spesso esce un genere: 1 è la norma, 0 non esce mai, 5 esce cinque volte più spesso. I generi con pochi brani restano privilegiati dalla rotazione.</p>`;
       $('#cGenQ').addEventListener('input', () => disegnaGeneri());
-      $('#bAttTutti').onclick = async () => {
-        const sospesi = ctrl.generi.filter((g) => !g.attivo);
-        if (!sospesi.length) { toast('Tutti i generi sono già attivi', 'ok'); return; }
-        await esegui(async () => { for (const g of sospesi) await invia('/api/controllo/genere', { nome: g.nome, attivo: true }); }, 'Generi attivati: ' + sospesi.length);
+      const massa = async (attivo) => {
+        const scelti = generiMostrati().filter((g) => g.attivo !== attivo);
+        if (!scelti.length) { toast('Nessun genere da cambiare', 'ok'); return; }
+        if (await chiedi(attivo ? 'Attivare i generi mostrati?' : 'Sospendere i generi mostrati?', `Cambierà lo stato di ${scelti.length} generi.`, attivo ? 'Attiva' : 'Sospendi')) {
+          esegui(async () => { for (const g of scelti) await invia('/api/controllo/genere', { nome: g.nome, attivo }); }, 'Generi aggiornati: ' + scelti.length);
+        }
+      };
+      $('#bAttMostrati').onclick = () => massa(true);
+      $('#bSospMostrati').onclick = () => massa(false);
+      $('#cGenFil').onclick = (e) => { const b = e.target.closest('[data-st]'); if (!b) return; vistaGeneri.stato = b.dataset.st; disegnaGeneri(); };
+      $('#c-generi').querySelector('thead').onclick = (e) => {
+        const b = e.target.closest('[data-gord]'); if (!b) return;
+        vistaGeneri.verso = vistaGeneri.ordine === b.dataset.gord ? -vistaGeneri.verso : (b.dataset.gord === 'etichetta' ? 1 : -1);
+        vistaGeneri.ordine = b.dataset.gord; disegnaGeneri();
       };
       $('#bPesiUno').onclick = async () => {
         const diversi = ctrl.generi.filter((g) => g.peso !== 1);
@@ -1266,17 +1396,17 @@
         }
       };
     }
-    const q = $('#cGenQ').value.trim().toLowerCase();
-    const lista = ctrl.generi.filter((g) => g.nome.toLowerCase().includes(q));
-    $('#gTbody').innerHTML = lista.map((g) => `
+    document.querySelectorAll('#cGenFil [data-st]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.st === vistaGeneri.stato)));
+    $('#gTbody').innerHTML = generiMostrati().map((g) => `
             <tr>
-              <td class="nm">${esc(g.nome)}</td>
+              <td class="nm">${esc(g.etichetta)}<br><small class="muted">${esc([g.ambito, g.famiglia].filter(Boolean).join(' · '))}</small></td>
               <td class="num">${n0(g.brani)}</td>
-              <td><label class="switch"><input type="checkbox" data-att="${esc(g.nome)}" ${g.attivo ? 'checked' : ''}><span></span></label></td>
+              <td><label class="switch"><input type="checkbox" data-att="${esc(g.nome)}" aria-label="${esc(g.etichetta)} attivo" ${g.attivo ? 'checked' : ''}><span></span></label></td>
               <td><div style="display:flex;align-items:center;gap:10px">
-                <input type="range" min="0" max="5" step="0.05" value="${g.peso}" data-peso="${esc(g.nome)}" aria-label="peso ${esc(g.nome)}">
+                <input type="range" min="0" max="5" step="0.05" value="${g.peso}" data-peso="${esc(g.nome)}" aria-label="peso ${esc(g.etichetta)}">
                 <span class="num" style="min-width:40px">${n1(g.peso)}</span></div></td>
-            </tr>`).join('') || '<tr><td colspan="4" class="empty">Nessun genere corrisponde.</td></tr>';
+              <td><button class="link" data-stile="${esc(g.nome)}">stile</button></td>
+            </tr>`).join('') || '<tr><td colspan="5" class="empty">Nessun genere corrisponde.</td></tr>';
     $('#c-generi').querySelectorAll('input[data-att]').forEach((c) => {
       c.onchange = () => esegui(() => invia('/api/controllo/genere', { nome: c.dataset.att, attivo: c.checked }),
         `${c.dataset.att}: ${c.checked ? 'attivato' : 'sospeso'}`);
@@ -1590,16 +1720,40 @@
     $('#in-note').onkeydown = (e) => { if (e.key === 'Enter') $('#gNotaVai').click(); };
   }
 
+  const vistaStorico = { sezione: '', q: '', quanti: 40 };
+  const leggibile = (v) => (v === null || v === undefined ? 'predefinito'
+    : Array.isArray(v) ? v.map(leggibile).join(', ') || 'vuoto'
+      : typeof v === 'object' ? Object.entries(v).filter(([, x]) => x !== undefined).map(([k, x]) => k + ': ' + leggibile(x)).join(' · ') || 'vuoto'
+        : typeof v === 'boolean' ? (v ? 'sì' : 'no') : String(v));
+  // sostituisce i nomi interni dei generi con quelli leggibili
+  const conNomi = (testo) => ctrl.generi.slice().sort((a, b) => b.nome.length - a.nome.length).reduce((t, g) => t.split(g.nome).join(g.etichetta), String(testo));
   function disegnaStorico() {
     const righe = ctrl.storico || [];
-    const breve = (v) => { const s = typeof v === 'string' ? v : JSON.stringify(v); return s.length > 90 ? s.slice(0, 87) + '…' : s; };
-    $('#c-storico').innerHTML = `
-      <div class="card" style="padding:0;overflow:hidden"><div class="scroll"><table>
-        <thead><tr><th>Quando</th><th>Sezione</th><th>Voce</th><th>Prima</th><th>Dopo</th></tr></thead>
-        <tbody>${righe.map((r) => `<tr><td class="muted">${data(r.ts)}</td><td><span class="tag">${esc(r.sezione)}</span></td><td>${esc(r.chiave)}</td>
-          <td class="muted" style="font-family:var(--mono);font-size:11.5px">${esc(breve(r.prima))}</td><td style="font-family:var(--mono);font-size:11.5px">${esc(breve(r.dopo))}</td></tr>`).join('') || '<tr><td colspan="5" class="empty">Nessuna modifica registrata.</td></tr>'}</tbody>
-      </table></div></div>
-      <p class="muted" style="font-size:12.5px;margin-top:10px">Ogni modifica fatta da questa pagina è registrata qui, con il valore precedente. Per tornare indietro, riporta il valore precedente dalla sezione corrispondente.</p>`;
+    if (!$('#sTbody')) {
+      $('#c-storico').innerHTML = `
+        <div class="toolbar">
+          <select class="field" id="sSez" aria-label="Filtra per sezione"></select>
+          <input class="search" id="sQ" type="search" placeholder="Cerca nello storico, per esempio un genere" aria-label="Cerca nello storico">
+          <span class="conteggio" id="sConta"></span>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="scroll"><table class="storico">
+          <thead><tr><th>Quando</th><th>Sezione</th><th>Voce</th><th>Prima</th><th>Dopo</th></tr></thead><tbody id="sTbody"></tbody></table></div></div>
+        <div style="margin-top:12px"><button class="btn small ghost" id="sAltri">Mostra altre 80</button></div>
+        <p class="muted" style="font-size:12.5px;margin-top:10px">Sono registrate le modifiche fatte da questa pagina, con il valore precedente. Per tornare indietro, riporta il valore precedente dalla sezione corrispondente.</p>`;
+      $('#sSez').onchange = (e) => { vistaStorico.sezione = e.target.value; disegnaStorico(); };
+      $('#sQ').oninput = (e) => { vistaStorico.q = e.target.value; disegnaStorico(); };
+      $('#sAltri').onclick = () => { vistaStorico.quanti += 80; disegnaStorico(); };
+    }
+    const sezioni = [...new Set(righe.map((r) => r.sezione))].sort();
+    $('#sSez').innerHTML = '<option value="">Tutte le sezioni</option>' + sezioni.map((x) => `<option${x === vistaStorico.sezione ? ' selected' : ''}>${esc(x)}</option>`).join('');
+    const q = vistaStorico.q.trim().toLowerCase();
+    const lista = righe.map((r) => ({ ...r, voce: conNomi(r.chiave), a: leggibile(r.prima), b: leggibile(r.dopo) }))
+      .filter((r) => (!vistaStorico.sezione || r.sezione === vistaStorico.sezione) && (!q || [r.sezione, r.voce, r.chiave, r.a, r.b].join(' ').toLowerCase().includes(q)));
+    const breve = (t) => (t.length > 120 ? `<span data-tip="${esc(t.slice(0, 900))}" tabindex="0">${esc(t.slice(0, 117))}…</span>` : esc(t));
+    $('#sConta').textContent = n0(lista.length) + ' di ' + n0(righe.length) + ' modifiche';
+    $('#sAltri').hidden = lista.length <= vistaStorico.quanti;
+    $('#sTbody').innerHTML = lista.slice(0, vistaStorico.quanti).map((r) => `<tr><td class="muted" style="white-space:nowrap">${data(r.ts)}</td><td><span class="tag">${esc(r.sezione)}</span></td><td>${esc(r.voce)}</td>
+      <td class="valore muted">${breve(r.a)}</td><td class="valore">${breve(r.b)}</td></tr>`).join('') || '<tr><td colspan="5" class="empty">Nessuna modifica corrisponde.</td></tr>';
   }
 
   // Note per genere: istruzioni scritte dal produttore, tradotte in inglese e aggiunte allo stile
@@ -1622,9 +1776,9 @@
       </div>`;
     const disegnaLista = () => {
       const q = $('#nQ').value.trim().toLowerCase();
-      $('#nLista').innerHTML = generi.filter((x) => x.nome.toLowerCase().includes(q)).map((x) => `
+      $('#nLista').innerHTML = generi.filter((x) => (x.etichetta + ' ' + x.nome).toLowerCase().includes(q)).map((x) => `
         <button class="fchip" data-ng="${esc(x.nome)}" aria-pressed="${x.nome === noteGenere}" style="text-align:left;display:flex;justify-content:space-between;gap:8px;border-radius:9px">
-          <span>${esc(x.nome)}</span><span class="${x.note.length ? '' : 'muted'}">${n0(x.note.length)}</span></button>`).join('');
+          <span>${esc(x.etichetta)}</span><span class="${x.note.length ? '' : 'muted'}">${n0(x.note.length)}</span></button>`).join('');
       $('#nLista').querySelectorAll('button[data-ng]').forEach((b) => {
         b.onclick = () => { noteGenere = b.dataset.ng; disegnaNote(); };
       });
@@ -1633,7 +1787,7 @@
     $('#nQ').addEventListener('input', disegnaLista);
     const note = g.note;
     $('#nPannello').innerHTML = `
-      <h2>${esc(g.nome)} <small>${esc(g.genere || '')}</small></h2>
+      <h2>${esc(g.etichetta)} <small><button class="link" data-stile="${esc(g.nome)}">modifica lo stile a blocchi</button></small></h2>
       <p class="muted" style="margin:0 0 14px;font-size:13px">Scrivi cosa vuoi sentire in questo genere, in italiano: per esempio <i>fai più assoli</i> oppure <i>usa il flauto di pan</i>. Il sistema la traduce in inglese e la aggiunge allo stile di ogni brano di questo genere.</p>
       <div style="display:grid;gap:8px;margin-bottom:16px">
         ${note.map((n, i) => `
@@ -1708,19 +1862,23 @@
       audio.removeAttribute('src'); audio.load();
     } else if (!vt.cur || vt.cur.numero !== b.numero) {
       vt.cur = b;
-      $('#vBrano').innerHTML = `<h3>${esc(b.titolo)}</h3><div class="sub">${esc([b.categoria, sec(b.durata_s), 'n. ' + b.numero].filter(Boolean).join(' · '))}</div>`;
+      intestazioneBrano(b);
       audio.src = '/audio/brano?n=' + encodeURIComponent(b.numero);
       $('#vNotaTxt').value = b.nota || '';
     } else {
       // stesso brano: dati aggiornati, lettore fermo; la nota si aggiorna solo se non e' stata toccata
       if ($('#vNotaTxt').value === (vt.cur.nota || '')) $('#vNotaTxt').value = b.nota || '';
       vt.cur = b;
+      intestazioneBrano(b);
     }
     abilitaVoto();
   }
+  function intestazioneBrano(b) {
+    $('#vBrano').innerHTML = `<h3>${esc(b.titolo)}</h3><div class="sub">${esc([nm(b.categoria), sec(b.durata_s), 'n. ' + b.numero].filter(Boolean).join(' · '))}</div>`;
+  }
 
   function disegnaVotati() {
-    $('#vVotati').innerHTML = vt.votati.map((b) => `<button class="vrow" data-n="${esc(b.numero)}"><span>${esc(b.titolo)}<br><small class="muted">${esc(b.categoria || '')}${b.nota ? ' · ' + esc(b.nota) : ''}</small></span>${stelle(b.voto)}</button>`).join('')
+    $('#vVotati').innerHTML = vt.votati.map((b) => `<button class="vrow" data-n="${esc(b.numero)}"><span>${esc(b.titolo)}<br><small class="muted">${esc(nm(b.categoria))}${b.nota ? ' · ' + esc(b.nota) : ''}</small></span>${stelle(b.voto)}</button>`).join('')
       || '<div class="empty">Nessun brano votato.</div>';
   }
 
@@ -1728,7 +1886,7 @@
   function disegnaCoda() {
     const generi = [...new Set(vt.coda.map((b) => b.categoria).filter(Boolean))].sort();
     if (vt.filtro && !generi.includes(vt.filtro)) vt.filtro = '';
-    $('#vFiltro').innerHTML = '<option value="">Tutti i generi</option>' + generi.map((g) => `<option value="${esc(g)}"${g === vt.filtro ? ' selected' : ''}>${esc(g)} (${vt.coda.filter((b) => b.categoria === g).length})</option>`).join('');
+    $('#vFiltro').innerHTML = '<option value="">Tutti i generi</option>' + generi.map((g) => `<option value="${esc(g)}"${g === vt.filtro ? ' selected' : ''}>${esc(nm(g))} (${vt.coda.filter((b) => b.categoria === g).length})</option>`).join('');
     const lista = vLista();
     $('#vCodaTit').textContent = `Da votare (${lista.length})`;
     // il brano corrente resta se e' in coda (con il filtro) o se e' un votato in correzione;
@@ -1752,6 +1910,12 @@
     }
     disegnaCoda();
     disegnaVotati();
+    // brano chiesto dalla libreria
+    if (vt.richiesto !== undefined) {
+      const b = vt.coda.concat(vt.votati).find((x) => x.numero === vt.richiesto);
+      delete vt.richiesto;
+      if (b) { vt.cur = null; mostraBrano(b); } else toast('Il brano non è ancora votabile: attendi qualche minuto', 'err');
+    }
   }
 
   async function votaBrano(voto) {
@@ -1806,12 +1970,16 @@
     audio.focus({ preventScroll: true });
   });
   document.addEventListener('keydown', (e) => {
-    if (!/^[1-5]$/.test(e.key) || e.ctrlKey || e.altKey || e.metaKey || e.repeat) return;
+    const tasto = e.key.toLowerCase();
+    if (!/^[1-5s ]$/.test(tasto) || e.ctrlKey || e.altKey || e.metaKey || e.repeat) return;
     if (!$('#t-voti').classList.contains('on') || !$('#modal').hidden) return;
     const t = e.target;
     if (t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+    if (tasto === ' ' && t.closest && t.closest('button, audio, [role="button"]')) return; // Spazio preme il controllo a fuoco
     e.preventDefault();
-    votaBrano(Number(e.key));
+    if (tasto === 's') { $('#vSalta').click(); return; }
+    if (tasto === ' ') { const au = $('#vAudio'); if (au.paused) au.play().catch(() => {}); else au.pause(); return; }
+    votaBrano(Number(tasto));
   });
 
   // ---------- andamento ----------
@@ -1928,7 +2096,7 @@
     $('#aGeneri').innerHTML = !righe.length ? '<div class="empty">Nessun brano nel periodo</div>' : '<table class="an-gen"><thead><tr>' +
       COL_GENERI.map(([c, nome]) => `<th${an.ordine === c ? ` aria-sort="${an.verso > 0 ? 'ascending' : 'descending'}"` : ''} class="${c === 'genere' ? '' : 'num'}"><button type="button" data-ordina="${c}">${nome}${freccia(c)}</button></th>`).join('') + '</tr></thead><tbody>' +
       righe.map((r) => '<tr>' + COL_GENERI.map(([c, , formato]) => c === 'genere'
-        ? `<td><button type="button" data-genere="${esc(r.genere)}">${esc(r.genere)}</button></td>`
+        ? `<td><button type="button" data-genere="${esc(r.genere)}">${esc(nm(r.genere))}</button></td>`
         : `<td class="num">${esc(formato(r[c]))}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
   }
 
@@ -2029,6 +2197,10 @@
     document.querySelectorAll('section.tab').forEach((s) => s.classList.toggle('on', s.id === 't-' + tab));
     document.querySelectorAll('#nav button').forEach((b) => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
     $('#titolo').textContent = TITOLI[tab];
+    document.title = TITOLI[tab] + ' · Officina Sonora';
+    const corrente = document.querySelector('#nav button[aria-current="page"]');
+    const nav = $('#nav');
+    if (corrente && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = corrente.offsetLeft - nav.clientWidth / 2;
     const hash = tab === 'controllo' ? (ctrlSub === 'guida' ? indirizzoGuida() : '#controllo/' + ctrlSub) : '#' + tab;
     if (location.hash !== hash) history.replaceState(null, '', hash);
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -2047,6 +2219,49 @@
     renderGeneri();
   });
   $('#q').addEventListener('input', (e) => { filtro.q = e.target.value; renderGeneri(); });
+  // azioni presenti in piu' pagine
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-vai], [data-ascolta], [data-vota], [data-stile], [data-produci]');
+    if (!b) return;
+    if (b.dataset.ascolta) return ascolta(b);
+    if (b.dataset.vai) return vai(b.dataset.vai);
+    if (b.dataset.vota) { vt.richiesto = Number(b.dataset.vota); vt.filtro = ''; return vai('voti'); }
+    if (b.dataset.stile) { apriGuida(encodeURIComponent(b.dataset.stile)); return vai('controllo/guida/' + encodeURIComponent(b.dataset.stile)); }
+    const g = b.dataset.produci;
+    return chiedi('Produrre questo genere?', 'Il prossimo brano sarà di ' + nm(g) + '. La richiesta vale una sola volta.', 'Produci')
+      .then((si) => si && invia('/api/controllo/comando', { azione: 'produci', genere: g }).then(() => toast('Richiesto: ' + nm(g))).catch((x) => toast(x.message, 'err')));
+  });
+  document.addEventListener('keydown', (e) => {
+    const b = e.target.closest && e.target.closest('[data-vai][role="button"]');
+    if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); vai(b.dataset.vai); }
+  });
+  $('#pChiudi').onclick = () => { const au = $('#pAudio'); au.pause(); au.removeAttribute('src'); au.load(); $('#player').hidden = true; document.body.classList.remove('suona'); };
+  $('#pAudio').addEventListener('error', (e) => { if (e.target.getAttribute('src')) toast('Impossibile riprodurre il brano', 'err'); });
+  $('#vAudio').addEventListener('play', () => $('#pAudio').pause());
+  $('#gOrd').onchange = renderGeneri;
+  const aggiornaLibreria = () => { lib.quanti = 25; disegnaLibreria(); };
+  $('#lQ').oninput = (e) => { lib.q = e.target.value; aggiornaLibreria(); };
+  $('#lGen').onchange = (e) => { lib.genere = e.target.value; aggiornaLibreria(); };
+  $('#lVotoF').onchange = (e) => { lib.voto = e.target.value; aggiornaLibreria(); };
+  $('#lAltri').onclick = () => { lib.quanti += 50; disegnaLibreria(); };
+  $('#recenti').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-lord]');
+    if (!b) return;
+    lib.verso = lib.ordine === b.dataset.lord ? -lib.verso : (['titolo', 'categoria', 'tipo'].includes(b.dataset.lord) ? 1 : -1);
+    lib.ordine = b.dataset.lord;
+    disegnaLibreria();
+  });
+  $('#logTipi').onclick = (e) => {
+    const b = e.target.closest('[data-l]');
+    if (!b) return;
+    vistaLog.tipo = b.dataset.l;
+    document.querySelectorAll('#logTipi [data-l]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    disegnaLog();
+  };
+  $('#logQ').oninput = (e) => { vistaLog.q = e.target.value; disegnaLog(); };
+  $('#logCopia').onclick = () => navigator.clipboard.writeText(righeLog().map(rigaLocale).join('\n'))
+    .then(() => toast('Log copiato'), () => toast('Copia non consentita dal browser', 'err'));
+
   vai((location.hash || '#panoramica').slice(1));
   window.addEventListener('hashchange', () => vai(location.hash.slice(1)));
 
@@ -2057,8 +2272,11 @@
     return r.json();
   }
   async function aggiornaStato() {
-    try { disegnaStato(await leggi('/api/stato')); }
-    catch (e) { $('#cAgg').textContent = 'connessione persa'; }
+    let stato;
+    try { stato = await leggi('/api/stato', AbortSignal.timeout(20000)); }
+    catch (e) { $('#cAgg').textContent = 'connessione persa'; $('#offline').hidden = false; return; }
+    $('#offline').hidden = true;
+    disegnaStato(stato);
   }
   async function aggiornaDati() {
     try { disegnaDati(await leggi('/api/dati')); }

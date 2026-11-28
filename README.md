@@ -32,6 +32,8 @@ Gira tutto sul tuo PC: **YuE2** genera l'audio, **gemma** (LM Studio) scrive tit
 | **Avviare** la produzione | doppio clic su `E:\n8n\avvia-automazione.vbs` |
 | **Fermare** tutto | doppio clic su `E:\n8n\ferma-automazione.vbs` (LM Studio resta acceso) |
 | **Vedere cosa succede** | apri [http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard) |
+| **Ritrovare e riascoltare** un brano | *Libreria*: cerca, filtra, ordina e premi ▶ |
+| Leggere **cosa ha fatto** il sistema | *Log e sistema*: filtro *errori* o ricerca per titolo |
 | Fare una **pausa** senza spegnere | dashboard, *Controllo → Produzione*: Metti in pausa / Riprendi |
 | Produrre **subito un genere** | dashboard, *Controllo → Produzione*: scegli il genere |
 | Avere **più o meno** di un genere | *Controllo → Generi*: peso da 0 (mai) a 5 |
@@ -245,26 +247,67 @@ da correggere con l'ascolto.
 
 ## 5. La dashboard
 
-[http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard), **solo da questo PC**. Si aggiorna ogni 5 secondi.
+[http://127.0.0.1:5790/dashboard](http://127.0.0.1:5790/dashboard), **solo da questo PC**. Lo stato dei servizi si
+aggiorna ogni 5 secondi, l'analisi della libreria ogni 30.
 
-| Scheda | Cosa trovi |
+| Scheda | A cosa serve |
 |---|---|
-| **Panoramica** | numeri chiave, produzione degli ultimi 14 giorni, render in corso, servizi |
-| **Render** | tempi di render, durata ottenuta contro richiesta, bpm e tipi |
-| **Generi** | brani e stato di ogni genere |
-| **Voti** | ascolto e voto dei brani |
-| **Andamento** | il sistema sta migliorando? |
-| **Qualità** | scarti, motivi, errori delle ultime 24 ore |
-| **Libreria** | brani recenti e caricamenti |
-| **Controllo** | tutte le impostazioni |
-| **Log e sistema** | servizi, sorveglianza, esecuzioni n8n, log |
+| [Panoramica](#panoramica) | numeri chiave, produzione per giorno, render in corso, ultimi brani, servizi |
+| [Render](#render) | tempi di render, durata ottenuta contro richiesta, bpm e tipi |
+| [Generi](#generi) | scheda di ogni genere, con accesso diretto allo stile e alla produzione |
+| [Voti](#voti) | ascolto e voto dei brani |
+| [Andamento](#andamento) | il sistema sta migliorando? |
+| [Qualità](#qualità) | scarti, motivi, errori delle ultime 24 ore |
+| [Libreria](#libreria) | tutti i brani, con ricerca, filtri e ascolto |
+| [Controllo](#controllo) | tutte le impostazioni |
+| [Log e sistema](#log-e-sistema) | servizi, sorveglianza, esecuzioni n8n, log filtrabile |
 
-### Render e generi
+### Come si usa, in ogni pagina
+
+| Elemento | Comportamento |
+|---|---|
+| **Indirizzo** | ogni pagina e sottosezione ha il suo (`#libreria`, `#controllo/guida/tempo`, `#controllo/guida/<genere>`): si può salvare tra i preferiti; il titolo della scheda del browser segue la pagina |
+| **Nomi dei generi** | in italiano e leggibili (*Sound bath con gong*), non con il nome interno |
+| **Tasto ▶** | apre il **lettore** in basso, che resta aperto mentre cambi pagina; *Chiudi* lo ferma. Avviare un brano ferma l'altro lettore |
+| **Pillole in alto** | sistema, LM Studio e gemma, motore YuE2, pipeline, ora dell'ultimo aggiornamento |
+| **Gateway non raggiungibile** | compare un avviso rosso: i numeri a video non sono aggiornati, la pagina riprova da sola |
+| **Modifiche** | confermate da un messaggio in basso; quelle che tolgono qualcosa chiedono conferma (Esc annulla) |
+| **Tastiera e telefono** | tutti i comandi si raggiungono con Tab; sotto 880 px il menu passa in alto e scorre |
+
+### Panoramica
+![Panoramica](docs/screenshots/01-panoramica.png)
+
+- I quattro numeri in alto sono **cliccabili** e portano a Libreria, Andamento e Voti.
+- **Brani generati per giorno** parte dal primo giorno con produzione (almeno una settimana, al massimo 14 giorni).
+- **Render**: titolo, tempo trascorso e stima; quando è fermo mostra l'ultimo brano completato, ascoltabile.
+- **Ultimi brani**: i sei più recenti con ▶ e il collegamento a tutta la libreria.
+- In basso: servizi, quota per famiglia e i 12 generi con più brani.
+
+### Render
 ![Render](docs/screenshots/02-render.png)
+
+Render in corso, tempo medio, minimo e massimo degli ultimi 40, confronto tra tempo di render e durata richiesta,
+tipi di brano e distribuzione dei bpm.
+
+### Generi
 ![Generi](docs/screenshots/03-generi.png)
+
+- Ricerca per nome, strumento o stile; filtro per famiglia; **ordinamento** per catalogo, nome, numero di brani o voto.
+- Ogni scheda mostra se il genere è **sospeso** e ha due pulsanti: **Modifica stile** (apre le linee guida di quel
+  genere) e **Produci ora** (il prossimo brano sarà di quel genere, una sola volta).
+- *Specifiche complete* resta aperto anche quando la pagina si aggiorna.
 
 ### Voti
 ![Voti](docs/screenshots/04-voti.png)
+
+| Tasto | Azione |
+|---|---|
+| **1 - 5** | vota il brano e passa al successivo |
+| **Spazio** | ascolta o mette in pausa |
+| **S** | salta al brano successivo |
+
+Si può filtrare per genere, lasciare una nota (fino a 300 caratteri) e correggere un voto da *Votati ora*. Un brano
+si può votare anche partendo dalla Libreria. Sotto: esiti, voto medio per genere, brani più apprezzati e da rivedere.
 
 ### Andamento
 ![Andamento](docs/screenshots/14-andamento.png)
@@ -293,33 +336,61 @@ guida, una per intervallo. Il giudizio confronta gli ultimi 7 giorni con i 7 pre
 
 Sotto la soglia il giudizio è *stabile*, sotto il minimo *dati insufficienti*.
 
-### Qualità e libreria
+### Qualità
 ![Qualità](docs/screenshots/05-qualita.png)
+
+Tasso di scarto, motivi (la lettera **N** sostituisce i numeri, per raggruppare i problemi uguali), generi con più
+scarti ed errori delle ultime 24 ore.
+
+### Libreria
 ![Libreria](docs/screenshots/06-libreria.png)
+
+Elenco di **tutti i brani**:
+
+- ricerca per titolo, genere o tipo; filtro per genere e per voto (non votati, votati, 4-5, 1-2);
+- **ordinamento** con un clic sull'intestazione (di nuovo per invertire);
+- 25 righe alla volta, con *Mostra altri 50*;
+- **▶** ascolta; il valore nella colonna *Voto* apre il brano nella pagina Voti.
+
+In alto: brani per ambito e tipo, caricati su iBroadcast e ascolti. I brani scartati non compaiono.
 
 ### Controllo
 Le modifiche valgono dal brano successivo e sono registrate nello **Storico** con il valore precedente.
 
 | Sezione | Cosa fa |
 |---|---|
-| Produzione | pausa e ripresa, svuota coda, produci un genere, genera gli sfondi delle copertine |
-| Parametri | durata, esplorazione, peso dei voti, soglie di qualità (ognuno con limiti) |
-| Generi | attiva o sospende, regola il peso |
-| Linee guida | blocchi di stile generali e per genere, anteprima del prompt, note, bpm |
-| Note per genere | richieste in italiano, tradotte e aggiunte allo stile |
-| Messaggi | frequenza, orari e contenuto dei messaggi Telegram |
-| Storico | tutte le modifiche |
+| [Produzione](#produzione) | pausa e ripresa, svuota coda, produci un genere, sfondi delle copertine |
+| [Parametri](#parametri) | durata, esplorazione, peso dei voti, soglie di qualità |
+| [Generi](#generi-pesi-e-stato) | attiva o sospende, regola il peso |
+| [Linee guida](#linee-guida-a-blocchi) | stile a blocchi, tempo e struttura, note per il sistema |
+| [Note per genere](#note-per-genere) | richieste in italiano, tradotte e aggiunte allo stile |
+| [Messaggi](#messaggi) | frequenza, orari e contenuto dei messaggi Telegram |
+| [Storico](#storico) | tutte le modifiche |
 
+#### Produzione
 ![Produzione](docs/screenshots/07-controllo-produzione.png)
+
+I quattro contatori (stato, coda, parametri personalizzati, generi sospesi) compaiono solo qui. *Produci ora un
+genere* elenca i generi per famiglia. **Genera gli sfondi** mette in pausa la produzione e alla fine la ripristina.
+
+#### Parametri
 ![Parametri](docs/screenshots/08-controllo-parametri.png)
+
+Ogni parametro ha descrizione, limiti, indicazione *predefinito* o *personalizzato* e il ritorno al predefinito.
+
+#### Generi: pesi e stato
 ![Generi: pesi](docs/screenshots/09-controllo-generi.png)
+
+- Ricerca, filtro **tutti / attivi / sospesi** e ordinamento per genere, brani, stato o peso.
+- **Attiva i mostrati** e **Sospendi i mostrati** agiscono sui soli generi visibili: per esempio cerca *rock* e
+  sospendili tutti insieme (con conferma).
+- Il **peso** va da 0 (mai) a 5; *Pesi a 1* li riporta alla norma. Il collegamento *stile* apre le linee guida del genere.
+
+#### Linee guida a blocchi
 ![Linee guida generali](docs/screenshots/10-controllo-guida.png)
 ![Linee guida di un genere](docs/screenshots/15-controllo-guida-genere.png)
 ![Tempo e struttura](docs/screenshots/16-controllo-guida-tempo.png)
-![Note per genere](docs/screenshots/11-controllo-note.png)
-![Storico](docs/screenshots/12-controllo-storico.png)
 
-#### Linee guida a blocchi
 Tre sottosezioni:
 
 - **Stile.** A sinistra l'elenco dei generi con ricerca (il numero indica le modifiche, i sospesi sono attenuati;
@@ -340,8 +411,30 @@ Tre sottosezioni:
   [YuE](https://github.com/multimodal-art-projection/YuE) (Apache-2.0, `config\yue-v1`), rigenerabile con
   `node tools/genera-vocabolario.js`.
 
+#### Note per genere
+![Note per genere](docs/screenshots/11-controllo-note.png)
+
+Scrivi in italiano cosa vuoi sentire in un genere: la nota viene tradotta in inglese e aggiunta allo stile. Si può
+passare direttamente allo stile a blocchi dello stesso genere.
+
+#### Messaggi
+![Messaggi](docs/screenshots/17-controllo-messaggi.png)
+
+Frequenza del riepilogo, fascia oraria e dati inclusi in ogni messaggio Telegram.
+
+#### Storico
+![Storico](docs/screenshots/12-controllo-storico.png)
+
+Ultime 300 modifiche, in forma leggibile (*predefinito* quando un valore non era impostato), con filtro per sezione
+e ricerca. I testi lunghi si leggono per intero nel tooltip.
+
 ### Log e sistema
 ![Log e sistema](docs/screenshots/13-log.png)
+
+- Servizi, battito del watchdog, ultimo **intervento** del supervisore (scrive solo quando deve riavviare
+  qualcosa: un valore alto è buon segno), coda, brani, scarti, spazio su disco, ultime esecuzioni n8n.
+- **Log di produzione**: ultime 200 righe in **ora locale**, filtro *tutto / errori / avvisi / riusciti*, ricerca e
+  *Copia*. Se scorri verso l'alto la lettura resta ferma; torna in fondo per seguire le righe nuove.
 
 ---
 

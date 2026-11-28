@@ -108,12 +108,14 @@ function calcola() {
     (perCat[c] = perCat[c] || []).push(t);
   }
   const scartatiPerCat = contaPer(scartati, (t) => t.categoria);
+  const sospesi = leggiJson(path.join(__dirname, '..', 'config', 'parametri.json'), {}).generi || {};
   const generi = (catalogo.categories || []).map((c) => {
     const list = perCat[c.name] || [];
     const ultimo = list.map((t) => t.generato_il).filter(Boolean).sort().pop() || null;
     return {
       nome: c.name,
       genere: c.genere || c.name,
+      attivo: (sospesi[c.name] || {}).attivo !== false,
       ambito: c.ambito || null,
       famiglia: c.famiglia || null,
       energia: c.energia,
@@ -211,7 +213,7 @@ function calcola() {
   }
   const erroriTop = Object.entries(erroriPerChiave).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([errore, n]) => ({ errore, n }));
 
-  const recenti = [...tracce].sort((a, b) => (b.generato_il || '').localeCompare(a.generato_il || '')).slice(0, 25);
+  const recenti = [...tracce].sort((a, b) => (b.generato_il || '').localeCompare(a.generato_il || '')).slice(0, 2000); // la pagina Libreria cerca e filtra su tutti
 
   return {
     aggiornato: new Date().toISOString(),

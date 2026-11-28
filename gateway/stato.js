@@ -130,7 +130,7 @@ async function leggiStato() {
     supervisore: { ultimeRighe: supervisoreLog, ultimoRun_s: eta(path.join(STATE, 'supervisore.log')) },
     sistema: { disco_E_liberoGb: liberoGb },
     esecuzioni: ultimeEsecuzioni(),
-    logProduzione: coda(path.join(STATE, 'tick.log'), 20),
+    logProduzione: coda(path.join(STATE, 'tick.log'), 200),
   };
 }
 
