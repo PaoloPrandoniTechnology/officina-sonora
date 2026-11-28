@@ -870,6 +870,8 @@
     nascondiTip();
     if (!el) return;
     tipDi = el;
+    // una finestra aperta copre il resto della pagina: il suggerimento va dentro la finestra
+    (el.closest('dialog') || document.body).appendChild(tip);
     tip.textContent = el.dataset.tip;
     tip.hidden = false;
     el.setAttribute('aria-describedby', 'tip');

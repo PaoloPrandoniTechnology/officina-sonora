@@ -169,21 +169,23 @@ Ogni voce dell'elenco ha una **mini timeline**: la riconosci a colpo d'occhio.
 
 #### La timeline di riproduzione
 
-Mostra esattamente ciò che stai sentendo, anche se non leggi la musica.
+Pensata per chi non legge la musica. Durante l'ascolto prende il posto della voce (e, nell'editor, dei pulsanti):
+si guarda una cosa sola. *Chiudi* fa tornare tutto.
 
-![La timeline durante l'ascolto: accordo, nota, battiti e riga che avanza](docs/screenshots/41-composizione-ascolto.png)
+![L'ascolto: nastro che scorre, riga ferma e tastiera accesa](docs/screenshots/41-composizione-ascolto.png)
 
 | Parte | Cosa ti dice |
 |---|---|
-| **Accordo** e **Nota** in grande | che cosa suona in questo istante (*pausa* se la melodia tace) |
-| **1 2 3 4** | il battito: il cerchio pieno segue il tempo |
-| *Battuta 3 di 16 · giro 1 di 2* | dove sei; nelle forme anche la sezione (Strofa, Ritornello…) |
-| Le quattro battute | accordi in alto, note sotto: **più in alto = più acuta, più larga = più lunga**. La riga rossa avanza, la nota in corso è rossa, le battute passate sbiadiscono |
-| La barra in basso | tutto l'ascolto: premi un punto per **saltare** lì |
-| Pulsanti | *Pausa* / *Riprendi*, *Dall'inizio*, *Ferma*, tempo trascorso |
+| **Nota** in grande e accordo per intero | per esempio *Mi* · *accordo di Do maggiore* (*pausa* se la melodia tace) |
+| **Nastro** | scorre senza scatti da destra a sinistra sotto la **riga rossa ferma**: in alto gli accordi, sotto le note. Più in alto = più acuta, più larga = più lunga |
+| **Tastiera** | in **rosso** la nota della melodia, in **blu** i tasti dell'accordo, con il nome sul tasto |
+| Barra sottile | tutto l'ascolto: premi un punto (o usa le frecce) per saltare |
+| *Pausa* · ↺ · *Chiudi* | ferma e riprende, ricomincia, chiude |
+| **Sincronia** | la riga segue ciò che la scheda audio sta facendo uscire; se con le tue cuffie (tipico quelle senza fili) arriva prima o dopo il suono, correggila di 50 ms alla volta: il valore resta memorizzato nel browser |
 
-Nello stesso momento, sulla timeline della voce (in elenco o nell'editor) si accende l'elemento in ascolto e una
-riga ne segna la posizione.
+Le spiegazioni stanno nei **suggerimenti**, che compaiono solo passando sopra: il **?** accanto alla nota, la
+tastiera, la barra, *Sincronia* e, nell'editor, le etichette sottolineate a puntini (*Grado*, *Durata*,
+*Movimento*…).
 
 #### L'editor in tre passi
 
@@ -192,7 +194,7 @@ riga ne segna la posizione.
 | Passo | Cosa fai |
 |---|---|
 | **1 Dove si usa** | stile, parte, modo o andamento; per richiami e forme anche il nome (l'unica cosa che si scrive). Sotto leggi in quali generi si sentirà |
-| **2 Componi** | premi un elemento sulla **timeline**: sotto compaiono solo i pulsanti che lo riguardano. Accordi e note si sentono appena scelti. *Annulla modifica*, *Ripeti*, *Ricomincia* |
+| **2 Componi** | premi un elemento sulla **timeline**: sotto compaiono solo i pulsanti che lo riguardano; passando su un'etichetta leggi che cosa vuol dire. Accordi e note si sentono appena scelti. *Annulla modifica*, *Ripeti*, *Ricomincia* |
 | **3 Controlla e salva** | ✓ a posto, ✗ da completare (blocca *Salva*), ○ consiglio. *Ascolta*, poi *Salva* |
 
 ![L'editor di un richiamo: accordi e note sulla stessa timeline](docs/screenshots/40-composizione-richiamo.png)

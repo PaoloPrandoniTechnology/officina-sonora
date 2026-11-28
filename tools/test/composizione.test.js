@@ -168,13 +168,13 @@ test('riproduzione: accordo, nota, battuta e battito giusti istante per istante'
   const ev = Lt.eventi(score);
   assert.equal(ev.totale, 4);
   assert.deepEqual(ev.note.map((n) => [n.midi, n.t, n.durata]), [[60, 0, 0.5], [64, 1, 3]], 'le note legate sono una sola');
-  const a = (t) => { const p = Lt.posizione(ev, t); return [p.battuta, p.battito, p.nota < 0 ? null : ev.note[p.nota].midi, ev.accordi[p.accordo].nome]; };
-  assert.deepEqual(a(0), [0, 0, 60, 'Do']);
-  assert.deepEqual(a(0.75), [0, 1, null, 'Do']);
-  assert.deepEqual(a(1.5), [0, 3, 64, 'Sol 7']);
-  assert.deepEqual(a(2.6), [1, 1, 64, 'La min']);
-  assert.deepEqual(a(3.999), [1, 3, 64, 'La min'], 'fino all’ultimo istante');
-  assert.deepEqual(['Bbm7', 'F#m7b5', 'D/F#', 'Ebmaj7'].map(Lt.nomeAccordo), ['Sib m7', 'Fa# m7♭5', 'Re / Fa#', 'Mib maj7']);
+  const a = (t) => { const p = Lt.posizione(ev, t); return [p.battuta, p.battito, p.nota < 0 ? null : ev.note[p.nota].midi, Lt.nomeAccordo(ev.accordi[p.accordo].sigla)]; };
+  assert.deepEqual(a(0), [0, 0, 60, 'Do maggiore']);
+  assert.deepEqual(a(0.75), [0, 1, null, 'Do maggiore']);
+  assert.deepEqual(a(1.5), [0, 3, 64, 'Sol settima']);
+  assert.deepEqual(a(2.6), [1, 1, 64, 'La minore']);
+  assert.deepEqual(a(3.999), [1, 3, 64, 'La minore'], 'fino all’ultimo istante');
+  assert.deepEqual(['Bbm7', 'F#m7b5', 'D/F#', 'Ebmaj7'].map(Lt.nomeAccordo), ['Sib minore settima', 'Fa# semidiminuito', 'Re maggiore, basso Fa#', 'Mib maggiore settima']);
 });
 
 test('riproduzione: ogni voce di serie si lascia seguire dall\'inizio alla fine, e la pagina carica il lettore', () => {
@@ -187,4 +187,29 @@ test('riproduzione: ogni voce di serie si lascia seguire dall\'inizio alla fine,
     }
   }
   for (const f of ['dashboard.html', 'server.js']) assert.ok(fs.readFileSync(path.join(RADICE, 'gateway', f), 'utf8').includes('composizione-lettore.js'), f);
+});
+
+test('riproduzione: i tasti accesi sono quelli che suonano e la tastiera li contiene tutti', () => {
+  for (const v of M.unisci({}).filter((_, i) => i % 5 === 0)) {
+    const ev = Lt.eventi(A.leggiAbc(G.gestisci('prova', v).abc).score);
+    const [min, max] = Lt.estensione(ev);
+    assert.deepEqual([min % 12, max % 12], [0, 11], v.id);
+    for (let i = 0; i < 40; i++) {
+      const t = (i * ev.totale) / 40;
+      const p = Lt.posizione(ev, t), k = Lt.tastiDi(ev, p);
+      assert.equal(k.melodia, p.nota < 0 ? null : ev.note[p.nota].midi, v.id);
+      for (const m of [...k.accordo, ...(k.melodia === null ? [] : [k.melodia])]) assert.ok(m >= min && m <= max, `${v.id}: ${m}`);
+      assert.ok(k.accordo.length >= 4, v.id);
+    }
+  }
+});
+
+test('riproduzione: la riga segue ciò che esce dalle casse, mai più avanti dell’orologio audio', () => {
+  // la scheda audio dice cosa sta uscendo: 2,0 s al millisecondo 1000; 40 ms dopo sono 2,04
+  const ctx = { currentTime: 2.1, getOutputTimestamp: () => ({ contextTime: 2, performanceTime: 1000 }) };
+  assert.ok(Math.abs(Lt.tempoUdibile(ctx, 1040) - 2.04) < 1e-9);
+  assert.equal(Lt.tempoUdibile(ctx, 9000), 2.1);
+  // senza quella informazione si toglie il ritardo dichiarato
+  assert.ok(Math.abs(Lt.tempoUdibile({ currentTime: 3, outputLatency: 0.2 }, 0) - 2.8) < 1e-9);
+  assert.ok(Math.abs(Lt.tempoUdibile({ currentTime: 3, baseLatency: 0.01, getOutputTimestamp: () => ({ contextTime: 0, performanceTime: 0 }) }, 5) - 2.99) < 1e-9);
 });

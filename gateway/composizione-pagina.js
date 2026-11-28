@@ -25,6 +25,29 @@ window.PaginaComposizione = function (app) {
     forma: () => ({ nome: 'Nuova forma', testo: 'gancio:4:0 strofa:8:0 rit:8:0 solo:8:1 rit:8:2 finale:4:0' }),
   };
   const MODI = [['m', 'Minore'], ['M', 'Maggiore']];
+  // spiegazioni in parole semplici: compaiono solo passando sull'etichetta
+  const AIUTI = {
+    Stile: 'La famiglia musicale in cui questa voce viene usata.',
+    Parte: 'Il momento del brano: la strofa racconta, il pre-ritornello prepara, il ritornello resta in testa, il ponte porta altrove.',
+    Modo: 'Minore suona più raccolto o drammatico, maggiore più aperto e luminoso.',
+    Andamento: 'Il modo di tenere il tempo: dritto, dondolante (swing), spostato (sincopato), largo o a danza.',
+    'Stili (anche più di uno)': 'Premi più stili per usare la voce in più famiglie di brani.',
+    Grado: 'Su quale nota della scala nasce l’accordo: I è la nota di casa, V porta di nuovo a casa.',
+    Tipo: 'Il colore dell’accordo: maggiore, minore, con la settima, sospeso…',
+    Basso: 'La nota più grave. «Come il grado» è la scelta normale; un’altra crea un passaggio morbido.',
+    Battuta: 'Una battuta è il piccolo contenitore di tempo da quattro battiti.',
+    'Cosa è': 'Una nota si sente, una pausa è un respiro.',
+    Durata: 'Quanta parte della battuta occupa: 1/4 è un battito, 1/2 sono due.',
+    Taglia: 'Spezza una figura in due, o la fonde con quella dopo.',
+    Nota: 'Quale nota suonare.',
+    Ottava: 'Quanto in alto: 4 è la zona centrale del pianoforte.',
+    Sposta: 'Su o giù di un tasto del pianoforte, nero compreso.',
+    Movimento: 'Come questa nota si muove rispetto alle altre quando il compositore le sceglie.',
+    Colore: 'Piccoli accenti espressivi.',
+    Battute: 'Quanto è lunga la sezione, o il richiamo.',
+    Quando: '«Sempre presente» c’è in ogni brano; le «extra» entrano solo se il brano è abbastanza lungo.',
+    Ordine: 'Sposta, aggiungi o togli la sezione.',
+  };
   let dati = null;
   let scheda = 'armonia';
   const filtro = { stile: '', modo: '', ruolo: '', andamento: '', q: '', solo: '', quanti: 40 };
@@ -34,16 +57,13 @@ window.PaginaComposizione = function (app) {
   // ---------- ascolto: la timeline di riproduzione sta in composizione-lettore.js ----------
   const L = window.LettoreComposizione;
   const SPIEGA = {
-    armonia: 'Primo giro: gli accordi da soli; secondo giro: con una melodia di prova sopra.',
-    motivo: 'Stai sentendo il ritmo del motivo con note di prova: in un brano le sceglie il compositore.',
-    cadenza: 'Stai sentendo il ritmo della chiusura con note di prova.',
-    assolo: 'La frase si ripete su otto accordi diversi: le note cambiano, il disegno resta.',
+    armonia: 'Primo giro: gli accordi da soli. Secondo giro: con una melodia di prova.',
+    motivo: 'Le note sono di prova: nei brani le sceglie il compositore, il ritmo è il tuo.',
+    cadenza: 'Le note sono di prova: nei brani le sceglie il compositore, il ritmo è il tuo.',
+    assolo: 'La frase si ripete su otto accordi: le note cambiano, il disegno resta.',
     richiamo: '',
-    forma: 'È un brano intero di prova: in alto leggi la sezione che sta suonando.',
+    forma: 'È un brano intero di prova.',
   };
-  function spegni(linea) {
-    linea?.querySelectorAll('.tl .suona, .tl .ora').forEach((x) => x.classList.remove('suona', 'ora'));
-  }
   function ferma() {
     if (!suono) return;
     const s0 = suono;
@@ -60,23 +80,8 @@ window.PaginaComposizione = function (app) {
     const nota = L.voce(colpo);
     note.forEach((m) => nota(m, colpo.currentTime + 0.02, 0.5, 'triangle', 0.5 / (note.length + 1)));
   }
-  // sulla timeline della voce si accendono la battuta e l'elemento in ascolto, con la riga che avanza
-  function accendi(linea, p) {
-    const battute = linea ? linea.querySelectorAll('.tl-battuta') : [];
-    if (!battute.length) return;
-    spegni(linea);
-    const b = battute[p.battuta % battute.length];
-    b.classList.add('suona');
-    b.style.setProperty('--t', p.quota);
-    for (const corsia of b.querySelectorAll('.tl-corsia')) {
-      const blocchi = [...corsia.children];
-      const totale = blocchi.reduce((a, x) => a + (parseFloat(x.style.flexGrow) || 1), 0);
-      let somma = 0;
-      for (const x of blocchi) { somma += parseFloat(x.style.flexGrow) || 1; if (p.quota * totale < somma) { x.classList.add('ora'); break; } }
-    }
-  }
-  // dove: la carta o il passo 2 dell'editor; lì si apre il lettore
-  async function ascolta(voce, tasto, { box, linea, errore, aperto = () => {}, chiuso = () => {} }) {
+  // dove: la carta o il passo 2 dell'editor; lì si apre il lettore, che prende il posto della timeline della voce
+  async function ascolta(voce, tasto, { box, errore, aperto = () => {}, chiuso = () => {} }) {
     const era = suono && suono.tasto === tasto;
     ferma();
     if (era) return;
@@ -86,18 +91,12 @@ window.PaginaComposizione = function (app) {
       if (!score) throw new Error('non riesco a leggere la prova');
       ferma();
       app.pausaLettore();
-      const dove = box(), riga = typeof linea === 'function' ? linea() : linea;
-      const sue = riga ? riga.querySelectorAll('.tl-battuta').length : 0;
-      const pulisci = () => { spegni(riga); chiuso(); if (tasto.isConnected) tasto.textContent = 'Ascolta'; };
-      const lettore = L.apri(dove, score, {
-        giro: sue,
-        spiega: SPIEGA[voce.tipo],
-        suPosizione: (p) => accendi(riga, p),
-        suFine: (fermato) => { if (fermato) { suono = null; pulisci(); } else spegni(riga); },
-      });
+      const dove = box();
+      const pulisci = () => { chiuso(); if (tasto.isConnected) tasto.textContent = 'Ascolta'; };
+      aperto(); // prima si fa spazio, poi il nastro misura la larghezza
+      const lettore = L.apri(dove, score, { spiega: SPIEGA[voce.tipo], suFine: () => { suono = null; pulisci(); } });
       suono = { lettore, tasto, pulisci };
       tasto.textContent = 'Ferma';
-      aperto();
       dove.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       if (r.genere) toast('Prova con il genere ' + r.genere);
     } catch (e) { errore ? errore(e.message) : toast(e.message, 'err'); }
@@ -194,7 +193,7 @@ window.PaginaComposizione = function (app) {
     const errore = (m) => { q('#cmErrore').textContent = m; };
 
     // un gruppo di pulsanti: [chiave, etichetta, spiegazione, disattivato]
-    const tasti = (etichetta, azione, voci, attivi) => `<div class="cm-riga" role="group" aria-label="${esc(etichetta)}"><span>${esc(etichetta)}</span>${voci.map(([k, e, aiuto, no]) => `<button type="button" class="cm-tasto" data-e="${azione}" data-v="${esc(k)}" aria-pressed="${[].concat(attivi).map(String).includes(String(k))}"${aiuto ? ` title="${esc(aiuto)}"` : ''}${no ? ' disabled' : ''}>${esc(e)}</button>`).join('')}</div>`;
+    const tasti = (etichetta, azione, voci, attivi) => `<div class="cm-riga" role="group" aria-label="${esc(etichetta)}"><span${AIUTI[etichetta] ? ` class="aiuto" tabindex="0" data-tip="${esc(AIUTI[etichetta])}"` : ''}>${esc(etichetta)}</span>${voci.map(([k, e, aiuto, no]) => `<button type="button" class="cm-tasto" data-e="${azione}" data-v="${esc(k)}" aria-pressed="${[].concat(attivi).map(String).includes(String(k))}"${aiuto ? ` data-tip="${esc(aiuto)}"` : ''}${no ? ' disabled' : ''}>${esc(e)}</button>`).join('')}</div>`;
 
     function disegnaDove() {
       const x = stato.meta;
@@ -374,7 +373,7 @@ window.PaginaComposizione = function (app) {
       if (azione === 'annulla') return storia(annulla, ripeti);
       if (azione === 'ripeti') return storia(ripeti, annulla);
       if (azione === 'ricomincia') return cambia(() => { stato = JSON.parse(JSON.stringify(iniziale)); sel = [corsia(), 0, 0]; });
-      if (azione === 'ascolta') return ascolta(voce(), t, { box: () => q('#cmLettore'), linea: () => q('#cmLinea'), errore });
+      if (azione === 'ascolta') return ascolta(voce(), t, { box: () => q('#cmLettore'), errore });
       if (azione === 'chiudi') return finestra.close();
       const [gruppo, campo] = azione.split('-');
       const fuoco = `[data-e="${azione}"][data-v="${CSS.escape(v)}"]`;
@@ -423,7 +422,6 @@ window.PaginaComposizione = function (app) {
       const carta = b.closest('.cm-voce');
       return ascolta(v, b, {
         box: () => carta.querySelector('.cm-qui'),
-        linea: carta,
         // la carta in ascolto prende tutta la riga, così la timeline si legge bene
         aperto: () => carta.classList.add('in-ascolto'),
         chiuso: () => carta.classList.remove('in-ascolto'),
