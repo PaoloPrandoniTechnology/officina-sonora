@@ -205,9 +205,11 @@
 
     const servizi = servizioRiga('n8n (regia)', s.servizi.n8n) + servizioRiga('Motore musicale YuE2', s.servizi.motoreYue)
       + servizioRiga('LM Studio', s.servizi.lmStudio, 'attivo', 'spento') + servizioRiga('Modello di testo gemma', s.servizi.gemmaCaricato, 'caricato', 'a riposo', 'w', 'Scrive i testi se i servizi cloud non rispondono. Durante la creazione di un brano viene tolta dalla scheda video: è normale.')
-      + (s.testi || []).map(rigaTesti).join('');
+      + (s.testi || []).map(rigaTesti).join('')
+      + '<div class="srv"><button class="link" data-vai="controllo/chiavi">Chiavi dei servizi di testo</button></div>';
     imposta('#servizi', servizi);
     imposta('#servizi2', servizi);
+    if (!$('#c-chiavi').hidden && $('#t-controllo').classList.contains('on')) disegnaChiavi(); // la scheda si riempie e si aggiorna con lo stato
 
     imposta('#sorv', `<div class="kv"><span>Battito watchdog</span><span>${ago(s.watchdog.battito_s)}</span>
       <span data-tip="Il supervisore controlla ogni 5 minuti e scrive solo quando deve riavviare qualcosa.">Ultimo intervento del supervisore</span><span>${ago(s.supervisore.ultimoRun_s)}</span>
@@ -443,7 +445,7 @@
   // ---------- controllo ----------
   let ctrl = null;
   let ctrlSub = 'produzione';
-  const CTRL_SEZIONI = ['produzione', 'guida', 'note', 'parametri', 'messaggi', 'storico'];
+  const CTRL_SEZIONI = ['produzione', 'guida', 'note', 'parametri', 'messaggi', 'chiavi', 'storico'];
   let noteGenere = null;
 
   function toast(testo, tipo) {
@@ -523,6 +525,7 @@
     if (ctrlSub === 'guida') disegnaGuida();
     if (ctrlSub === 'note') disegnaNote();
     if (ctrlSub === 'messaggi') disegnaMessaggi();
+    if (ctrlSub === 'chiavi') disegnaChiavi();
     if (ctrlSub === 'storico') disegnaStorico();
   }
 
@@ -683,6 +686,95 @@
       // in caso di errore le scelte restano a video, pronte da correggere
       try { await invia('/api/controllo/messaggi', corpo); toast('Impostazioni dei messaggi salvate', 'ok'); await caricaControllo(true); }
       catch (e) { toast(e.message, 'err'); }
+    };
+  }
+
+  // ---------- chiavi dei servizi di testo ----------
+  const GUIDA_CHIAVI = {
+    gemini: { titolo: 'Google Gemini', pagina: 'https://aistudio.google.com/apikey', sito: 'Google AI Studio',
+      passi: ['Accedi con un account Google.', 'Premi <b>Create API key</b> (Crea chiave API) e scegli o crea un progetto.', 'Copia la chiave e incollala qui sotto.'],
+      nota: 'I limiti gratuiti si leggono in AI Studio. Il piano gratuito può usare i testi inviati per migliorare i prodotti di Google.' },
+    groq: { titolo: 'Groq', pagina: 'https://console.groq.com/keys', sito: 'Groq',
+      passi: ['Registrati o accedi.', 'In <b>API Keys</b> premi <b>Create API Key</b> e dalle un nome.', 'Copia subito la chiave, perché viene mostrata una sola volta, e incollala qui sotto.'],
+      nota: 'Al 28/11/2026 il piano gratuito dichiara 1.000 richieste e 200.000 token al giorno.' },
+    openrouter: { titolo: 'OpenRouter', pagina: 'https://openrouter.ai/keys', sito: 'OpenRouter',
+      passi: ['Registrati o accedi.', 'Premi <b>Create Key</b>, dalle un nome e copia la chiave.', 'Incollala qui sotto. Se la prova segnala un rifiuto, controlla le impostazioni sulla privacy dell’account: i modelli gratuiti possono richiedere il consenso all’uso dei dati.'],
+      nota: 'Al 28/11/2026: 50 richieste al giorno sui modelli gratuiti, senza acquistare credito.' },
+  };
+
+  // La struttura si crea una sola volta: gli aggiornamenti non devono cancellare quello che stai incollando
+  function disegnaChiavi() {
+    const testi = (statoUltimo && statoUltimo.testi) || [];
+    if (!testi.length) { if (!$('#c-chiavi').firstElementChild) $('#c-chiavi').innerHTML = '<div class="empty">Leggo i servizi…</div>'; return; }
+    const nomi = [...new Set(testi.map((t) => t.chiave))];
+    if (!$('#c-chiavi [data-chiave]')) {
+      $('#c-chiavi').innerHTML = `
+        <div class="grid">
+          <div class="card c12">
+            <h2>A cosa servono</h2>
+            <p>Titoli, descrizioni, analisi dei voti e comandi di Telegram possono essere scritti da modelli in rete, gratuiti. Il sistema li prova in ordine; se non rispondono o la quota è finita, usa <b>gemma</b> sul tuo computer. La musica nasce sempre sul tuo computer.</p>
+            <p class="muted">Una chiave è un codice personale che il servizio ti assegna: ne basta una per iniziare, più chiavi danno più richieste gratuite. Viene salvata cifrata su questo PC e non è più visibile, nemmeno qui. Con una chiave inserita, titoli, voti, note e messaggi al bot escono dal computer: non scrivere informazioni personali.</p>
+          </div>
+          ${nomi.map((n) => {
+            const g = GUIDA_CHIAVI[n] || { titolo: n, passi: [] };
+            return `<form class="card c4" data-chiave="${esc(n)}">
+              <h2>${esc(g.titolo)} <span class="pill" data-inserita></span></h2>
+              ${g.pagina ? `<p><a class="btn small ghost" href="${esc(g.pagina)}" target="_blank" rel="noopener noreferrer">Crea la chiave su ${esc(g.sito)}</a></p>` : ''}
+              <ol style="padding-left:18px">${g.passi.map((p) => `<li>${p}</li>`).join('')}</ol>
+              <p class="muted" style="font-size:12.5px">${esc(g.nota || '')}</p>
+              <label>Chiave<input class="field" style="width:100%" type="password" autocomplete="new-password" spellcheck="false" maxlength="300"></label>
+              <p style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn small" type="submit">Salva e prova</button>
+                <button class="btn small ghost" type="button" data-prova>Prova</button>
+                <button class="btn small danger" type="button" data-togli>Elimina</button>
+              </p>
+              <div data-esito aria-live="polite"></div>
+              <div data-servizi></div>
+            </form>`;
+          }).join('')}
+        </div>`;
+      $('#c-chiavi').querySelectorAll('form[data-chiave]').forEach(collegaChiave);
+    }
+    $('#c-chiavi').querySelectorAll('form[data-chiave]').forEach((f) => {
+      const suoi = testi.filter((t) => t.chiave === f.dataset.chiave);
+      const inserita = suoi.some((t) => t.configurato);
+      const p = f.querySelector('[data-inserita]');
+      p.className = 'pill ' + (inserita ? 'ok' : 'w');
+      p.textContent = inserita ? 'inserita' : 'mancante';
+      f.querySelector('input').placeholder = inserita ? 'Incolla per sostituirla' : 'Incolla qui la chiave';
+      f.querySelector('[data-prova]').disabled = f.querySelector('[data-togli]').disabled = !inserita || f.dataset.attesa === '1';
+      imposta(f.querySelector('[data-servizi]'), suoi.map(rigaTesti).join(''));
+    });
+  }
+
+  function collegaChiave(f) {
+    const campo = f.querySelector('input'), esito = f.querySelector('[data-esito]');
+    async function manda(azione, corpo) {
+      f.dataset.attesa = '1';
+      f.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+      esito.innerHTML = '<p class="muted">Attendi: la prova può richiedere un minuto.</p>';
+      try {
+        const r = await invia('/api/testi/' + azione, { chiave: f.dataset.chiave, ...corpo });
+        campo.value = '';
+        esito.innerHTML = (r.prove || []).map((p) => `<div class="srv"><span>${esc(p.ok ? p.nome + ': funziona' : p.errore)}</span><span class="pill ${p.ok ? 'ok' : 'ko'}">${p.ok ? 'ok' : 'no'}</span></div>`).join('');
+        if (azione === 'togli') toast('Chiave eliminata', 'ok');
+      } catch (e) {
+        esito.innerHTML = '';
+        toast(e.message, 'err');
+      }
+      delete f.dataset.attesa;
+      f.querySelector('[type="submit"]').disabled = false;
+      await aggiornaStato();
+      disegnaChiavi();
+    }
+    f.onsubmit = (e) => {
+      e.preventDefault();
+      if (!campo.value.trim()) { toast('Incolla prima la chiave', 'err'); campo.focus(); return; }
+      manda('chiave', { valore: campo.value });
+    };
+    f.querySelector('[data-prova]').onclick = () => manda('prova');
+    f.querySelector('[data-togli]').onclick = async () => {
+      if (await chiedi('Eliminare la chiave?', 'Il servizio non verrà più usato finché non ne inserisci una nuova.', 'Elimina')) manda('togli');
     };
   }
 

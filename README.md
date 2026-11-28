@@ -63,7 +63,7 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 |---|---|
 | **Avviare** la produzione | doppio clic su `E:\n8n\avvia-automazione.vbs` |
 | **Spegnere** tutto | doppio clic su `E:\n8n\ferma-automazione.vbs`; resta spento finché non riavvii tu (LM Studio resta acceso) |
-| Usare i **modelli di testo in rete**, gratis | [Servizi di testo](#servizi-di-testo): inserisci le chiavi con `tools\chiavi.ps1` |
+| Usare i **modelli di testo in rete**, gratis | [Controllo → Chiavi](#chiavi): crea le chiavi dai link e incollale |
 | Fare una **pausa** senza spegnere | *Metti in pausa* in alto a destra, in ogni pagina; su Telegram `/pausa` e `/riprendi` |
 | **Vedere se funziona** | [Panoramica](#panoramica): la riga delle fasi e gli eventuali avvisi |
 | **Ritrovare e riascoltare** un brano | [Libreria](#libreria) (tasto `/` per cercare) |
@@ -196,7 +196,8 @@ una catena di servizi gratuiti. Il gateway li prova nell'ordine di `config\servi
 | 5 | `openrouter-riserva` | `openrouter/free` (stessa chiave) | |
 | ultimo | gemma | `google/gemma-4-e4b` in LM Studio | nessuna |
 
-**Per attivarli** crea gli account gratuiti (bastano anche uno o due) e inserisci le chiavi:
+**Per attivarli** crea gli account gratuiti (bastano anche uno o due) e inserisci le chiavi nella dashboard, in
+[Controllo → Chiavi](#chiavi). In alternativa, da terminale:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File E:\n8n\officina-sonora\tools\chiavi.ps1
@@ -206,7 +207,8 @@ Lo script le salva cifrate in `secrets\`, prova ogni servizio e dice quale funzi
 Non incollare le chiavi in file del progetto o in chat. Senza chiavi il sistema usa solo gemma.
 
 **Quando un servizio non risponde** si passa al successivo. Se ha finito la quota si mette in pausa per il tempo che
-indica (altrimenti 15 minuti); se rifiuta chiave o modello, per un'ora. Il riquadro dei servizi nella
+indica (altrimenti 15 minuti); se rifiuta chiave o modello, per un'ora; se non risponde in
+tempo, per 5 minuti. Il riquadro dei servizi nella
 [Panoramica](#panoramica) e in [Log e sistema](#log-e-sistema) mostra per ognuno: *senza chiave*, *pronto* con le
 richieste di oggi (conteggio per giorno UTC), oppure *in pausa fino alle*; passandoci sopra si vedono modello e
 ultimo errore.
@@ -588,6 +590,7 @@ Qui **cambi il comportamento** del sistema. Le modifiche valgono **dal brano suc
 | [Note per genere](#note-per-genere) | richieste scritte in italiano |
 | [Parametri](#parametri) | regole generali, con dei cursori |
 | [Messaggi](#messaggi) | cosa ricevere su Telegram |
+| [Chiavi](#chiavi) | i modelli di testo in rete |
 | [Storico](#storico) | cosa è stato cambiato e quando |
 
 #### Produzione
@@ -675,6 +678,19 @@ chitarra*. La richiesta viene tradotta in inglese e aggiunta allo stile.
 ![Messaggi: frequenza, orari e contenuto dei messaggi Telegram](docs/screenshots/17-controllo-messaggi.png)
 
 Scegli ogni quanto ricevere il riepilogo su Telegram, in quali ore e con quali informazioni, poi premi **Salva**.
+
+#### Chiavi
+
+![Chiavi: spiegazione, link per crearle e un riquadro per ogni servizio](docs/screenshots/35-controllo-chiavi.png)
+
+Qui attivi i [servizi di testo](#servizi-di-testo) in rete. Per ognuno (Gemini, Groq, OpenRouter):
+
+1. premi **Crea la chiave su…** (si apre il sito del servizio) e segui i passi scritti nel riquadro;
+2. incolla la chiave nel campo e premi **Salva e prova**: dopo la prova leggi quali modelli funzionano;
+3. **Prova** ripete il controllo quando vuoi, **Elimina** toglie la chiave.
+
+La chiave viene salvata cifrata sul tuo PC e **non si può rileggere** dalla pagina: per cambiarla incolla quella
+nuova. Non serve riavviare nulla.
 
 #### Storico
 
@@ -918,6 +934,8 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 - Solo il **gateway** li conosce; i blocchi n8n lo chiamano su `127.0.0.1`.
 - Se `config\parametri.json` o le linee guida risultano illeggibili, la dashboard rifiuta di salvare invece di
   sovrascriverli.
+- Le chiavi inserite dalla dashboard passano solo tra il browser e il gateway su questo PC; il gateway le cifra e
+  non le restituisce mai.
 - Il gateway accetta solo richieste dal tuo PC (`127.0.0.1:5790` o `localhost:5790`) e rifiuta le scritture
   inviate da pagine di altri siti. La dashboard non mostra token; l'audio si chiede per numero, mai per percorso.
 - Per rinnovare l'accesso a iBroadcast: `ibroadcast-login.ps1`. Per Telegram: aggiorna `secrets\telegram.dpapi`.
@@ -1011,5 +1029,5 @@ In ordine di priorità. Il disegno completo è in
 | 5 | **Lettore**: equalizzatore, playlist inviate a iBroadcast, cronologia comune a più browser | oggi restano su questo PC e nel browser |
 | 6 | **Schede artistiche** più ricche per i generi attivi: forme e varianti vere al posto di quelle segnaposto | generi più distinti |
 | 7 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |
-| 8 | **Servizi di testo dalla dashboard**: accendere, spegnere e ordinare; aggiungere Cloudflare Workers AI | oggi si modifica `config\servizi.json` |
+| 8 | **Servizi di testo dalla dashboard**: accendere, spegnere e ordinare (le chiavi si inseriscono già); aggiungere Cloudflare Workers AI | oggi si modifica `config\servizi.json` |
 | 9 | **Prova di un motore musicale in rete** (ACE-Step su Hugging Face, pochi brani al giorno) | valutata e non attivata: vedi [analisi](docs/superpowers/specs/2026-11-28-motori-cloud-design.md) |

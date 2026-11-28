@@ -252,10 +252,11 @@ const server = http.createServer(async (req, res) => {
       const r = await controllo.gestisci(daTelegram ? '/api/controllo/voto' : req.url, dati);
       return rispondi(r.codice, r.corpo);
     }
-    const archivio = req.url.startsWith('/api/playlist/') ? [playlist, '/api/playlist/'] : req.url.startsWith('/api/score/') ? [score, '/api/score/'] : null;
+    const archivio = req.url.startsWith('/api/playlist/') ? [playlist, '/api/playlist/'] : req.url.startsWith('/api/score/') ? [score, '/api/score/']
+      : req.url.startsWith('/api/testi/') ? [testi, '/api/testi/'] : null;
     if (archivio) {
       if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
-      try { return rispondi(200, archivio[0].gestisci(req.url.slice(archivio[1].length), JSON.parse(corpo.toString('utf8') || '{}'))); }
+      try { return rispondi(200, await archivio[0].gestisci(req.url.slice(archivio[1].length), JSON.parse(corpo.toString('utf8') || '{}'))); }
       catch (e) { return rispondi(400, { ok: false, error: e.message }); }
     }
     if (req.url === '/tg') {

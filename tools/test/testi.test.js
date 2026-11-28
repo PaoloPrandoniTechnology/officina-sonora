@@ -33,7 +33,7 @@ async function banco(risposte, extra = {}) {
     decifra: async (f) => 'chiave-' + path.basename(f, '.dpapi'),
     carica: async () => { caricata++; }, renderInCorso: () => false, adesso: () => ora, ...extra,
   });
-  return { t, chiamate, caricata: () => caricata, avanti: (ms) => { ora += ms; }, fine: () => { server.close(); fs.rmSync(dir, { recursive: true, force: true }); } };
+  return { t, dir, chiamate, caricata: () => caricata, avanti: (ms) => { ora += ms; }, fine: () => { server.close(); fs.rmSync(dir, { recursive: true, force: true }); } };
 }
 const domanda = { system: 's', user: 'u', maxTokens: 200 };
 
@@ -99,5 +99,33 @@ test('il riepilogo non contiene chiavi e dice chi è configurato', async () => {
     const r = b.t.riepilogo();
     assert.deepEqual(r.map((x) => [x.nome, x.configurato, x.oggi]), [['primo', true, 1], ['secondo', true, 0], ['senzachiave', false, 0]]);
     assert.doesNotMatch(JSON.stringify(r), /chiave-|127\.0\.0\.1/);
+  } finally { b.fine(); }
+});
+
+test('chiavi dalla dashboard: salvata cifrata, provata subito, mai restituita; togliere la cancella', async () => {
+  const risposte = { primo: { codice: 401 } };
+  const b = await banco(risposte, { cifra: async (v) => 'CIFRATO:' + v.length });
+  try {
+    await assert.rejects(b.t.chiedi({ ...domanda, solo: 'primo' }));
+    assert.ok(b.t.riepilogo()[0].sospesoFino);
+    risposte.primo = { testo: '{"ok":true}' };
+    const r = await b.t.gestisci('chiave', { chiave: 'primo', valore: '  nuova-chiave-123  ' });
+    assert.deepEqual(r, { ok: true, prove: [{ nome: 'primo', ok: true }] });
+    assert.equal(fs.readFileSync(path.join(b.dir, 'primo.dpapi'), 'utf8'), 'CIFRATO:16');
+    assert.equal(b.t.riepilogo()[0].sospesoFino, null);
+    assert.doesNotMatch(JSON.stringify([r, b.t.riepilogo()]), /nuova-chiave/);
+    await b.t.gestisci('togli', { chiave: 'primo' });
+    assert.equal(b.t.riepilogo()[0].configurato, false);
+    await assert.rejects(b.t.gestisci('prova', { chiave: 'primo' }), /non inserita/);
+  } finally { b.fine(); }
+});
+
+test('chiavi dalla dashboard: nomi non previsti e valori strani si rifiutano', async () => {
+  const b = await banco({}, { cifra: async () => 'x' });
+  try {
+    for (const chiave of ['../fuori', 'telegram', undefined]) await assert.rejects(b.t.gestisci('chiave', { chiave, valore: 'abcdefghijkl' }), /non previsto/);
+    for (const valore of ['', 'corta', 'con spazio dentro 123', 'a'.repeat(400), 'à'.repeat(20)]) await assert.rejects(b.t.gestisci('chiave', { chiave: 'primo', valore }), /non valida/);
+    await assert.rejects(b.t.gestisci('altro', { chiave: 'primo' }), /non previst/);
+    assert.equal(fs.readFileSync(path.join(b.dir, 'primo.dpapi'), 'utf8'), 'cifrato', 'la chiave precedente resta');
   } finally { b.fine(); }
 });

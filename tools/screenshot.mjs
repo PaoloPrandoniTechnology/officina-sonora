@@ -47,6 +47,7 @@ const PAGINE = [
   { nome: '20-controllo-guida-note', pagina: 'controllo/guida/note' },
   { nome: '11-controllo-note', pagina: 'controllo/note' },
   { nome: '17-controllo-messaggi', pagina: 'controllo/messaggi' },
+  { nome: '35-controllo-chiavi', pagina: 'controllo/chiavi' },
   { nome: '12-controllo-storico', pagina: 'controllo/storico' },
   { nome: '13-log', pagina: 'log' },
   { nome: '24-menu-ridotto', pagina: 'libreria', dopo: clic('#bMenu'), fissa: 900 },

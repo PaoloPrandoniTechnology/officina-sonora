@@ -8,6 +8,7 @@ const { scriviAtomico } = require('./disco');
 const RADICE = path.join(__dirname, '..');
 const MARGINE_LOCALE = 6000; // gemma ragiona prima di rispondere e il ragionamento consuma max_tokens
 const SOSPESO_QUOTA_MS = 15 * 60000; // quota finita senza indicazioni su quando torna
+const SOSPESO_LENTO_MS = 5 * 60000; // non risponde in tempo: non lo si aspetta di nuovo a ogni richiesta
 const SOSPESO_RIFIUTO_MS = 60 * 60000; // chiave o modello rifiutati: inutile insistere
 
 const LMS = path.join(require('os').homedir(), '.cache', 'lm-studio', 'bin', 'lms.exe');
@@ -39,10 +40,22 @@ function decifraDpapi(file) {
   });
 }
 
+// La chiave arriva a PowerShell dallo standard input: non compare tra gli argomenti dei processi
+function cifraDpapi(valore) {
+  const comando = '[Console]::In.ReadToEnd().Trim() | ConvertTo-SecureString -AsPlainText -Force | ConvertFrom-SecureString';
+  const env = { ...process.env };
+  delete env.PSModulePath;
+  return new Promise((resolve, reject) => {
+    const p = execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', comando], { env, windowsHide: true, timeout: 20000 },
+      (e, out) => (e || !out.trim() ? reject(new Error('cifratura della chiave non riuscita')) : resolve(out.trim())));
+    p.stdin.end(valore);
+  });
+}
+
 function crea({
   config = path.join(RADICE, 'config', 'servizi.json'), segreti = path.join(RADICE, 'secrets'),
   stato = path.join(RADICE, 'state', 'testi.json'), locale = { url: 'http://127.0.0.1:1234/v1/chat/completions', modello: 'google/gemma-4-e4b' },
-  decifra = decifraDpapi, carica = caricaGemma, adesso = Date.now,
+  decifra = decifraDpapi, cifra = cifraDpapi, carica = caricaGemma, adesso = Date.now,
   renderInCorso = () => Boolean(leggi(path.join(RADICE, 'state', 'state.json'), {}).job),
 } = {}) {
   const memoria = new Map(); // chiavi in chiaro, solo in memoria, rilette se il file cambia
@@ -107,7 +120,7 @@ function crea({
         annota(s.nome, (v) => { v.oggi++; v.ultimo = new Date(adesso()).toISOString(); delete v.sospesoFino; delete v.errore; });
         return { servizio: s.nome, ...r };
       } catch (e) {
-        const pausa = e.codice === 429 ? (e.riprovaTra > 0 ? e.riprovaTra * 1000 : SOSPESO_QUOTA_MS) : [401, 403, 404].includes(e.codice) ? SOSPESO_RIFIUTO_MS : 0;
+        const pausa = e.codice === 429 ? (e.riprovaTra > 0 ? e.riprovaTra * 1000 : SOSPESO_QUOTA_MS) : [401, 403, 404].includes(e.codice) ? SOSPESO_RIFIUTO_MS : e.name === 'TimeoutError' ? SOSPESO_LENTO_MS : 0;
         const errore = e.codice === 429 ? 'quota esaurita' : e.name === 'TimeoutError' ? 'nessuna risposta in tempo' : e.codice ? `HTTP ${e.codice}` : e.message.slice(0, 120);
         annota(s.nome, (v) => { v.errori++; v.errore = errore; if (pausa) v.sospesoFino = new Date(adesso() + pausa).toISOString(); });
         motivi.push(`${s.nome}: ${errore}`);
@@ -123,18 +136,50 @@ function crea({
     }
   }
 
+  // Prova, senza ripiego, tutti i servizi che usano una chiave
+  async function prova(chiave) {
+    const prove = [];
+    for (const s of servizi().filter((x) => x.chiave === chiave)) {
+      try {
+        await chiedi({ system: 'Rispondi solo con JSON valido.', user: 'Rispondi con {"ok":true}', maxTokens: 50, solo: s.nome, attesaMs: 60000 });
+        prove.push({ nome: s.nome, ok: true });
+      } catch (e) { prove.push({ nome: s.nome, ok: false, errore: e.message }); }
+    }
+    return prove;
+  }
+
+  // Richieste della scheda "Chiavi": la chiave entra, non esce mai
+  async function gestisci(azione, { chiave, valore } = {}) {
+    const suoi = servizi().filter((s) => s.chiave === chiave);
+    if (!suoi.length) throw new Error('servizio non previsto');
+    const file = fileChiave(suoi[0]);
+    if (azione === 'chiave') {
+      const v = String(valore || '').trim();
+      if (!/^[\x21-\x7e]{10,300}$/.test(v)) throw new Error('chiave non valida: incollala intera, senza spazi');
+      scriviAtomico(file, await cifra(v));
+    } else if (azione === 'togli') {
+      fs.rmSync(file, { force: true });
+    } else if (azione !== 'prova') throw new Error('richiesta non prevista');
+    memoria.delete(file);
+    // una chiave cambiata riparte senza pause né vecchi errori
+    if (azione !== 'prova') for (const s of suoi) annota(s.nome, (v) => { delete v.sospesoFino; delete v.errore; });
+    if (azione === 'togli') return { ok: true };
+    if (!fs.existsSync(file)) throw new Error('chiave non inserita');
+    return { ok: true, prove: await prova(chiave) };
+  }
+
   // Per la dashboard: nessuna chiave e nessun indirizzo
   function riepilogo() {
     const d = leggi(stato, {});
     return servizi().map((s) => {
       const v = (d.servizi || {})[s.nome] || {};
       const sospeso = v.sospesoFino && Date.parse(v.sospesoFino) > adesso() ? v.sospesoFino : null;
-      return { nome: s.nome, modello: s.modello, configurato: fs.existsSync(fileChiave(s)), attivo: s.attivo !== false,
+      return { nome: s.nome, chiave: s.chiave, modello: s.modello, configurato: fs.existsSync(fileChiave(s)), attivo: s.attivo !== false,
         oggi: d.giorno === oggi() ? v.oggi || 0 : 0, sospesoFino: sospeso, errore: v.errore || null };
     });
   }
 
-  return { chiedi, riepilogo };
+  return { chiedi, riepilogo, gestisci };
 }
 
 function leggi(file, vuoto) {
