@@ -65,8 +65,10 @@ riavvia; se l'hai fermato tu, non lo riavvia. **Vota con regolarità**: senza vo
 | Fare una **pausa** senza spegnere | *Metti in pausa* in alto a destra, in ogni pagina; su Telegram `/pausa` e `/riprendi` |
 | **Vedere se funziona** | [Panoramica](#panoramica): la riga delle fasi e gli eventuali avvisi |
 | **Ritrovare e riascoltare** un brano | [Libreria](#libreria) (tasto `/` per cercare) |
-| **Dare un voto** | stelle nel [lettore](#lettore-e-scheda-del-brano), pagina [Voti](#voti), `/menu` su Telegram o stelle in iBroadcast |
-| **Scaricare** un brano o vedere come è stato fatto | clic sul titolo: [scheda del brano](#lettore-e-scheda-del-brano) |
+| **Ascoltare** di seguito, in ordine o a caso | *Riproduci* o *Casuale* in [Libreria](#libreria) e [Playlist](#playlist); vedi [Il lettore](#il-lettore) |
+| **Preparare la musica per una lezione** | una [playlist](#playlist), con [dissolvenza e timer di spegnimento](#timer-dissolvenza-e-scorciatoie) |
+| **Dare un voto** | stelle nel [lettore](#il-lettore), pagina [Voti](#voti), `/menu` su Telegram o stelle in iBroadcast |
+| **Scaricare** un brano o vedere come è stato fatto | clic sul titolo: [scheda del brano](#la-scheda-del-brano) |
 | Avere **subito** un certo genere | [Generi](#generi): *Produci ora* |
 | **Sospendere** un genere o farlo uscire di più | [Generi](#generi): interruttore sulla scheda, peso in *Attivazione e frequenza* |
 | **Chiedere un cambiamento** a parole | [Note per genere](#note-per-genere), in italiano |
@@ -295,6 +297,7 @@ Non devi premere nulla per aggiornarla: lo stato si rinfresca ogni 5 secondi, i 
 |---|---|---|
 | Ascolto | [Panoramica](#panoramica) | Va tutto bene? Cosa sta facendo adesso? |
 | Ascolto | [Libreria](#libreria) | Dov'è quel brano? |
+| Ascolto | [Playlist](#playlist) | Cosa voglio ascoltare, e in che ordine? |
 | Ascolto | [Voti](#voti) | Mi piace questo brano? |
 | Produzione | [Generi](#generi) | Che tipi di musica produrre? |
 | Produzione | [Controllo](#controllo) | Come cambio il comportamento? |
@@ -323,22 +326,92 @@ più spazio alla pagina; **Allarga il menu** lo riporta intero. La scelta resta 
 
 ![Tema scuro](docs/screenshots/23-tema-scuro.png)
 
-### Lettore e scheda del brano
+### Il lettore
 
-Premendo su una copertina si apre il **lettore** in basso, che continua a suonare mentre navighi.
+Premendo su una copertina si apre il **lettore** in basso, che continua a suonare mentre navighi. Gli altri brani
+dell'elenco da cui sei partito vengono dopo, in quell'ordine (in Libreria: **tutti** quelli trovati con i filtri, non
+solo i 50 a video).
 
 ![Lettore in fondo alla libreria](docs/screenshots/18-lettore.png)
 
 | Nel lettore | Cosa fa |
 |---|---|
-| ⏮ ▶ ⏭ | scorre i brani dell'elenco da cui sei partito; a fine brano passa al successivo |
-| stelle | vota il brano in ascolto, senza cambiare pagina |
-| copertina e titolo | aprono la scheda |
-| tastiera | **Spazio** pausa, **← →** indietro o avanti di 10 secondi |
+| ♡ | **Mi piace**: mette il brano in *Brani che ti piacciono* |
+| ⋯ | il [menu del brano](#il-menu-di-un-brano) |
+| casuale | mescola i brani che restano; spento, torna l'ordine dell'elenco dal brano in corso |
+| ⏮ ⏭ | precedente e successivo. A brano avviato da più di 3 secondi, ⏮ lo ricomincia |
+| ripeti | un clic ripete **tutto l'elenco**, due ripetono **questo brano** (compare un 1), tre spengono |
+| barra e tempi | trascina per spostarti; clic sul tempo a destra per vedere quanto **resta** |
+| stelle | vota il brano in ascolto (è il voto da cui il sistema impara) |
+| orologio | [timer, dissolvenza e scorciatoie](#timer-dissolvenza-e-scorciatoie) |
+| coda | apre la [coda di ascolto](#coda-e-cronologia) |
+| volume | altoparlante per silenziare; la rotellina del mouse sul cursore lo regola |
+| ⌃ e riquadro | **lettore grande** e **schermo intero** |
+| ✕ | chiude il lettore e ferma l'ascolto |
+
+**Cuore e stelle sono due cose diverse:** il cuore serve a *ritrovare* un brano, le stelle a *insegnare* al sistema
+i tuoi gusti.
+
+Ricaricando la pagina (o riaprendola) ritrovi brano, punto di ascolto, coda e impostazioni: il lettore riparte **in
+pausa**. Funzionano anche i **tasti multimediali** della tastiera e i controlli di Windows, con titolo e copertina.
+Se un file non si apre, il lettore passa al successivo.
+
+#### Coda e cronologia
+
+![La coda di ascolto](docs/screenshots/27-coda.png)
+
+| Nel pannello | Significato |
+|---|---|
+| **In ascolto** | il brano di adesso |
+| **In coda** | i brani che hai aggiunto tu: passano **davanti** a tutto. *Svuota* li toglie |
+| **Poi da…** | il seguito dell'elenco da cui sei partito |
+| clic sul titolo | salta subito a quel brano |
+| maniglia a puntini | trascina per riordinare; da tastiera, mettila a fuoco e usa **↑ ↓** |
+| ✕ | toglie il brano dalla coda |
+| *Salva come playlist* | conserva il brano in corso e quelli in arrivo |
+| scheda **Ascoltati** | gli ultimi 100 brani ascoltati in questo browser, con la possibilità di cancellarli |
+
+#### Lettore grande
+
+Il pulsante ⌃ allarga il lettore a tutta la pagina: copertina, comandi e coda, con il colore del genere sullo sfondo.
+Il pulsante **Schermo intero** nasconde anche il browser: utile durante una lezione. **Esc** torna indietro.
+
+![Il lettore grande](docs/screenshots/28-lettore-grande.png)
+
+#### Timer, dissolvenza e scorciatoie
+
+<p align="center"><img src="docs/screenshots/30-opzioni-ascolto.png" alt="Timer di spegnimento, dissolvenza e scorciatoie" width="900"></p>
+
+- **Timer di spegnimento**: da 5 a 90 minuti, oppure *alla fine del brano*. Negli ultimi 20 secondi il volume sfuma,
+  poi l'ascolto si ferma. Il tempo che resta è scritto accanto all'orologio.
+- **Dissolvenza tra i brani**: 3, 6, 10 o 15 secondi in cui un brano esce mentre il successivo entra, senza silenzi.
+  Vale al passaggio automatico, non quando salti a mano.
+
+| Tasto | Cosa fa |
+|---|---|
+| **Spazio** | ascolta o pausa |
+| **← →** | indietro o avanti di 10 secondi |
+| **Maiusc + ← →** | brano precedente o successivo |
+| **Maiusc + ↑ ↓** | volume |
+| **M** · **C** · **R** | silenzia, casuale, ripeti |
+| **L** · **Q** · **F** | mi piace, coda, lettore grande |
+| **Esc** | chiude lettore grande o coda |
+
+Le scorciatoie valgono a lettore aperto; nella pagina *Voti* contano i suoi tasti.
+
+#### Il menu di un brano
+
+Si apre con **⋯** o con il **tasto destro** su un brano: *Riproduci ora*, *Riproduci dopo*, *Aggiungi in coda*, cuore,
+aggiunta a una playlist (anche nuova), scheda, voto, *Produci un altro di questo genere* e scarico del file. Nelle
+tabelle, un **doppio clic** sulla riga fa partire il brano.
+
+<p align="center"><img src="docs/screenshots/29-menu-brano.png" alt="Il menu di un brano" width="900"></p>
+
+### La scheda del brano
 
 La **scheda** (clic sul titolo) raccoglie tutto sul brano: descrizione, durata, bpm, tonalità, strumenti, sezioni,
-descrizione inviata al motore (*Copia*), esito del controllo, file. Da lì puoi ascoltare, votare, **scaricare il
-file**, chiedere **un altro così** o aprire lo stile del genere.
+descrizione inviata al motore (*Copia*), esito del controllo, file. Da lì puoi ascoltare, mettere il cuore, aggiungerlo
+a coda o playlist, votare, **scaricare il file**, chiedere **un altro così** o aprire lo stile del genere.
 
 ![La scheda di un brano](docs/screenshots/22-scheda.png)
 
@@ -368,12 +441,44 @@ L'archivio di **tutta la musica prodotta** (i brani scartati non ci sono).
 | Per… | Fai così |
 |---|---|
 | trovare un brano | tasto **/** oppure la casella di ricerca (titolo, genere, tipo) |
-| filtrare | per genere, ambito (yoga o sottofondo) o voto |
+| filtrare | per genere, ambito (yoga o sottofondo), voto o *Che ti piacciono* |
+| ascoltare tutto ciò che hai filtrato | *Riproduci* o *Casuale* sopra la tabella; *Salva come playlist* lo conserva |
+| cuore, coda, playlist | cuore e **⋯** in fondo a ogni riga |
 | mettere in ordine | clic sul titolo di una colonna; un altro clic inverte |
 | ascoltare | clic sulla copertina |
 | aprire la scheda | clic sul titolo |
 | votare | clic su *Vota* (o sulle stelle) nella colonna *Voto* |
 | vedere altri brani | *Mostra altri 50* in fondo |
+
+---
+
+### Playlist
+
+Le raccolte da ascoltare. Clic su una copertina per aprirla, sul ▶ per farla partire.
+
+![La pagina Playlist](docs/screenshots/25-playlist.png)
+
+| Raccolta | Come si riempie |
+|---|---|
+| **Le tue playlist** | le crei tu (*Nuova playlist*, o dal menu **⋯** di un brano) |
+| **Brani che ti piacciono** | con il cuore |
+| **Appena prodotti** · **I più votati** · **Ascoltati di recente** | da sole: gli ultimi 50, quelli con 4 o 5 stelle, la cronologia di questo browser |
+| **Un mix per genere** | da sole: tutti i brani di un genere |
+
+![Una playlist aperta](docs/screenshots/26-playlist-dettaglio.png)
+
+| In una playlist | Cosa fa |
+|---|---|
+| *Riproduci* · *Casuale* · *Aggiungi in coda* | ascolto |
+| *Aggiungi brani* | cerca nella libreria e aggiunge o toglie con un clic |
+| maniglia a puntini | trascina per cambiare l'ordine; da tastiera **↑ ↓** |
+| ✕ sulla riga | toglie il brano dalla playlist (resta in libreria) |
+| *Rinomina* · *Elimina* | nome e descrizione; l'eliminazione chiede conferma |
+| *Esporta* | file `.m3u8` con i percorsi dei brani, per VLC e altri lettori di questo PC |
+| *Salva come playlist* (raccolte automatiche) | ne fa una copia che puoi modificare |
+
+Playlist e preferiti stanno in `state\playlist.json`, su questo computer: **non** vengono inviati a iBroadcast e non
+sono nel repository (mettilo nelle tue copie di sicurezza). Un brano scartato o cancellato sparisce dalle raccolte.
 
 ---
 
@@ -707,6 +812,7 @@ modelli, libreria audio, `secrets\`, `state\`, gli sfondi e `config\telegram.jso
 | Sintomo | Cosa fare |
 |---|---|
 | La dashboard non si apre | l'automazione è ferma: `avvia-automazione.vbs`. Se il gateway si è chiuso per un errore, vedi `state\gateway-errori.log` |
+| Playlist o cuori non si salvano | il messaggio dice il motivo; se `state\playlist.json` è illeggibile il gateway non lo sovrascrive: correggilo o rinominalo |
 | L'automazione non riparte da sola | l'hai fermata tu: il file `state\STOP` resta finché non lanci `avvia-automazione.vbs` |
 | Nessun brano da molto | controlla i servizi in dashboard e che la produzione non sia in pausa |
 | Il motore non risponde | il watchdog lo riavvia; vedi `state\watchdog.log` |
@@ -733,7 +839,7 @@ Log: `state\tick.log` (produzione), `state\watchdog.log` (servizi), `state\super
 | `src\lib*.js`, `src\cover.js` | funzioni condivise |
 | `src\compositore\` | compositore, revisore, scrittura e validazione dello score ABC |
 | `config\` | catalogo, vocabolario di stile, linee guida e storico, parametri |
-| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica) |
+| `gateway\` | servizio locale e dashboard (`dashboard.html`, `.css`, `.js`; `libreria.js` indice delle schede, `id3.js` copertine, `disco.js` scrittura atomica; `lettore.js` e `.css` lettore e playlist, `coda.js` logica della coda, `playlist.js` salvataggio) |
 | `tools\` | manutenzione, prove sul motore (`prove\`), test (`test\`) |
 | `docs\superpowers\` | documenti di progetto e piani |
 | `officina-sonora-workflow.json` | workflow generato |
@@ -760,7 +866,8 @@ n8n in esecuzione applica la nuova versione da sé; il render in corso continua.
 è rimasto quello originario. Se cambi file in `gateway\`, riavvia anche il gateway.
 
 **Screenshot e diagramma:** `tools\screenshot.ps1` (gateway attivo; usa `tools\screenshot.mjs`, che fotografa le
-pagine per intero) e `node tools\diagramma.mjs`.
+pagine per intero) e `node tools\diagramma.mjs`. Per immagini con playlist di esempio senza toccare le tue, avvia un
+secondo gateway con `OFS_PORTA` e `OFS_PLAYLIST` impostate e lancia gli screenshot con la stessa `OFS_PORTA`.
 `tools\pubblica.ps1 -Messaggio "..."` li rigenera, committa e invia su GitHub.
 
 **Prove sul motore:** `node tools/prove/prove-motore.js` confronta score, lyrics e LoRA e crea una pagina di
@@ -781,5 +888,6 @@ In ordine di priorità. Il disegno completo è in
 | 2 | **Ascoltare e votare** i brani del nuovo percorso, poi correggere i descrittori `en` e le soglie dello score | la qualità musicale non è verificabile dai test |
 | 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |
 | 4 | **Dashboard**: mostrare lo score ABC nella scheda del brano | oggi si vedono chi l'ha scritto e le sezioni, non le note |
-| 5 | **Schede artistiche** più ricche per i generi attivi: forme e varianti vere al posto di quelle segnaposto | generi più distinti |
-| 6 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |
+| 5 | **Lettore**: equalizzatore, playlist inviate a iBroadcast, cronologia comune a più browser | oggi restano su questo PC e nel browser |
+| 6 | **Schede artistiche** più ricche per i generi attivi: forme e varianti vere al posto di quelle segnaposto | generi più distinti |
+| 7 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |

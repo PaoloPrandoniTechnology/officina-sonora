@@ -121,4 +121,13 @@ function inviaAudio(req, res, numero, scarica) {
   pipeline(fs.createReadStream(file, r || {}), res, () => {});
 }
 
-module.exports = { vota, elenco, inviaAudio, scheda, trova, audioDi };
+// File audio dei brani chiesti, nello stesso ordine; quelli che non ci sono più si saltano
+function percorsi(numeri) {
+  const per = new Map(schede().map((s) => [s.meta.numero_traccia, s]));
+  return numeri.flatMap((n) => {
+    const s = per.get(n), file = audioDi(s);
+    return file ? [{ titolo: s.meta.titolo, durata_s: s.meta.durata_s, percorso: file }] : [];
+  });
+}
+
+module.exports = { vota, elenco, inviaAudio, scheda, trova, audioDi, percorsi };

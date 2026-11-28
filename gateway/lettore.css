@@ -1,0 +1,175 @@
+/* Lettore, coda, playlist e menu. I colori vengono da dashboard.css. */
+.solo-lettore { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+/* ---------- barra ---------- */
+#player { position: fixed; left: var(--lato); right: 0; bottom: 0; z-index: 40; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) auto; grid-template-areas: "sinistra centro destra"; gap: 16px; align-items: center; height: 86px; padding: 0 16px; background: var(--panel); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(10, 14, 24, .08); }
+#player .p-sinistra button, #player .p-centro button, #player .p-destra button { background: none; border: 0; padding: 0; }
+#player .p-tasti button, #player .p-destra > button, #player .p-volume button, #player .p-sinistra > button:not(.p-brano) { display: grid; place-items: center; min-width: 30px; height: 30px; border-radius: 50%; color: var(--muted); }
+#player .p-tasti button:hover, #player .p-destra > button:hover, #player .p-volume button:hover, #player .p-sinistra > button:not(.p-brano):hover { color: var(--ink); background: var(--panel-2); }
+#player button:disabled { opacity: .35; cursor: default; }
+.p-sinistra { grid-area: sinistra; display: flex; align-items: center; gap: 4px; min-width: 0; }
+#player .p-brano { display: flex; align-items: center; gap: 12px; min-width: 0; text-align: left; margin-right: 6px; }
+.p-brano .cop { width: 56px; height: 56px; }
+.p-testi { min-width: 0; }
+.p-testi b, .p-testi small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-testi small { color: var(--muted); font-size: 12px; }
+.p-centro { grid-area: centro; display: grid; justify-items: center; gap: 4px; min-width: 0; }
+.p-tasti { display: flex; gap: 12px; align-items: center; }
+#player .p-tasti button.grande, #player .p-tasti button.grande:hover { width: 38px; height: 38px; background: var(--ink); color: var(--panel); }
+/* un comando acceso si riconosce dal colore e dal punto, non solo dal colore */
+#player button.modo[aria-pressed="true"] { position: relative; color: var(--accent-text); }
+#player button.modo[aria-pressed="true"]::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor; }
+#pRipeti small { display: none; position: absolute; right: 2px; top: 0; font: 700 10px/1 var(--testo); }
+#pRipeti[data-modo="uno"] small { display: block; }
+#player button.cuore[aria-pressed="true"], .tasto-riga.cuore[aria-pressed="true"] { color: var(--accent-text); }
+.cuore[aria-pressed="true"] .ic { fill: currentColor; }
+.p-tempo { display: flex; gap: 10px; align-items: center; width: 100%; max-width: 560px; font-size: 11.5px; color: var(--faint); }
+.p-tempo input { flex: 1; }
+.p-tempo > span, #player .p-tempo button { min-width: 40px; text-align: center; color: var(--faint); }
+.p-destra { grid-area: destra; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+.p-destra .stelle-mini { margin-right: 8px; }
+.p-volume { display: flex; align-items: center; gap: 2px; }
+#pVol { width: 88px; }
+#player #pOpzioni { display: flex; align-items: center; gap: 4px; border-radius: 15px; padding: 0 7px; }
+#player #pOpzioni.acceso { color: var(--accent-text); }
+#pResta { font-size: 11px; white-space: nowrap; }
+#pResta:empty { display: none; }
+.stelle-mini { display: flex; }
+.stelle-mini button { font-size: 18px; width: 22px; padding: 0; border: 0; background: none; color: var(--line-2); line-height: 1; }
+.stelle-mini button.on { color: var(--star); }
+.stelle-mini:hover button { color: var(--star); }
+.stelle-mini button:hover ~ button { color: var(--line-2); }
+#player .stelle-mini:hover button { color: var(--star); }
+#player .stelle-mini button.on { color: var(--star); }
+#player .stelle-mini button { color: var(--line-2); }
+#player .stelle-mini:hover button:hover ~ button { color: var(--line-2); }
+
+/* ---------- pulsanti nelle righe ---------- */
+.tasto-riga { display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--faint); }
+.tasto-riga:hover { color: var(--ink); background: var(--line); }
+.maniglia { cursor: grab; }
+.azioni-brano { display: inline-flex; gap: 2px; vertical-align: middle; }
+.azioni-riga { width: 1%; white-space: nowrap; text-align: right; }
+.s-azioni .azioni-brano { align-items: center; }
+[data-dove].sopra { box-shadow: inset 0 2px 0 var(--accent); }
+.nota-barra { font-size: 12.5px; }
+
+/* ---------- coda ---------- */
+#pCoda { position: fixed; right: 0; bottom: 86px; top: 0; z-index: 41; width: min(380px, 100%); display: flex; flex-direction: column; background: var(--panel); border-left: 1px solid var(--line-2); box-shadow: var(--ombra); }
+.c-testa { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 0; border-bottom: 1px solid var(--line); }
+.c-testa .sub-nav { margin: 0 0 -1px; border: 0; }
+.c-corpo { overflow-y: auto; padding: 4px 8px 16px 10px; flex: 1; }
+.c-corpo h3 { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 4px 4px; font-size: 13.5px; }
+.c-corpo ul { list-style: none; margin: 0; padding: 0; }
+.c-corpo p { padding: 0 4px; }
+.c-corpo .empty { padding: 12px 4px; }
+.c-riga { display: flex; align-items: center; gap: 8px; padding: 4px; border-radius: 4px; }
+.c-riga:hover { background: var(--panel-2); }
+#player .c-riga .c-testi { flex: 1; min-width: 0; text-align: left; padding: 0; border: 0; background: none; }
+.c-testi b, .c-testi small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.c-testi small { color: var(--faint); font-size: 12px; }
+.c-riga .maniglia { width: 18px; border-radius: 3px; }
+
+/* ---------- lettore grande: copertina e comandi a sinistra, coda a destra ---------- */
+#player.grande { left: 0; top: 0; height: 100%; z-index: 60; border: 0; padding: 18px 28px 28px; gap: 14px 40px;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "destra destra" "sinistra coda" "centro coda";
+  --panel: #15171c; --panel-2: #262a33; --ink: #f2f3f6; --muted: #bcc2ce; --faint: #98a0ae; --line: #2c313b; --line-2: #444b58; --accent: #5c82ee; --accent-text: #a6bcfa; --accent-soft: #252f4d;
+  color: var(--ink); color-scheme: dark; background: linear-gradient(165deg, color-mix(in srgb, var(--tinta, #39414f) 48%, #101216), #101216 62%); }
+#player.grande .p-sinistra { flex-wrap: wrap; justify-content: center; align-content: center; align-self: stretch; min-height: 0; gap: 12px; }
+#player.grande .p-brano { flex: 0 0 100%; flex-direction: column; gap: 16px; margin: 0; text-align: center; }
+#player.grande #pCop { display: block; width: min(46vh, 100%, 520px); min-width: 140px; }
+#player.grande .p-brano .cop { width: 100%; height: auto; aspect-ratio: 1; border-radius: 6px; box-shadow: 0 24px 60px rgba(0, 0, 0, .45); }
+#player.grande .p-testi { max-width: min(640px, 100%); }
+#player.grande .p-testi b { font: 600 clamp(22px, 3.2vw, 34px)/1.2 var(--titoli); white-space: normal; }
+#player.grande .p-testi small { font-size: 14px; margin-top: 4px; }
+#player.grande .p-centro { gap: 12px; }
+#player.grande .p-tasti { gap: 22px; }
+#player.grande .p-tasti button { min-width: 40px; height: 40px; }
+#player.grande .p-tasti button.grande { width: 56px; height: 56px; }
+#player.grande .p-tasti .ic { width: 20px; height: 20px; }
+#player.grande .p-tempo { max-width: 640px; }
+#player.grande .p-destra .stelle-mini { margin-right: auto; }
+#player.grande .p-destra .stelle-mini button { font-size: 24px; width: 28px; }
+#player.grande #pCoda { grid-area: coda; align-self: stretch; position: static; width: auto; min-height: 0; background: rgba(8, 9, 12, .42); border: 1px solid var(--line); border-radius: 8px; box-shadow: none; }
+#player.grande .c-chiudi, #player.grande #pChiudi { display: none; }
+
+/* ---------- menu a comparsa ---------- */
+.menu { position: fixed; inset: auto; margin: 0; width: 270px; max-height: calc(100vh - 16px); overflow-y: auto; padding: 6px; background: var(--panel); color: var(--ink); border: 1px solid var(--line-2); border-radius: 6px; box-shadow: var(--ombra); font-size: 13px; }
+.menu button, .menu a { display: block; width: 100%; padding: 6px 8px; border: 0; border-radius: 4px; background: none; color: inherit; text-align: left; text-decoration: none; font: inherit; }
+.menu button:hover, .menu a:hover, .menu button:focus-visible, .menu a:focus-visible { background: var(--accent-soft); }
+.menu button:disabled { color: var(--faint); background: none; cursor: default; }
+.menu button small { color: var(--faint); }
+.menu p { margin: 4px 8px; font-size: 12px; color: var(--faint); overflow: hidden; text-overflow: ellipsis; }
+.menu p b { color: var(--ink); font-size: 13px; }
+.menu hr { border: 0; border-top: 1px solid var(--line); margin: 5px 0; }
+.menu-elenco { max-height: 170px; overflow-y: auto; }
+#menuOpzioni { width: 300px; }
+#menuOpzioni label { display: grid; gap: 3px; margin: 6px 8px 10px; font-size: 12.5px; color: var(--muted); }
+#menuOpzioni dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 4px 8px 6px; align-items: center; font-size: 12.5px; }
+#menuOpzioni dt, #menuOpzioni dd { margin: 0; }
+#menuOpzioni dd { color: var(--muted); }
+
+/* ---------- pagina Playlist ---------- */
+.pl-sezione { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 12px; }
+.pl-sezione:first-child, .err + .pl-sezione { margin-top: 0; }
+.pl-sezione h2 { margin: 0; font-size: 17px; }
+.pl-griglia { display: grid; gap: 18px 16px; grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); }
+.pl-carta { min-width: 0; }
+.pl-quadro { position: relative; }
+.pl-apri { display: block; width: 100%; padding: 0; border: 0; background: none; }
+.mosaico { display: grid; grid-template-columns: 1fr 1fr; width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 5px; background: var(--panel); }
+.mosaico.uno { grid-template-columns: 1fr; }
+.mosaico .cop.grande { border-radius: 0; }
+.mosaico.vuoto { grid-template-columns: 1fr; place-items: center; border: 1px solid var(--line-2); color: var(--faint); }
+.mosaico.vuoto .ic { width: 34px; height: 34px; stroke-width: 1; }
+.pl-play { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: var(--accent); color: var(--accent-ink); box-shadow: 0 6px 16px rgba(0, 0, 0, .35); opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; }
+.pl-quadro:hover .pl-play, .pl-play:focus-visible { opacity: 1; transform: none; }
+@media (hover: none) { .pl-play { opacity: 1; transform: none; } }
+.pl-nome { display: block; width: 100%; margin-top: 8px; padding: 0; border: 0; background: none; text-align: left; font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-nome:hover { color: var(--accent-text); }
+.pl-carta small { color: var(--faint); font-size: 12px; }
+.pl-testa { display: flex; gap: 22px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px; padding: 18px; border-radius: 8px; border: 1px solid var(--line); background: linear-gradient(150deg, color-mix(in srgb, var(--tinta, var(--line-2)) 26%, var(--panel)), var(--panel) 70%); }
+.pl-testa > .mosaico { width: 180px; flex: none; box-shadow: var(--ombra); }
+.pl-testa > div { flex: 1 1 280px; min-width: 0; }
+.pl-testa h2 { margin: 0; font-size: 30px; line-height: 1.15; overflow-wrap: anywhere; }
+.pl-testa p { margin: 6px 0 0; }
+.pl-azioni { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.pl-brani td:first-child { width: 36px; color: var(--faint); }
+
+/* ---------- finestre ---------- */
+#finestra { width: min(460px, calc(100% - 32px)); max-height: min(640px, calc(100% - 32px)); padding: 0; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); color: var(--ink); box-shadow: var(--ombra); }
+#finestra::backdrop { background: rgba(8, 10, 16, .55); }
+#finestra form, .f-scelta { display: grid; gap: 12px; padding: 20px; }
+#finestra h2 { margin: 0; font-size: 18px; overflow-wrap: anywhere; }
+#finestra label { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); }
+#finestra textarea { resize: vertical; font: inherit; }
+.f-tasti { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.f-tasti span { margin-right: auto; font-size: 12.5px; }
+.f-scelta ul { list-style: none; margin: 0; padding: 0; height: min(360px, 48vh); overflow-y: auto; }
+.f-scelta li { display: flex; align-items: center; gap: 10px; padding: 5px 2px; border-bottom: 1px solid var(--line); }
+.f-scelta li > div { flex: 1; min-width: 0; }
+.f-scelta li b, .f-scelta li small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.f-scelta li small { color: var(--faint); }
+.f-scelta .search { flex: none; }
+
+/* ---------- schermi più stretti: prima spariscono le stelle, poi il volume ---------- */
+@media (max-width: 1360px) { #player:not(.grande) .p-destra .stelle-mini { display: none; } }
+@media (max-width: 1100px) { #player:not(.grande) #pVol { display: none; } }
+@media (max-width: 880px) {
+  #player { left: 0; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "sinistra destra" "centro centro"; height: auto; padding: 8px 10px; gap: 6px 8px; }
+  #player:not(.grande) .p-volume, #player:not(.grande) #pSchermo, #player:not(.grande) #pOpzioni, #player:not(.grande) #pAltro { display: none; }
+  .p-brano .cop { width: 44px; height: 44px; }
+  .nota-barra { display: none; }
+  #pCoda { bottom: 138px; }
+  #player.grande { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto minmax(240px, auto); grid-template-areas: "destra" "sinistra" "centro" "coda"; overflow-y: auto; padding: 12px 14px 20px; }
+  #player.grande #pCop { width: min(30vh, 70vw); }
+  #player.grande .p-destra .stelle-mini button { font-size: 22px; width: 26px; }
+  #player.grande .p-volume { display: none; }
+}
+
+.azioni-riga .tasto-riga { vertical-align: middle; }
+/* con la coda aperta la pagina si stringe, invece di finire sotto il pannello */
+@media (min-width: 1200px) { body.coda-aperta main { padding-right: 408px; } }
+body.coda-aperta .toasts { right: 398px; }
+@media (max-width: 880px) { body.coda-aperta .toasts { right: 18px; bottom: auto; top: 12px; } }
+@media (min-width: 1200px) and (max-width: 1750px) { body.coda-aperta .libreria .extra { display: none; } }

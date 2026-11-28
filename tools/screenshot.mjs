@@ -7,10 +7,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const CARTELLA = join(dirname(fileURLToPath(import.meta.url)), '..', 'docs', 'screenshots');
-const BASE = 'http://127.0.0.1:5790/dashboard#';
+// OFS_PORTA: per fotografare un secondo gateway, per esempio con playlist di esempio (OFS_PLAYLIST)
+const ORIGINE = `http://127.0.0.1:${process.env.OFS_PORTA || 5790}`;
+const BASE = ORIGINE + '/dashboard#';
 const MAX_ALTEZZA = 7000; // oltre, l'immagine diventa illeggibile
 
 const clic = (selettore) => `document.querySelector('${selettore}')?.click()`;
+// avvia il primo brano della libreria e poi preme un comando del lettore
+const ascolta = (poi) => `${clic('#recenti [data-ascolta]')};${poi ? clic(poi) : ''}`;
 const mostraTip = (selettore) => `document.querySelector('${selettore}')?.dispatchEvent(new MouseEvent('mouseover',{bubbles:true}))`;
 // pagina: percorso; dopo: JavaScript eseguito prima dello scatto; fissa: altezza imposta (solo cio' che si vede)
 const PAGINE = [
@@ -21,6 +25,12 @@ const PAGINE = [
   { nome: '05-qualita', pagina: 'qualita' },
   { nome: '06-libreria', pagina: 'libreria' },
   { nome: '18-lettore', pagina: 'libreria', dopo: clic('#recenti [data-ascolta]'), fissa: 900 },
+  { nome: '25-playlist', pagina: 'playlist' },
+  { nome: '26-playlist-dettaglio', pagina: 'playlist', dopo: clic('.pl-carta:nth-child(2) .pl-nome'), fissa: 900 },
+  { nome: '27-coda', pagina: 'libreria', dopo: `${clic('#recenti [data-ascolta]')};${clic('#recenti tbody tr:nth-child(4) [data-azioni]')};${clic('#menuBrano [data-m=coda]')};${clic('#pCodaTasto')}`, fissa: 900 },
+  { nome: '28-lettore-grande', pagina: 'libreria', dopo: ascolta('#pGrande'), fissa: 900 },
+  { nome: '29-menu-brano', pagina: 'libreria', dopo: clic('#recenti tbody tr:nth-child(3) [data-azioni]'), fissa: 900 },
+  { nome: '30-opzioni-ascolto', pagina: 'libreria', dopo: ascolta('#pOpzioni'), fissa: 900 },
   { nome: '22-scheda', pagina: 'libreria', dopo: clic('#recenti [data-info]'), fissa: 900 },
   { nome: '23-tema-scuro', pagina: 'panoramica', fissa: 900, scuro: true },
   { nome: '07-controllo-produzione', pagina: 'controllo/produzione' },
@@ -48,7 +58,7 @@ const browser = [
 if (!browser) throw new Error('Chrome o Edge non trovati');
 
 const profilo = join(tmpdir(), `os-screenshot-${process.pid}`);
-const processo = spawn(browser, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--no-first-run', '--remote-debugging-port=0', `--user-data-dir=${profilo}`, 'about:blank'], { stdio: 'ignore' });
+const processo = spawn(browser, ['--headless=new', '--autoplay-policy=no-user-gesture-required', '--mute-audio', '--disable-gpu', '--hide-scrollbars', '--no-first-run', '--remote-debugging-port=0', `--user-data-dir=${profilo}`, 'about:blank'], { stdio: 'ignore' });
 let ws;
 try {
   const filePorta = join(profilo, 'DevToolsActivePort');
@@ -79,6 +89,9 @@ try {
     await misura(larghezza, p.fissa || 1000);
     await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }, { name: 'prefers-color-scheme', value: p.scuro ? 'dark' : 'light' }] });
     await cdp('Page.navigate', { url: 'about:blank' });
+    await attesa(500);
+    // ogni scatto parte pulito: niente brano o menu ricordati dallo scatto precedente
+    await cdp('Storage.clearDataForOrigin', { origin: ORIGINE, storageTypes: 'local_storage' });
     await cdp('Page.navigate', { url: BASE + p.pagina });
     await attesa(6000);
     if (!p.fissa) {

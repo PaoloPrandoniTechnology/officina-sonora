@@ -9,6 +9,7 @@ const { leggiStato } = require('./stato');
 const { datiAnalisi } = require('./analisi');
 const controllo = require('./controllo');
 const voti = require('./voti');
+const playlist = require('./playlist');
 const andamento = require('./andamento');
 const { ammessa } = require('./protezione');
 const { scriviAtomico } = require('./disco');
@@ -19,7 +20,8 @@ process.on('uncaughtException', (e) => {
   try { fs.appendFileSync(path.join(__dirname, '..', 'state', 'gateway-errori.log'), `${new Date().toISOString()} ${e.stack}\n`); } catch (x) { /* nulla da fare */ }
   process.exit(1);
 });
-const STATICI = { '/dashboard': ['dashboard.html', 'text/html'], '/dashboard.css': ['dashboard.css', 'text/css'], '/dashboard.js': ['dashboard.js', 'text/javascript'] };
+const STATICI = { '/dashboard': ['dashboard.html', 'text/html'], '/dashboard.css': ['dashboard.css', 'text/css'], '/dashboard.js': ['dashboard.js', 'text/javascript'],
+  '/coda.js': ['coda.js', 'text/javascript'], '/lettore.js': ['lettore.js', 'text/javascript'], '/lettore.css': ['lettore.css', 'text/css'] };
 const MAX_CORPO = 300 * 1024 * 1024;
 
 const PORT = process.env.OFS_PORTA || 5790;
@@ -223,6 +225,15 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': img.mime, 'Cache-Control': 'private, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
       return res.end(img.dati);
     }
+    if (req.method === 'GET' && req.url === '/api/playlist') return rispondi(200, playlist.leggi());
+    if (req.method === 'GET' && req.url.startsWith('/api/playlist/m3u?')) {
+      const id = new URLSearchParams(req.url.slice(req.url.indexOf('?'))).get('id');
+      const d = playlist.leggi();
+      const p = id === 'preferiti' ? { nome: 'Brani che ti piacciono', brani: d.preferiti } : d.playlist.find((x) => x.id === id);
+      if (!p) return rispondi(404, { ok: false, error: 'playlist non trovata' });
+      res.writeHead(200, { 'Content-Type': 'audio/x-mpegurl; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(p.nome)}.m3u8` });
+      return res.end(playlist.m3u(voti.percorsi(p.brani)));
+    }
     if (req.method === 'GET' && (req.url === '/api/andamento' || req.url.startsWith('/api/andamento?'))) {
       const q = new URLSearchParams(req.url.slice('/api/andamento'.length));
       return rispondi(200, andamento.leggi(Object.fromEntries(q)));
@@ -238,6 +249,11 @@ const server = http.createServer(async (req, res) => {
       try { dati = JSON.parse(corpo.toString('utf8') || '{}'); } catch (e) { return rispondi(400, { ok: false, error: 'JSON non valido' }); }
       const r = await controllo.gestisci(daTelegram ? '/api/controllo/voto' : req.url, dati);
       return rispondi(r.codice, r.corpo);
+    }
+    if (req.url.startsWith('/api/playlist/')) {
+      if (req.headers['x-controllo'] !== '1') return rispondi(403, { ok: false, error: 'intestazione mancante' });
+      try { return rispondi(200, playlist.gestisci(req.url.slice('/api/playlist/'.length), JSON.parse(corpo.toString('utf8') || '{}'))); }
+      catch (e) { return rispondi(400, { ok: false, error: e.message }); }
     }
     if (req.url === '/tg') {
       const { method, body } = JSON.parse(corpo.toString('utf8'));

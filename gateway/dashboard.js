@@ -299,9 +299,10 @@
     disegnaLinea();
     disegnaAvvisi();
     disegnaCodaProduzione();
+    lettore.aggiorna();
   }
 
-  const lib = { q: '', genere: '', ambito: '', voto: '', ordine: 'generato_il', verso: -1, quanti: 50 };
+  const lib = { q: '', genere: '', ambito: '', voto: '', ordine: 'generato_il', verso: -1, quanti: 50, ordinati: [] };
   const COL_LIB = [['titolo', 'Titolo'], ['categoria', 'Genere'], ['durata_s', 'Durata', 'num'], ['bpm', 'BPM', 'num extra'], ['voto', 'Voto'], ['ascolti', 'Ascolti', 'num extra'], ['generato_il', 'Creato', 'extra']];
   const durata = (s) => (s ? Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0') : '—');
   function disegnaLibreria() {
@@ -313,8 +314,8 @@
     $('#lGen').value = lib.genere;
     $('#lAmbitoF').value = lib.ambito;
     const q = lib.q.trim().toLowerCase();
-    const voti = { no: (v) => v === null, si: (v) => v !== null, alti: (v) => v >= 4, bassi: (v) => v !== null && v <= 2 };
-    const lista = tutti.filter((t) => (!lib.genere || t.categoria === lib.genere) && (!lib.ambito || t.ambito === lib.ambito) && (!lib.voto || voti[lib.voto](t.voto))
+    const voti = { no: (v) => v === null, si: (v) => v !== null, alti: (v) => v >= 4, bassi: (v) => v !== null && v <= 2, cuore: (v, t) => lettore.preferito(t.numero) };
+    const lista = tutti.filter((t) => (!lib.genere || t.categoria === lib.genere) && (!lib.ambito || t.ambito === lib.ambito) && (!lib.voto || voti[lib.voto](t.voto, t))
       && (!q || [t.titolo, nm(t.categoria), t.categoria, t.tipo, t.famiglia].join(' ').toLowerCase().includes(q)));
     const chiave = (t) => (lib.ordine === 'categoria' ? nm(t.categoria) : t[lib.ordine]);
     lista.sort((a, b) => {
@@ -322,14 +323,15 @@
       if (x === null || x === undefined || y === null || y === undefined) return (x === null || x === undefined) - (y === null || y === undefined);
       return (typeof x === 'string' ? x.localeCompare(y) : x - y) * lib.verso;
     });
+    lib.ordinati = lista.map((t) => t.numero).filter((n) => n !== null);
     $('#lConta').textContent = n0(lista.length) + ' di ' + n0(tutti.length) + ' brani';
     $('#lAltri').hidden = lista.length <= lib.quanti;
-    imposta('#recenti', `<thead><tr><th><span class="muted">Ascolta</span></th>${COL_LIB.map(([c, nome, cl]) => `<th class="${cl || ''}"${lib.ordine === c ? ` aria-sort="${lib.verso > 0 ? 'ascending' : 'descending'}"` : ''}><button type="button" data-lord="${c}">${nome}${lib.ordine === c ? (lib.verso > 0 ? ' ↑' : ' ↓') : ''}</button></th>`).join('')}</tr></thead><tbody>${
-      lista.slice(0, lib.quanti).map((t) => `<tr><td>${tastoAscolta(t)}</td><td class="nome">${titoloBrano(t)}${t.caricato ? '' : '<small>non ancora su iBroadcast</small>'}</td><td>${esc(nm(t.categoria))}</td>
+    imposta('#recenti', `<thead><tr><th><span class="muted">Ascolta</span></th>${COL_LIB.map(([c, nome, cl]) => `<th class="${cl || ''}"${lib.ordine === c ? ` aria-sort="${lib.verso > 0 ? 'ascending' : 'descending'}"` : ''}><button type="button" data-lord="${c}">${nome}${lib.ordine === c ? (lib.verso > 0 ? ' ↑' : ' ↓') : ''}</button></th>`).join('')}<th><span class="solo-lettore">Azioni</span></th></tr></thead><tbody>${
+      lista.slice(0, lib.quanti).map((t) => `<tr${t.numero === null ? '' : ` data-brano="${t.numero}"`}><td>${tastoAscolta(t)}</td><td class="nome">${titoloBrano(t)}${t.caricato ? '' : '<small>non ancora su iBroadcast</small>'}</td><td>${esc(nm(t.categoria))}</td>
         <td class="num">${durata(t.durata_s)}</td><td class="num extra">${n0(t.bpm)}</td>
         <td>${t.numero === null ? stelle(t.voto) : `<button class="link" data-vota="${t.numero}" data-tip="Apre il brano nella pagina Voti">${t.voto === null ? 'Vota' : stelle(t.voto)}</button>`}</td>
-        <td class="num extra">${n0(t.ascolti)}</td><td class="muted extra">${data(t.generato_il)}</td></tr>`).join('')
-      || '<tr><td colspan="8" class="empty">Nessun brano corrisponde: togli un filtro o cambia la ricerca.</td></tr>'}</tbody>`);
+        <td class="num extra">${n0(t.ascolti)}</td><td class="muted extra">${data(t.generato_il)}</td><td class="azioni-riga">${lettore.azioni(t.numero)}</td></tr>`).join('')
+      || '<tr><td colspan="9" class="empty">Nessun brano corrisponde: togli un filtro o cambia la ricerca.</td></tr>'}</tbody>`);
   }
 
   function lineaRender(ult) {
@@ -1308,48 +1310,17 @@
     votaBrano(Number(tasto));
   });
 
-  // ---------- lettore comune ----------
-  const lettore = { coda: [], brano: null };
-  const evidenza = document.head.appendChild(document.createElement('style')); // segna la copertina del brano in ascolto
+  // ---------- lettore comune (lettore.js) ----------
   const trovaBrano = (n) => dati && dati.libreria.recenti.find((x) => x.numero === n);
   const orologio = (s) => (Number.isFinite(s) ? Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0') : '0:00');
   const stelleVoto = (voto, attr) => [1, 2, 3, 4, 5].map((v) => `<button type="button" ${attr}="${v}" class="${voto >= v ? 'on' : ''}" aria-label="Voto ${v} su 5" aria-pressed="${voto === v}">★</button>`).join('');
-
-  async function suona(n) {
-    let b = trovaBrano(n);
-    if (!b) { try { b = await leggi('/api/brano?n=' + n); } catch (e) { toast('Brano non trovato', 'err'); return; } }
-    lettore.brano = b;
-    const au = $('#pAudio');
-    au.src = '/audio/brano?n=' + encodeURIComponent(n);
-    $('#player').hidden = false;
-    document.body.classList.add('suona');
-    evidenza.textContent = `[data-ascolta="${n}"] > .ic { opacity: 1; background: var(--accent); }`;
-    au.play().catch(() => {});
-    disegnaLettore();
-  }
-  // il pulsante di una copertina: gli altri brani dello stesso elenco diventano la coda
-  function ascolta(el) {
-    const n = Number(el.dataset.ascolta);
-    if (lettore.brano && lettore.brano.numero === n) return $('#pPlay').click();
-    const elenco = el.closest('[data-coda]');
-    lettore.coda = elenco ? [...new Set([...elenco.querySelectorAll('[data-ascolta]')].map((x) => Number(x.dataset.ascolta)))] : [n];
-    return suona(n);
-  }
-  function disegnaLettore() {
-    const b = lettore.brano;
-    if (!b) return;
-    imposta('#pCop', copertina(b));
-    $('#pTit').textContent = b.titolo;
-    $('#pSub').textContent = nm(b.categoria);
-    imposta('#pStelle', stelleVoto(b.voto, 'data-pvoto'));
-    const i = lettore.coda.indexOf(b.numero);
-    $('#pPrima').disabled = i <= 0;
-    $('#pDopo').disabled = i < 0 || i >= lettore.coda.length - 1;
-  }
-  function passo(d) {
-    const i = lettore.coda.indexOf(lettore.brano && lettore.brano.numero) + d;
-    if (i >= 0 && i < lettore.coda.length) suona(lettore.coda[i]);
-  }
+  const lettore = window.Lettore({
+    $, esc, ic, imposta, copertina, tastoAscolta, titoloBrano, stelle, nm, toast, chiedi, invia, leggi, apriScheda, votaDa, stelleVoto, orologio, alPasso, trovaBrano, nascondiTip, vai,
+    brani: () => (dati ? dati.libreria.recenti : []),
+    pronto: () => !!dati,
+    inLibreria: () => lib.ordinati,
+    ridisegna: () => { disegnaLibreria(); if (schedaAperta && $('#scheda').open) disegnaScheda(); },
+  });
   // voto dal lettore o dalla scheda
   async function votaDa(b, voto) {
     try { await invia('/api/controllo/voto', { numero: b.numero, voto }, AbortSignal.timeout(15000)); }
@@ -1358,41 +1329,13 @@
     b.voto = voto;
     const t = trovaBrano(b.numero);
     if (t) { t.voto = voto; t.voto_il = new Date().toISOString(); }
-    if (lettore.brano && lettore.brano.numero === b.numero) lettore.brano.voto = voto;
-    disegnaLettore();
+    lettore.votato(b.numero, voto);
     disegnaLibreria();
     disegnaAvvisi();
     if ($('#t-voti').classList.contains('on')) caricaVoti();
     return true;
   }
-  {
-    const au = $('#pAudio'), barra = $('#pBarra'), vol = $('#pVol');
-    const tasto = () => { $('#pPlay').innerHTML = ic(au.paused ? 'play' : 'pausa'); $('#pPlay').setAttribute('aria-label', au.paused ? 'Ascolta' : 'Metti in pausa l\'ascolto'); };
-    au.addEventListener('play', () => { $('#vAudio').pause(); tasto(); });
-    au.addEventListener('pause', tasto);
-    au.addEventListener('ended', () => passo(1));
-    au.addEventListener('durationchange', () => { $('#pFine').textContent = orologio(au.duration); });
-    au.addEventListener('timeupdate', () => {
-      $('#pOra').textContent = orologio(au.currentTime);
-      const p = au.duration ? au.currentTime / au.duration : 0;
-      barra.value = Math.round(p * 1000);
-      barra.style.setProperty('--p', p * 100 + '%');
-    });
-    au.addEventListener('error', () => { if (au.getAttribute('src')) toast('Impossibile riprodurre il brano', 'err'); });
-    barra.style.setProperty('--p', '0%');
-    barra.oninput = () => { if (au.duration) au.currentTime = barra.value / 1000 * au.duration; };
-    try { const v = Number(localStorage.getItem('volume')); if (v > 0 && v <= 100) vol.value = v; } catch (e) { /* volume pieno */ }
-    au.volume = vol.value / 100;
-    alPasso(vol);
-    vol.oninput = () => { au.volume = vol.value / 100; alPasso(vol); try { localStorage.setItem('volume', vol.value); } catch (e) { /* solo per questa visita */ } };
-    $('#pPlay').onclick = () => { if (au.paused) au.play().catch(() => {}); else au.pause(); };
-    $('#pPrima').onclick = () => passo(-1);
-    $('#pDopo').onclick = () => passo(1);
-    $('#pInfo').onclick = () => lettore.brano && apriScheda(lettore.brano.numero);
-    $('#pStelle').addEventListener('click', (e) => { const x = e.target.closest('[data-pvoto]'); if (x && lettore.brano) votaDa(lettore.brano, Number(x.dataset.pvoto)); });
-    $('#pChiudi').onclick = () => { au.pause(); au.removeAttribute('src'); au.load(); lettore.brano = null; evidenza.textContent = ''; $('#player').hidden = true; document.body.classList.remove('suona'); };
-    $('#vAudio').addEventListener('play', () => au.pause());
-  }
+  $('#vAudio').addEventListener('play', () => lettore.pausa());
 
   // ---------- scheda del brano ----------
   let schedaAperta = null;
@@ -1418,7 +1361,7 @@
       ${b.descrizione ? `<p>${esc(b.descrizione)}</p>` : ''}
       <div class="stelle-mini" role="group" aria-label="Voto" data-svoti>${stelleVoto(b.voto, 'data-svoto')}</div>
       ${b.nota ? `<p class="muted">Nota: ${esc(b.nota)}</p>` : ''}
-      <div class="s-azioni"><button class="btn" data-ascolta="${b.numero}">${ic('play')} Ascolta</button>
+      <div class="s-azioni"><button class="btn" data-ascolta="${b.numero}">${ic('play')} Ascolta</button>${lettore.azioni(b.numero)}
         ${b.file ? `<a class="btn ghost" href="/audio/brano?n=${b.numero}&amp;scarica=1" download>Scarica il file</a>` : ''}
         <button class="btn ghost" data-produci="${esc(b.categoria)}">Un altro così</button>
         <button class="btn ghost" data-stile="${esc(b.categoria)}">Stile del genere</button></div>
@@ -1644,7 +1587,7 @@
   setInterval(() => { if ($('#t-andamento').classList.contains('on')) caricaAndamento(); }, 30000);
 
   // ---------- navigazione ----------
-  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
+  const TITOLI = { panoramica: 'Panoramica', libreria: 'Libreria', playlist: 'Playlist', voti: 'Voti', generi: 'Generi', controllo: 'Controllo', andamento: 'Andamento', qualita: 'Qualità e tempi', log: 'Log e sistema' };
   function vai(indirizzo) {
     const parti = String(indirizzo || '').split('/');
     let tab = parti[0];
@@ -1661,13 +1604,15 @@
     const corrente = document.querySelector('#nav button[aria-current="page"]');
     const nav = $('#nav');
     if (corrente && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = corrente.offsetLeft - nav.clientWidth / 2;
-    const hash = tab === 'controllo' ? (ctrlSub === 'guida' ? indirizzoGuida() : '#controllo/' + ctrlSub) : tab === 'generi' && parti[1] === 'pesi' ? '#generi/pesi' : '#' + tab;
+    const hash = tab === 'controllo' ? (ctrlSub === 'guida' ? indirizzoGuida() : '#controllo/' + ctrlSub) : tab === 'generi' && parti[1] === 'pesi' ? '#generi/pesi' : tab === 'playlist' && parti[1] ? '#playlist/' + parti[1] : '#' + tab;
     if (location.hash !== hash) history.replaceState(null, '', hash);
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (tab === 'controllo') caricaControllo();
     if (tab === 'generi') mostraVistaGeneri(parti[1]);
     if (tab === 'voti') caricaVoti(); else $('#vAudio').pause();
     if (tab === 'andamento') caricaAndamento();
+    if (tab === 'playlist') lettore.pagina(parti[1]);
+    lettore.navigato();
   }
   document.getElementById('nav').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-tab]');
@@ -1693,7 +1638,7 @@
     const b = e.target.closest('[data-vai], [data-ascolta], [data-info], [data-vota], [data-stile], [data-produci], [data-brani], [data-riprendi]');
     if (!$('#sistema').contains(e.target)) $('#sistema').open = false;
     if (!b) return;
-    if (b.dataset.ascolta) return ascolta(b);
+    if (b.dataset.ascolta) return lettore.ascolta(b);
     if (b.dataset.info) return apriScheda(Number(b.dataset.info));
     if (b.closest('#scheda')) $('#scheda').close();
     if (b.dataset.vai) return vai(b.dataset.vai);
@@ -1707,10 +1652,7 @@
     const campo = e.target.closest && e.target.closest('input, textarea, select, [contenteditable]');
     if (campo || e.ctrlKey || e.altKey || e.metaKey) return;
     if (e.key === '/') { e.preventDefault(); vai('libreria'); $('#lQ').focus(); return; }
-    // lettore comune: spazio e frecce (nella pagina Voti valgono i suoi comandi)
-    if ($('#player').hidden || $('#t-voti').classList.contains('on') || $('#scheda').open || !$('#modal').hidden) return;
-    if (e.key === ' ' && !e.target.closest('button, summary, a')) { e.preventDefault(); $('#pPlay').click(); }
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); const au = $('#pAudio'); au.currentTime = Math.max(0, au.currentTime + (e.key === 'ArrowLeft' ? -10 : 10)); }
+    lettore.tasto(e);
   });
   // menu laterale: intero o a sole icone (con il nome nel suggerimento)
   function menu(stretto) {

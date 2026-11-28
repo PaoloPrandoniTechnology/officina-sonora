@@ -11,6 +11,7 @@
   try { const t = localStorage.getItem('tema'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; if (localStorage.getItem('menu') === 'stretto') document.documentElement.dataset.menu = 'stretto'; } catch (e) { /* memoria del browser non disponibile */ }
 </script>
 <link rel="stylesheet" href="/dashboard.css">
+<link rel="stylesheet" href="/lettore.css">
 </head>
 <body>
 <a class="salta" href="#principale">Vai al contenuto</a>
@@ -29,6 +30,19 @@
   <symbol id="i-prima" viewBox="0 0 16 16"><path d="M13 3.500v9L6 8zM3.500 3h1.700v10H3.500z" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-dopo" viewBox="0 0 16 16"><path d="M3 3.500v9L10 8zM10.800 3h1.700v10h-1.700z" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-x" viewBox="0 0 16 16"><path d="M3.500 3.500l9 9M12.500 3.500l-9 9"/></symbol>
+  <symbol id="i-playlist" viewBox="0 0 16 16"><path d="M2.5 3.5h9M2.5 7h6M2.5 10.5h4M12.5 12V6.5l1.5 1.5"/><circle cx="11" cy="12" r="1.6"/></symbol>
+  <symbol id="i-casuale" viewBox="0 0 16 16"><path d="M2 4.5h2.5l6 7H14M2 11.5h2.5l1.6-1.9M8.9 6.4l1.6-1.9H14M12 2.5l2 2-2 2M12 9.5l2 2-2 2"/></symbol>
+  <symbol id="i-ripeti" viewBox="0 0 16 16"><path d="M3 8V6.5a2 2 0 0 1 2-2h8M11 2.5l2 2-2 2M13 8v1.5a2 2 0 0 1-2 2H3M5 13.5l-2-2 2-2"/></symbol>
+  <symbol id="i-cuore" viewBox="0 0 16 16"><path d="M8 13.5C4.5 11 2 8.8 2 6.1 2 4.4 3.3 3 5 3c1.2 0 2.3.7 3 1.8C8.7 3.7 9.8 3 11 3c1.7 0 3 1.4 3 3.1 0 2.7-2.5 4.9-6 7.4z"/></symbol>
+  <symbol id="i-altro" viewBox="0 0 16 16"><path d="M3 8h.01M8 8h.01M13 8h.01" stroke-width="2.6"/></symbol>
+  <symbol id="i-coda" viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h6M2.5 12h6M11 8.5v5l3.5-2.5z"/></symbol>
+  <symbol id="i-orologio" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2 1.3"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 16 16"><path d="M2.5 6h2.5L8.5 3v10L5 10H2.5zM11 5.8a3 3 0 0 1 0 4.4M12.7 4a5.5 5.5 0 0 1 0 8"/></symbol>
+  <symbol id="i-muto" viewBox="0 0 16 16"><path d="M2.5 6h2.5L8.5 3v10L5 10H2.5zM11 6l3.5 4M14.5 6 11 10"/></symbol>
+  <symbol id="i-grande" viewBox="0 0 16 16"><path d="M3.5 10 8 5.5l4.5 4.5"/></symbol>
+  <symbol id="i-piccolo" viewBox="0 0 16 16"><path d="M3.5 6 8 10.5 12.5 6"/></symbol>
+  <symbol id="i-schermo" viewBox="0 0 16 16"><path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/></symbol>
+  <symbol id="i-trascina" viewBox="0 0 16 16"><path d="M6 4h.01M10 4h.01M6 8h.01M10 8h.01M6 12h.01M10 12h.01" stroke-width="2.4"/></symbol>
   <symbol id="i-menu" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11zM6 2.5v11M11.5 6 9.5 8l2 2"/></symbol>
   <symbol id="i-tema" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.500"/><path d="M8 2.500a5.500 5.500 0 0 1 0 11z" fill="currentColor"/></symbol>
 </svg>
@@ -40,6 +54,7 @@
       <p>Ascolto</p>
       <button data-tab="panoramica" aria-current="page"><svg class="ic"><use href="#i-panoramica"/></svg>Panoramica</button>
       <button data-tab="libreria"><svg class="ic"><use href="#i-libreria"/></svg>Libreria</button>
+      <button data-tab="playlist"><svg class="ic"><use href="#i-playlist"/></svg>Playlist</button>
       <button data-tab="voti"><svg class="ic"><use href="#i-voti"/></svg>Voti<span class="conta" id="navVoti" hidden></span></button>
       <p>Produzione</p>
       <button data-tab="generi"><svg class="ic"><use href="#i-generi"/></svg>Generi</button>
@@ -86,7 +101,7 @@
         </div>
         <div class="card c8">
           <h2>Appena prodotti <button class="link" data-vai="libreria">Tutta la libreria</button></h2>
-          <div class="copertine" id="ultimiBrani" data-coda></div>
+          <div class="copertine" id="ultimiBrani" data-coda data-nome="Appena prodotti"></div>
         </div>
         <div class="card c4">
           <h2>In coda</h2>
@@ -109,12 +124,21 @@
         <input class="search" id="lQ" type="search" placeholder="Cerca per titolo, genere o tipo (tasto /)" aria-label="Cerca un brano">
         <select class="field" id="lGen" aria-label="Filtra per genere"><option value="">Tutti i generi</option></select>
         <select class="field" id="lAmbitoF" aria-label="Filtra per ambito"><option value="">Yoga e sottofondo</option></select>
-        <select class="field" id="lVotoF" aria-label="Filtra per voto"><option value="">Tutti i voti</option><option value="no">Non votati</option><option value="si">Votati</option><option value="alti">4 e 5 stelle</option><option value="bassi">1 e 2 stelle</option></select>
+        <select class="field" id="lVotoF" aria-label="Filtra per voto"><option value="">Tutti i voti</option><option value="no">Non votati</option><option value="si">Votati</option><option value="alti">4 e 5 stelle</option><option value="bassi">1 e 2 stelle</option><option value="cuore">Che ti piacciono</option></select>
         <span class="conteggio" id="lConta"></span>
       </div>
-      <div class="card piatta" data-coda><div class="scroll"><table class="libreria" id="recenti"></table></div></div>
+      <div class="toolbar">
+        <button class="btn" data-suona="libreria"><svg class="ic"><use href="#i-play"/></svg>Riproduci</button>
+        <button class="btn ghost" data-suona="libreria" data-casuale="1"><svg class="ic"><use href="#i-casuale"/></svg>Casuale</button>
+        <button class="btn ghost" id="lSalva">Salva come playlist</button>
+        <span class="muted nota-barra">Per tutti i brani trovati con ricerca e filtri</span>
+      </div>
+      <div class="card piatta" data-coda="libreria" data-nome="Libreria"><div class="scroll"><table class="libreria" id="recenti"></table></div></div>
       <div class="sotto-tabella"><button class="btn small ghost" id="lAltri">Mostra altri 50</button><span class="muted" id="lCar"></span></div>
     </section>
+
+    <!-- PLAYLIST: indice e dettaglio, disegnati da lettore.js -->
+    <section class="tab" id="t-playlist"><div id="plPagina"></div></section>
 
     <!-- VOTI -->
     <section class="tab" id="t-voti">
@@ -148,8 +172,8 @@
           <h2>Voto medio per genere <small id="vNota"></small></h2>
           <div id="vCat"></div>
         </div>
-        <div class="card c6"><h2>Brani più apprezzati</h2><div id="vMiglio" data-coda></div></div>
-        <div class="card c6"><h2>Brani da rivedere</h2><div id="vPeggio" data-coda></div></div>
+        <div class="card c6"><h2>Brani più apprezzati</h2><div id="vMiglio" data-coda data-nome="Brani più apprezzati"></div></div>
+        <div class="card c6"><h2>Brani da rivedere</h2><div id="vPeggio" data-coda data-nome="Brani da rivedere"></div></div>
       </div>
     </section>
 
@@ -264,29 +288,44 @@
 </div>
 
 <div id="player" hidden role="region" aria-label="Lettore">
-  <button class="p-brano" id="pInfo" data-tip="Apre la scheda del brano"><span id="pCop"></span><span class="p-testi"><b id="pTit"></b><small id="pSub"></small></span></button>
+  <div class="p-sinistra">
+    <button type="button" class="p-brano" id="pInfo" data-tip="Apre la scheda del brano"><span id="pCop"></span><span class="p-testi"><b id="pTit"></b><small id="pSub"></small></span></button>
+    <button type="button" id="pCuore" aria-label="Mi piace" data-tip="Mi piace" class="cuore" aria-pressed="false"><svg class="ic"><use href="#i-cuore"/></svg></button>
+    <button type="button" id="pAltro" aria-label="Altre azioni sul brano" data-tip="Altre azioni sul brano"><svg class="ic"><use href="#i-altro"/></svg></button>
+  </div>
   <div class="p-centro">
     <div class="p-tasti">
-      <button id="pPrima" aria-label="Brano precedente"><svg class="ic"><use href="#i-prima"/></svg></button>
-      <button id="pPlay" class="grande" aria-label="Ascolta"><svg class="ic"><use href="#i-play"/></svg></button>
-      <button id="pDopo" aria-label="Brano successivo"><svg class="ic"><use href="#i-dopo"/></svg></button>
+      <button type="button" id="pCasuale" aria-label="Ordine casuale" data-tip="Ordine casuale" class="modo" aria-pressed="false"><svg class="ic"><use href="#i-casuale"/></svg></button>
+      <button type="button" id="pPrima" aria-label="Brano precedente" data-tip="Brano precedente"><svg class="ic"><use href="#i-prima"/></svg></button>
+      <button type="button" id="pPlay" class="grande" aria-label="Ascolta"><svg class="ic"><use href="#i-play"/></svg></button>
+      <button type="button" id="pDopo" aria-label="Brano successivo" data-tip="Brano successivo"><svg class="ic"><use href="#i-dopo"/></svg></button>
+      <button type="button" id="pRipeti" class="modo" aria-label="Ripeti" data-tip="Ripeti" aria-pressed="false"><svg class="ic"><use href="#i-ripeti"/></svg><small aria-hidden="true">1</small></button>
     </div>
-    <div class="p-tempo"><span id="pOra">0:00</span><input type="range" id="pBarra" min="0" max="1000" value="0" aria-label="Posizione nel brano"><span id="pFine">0:00</span></div>
+    <div class="p-tempo"><span id="pOra">0:00</span><input type="range" id="pBarra" min="0" max="1000" value="0" aria-label="Posizione nel brano"><button type="button" id="pFine" data-tip="Clic: durata o tempo che resta">0:00</button></div>
   </div>
   <div class="p-destra">
     <div class="stelle-mini" id="pStelle" role="group" aria-label="Voto del brano in ascolto"></div>
-    <input type="range" id="pVol" min="0" max="100" value="100" aria-label="Volume">
-    <button id="pChiudi" aria-label="Chiudi il lettore"><svg class="ic"><use href="#i-x"/></svg></button>
+    <button type="button" id="pOpzioni" aria-label="Timer di spegnimento, dissolvenza e scorciatoie" data-tip="Timer, dissolvenza e scorciatoie"><svg class="ic"><use href="#i-orologio"/></svg><small id="pResta"></small></button>
+    <button type="button" id="pCodaTasto" aria-label="Coda di ascolto" data-tip="Coda di ascolto" class="modo" aria-pressed="false" aria-controls="pCoda"><svg class="ic"><use href="#i-coda"/></svg></button>
+    <span class="p-volume"><button type="button" id="pMuto" aria-label="Silenzia" data-tip="Silenzia" aria-pressed="false"><svg class="ic"><use href="#i-volume"/></svg></button><input type="range" id="pVol" min="0" max="100" value="100" aria-label="Volume"></span>
+    <button type="button" id="pGrande" aria-label="Ingrandisci il lettore" data-tip="Ingrandisci il lettore" aria-pressed="false"><svg class="ic"><use href="#i-grande"/></svg></button>
+    <button type="button" id="pSchermo" aria-label="Schermo intero" data-tip="Schermo intero"><svg class="ic"><use href="#i-schermo"/></svg></button>
+    <button type="button" id="pChiudi" aria-label="Chiudi il lettore" data-tip="Chiudi il lettore"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
+  <aside id="pCoda" hidden aria-label="Coda di ascolto"></aside>
   <audio id="pAudio" preload="none"></audio>
+  <audio id="pAudio2" preload="none"></audio>
 </div>
 
+<dialog id="finestra" aria-labelledby="fTitolo"></dialog>
 <dialog id="scheda" aria-labelledby="sTitolo"></dialog>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <div class="modal-bg" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTit">
   <div class="modal"><h3 id="mTit"></h3><p id="mTesto"></p>
     <div class="acts"><button class="btn ghost" id="mNo">Annulla</button><button class="btn danger" id="mSi">Conferma</button></div></div>
 </div>
+<script src="/coda.js"></script>
+<script src="/lettore.js"></script>
 <script src="/dashboard.js"></script>
 </body>
 </html>

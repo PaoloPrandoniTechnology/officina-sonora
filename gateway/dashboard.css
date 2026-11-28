@@ -428,30 +428,6 @@ body.suona .toasts { bottom: 100px; }
 .s-azioni { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
 .s-percorso { font: 12px var(--mono); overflow-wrap: anywhere; color: var(--muted); }
 
-/* lettore */
-#player { position: fixed; left: var(--lato); right: 0; bottom: 0; z-index: 40; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: center; height: 82px; padding: 0 20px; background: var(--panel); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(10, 14, 24, .08); }
-#player button { background: none; border: 0; padding: 0; }
-.p-brano { display: flex; align-items: center; gap: 12px; min-width: 0; text-align: left; }
-.p-brano .cop { width: 54px; height: 54px; }
-.p-testi { min-width: 0; }
-.p-testi b, .p-testi small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.p-testi small { color: var(--muted); font-size: 12px; }
-.p-centro { display: grid; justify-items: center; gap: 4px; min-width: 0; }
-.p-tasti { display: flex; gap: 18px; align-items: center; }
-#player .p-tasti button { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; }
-#player .p-tasti button.grande { width: 36px; height: 36px; background: var(--ink); color: var(--panel); }
-#player button:disabled { opacity: .35; cursor: default; }
-.p-tempo { display: flex; gap: 10px; align-items: center; width: 100%; max-width: 520px; font-size: 11.5px; color: var(--faint); }
-.p-tempo input { flex: 1; }
-.p-destra { display: flex; justify-content: flex-end; align-items: center; gap: 14px; }
-#pVol { width: 90px; }
-.stelle-mini { display: flex; }
-.stelle-mini button { font-size: 18px; width: 22px; padding: 0; border: 0; background: none; color: var(--line-2); line-height: 1; }
-.stelle-mini button.on { color: var(--star); }
-#player .stelle-mini button { padding: 0; }
-.stelle-mini:hover button { color: var(--star); }
-.stelle-mini button:hover ~ button { color: var(--line-2); }
-
 /* menu ridotto: solo le icone. Il testo resta per i lettori di schermo; sugli schermi stretti il menu è già in alto */
 @media (min-width: 881px) {
   :root[data-menu="stretto"] { --lato: 60px; }
@@ -473,12 +449,8 @@ body.suona .toasts { bottom: 100px; }
   main { padding: 0 14px 40px; }
   .testata { position: static; }
   body.suona main { padding-bottom: 170px; }
-  #player { left: 0; grid-template-columns: minmax(0, 1fr) auto; height: auto; padding: 8px 12px; gap: 6px 10px; }
-  .p-centro { grid-column: 1 / -1; grid-row: 2; }
-  .p-destra { gap: 8px; }
   .linea-tempo { text-align: left; }
   .linea-tempo b { display: inline; margin-right: 8px; }
-  #pVol { display: none; }
   .tendina { right: auto; left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
