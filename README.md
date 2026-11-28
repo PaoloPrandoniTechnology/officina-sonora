@@ -148,7 +148,7 @@ le librerie condivise (`src\lib.js`, `lib-apprendimento.js`, `lib-messaggi.js`).
 | **5b Titolo** | Chiede ai [servizi di testo](#servizi-di-testo) titolo, descrizione, bpm e durata, entro i limiti del genere; Gli indica le prime parole dei titoli recenti da non ripetere. Se nessun modello risponde, riprova al giro successivo. |
 | **5c Componi concept** | Compone il testo di **stile** in inglese e il campo **lyrics** (la mappa delle sezioni) e mette il brano in coda. |
 | **5d Componi score** | Compone lo score (30 candidati valutati dal revisore, [memoria](#la-memoria-di-composizione) del genere). Nei [generi creativi](#quiete-o-estro) è lo score del brano, con forma, assolo e richiami decisi dal compositore *estro*. Nei generi di quiete è il **ripiego**, usato solo se il modello non ne scrive uno valido. |
-| **6 Invia render** | Toglie gemma dalla GPU, sceglie le **LoRA** presenti sul motore e chiede a YuE2 lo score (strumentali di quiete) oppure direttamente l'audio (generi creativi, voci, ripieghi e [score scelti da te](#da-produrre)). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
+| **6 Invia render** | Toglie gemma dalla GPU, sceglie la [**LoRA**](#lora) (una sola) tra quelle presenti sul motore e chiede a YuE2 lo score (strumentali di quiete) oppure direttamente l'audio (generi creativi, voci, ripieghi e [score scelti da te](#da-produrre)). Se il motore rifiuta la stessa richiesta 5 volte, il brano viene abbandonato. |
 
 ### Audio e pubblicazione
 
@@ -360,9 +360,17 @@ sua voce dal file.
 Un brano scartato perché troppo corto viene rigenerato con uno **score nuovo** del compositore.
 
 ### LoRA
-Gli strumentali usano `yue2-instrumental-kto`. L'altra LoRA strumentale installata (`yue2-instrumental`) è
-esclusa: in produzione il motore chiudeva i brani dopo 30 secondi.
-I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una propria (campo `lora` del catalogo):
+Ogni brano usa **una sola LoRA**: due sovrapposte peggiorano il suono. Quale si sceglie in
+[Score → Come nascono](#come-nascono), voce *LoRA del render*, per tutti i generi o per uno solo:
+
+| Scelta | Cosa usa il render |
+|---|---|
+| **Solo la strumentale** (predefinita) | `yue2-instrumental-kto`, che tiene il brano senza voci |
+| **Solo quella del genere** | la LoRA del genere **al posto** della strumentale; dove il genere non ne ha, la strumentale. Più carattere, ma possono comparire voci |
+| **Nessuna** | il motore senza LoRA |
+
+L'altra LoRA strumentale installata (`yue2-instrumental`) è esclusa: in produzione il motore chiudeva i brani dopo
+30 secondi. I generi con voci non usano LoRA strumentali. LoRA di genere disponibili (campo `lora` del catalogo):
 
 | Generi | LoRA di genere |
 |---|---|
@@ -377,10 +385,9 @@ I generi vocali non usano LoRA strumentali. Alcuni generi ne aggiungono una prop
 
 Lo score si chiede senza LoRA: agiscono solo sul render.
 
-Se un render fallisce (per esempio perché le LoRA sovrapposte producono uno score illeggibile), il secondo
-tentativo parte senza la LoRA di genere e con lo score scritto dal motore (nei generi creativi resta ancora il nostro),
-e il terzo con lo score di sola melodia.
-Anche il secondo ritento di un brano troppo corto parte senza LoRA di genere.
+Se un render fallisce, il secondo tentativo usa la strumentale con lo score scritto dal motore (nei generi
+creativi resta ancora il nostro) e il terzo lo score di sola melodia. Anche il secondo ritento di un brano troppo
+corto torna alla strumentale.
 
 Una LoRA assente dal motore viene saltata e annotata nel log. Le scale scelte sono un punto di partenza,
 da correggere con l'ascolto.
@@ -829,6 +836,7 @@ modifiche nello [Storico](#storico) e si applicano ai brani successivi.
 
 | Impostazione | Predefinito | Effetto |
 |---|---|---|
+| LoRA del render | solo la strumentale | una sola per brano: vedi [LoRA](#lora) |
 | Chi scrive lo score | automatico | compositore per i generi creativi; modello (poi compositore) per quelli di quiete. Si può forzare modello, compositore o motore |
 | Estro | automatico dal genere | quiete, vivo o pieno: vedi [Quiete o estro](#quiete-o-estro) |
 | Tentativi del modello | 3 | ognuno costa circa 2 minuti |
@@ -1200,7 +1208,7 @@ In ordine di priorità. Il disegno completo è in
 | 0 bis | **Materiale da musica vera**: frasi e giri ricavati da raccolte con licenza (Weimar Jazz Database, McGill Billboard) | il salto successivo sul fraseggio; richiede di scaricarle e verificarne le licenze |
 | 1 | **Selezione sull'audio**: 2-3 versioni per brano e pubblicazione della migliore, giudicata da un modello (per esempio Meta Audiobox Aesthetics o SongEval) | richiede di scaricare pacchetto e pesi, e di verificarli sugli strumentali |
 | 2 | **Ascoltare e votare** i brani del nuovo percorso, poi correggere i descrittori `en` e le soglie dello score | la qualità musicale non è verificabile dai test |
-| 3 | **Rivalutare le LoRA** (KTO, strumentale cot-full, slider di genere) sul backbone attuale | le scale attuali non sono validate a orecchio |
+| 3 | **Confrontare a orecchio** le tre scelte di LoRA (strumentale, genere, nessuna) e le scale degli slider | le scale non sono validate a orecchio |
 | 4 | **Score**: pentagramma oltre al piano roll, e confronto fra due versioni | il piano roll non è una partitura |
 | 5 | **Lettore**: equalizzatore, playlist inviate a iBroadcast, cronologia comune a più browser | oggi restano su questo PC e nel browser |
 | 6 | **Rotazione**: verificare dopo la prima eliminazione che la quota di iBroadcast scenda davvero | l'API di svuotamento non è documentata e i file potrebbero restare in *Unavailable Files* |

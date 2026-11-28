@@ -15,9 +15,9 @@ const L = new Function('require', LIB + '\nreturn { CFG, extractAbc, componiStil
 const TAG = ['[intro]', '[verse]', '[pre-chorus]', '[chorus]', '[bridge]', '[outro]'];
 
 // Esegue il blocco 6 con un motore finto; ritorna il corpo inviato a /synth e lo stato
-async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0, pianoFallito = true } = {}) {
+async function invia(categoria, { props, vocale = false, attempts = 0, abc, corti = 0, pianoFallito = true, lora } = {}) {
   const finta = `
-    confScore = () => ({}); archivioScore = () => ({});
+    confScore = () => (${JSON.stringify(lora ? { generale: { lora } } : {})}); archivioScore = () => ({});
     CFG.comandi = {}; log = () => {}; engineUp = async () => true; saveState = () => {}; gw = async () => ({});
     req = async (m, url, o) => {
       if (url.endsWith('/props')) { if (!$env.props) throw new Error('no'); return { ok: true, status: 200, buf: Buffer.from(JSON.stringify($env.props)) }; }
@@ -40,15 +40,27 @@ test('strutture: solo i sei tag riconosciuti, forme di almeno cinque sezioni', (
   for (const c of L.CFG.categories) for (const s of c.strutture) assert.ok(L.CFG.strutture[s], `${c.name}: ${s}`);
 });
 
-test('strumentale: score con accordi, LoRA strumentale e LoRA del genere', async () => {
-  const { corpo, job } = await invia('Score-cinematico', { props: elenco('yue2-instrumental', 'yue2-instrumental-kto', 'yue2-epic-trailer') });
+const KTO = { name: 'yue2-instrumental-kto', scale: 1, ar_scale: 1, nar_scale: 0 };
+const EPICA = { name: 'yue2-epic-trailer', scale: 1, ar_scale: 0.5, nar_scale: 0.375 };
+const TUTTE = () => elenco('yue2-instrumental', 'yue2-instrumental-kto', 'yue2-epic-trailer');
+
+test('una sola LoRA per brano: di serie la strumentale; a scelta quella del genere al suo posto, o nessuna', async () => {
+  const { corpo, job } = await invia('Score-cinematico', { props: TUTTE() });
   assert.equal(corpo.cot, 'full');
-  assert.deepEqual(corpo.adapters, [
-    { name: 'yue2-instrumental-kto', scale: 1, ar_scale: 1, nar_scale: 0 },
-    { name: 'yue2-epic-trailer', scale: 1, ar_scale: 0.5, nar_scale: 0.375 },
-  ]);
+  assert.deepEqual(corpo.adapters, [KTO]);
   assert.deepEqual(job.adapters, corpo.adapters);
   assert.ok(corpo.semantic_sampling.max_tokens <= 9000 && corpo.duration <= 360);
+  assert.deepEqual((await invia('Score-cinematico', { props: TUTTE(), lora: 'genere' })).corpo.adapters, [EPICA]);
+  assert.equal((await invia('Score-cinematico', { props: TUTTE(), lora: 'nessuna' })).corpo.adapters, undefined);
+  // un genere senza LoRA propria resta con la strumentale
+  assert.deepEqual((await invia('Surf-rock-strumentale', { props: TUTTE(), lora: 'genere' })).corpo.adapters, [KTO]);
+  // in nessun genere e con nessuna scelta ne partono due
+  for (const c of L.CFG.categories) {
+    for (const lora of ['strumentale', 'genere', 'nessuna']) {
+      const r = await invia(c.name, { props: elenco('yue2-instrumental-kto', ...(c.lora || []).map((x) => x.name)), lora, vocale: !!c.vocale_senza_parole, abc: 'X:1' });
+      assert.ok((r.job.adapters || []).length <= 1, `${c.name} ${lora}`);
+    }
+  }
 });
 
 test('genere vocale senza parole: nessuna LoRA strumentale', async () => {
@@ -57,8 +69,8 @@ test('genere vocale senza parole: nessuna LoRA strumentale', async () => {
 });
 
 // Visto in produzione: con yue2-instrumental il motore chiudeva i brani a 30 secondi
-test('LoRA assente: il brano parte senza; yue2-instrumental non viene usata', async () => {
-  const { corpo } = await invia('Score-cinematico', { props: elenco('yue2-instrumental', 'yue2-instrumental-kto') });
+test('LoRA del genere assente: si usa la strumentale; yue2-instrumental mai', async () => {
+  const { corpo } = await invia('Score-cinematico', { props: elenco('yue2-instrumental', 'yue2-instrumental-kto'), lora: 'genere' });
   assert.deepEqual(corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
 });
 
@@ -80,15 +92,15 @@ test('stile: nessuna frase ripetuta', () => {
   assert.equal(s.match(/double bass drums/g).length, 1, s);
 });
 
-// Visto in produzione: LoRA sovrapposte possono scrivere uno score che il motore non riesce a cantare
-test('dopo un render fallito si riducono le LoRA, poi si torna alla configurazione sicura', async () => {
-  const props = elenco('yue2-instrumental', 'yue2-instrumental-kto', 'yue2-epic-trailer');
-  const secondo = await invia('Score-cinematico', { props, attempts: 1 });
-  assert.equal(secondo.corpo.cot, 'full');
-  assert.deepEqual(secondo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
-  const terzo = await invia('Score-cinematico', { props, attempts: 2 });
-  assert.equal(terzo.corpo.cot, 'melody');
-  assert.deepEqual(terzo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
+test('dopo un render fallito si torna alla strumentale, anche se la scelta era un altra', async () => {
+  for (const lora of ['strumentale', 'genere', 'nessuna']) {
+    const secondo = await invia('Score-cinematico', { props: TUTTE(), attempts: 1, lora });
+    assert.equal(secondo.corpo.cot, 'full');
+    assert.deepEqual(secondo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto'], lora);
+    const terzo = await invia('Score-cinematico', { props: TUTTE(), attempts: 2, lora });
+    assert.equal(terzo.corpo.cot, 'melody');
+    assert.deepEqual(terzo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto'], lora);
+  }
 });
 
 // Esegue il blocco 5d cosi' come finisce nel workflow generato
@@ -155,10 +167,10 @@ test('blocco 6: prima il solo score; col ripiego il nostro; dopo un fallimento l
   assert.ok(secondo.corpo.abc_sampling.max_tokens > 0);
 });
 
-test('secondo ritento di un brano corto: senza LoRA di genere', async () => {
+test('secondo ritento di un brano corto: la LoRA di genere lascia il posto alla strumentale', async () => {
   const props = elenco('yue2-instrumental-kto', 'yue2-epic-trailer');
-  const primo = await invia('Score-cinematico', { props, corti: 1 });
-  assert.equal(primo.corpo.adapters.length, 2);
-  const secondo = await invia('Score-cinematico', { props, corti: 2 });
+  const primo = await invia('Score-cinematico', { props, corti: 1, lora: 'genere' });
+  assert.deepEqual(primo.corpo.adapters.map((a) => a.name), ['yue2-epic-trailer']);
+  const secondo = await invia('Score-cinematico', { props, corti: 2, lora: 'genere' });
   assert.deepEqual(secondo.corpo.adapters.map((a) => a.name), ['yue2-instrumental-kto']);
 });

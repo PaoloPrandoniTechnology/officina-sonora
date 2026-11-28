@@ -89,6 +89,7 @@ test('numerazione: il progressivo cresce e non si ripete', () => {
 
 test('rotazione: i generi senza brani vengono scelti', () => {
   L.CFG.generiOverride = {}; // pesi e generi sospesi della produzione non contano
+  L.CFG.comandi = {}; // né un genere richiesto dalla dashboard
   const guidance = L.readGuidance();
   const nomi = L.CFG.categories.map((c) => c.name);
   const senza = nomi.slice(0, 3);

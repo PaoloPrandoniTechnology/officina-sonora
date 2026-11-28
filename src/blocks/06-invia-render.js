@@ -21,7 +21,8 @@ if (scelto) {
 const manuale = Boolean(concept.scoreManuale);
 const imp = ScoreAbc.risolvi(ScoreAbc.impostazioni(confScore(), concept.categoria), (CFG.categories || []).find((x) => x.name === concept.categoria));
 const seed = nuovoSeed();
-// LoRA: la strumentale KTO piu' quella del genere, solo se il motore le ha davvero.
+// LoRA: UNA sola per brano (due sovrapposte peggiorano il suono). Quale, lo dice l'impostazione 'lora':
+// la strumentale KTO (predefinita), quella del genere al suo posto, o nessuna. Solo se il motore la ha davvero.
 // Non si usa yue2-instrumental: in produzione il motore chiudeva i brani a 30 secondi.
 // Senza elenco da /props si usa la sola KTO, per non farsi rifiutare il render.
 let presenti = [];
@@ -35,14 +36,13 @@ try {
   log(`elenco LoRA non disponibile: ${e.message}`);
 }
 const piena = (name) => ({ name, scale: 1.0, ar_scale: 1.0, nar_scale: 0.0 });
-const delGenere = ((CFG.categories || []).find((x) => x.name === concept.categoria) || {}).lora || [];
-const mancanti = delGenere.filter((a) => !presenti.includes(a.name));
-if (presenti.length && mancanti.length) log(`LoRA assente sul motore, brano senza: ${mancanti.map((a) => a.name).join(', ')}`);
-// Ripiego: dopo un render fallito, o al secondo ritento di un brano corto, si toglie la LoRA di genere
-// (LoRA sovrapposte possono rovinare lo score); al terzo fallimento lo score e' di sola melodia.
-const sicuro = (concept.attempts || 0) >= 2;
-const adapters = concept.vocale ? [] : [piena('yue2-instrumental-kto')];
-if (!concept.attempts && (concept.tentativi_render || 0) < 2) adapters.push(...delGenere.filter((a) => presenti.includes(a.name)));
+const delGenere = (((CFG.categories || []).find((x) => x.name === concept.categoria) || {}).lora || [])[0];
+// dopo un render fallito, o al secondo ritento di un brano corto, si torna alla strumentale
+const vuoleGenere = imp.lora === 'genere' && delGenere && !concept.attempts && (concept.tentativi_render || 0) < 2;
+if (vuoleGenere && presenti.length && !presenti.includes(delGenere.name)) log(`LoRA assente sul motore, uso la strumentale: ${delGenere.name}`);
+let adapters = [];
+if (vuoleGenere && presenti.includes(delGenere.name)) adapters = [delGenere];
+else if (!concept.vocale && (imp.lora !== 'nessuna' || concept.attempts)) adapters = [piena('yue2-instrumental-kto')];
 
 // gemma esce dalla GPU prima del render: su 6 GB i due modelli insieme rallentano il caricamento
 try { await gw('/llm/scarica'); } catch (e) { log(`gemma non scaricato: ${e.message}`); }
