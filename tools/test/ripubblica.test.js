@@ -22,13 +22,14 @@ test('prossimoPasso: un id nuovo non valido o uguale al vecchio non porta mai a 
   for (const nuovo of ['ok', '1']) assert.throws(() => prossimoPasso({ ...pronto, nuovo }), /id/);
 });
 
-test('daRipubblicare: vecchi, provvisori e cambi a meta, in ordine di numero', () => {
+test('daRipubblicare: vecchi, provvisori, copertine nuove e cambi a meta, in ordine di numero', () => {
   const b = (n, meta) => ({ jsonPath: `${n}.json`, meta: { numero_traccia: n, ibroadcast: { track_id: String(n) }, ...meta } });
   const aggiornato = { id3_versione: 2, copertina: 'ai' };
   const brani = [b(5, {}), b(2, { id3_versione: 2, copertina: 'provvisoria' }), b(3, aggiornato), b(4, aggiornato), b(1, aggiornato),
+    b(6, { ...aggiornato, copertina_online: false }), b(7, { ...aggiornato, copertina_online: true }),
     { jsonPath: '9.json', meta: { numero_traccia: 9 } }];
   const mappa = { '4.json': { ...base, cestinato: false }, '1.json': { ...base, cestinato: true } };
-  assert.deepEqual(daRipubblicare(brani, mappa).map((x) => x.meta.numero_traccia), [2, 4, 5]);
+  assert.deepEqual(daRipubblicare(brani, mappa).map((x) => x.meta.numero_traccia), [2, 4, 5, 6]);
 });
 
 test('segnali: stelle, playlist e tag dell utente; ignorati quelli di sistema e i nostri', () => {

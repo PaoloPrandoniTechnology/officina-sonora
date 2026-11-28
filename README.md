@@ -928,10 +928,13 @@ sua; finché manca si usa uno degli 8 sfondi del genere, che quindi si ripetono.
    `copertina_propria` dalla scheda del brano e cancella `assets\copertine\<numero>.jpg` e la sua voce nel registro.
 4. Gli sfondi di genere (compresi quelli di un genere nuovo, creati nello stesso lotto) sono in
    `assets\sfondi\<categoria>` (`_foglio.jpg` li mostra tutti); il loro prompt è nel campo `copertina` del catalogo.
-5. **Su iBroadcast la copertina di un brano già online non cambia da sola.** Per aggiornare i brani online con
-   copertina provvisoria: prima `node tools\ripubblica.js --prova <a.json> <b.json> <c.json>`
-   (almeno uno con le stelle), controlla nell'app, poi `node tools\ripubblica.js --tutti`. La vecchia copia si
-   cestina solo dopo che la nuova ha tag, playlist e voti; il conteggio degli ascolti riparte da zero.
+5. **Su iBroadcast la copertina di un brano già online non cambia da sola**: l'API non permette di sostituire
+   l'immagine, quindi il brano va ricaricato. Dopo i lotti, prima
+   `node tools\ripubblica.js --prova <a.json> <b.json> <c.json>` (almeno uno con le stelle), controlla
+   nell'app, poi `node tools\ripubblica.js --tutti`. Vengono ricaricati i brani con copertina nuova (e quelli
+   con copertina provvisoria o tag vecchi: conviene completare prima i lotti, per non ricaricarli due volte).
+   La vecchia copia si cestina solo dopo che la nuova ha tag, playlist e voti; il conteggio degli ascolti
+   riparte da zero.
 
 ---
 
@@ -1082,4 +1085,4 @@ In ordine di priorità. Il disegno completo è in
 | 7 | **Agente di ricerca locale**, con approvazione in dashboard | miglioramento artistico continuo |
 | 8 | **Servizi di testo dalla dashboard**: accendere, spegnere e ordinare (le chiavi si inseriscono già); aggiungere Cloudflare Workers AI | oggi si modifica `config\servizi.json` |
 | 9 | **Prova di un motore musicale in rete** (ACE-Step su Hugging Face, pochi brani al giorno) | valutata e non attivata: vedi [analisi](docs/superpowers/specs/2026-11-28-motori-cloud-design.md) |
-| 10 | **Copertine online**: portare su iBroadcast, a richiesta, le immagini proprie dei brani già caricati; confrontare le scene per significato | oggi `ripubblica.js` considera solo copertine provvisorie e tag vecchi, e il confronto è sulle parole |
+| 10 | **Copertine**: confrontare le scene per significato; avviare la ripubblicazione dalla dashboard | oggi il confronto è sulle parole e `ripubblica.js` si lancia a mano |

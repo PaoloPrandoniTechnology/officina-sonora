@@ -1,4 +1,5 @@
-// Ripubblica su iBroadcast i brani gia' online con i nuovi tag e la copertina AI.
+// Ripubblica su iBroadcast i brani gia' online con tag vecchi, copertina provvisoria o copertina nuova
+// (iBroadcast non permette di cambiare l'immagine di un brano: serve ricaricarlo).
 // Uso: node tools/ripubblica.js --prova a.json b.json c.json   |   node tools/ripubblica.js --tutti
 // Per ogni brano: carica la copia nuova, attende tag e playlist, trasferisce stelle, playlist e tag
 // dell'utente e solo alla fine cestina la vecchia. La mappa in state/ripubblica.json rende tutto riprendibile.
@@ -23,7 +24,7 @@ function daRipubblicare(brani, mappa) {
     if (!meta.ibroadcast || !meta.ibroadcast.track_id) return false;
     const r = mappa[jsonPath];
     if (r && !r.cestinato) return true;
-    return (meta.id3_versione || 0) < 2 || meta.copertina === 'provvisoria';
+    return (meta.id3_versione || 0) < 2 || meta.copertina === 'provvisoria' || meta.copertina_online === false;
   }).sort((a, b) => (a.meta.numero_traccia || 0) - (b.meta.numero_traccia || 0));
 }
 
@@ -169,7 +170,7 @@ async function main() {
     const c = esito.caricati[0];
     if (!c || !/^\d+$/.test(c.trackId) || c.trackId === r.vecchio) throw new Error(`${meta.titolo}: caricamento non riuscito (${c ? c.trackId : 'nessun id'})`);
     // solo questi campi: un voto dato durante il caricamento resta
-    m.aggiornaScheda(b.jsonPath, { id3_frames: c.nTags, ibroadcast_precedente: meta.ibroadcast,
+    m.aggiornaScheda(b.jsonPath, { id3_frames: c.nTags, ibroadcast_precedente: meta.ibroadcast, copertina_online: true,
       ibroadcast: { track_id: c.trackId, caricato_il: new Date().toISOString(), organizzato: false } });
     r.nuovo = c.trackId;
     salva();

@@ -98,5 +98,5 @@ Dashboard, Controllo, Produzione: "Metti in pausa e genera un lotto". Un'immagin
 Si ferma con "Ferma la generazione" e il lotto successivo riprende dai brani rimasti.
 
 ## Aggiornare i brani gia' online
-Con gli sfondi completi: `node tools\ripubblica.js --prova a.json b.json c.json` (almeno un brano con le stelle),
+Per portare online le copertine nuove (dopo i lotti): `node tools\ripubblica.js --prova a.json b.json c.json` (almeno un brano con le stelle),
 controllo nell'app, poi `node tools\ripubblica.js --tutti`. Mappa e ripresa in `state\ripubblica.json`.

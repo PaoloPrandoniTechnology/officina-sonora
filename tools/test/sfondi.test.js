@@ -95,8 +95,13 @@ test('applica: scrive la copertina nell MP3 solo dei brani finiti e annota la sc
   assert.equal(await applica({ file: scheda, meta: { ...meta, ibroadcast: {}, id3_frames: 1 } }, d, componiFn), true);
   assert.equal(leggi(scheda).voto, 4, 'il voto arrivato nel frattempo resta');
   assert.ok(leggi(scheda).copertina_propria);
+  assert.equal(leggi(scheda).copertina_online, false, 'da portare su iBroadcast');
   const dopo = fs.readFileSync(mp3);
   assert.ok(dopo.includes(Buffer.from('TIT2')) && dopo.includes(Buffer.from('APIC')));
   assert.deepEqual(dopo.subarray(-audio.length), audio);
   assert.deepEqual(require(path.join(__dirname, '..', '..', 'gateway', 'id3.js')).copertinaDi(mp3).dati, Buffer.from([0xff, 0xd8, 9]));
+  // stessa immagine già nel file: online non cambia nulla
+  fs.writeFileSync(scheda, JSON.stringify(meta));
+  assert.equal(await applica({ file: scheda, meta: { ...meta, ibroadcast: {}, id3_frames: 1 } }, d, componiFn), true);
+  assert.equal(leggi(scheda).copertina_online, undefined);
 });

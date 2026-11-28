@@ -9,7 +9,7 @@ const path = require('path');
 const http = require('http');
 const { spawn, execFileSync } = require('child_process');
 const { stileCopertina, componi } = require('../gateway/copertina');
-const { sostituisciCopertina } = require('../gateway/id3');
+const { copertinaDi, sostituisciCopertina } = require('../gateway/id3');
 const { daFare } = require('../gateway/sfondi');
 
 const DIR = path.join(__dirname, '..');
@@ -180,10 +180,16 @@ async function applica(lavoro, cartella = COPERTINE, componiFn = componi) {
   const m = lavoro.meta;
   if (!lavoro.file || !m.ibroadcast || !m.id3_frames) return false;
   const r = await componiFn({ categoria: m.categoria, titolo: m.titolo, numero: m.numero_traccia }, SFONDI, cartella);
-  if (!r || !sostituisciCopertina(lavoro.file.replace(/json$/, 'mp3'), r.jpeg)) return false;
+  if (!r) return false;
+  const mp3 = lavoro.file.replace(/json$/, 'mp3');
+  const attuale = copertinaDi(mp3);
+  // se l'MP3 ha già questa immagine (messa dal blocco 3d1 prima del caricamento), online è la stessa
+  const cambiata = !attuale || !attuale.dati.equals(r.jpeg);
+  if (cambiata && !sostituisciCopertina(mp3, r.jpeg)) return false;
   // rilettura subito prima di scrivere: nel frattempo può essere arrivato un voto
   const scheda = JSON.parse(fs.readFileSync(lavoro.file, 'utf8'));
-  scriviAtomico(lavoro.file, JSON.stringify({ ...scheda, copertina_propria: new Date().toISOString() }, null, 2), '.cop.tmp');
+  scriviAtomico(lavoro.file, JSON.stringify({ ...scheda, copertina_propria: new Date().toISOString(),
+    ...(cambiata && { copertina_online: false }) }, null, 2), '.cop.tmp'); // false = tools/ripubblica.js la deve portare su iBroadcast
   return true;
 }
 
