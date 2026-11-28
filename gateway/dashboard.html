@@ -1191,6 +1191,8 @@
       <div class="grid">
         <div class="card c6"><h2>Da aggiungere allo stile <small>${n0(g.style_extra.length)} voci</small></h2>${chipList('style_extra', g.style_extra, '')}</div>
         <div class="card c6"><h2>Da evitare nello stile <small>${n0(g.style_avoid.length)} voci</small></h2>${chipList('style_avoid', g.style_avoid, 'avoid')}</div>
+        <div class="card c12"><h2>Stile per genere <small>scritto dalla revisione periodica</small></h2>
+          ${Object.entries(g.stile_generi || {}).filter(([, p]) => p.length).map(([nome, p]) => `<div class="srv"><span style="font-size:13px">${esc(nome)}</span><div class="chips">${p.map((v) => `<span class="chipx">${esc(v)}</span>`).join('')}</div></div>`).join('') || '<div class="empty">Nessuna parola per genere: arriveranno con le prossime revisioni.</div>'}</div>
         <div class="card c6"><h2>Note per il sistema <small>lette dalla revisione periodica</small></h2>
           ${g.note.map((n, i) => `<div class="srv"><span style="font-size:13px">${esc(n)}</span><button class="btn small ghost" data-rm="note" data-i="${i}">Rimuovi</button></div>`).join('') || '<div class="empty">Nessuna nota.</div>'}
           <div class="addrow" style="margin-top:10px"><input class="field" id="in-note" placeholder="Scrivi una nota, per esempio: più pause tra le sezioni" maxlength="300"><button class="btn small" data-add="note">Aggiungi</button></div></div>

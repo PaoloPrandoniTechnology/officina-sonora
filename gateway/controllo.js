@@ -91,7 +91,8 @@ function lettura() {
       aggiornato: guida.aggiornato || null,
       style_extra: guida.style_extra || [],
       style_avoid: guida.style_avoid || [],
-      note: guida.note || [],
+      note: [].concat(guida.note || []), // la revisione la scrive come testo, la pagina vuole un elenco
+      stile_generi: guida.stile_generi || {},
       bpm_range: guida.bpm_range || {},
     },
     storico: righe.slice(-80).map((r) => JSON.parse(r)).reverse(),

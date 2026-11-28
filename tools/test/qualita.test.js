@@ -187,3 +187,11 @@ test('parole di stile: quelle della revisione valgono solo per il loro genere', 
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('titoli: al modello si dice con quali parole non iniziare', async () => {
+  const finta = `let preso; llmJson = async (s, u) => { preso = u; return { titolo: 't' }; };`;
+  const recent = [{ titolo: 'Eco di Forza' }, { titolo: "Riflessi d'Estate" }, { titolo: 'Il Groove' }, { titolo: 'Eco del Movimento' }];
+  const input = { first: () => ({ json: { state: { recent }, cat: { name: 'x', bpm: [60, 80] }, dmin: 120, dmax: 180 } }) };
+  const esegui = new AF('require', '$input', LIB + finta + '\nawait (async () => {' + leggi('src', 'blocks', '05b-titolo-modello.js') + '})(); return preso;');
+  assert.match(await esegui(require, input), /Non iniziare il titolo con: Eco, Riflessi\./);
+});

@@ -40,3 +40,9 @@ test('controllo: le note per genere vengono validate', async () => {
   assert.equal((await controllo.gestisci('/api/controllo/nota', { nome: 'Meditazione', testo: 'ab' })).codice, 400);
   assert.equal((await controllo.gestisci('/api/controllo/nota', { nome: 'Meditazione', testo: '<b>x</b>' })).codice, 400);
 });
+
+test('controllo: le linee guida arrivano alla pagina con le note in elenco e le parole per genere', () => {
+  const g = controllo.lettura().guida;
+  assert.ok(Array.isArray(g.note), 'la pagina scorre le note come elenco, anche se il file le ha come testo');
+  assert.equal(typeof g.stile_generi, 'object');
+});
